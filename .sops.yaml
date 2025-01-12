@@ -1,0 +1,12 @@
+keys:
+  - &primary age1702z4ggxea0prheaxe5v407k09j3hm895cyeskqedk7kn60903xsmmtcw3
+creation_rules:
+  - path_regex: .*.yaml
+    encrypted_regex: ^(data|stringData)$
+    key_groups:
+      - age:
+        - *primary
+  - path_regex: cluster.token
+    key_groups:
+      - age:
+        - *primary
