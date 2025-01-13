@@ -14,5 +14,3 @@ spec:
         name: metallb
         namespace: metallb-system
       interval: 10m
-  values:
-    replicaCount: 2
