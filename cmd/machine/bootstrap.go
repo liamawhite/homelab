@@ -1,4 +1,4 @@
-package cmd
+package machine
 
 import (
 	"github.com/spf13/cobra"
@@ -9,5 +9,5 @@ var bootstrapCmd = &cobra.Command{
 }
 
 func init() {
-	machineCmd.AddCommand(bootstrapCmd)
+	MachineCmd.AddCommand(bootstrapCmd)
 }

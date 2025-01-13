@@ -1,14 +1,10 @@
-package cmd
+package machine
 
 import (
 	"github.com/spf13/cobra"
 )
 
-var machineCmd = &cobra.Command{
+var MachineCmd = &cobra.Command{
 	Use:   "machine",
 	Short: "manage machines in my homelab",
-}
-
-func init() {
-	rootCmd.AddCommand(machineCmd)
 }

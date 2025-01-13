@@ -1,4 +1,4 @@
-package cmd
+package kubernetes
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// kubeconfigCmd represents the kubeconfig command
-var kubeconfigCmd = &cobra.Command{
-	Use:  "kubeconfig <username>@<address>",
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:  "init <username>@<address>",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := remote.NewClient(args[0])
@@ -20,7 +20,7 @@ var kubeconfigCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer client.Close()
-		if err := kubernetes.RetrieveKubeConfig(client); err != nil {
+		if err := kubernetes.Init(client); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -28,5 +28,5 @@ var kubeconfigCmd = &cobra.Command{
 }
 
 func init() {
-	kubernetesCmd.AddCommand(kubeconfigCmd)
+	KubernetesCmd.AddCommand(initCmd)
 }

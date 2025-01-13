@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/liamawhite/homelab/cmd/kubernetes"
+	"github.com/liamawhite/homelab/cmd/machine"
 	"github.com/spf13/cobra"
 )
 
@@ -21,4 +23,6 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(machine.MachineCmd)
+	rootCmd.AddCommand(kubernetes.KubernetesCmd)
 }
