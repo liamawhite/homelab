@@ -1,17 +1,16 @@
-package cmd
+package machine
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/liamawhite/homelab/pkg/kubernetes"
+	"github.com/liamawhite/homelab/pkg/pi5"
 	"github.com/liamawhite/homelab/pkg/remote"
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:  "init <username>@<address>",
+var pi5Cmd = &cobra.Command{
+	Use:  "pi5 <username>@<address>",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := remote.NewClient(args[0])
@@ -20,7 +19,7 @@ var initCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer client.Close()
-		if err := kubernetes.Init(client); err != nil {
+		if err := pi5.Bootstrap(client); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -28,5 +27,5 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
-	kubernetesCmd.AddCommand(initCmd)
+	bootstrapCmd.AddCommand(pi5Cmd)
 }
