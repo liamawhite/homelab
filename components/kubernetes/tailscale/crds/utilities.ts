@@ -40,7 +40,7 @@ export function getEnvNumber(...vars: string[]): number | undefined {
     return undefined
 }
 
-export const getVersion: () => string = () => '4.5.5'
+export const getVersion: () => string = () => '4.18.0'
 
 function unusedGetVersion(): string {
     let version = require('./package.json').version

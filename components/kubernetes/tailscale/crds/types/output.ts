@@ -5,41 +5,360 @@ import * as pulumi from '@pulumi/pulumi'
 import * as inputs from '../types/input'
 import * as outputs from '../types/output'
 
-import * as utilities from '../utilities'
+export namespace meta {
+    export namespace v1 {
+        /**
+         * ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
+         */
+        export interface ListMeta {
+            /**
+             * continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message.
+             */
+            continue: string
+            /**
+             * remainingItemCount is the number of subsequent items in the list which are not included in this list response. If the list request contained label or field selectors, then the number of remaining items is unknown and the field will be left unset and omitted during serialization. If the list is complete (either because it is not chunking or because this is the last chunk), then there are no more remaining items and this field will be left unset and omitted during serialization. Servers older than v1.15 do not set this field. The intended use of the remainingItemCount is *estimating* the size of a collection. Clients should not rely on the remainingItemCount to be set or to be exact.
+             */
+            remainingItemCount: number
+            /**
+             * String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion: string
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink: string
+        }
 
-import { ObjectMeta } from '../meta/v1'
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntry {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion: string
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType: string
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1: any
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager: string
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation: string
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource: string
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time: string
+        }
+
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntryPatch {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion: string
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType: string
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1: any
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager: string
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation: string
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource: string
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time: string
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMeta {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations: { [key: string]: string }
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp: string
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds: number
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp: string
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers: string[]
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName: string
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation: number
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels: { [key: string]: string }
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields: outputs.meta.v1.ManagedFieldsEntry[]
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: string
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace: string
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences: outputs.meta.v1.OwnerReference[]
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion: string
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink: string
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: string
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMetaPatch {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations: { [key: string]: string }
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp: string
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds: number
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp: string
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers: string[]
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName: string
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation: number
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels: { [key: string]: string }
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields: outputs.meta.v1.ManagedFieldsEntryPatch[]
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: string
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace: string
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences: outputs.meta.v1.OwnerReferencePatch[]
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion: string
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink: string
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: string
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReference {
+            /**
+             * API version of the referent.
+             */
+            apiVersion: string
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion: boolean
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller: boolean
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: string
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: string
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: string
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReferencePatch {
+            /**
+             * API version of the referent.
+             */
+            apiVersion: string
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion: boolean
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller: boolean
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: string
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: string
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: string
+        }
+    }
+}
 
 export namespace tailscale {
     export namespace v1alpha1 {
+        /**
+         * Connector defines a Tailscale node that will be deployed in the cluster. The
+         * node can be configured to act as a Tailscale subnet router and/or a Tailscale
+         * exit node.
+         * Connector is a cluster-scoped resource.
+         * More info:
+         * https://tailscale.com/kb/1441/kubernetes-operator-connector
+         */
+        export interface Connector {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion: 'tailscale.com/v1alpha1'
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: 'Connector'
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata: outputs.meta.v1.ObjectMeta
+            spec: outputs.tailscale.v1alpha1.ConnectorSpec
+            status: outputs.tailscale.v1alpha1.ConnectorStatus
+        }
+
         /**
          * ConnectorSpec describes the desired Tailscale component.
          * More info:
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
         export interface ConnectorSpec {
-            /**
-             * AppConnector defines whether the Connector device should act as a Tailscale app connector. A Connector that is
-             * configured as an app connector cannot be a subnet router or an exit node. If this field is unset, the
-             * Connector does not act as an app connector.
-             * Note that you will need to manually configure the permissions and the domains for the app connector via the
-             * Admin panel.
-             * Note also that the main tested and supported use case of this config option is to deploy an app connector on
-             * Kubernetes to access SaaS applications available on the public internet. Using the app connector to expose
-             * cluster workloads or other internal workloads to tailnet might work, but this is not a use case that we have
-             * tested or optimised for.
-             * If you are using the app connector to access SaaS applications because you need a predictable egress IP that
-             * can be whitelisted, it is also your responsibility to ensure that cluster traffic from the connector flows
-             * via that predictable IP, for example by enforcing that cluster egress traffic is routed via an egress NAT
-             * device with a static IP address.
-             * https://tailscale.com/kb/1281/app-connectors
-             */
-            appConnector?: outputs.tailscale.v1alpha1.ConnectorSpecAppConnector
+            appConnector: outputs.tailscale.v1alpha1.ConnectorSpecAppConnector
             /**
              * ExitNode defines whether the Connector device should act as a Tailscale exit node. Defaults to false.
              * This field is mutually exclusive with the appConnector field.
              * https://tailscale.com/kb/1103/exit-nodes
              */
-            exitNode?: boolean
+            exitNode: boolean
             /**
              * Hostname is the tailnet hostname that should be assigned to the
              * Connector node. If unset, hostname defaults to <connector
@@ -47,22 +366,15 @@ export namespace tailscale {
              * dashes, it must not start or end with a dash and must be between 2
              * and 63 characters long.
              */
-            hostname?: string
+            hostname: string
             /**
              * ProxyClass is the name of the ProxyClass custom resource that
              * contains configuration options that should be applied to the
              * resources created for this Connector. If unset, the operator will
              * create resources with the default configuration.
              */
-            proxyClass?: string
-            /**
-             * SubnetRouter defines subnet routes that the Connector device should
-             * expose to tailnet as a Tailscale subnet router.
-             * https://tailscale.com/kb/1019/subnets/
-             * If this field is unset, the device does not get configured as a Tailscale subnet router.
-             * This field is mutually exclusive with the appConnector field.
-             */
-            subnetRouter?: outputs.tailscale.v1alpha1.ConnectorSpecSubnetRouter
+            proxyClass: string
+            subnetRouter: outputs.tailscale.v1alpha1.ConnectorSpecSubnetRouter
             /**
              * Tags that the Tailscale node will be tagged with.
              * Defaults to [tag:k8s].
@@ -75,7 +387,7 @@ export namespace tailscale {
              * Tags cannot be changed once a Connector node has been created.
              * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
              */
-            tags?: string[]
+            tags: string[]
         }
 
         /**
@@ -102,7 +414,78 @@ export namespace tailscale {
              * also dynamically discover other routes.
              * https://tailscale.com/kb/1332/apps-best-practices#preconfiguration
              */
-            routes?: string[]
+            routes: string[]
+        }
+
+        /**
+         * AppConnector defines whether the Connector device should act as a Tailscale app connector. A Connector that is
+         * configured as an app connector cannot be a subnet router or an exit node. If this field is unset, the
+         * Connector does not act as an app connector.
+         * Note that you will need to manually configure the permissions and the domains for the app connector via the
+         * Admin panel.
+         * Note also that the main tested and supported use case of this config option is to deploy an app connector on
+         * Kubernetes to access SaaS applications available on the public internet. Using the app connector to expose
+         * cluster workloads or other internal workloads to tailnet might work, but this is not a use case that we have
+         * tested or optimised for.
+         * If you are using the app connector to access SaaS applications because you need a predictable egress IP that
+         * can be whitelisted, it is also your responsibility to ensure that cluster traffic from the connector flows
+         * via that predictable IP, for example by enforcing that cluster egress traffic is routed via an egress NAT
+         * device with a static IP address.
+         * https://tailscale.com/kb/1281/app-connectors
+         */
+        export interface ConnectorSpecAppConnectorPatch {
+            /**
+             * Routes are optional preconfigured routes for the domains routed via the app connector.
+             * If not set, routes for the domains will be discovered dynamically.
+             * If set, the app connector will immediately be able to route traffic using the preconfigured routes, but may
+             * also dynamically discover other routes.
+             * https://tailscale.com/kb/1332/apps-best-practices#preconfiguration
+             */
+            routes: string[]
+        }
+
+        /**
+         * ConnectorSpec describes the desired Tailscale component.
+         * More info:
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface ConnectorSpecPatch {
+            appConnector: outputs.tailscale.v1alpha1.ConnectorSpecAppConnectorPatch
+            /**
+             * ExitNode defines whether the Connector device should act as a Tailscale exit node. Defaults to false.
+             * This field is mutually exclusive with the appConnector field.
+             * https://tailscale.com/kb/1103/exit-nodes
+             */
+            exitNode: boolean
+            /**
+             * Hostname is the tailnet hostname that should be assigned to the
+             * Connector node. If unset, hostname defaults to <connector
+             * name>-connector. Hostname can contain lower case letters, numbers and
+             * dashes, it must not start or end with a dash and must be between 2
+             * and 63 characters long.
+             */
+            hostname: string
+            /**
+             * ProxyClass is the name of the ProxyClass custom resource that
+             * contains configuration options that should be applied to the
+             * resources created for this Connector. If unset, the operator will
+             * create resources with the default configuration.
+             */
+            proxyClass: string
+            subnetRouter: outputs.tailscale.v1alpha1.ConnectorSpecSubnetRouterPatch
+            /**
+             * Tags that the Tailscale node will be tagged with.
+             * Defaults to [tag:k8s].
+             * To autoapprove the subnet routes or exit node defined by a Connector,
+             * you can configure Tailscale ACLs to give these tags the necessary
+             * permissions.
+             * See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+             * If you specify custom tags here, you must also make the operator an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a Connector node has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+             */
+            tags: string[]
         }
 
         /**
@@ -123,6 +506,23 @@ export namespace tailscale {
         }
 
         /**
+         * SubnetRouter defines subnet routes that the Connector device should
+         * expose to tailnet as a Tailscale subnet router.
+         * https://tailscale.com/kb/1019/subnets/
+         * If this field is unset, the device does not get configured as a Tailscale subnet router.
+         * This field is mutually exclusive with the appConnector field.
+         */
+        export interface ConnectorSpecSubnetRouterPatch {
+            /**
+             * AdvertiseRoutes refer to CIDRs that the subnet router should make
+             * available. Route values must be strings that represent a valid IPv4
+             * or IPv6 CIDR range. Values can be Tailscale 4via6 subnet routes.
+             * https://tailscale.com/kb/1201/4via6-subnets/
+             */
+            advertiseRoutes: string[]
+        }
+
+        /**
          * ConnectorStatus describes the status of the Connector. This is set
          * and managed by the Tailscale operator.
          */
@@ -131,31 +531,31 @@ export namespace tailscale {
              * List of status conditions to indicate the status of the Connector.
              * Known condition types are `ConnectorReady`.
              */
-            conditions?: outputs.tailscale.v1alpha1.ConnectorStatusConditions[]
+            conditions: outputs.tailscale.v1alpha1.ConnectorStatusConditions[]
             /**
              * Hostname is the fully qualified domain name of the Connector node.
              * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
              * node.
              */
-            hostname?: string
+            hostname: string
             /**
              * IsAppConnector is set to true if the Connector acts as an app connector.
              */
-            isAppConnector?: boolean
+            isAppConnector: boolean
             /**
              * IsExitNode is set to true if the Connector acts as an exit node.
              */
-            isExitNode?: boolean
+            isExitNode: boolean
             /**
              * SubnetRoutes are the routes currently exposed to tailnet via this
              * Connector instance.
              */
-            subnetRoutes?: string
+            subnetRoutes: string
             /**
              * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
              * assigned to the Connector node.
              */
-            tailnetIPs?: string[]
+            tailnetIPs: string[]
         }
 
         /**
@@ -177,7 +577,7 @@ export namespace tailscale {
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: number
+            observedGeneration: number
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -197,17 +597,130 @@ export namespace tailscale {
         }
 
         /**
+         * Condition contains details for one aspect of the current state of this API Resource.
+         */
+        export interface ConnectorStatusConditionsPatch {
+            /**
+             * lastTransitionTime is the last time the condition transitioned from one status to another.
+             * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+             */
+            lastTransitionTime: string
+            /**
+             * message is a human readable message indicating details about the transition.
+             * This may be an empty string.
+             */
+            message: string
+            /**
+             * observedGeneration represents the .metadata.generation that the condition was set based upon.
+             * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+             * with respect to the current state of the instance.
+             */
+            observedGeneration: number
+            /**
+             * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+             * Producers of specific condition types may define expected values and meanings for this field,
+             * and whether the values are considered a guaranteed API.
+             * The value should be a CamelCase string.
+             * This field may not be empty.
+             */
+            reason: string
+            /**
+             * status of the condition, one of True, False, Unknown.
+             */
+            status: string
+            /**
+             * type of condition in CamelCase or in foo.example.com/CamelCase.
+             */
+            type: string
+        }
+
+        /**
+         * ConnectorStatus describes the status of the Connector. This is set
+         * and managed by the Tailscale operator.
+         */
+        export interface ConnectorStatusPatch {
+            /**
+             * List of status conditions to indicate the status of the Connector.
+             * Known condition types are `ConnectorReady`.
+             */
+            conditions: outputs.tailscale.v1alpha1.ConnectorStatusConditionsPatch[]
+            /**
+             * Hostname is the fully qualified domain name of the Connector node.
+             * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
+             * node.
+             */
+            hostname: string
+            /**
+             * IsAppConnector is set to true if the Connector acts as an app connector.
+             */
+            isAppConnector: boolean
+            /**
+             * IsExitNode is set to true if the Connector acts as an exit node.
+             */
+            isExitNode: boolean
+            /**
+             * SubnetRoutes are the routes currently exposed to tailnet via this
+             * Connector instance.
+             */
+            subnetRoutes: string
+            /**
+             * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
+             * assigned to the Connector node.
+             */
+            tailnetIPs: string[]
+        }
+
+        /**
+         * DNSConfig can be deployed to cluster to make a subset of Tailscale MagicDNS
+         * names resolvable by cluster workloads. Use this if: A) you need to refer to
+         * tailnet services, exposed to cluster via Tailscale Kubernetes operator egress
+         * proxies by the MagicDNS names of those tailnet services (usually because the
+         * services run over HTTPS)
+         * B) you have exposed a cluster workload to the tailnet using Tailscale Ingress
+         * and you also want to refer to the workload from within the cluster over the
+         * Ingress's MagicDNS name (usually because you have some callback component
+         * that needs to use the same URL as that used by a non-cluster client on
+         * tailnet).
+         * When a DNSConfig is applied to a cluster, Tailscale Kubernetes operator will
+         * deploy a nameserver for ts.net DNS names and automatically populate it with records
+         * for any Tailscale egress or Ingress proxies deployed to that cluster.
+         * Currently you must manually update your cluster DNS configuration to add the
+         * IP address of the deployed nameserver as a ts.net stub nameserver.
+         * Instructions for how to do it:
+         * https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#configuration-of-stub-domain-and-upstream-nameserver-using-coredns (for CoreDNS),
+         * https://cloud.google.com/kubernetes-engine/docs/how-to/kube-dns (for kube-dns).
+         * Tailscale Kubernetes operator will write the address of a Service fronting
+         * the nameserver to dsnconfig.status.nameserver.ip.
+         * DNSConfig is a singleton - you must not create more than one.
+         * NB: if you want cluster workloads to be able to refer to Tailscale Ingress
+         * using its MagicDNS name, you must also annotate the Ingress resource with
+         * tailscale.com/experimental-forward-cluster-traffic-via-ingress annotation to
+         * ensure that the proxy created for the Ingress listens on its Pod IP address.
+         * NB: Clusters where Pods get assigned IPv6 addresses only are currently not supported.
+         */
+        export interface DNSConfig {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion: 'tailscale.com/v1alpha1'
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: 'DNSConfig'
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata: outputs.meta.v1.ObjectMeta
+            spec: outputs.tailscale.v1alpha1.DNSConfigSpec
+            status: outputs.tailscale.v1alpha1.DNSConfigStatus
+        }
+
+        /**
          * Spec describes the desired DNS configuration.
          * More info:
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
         export interface DNSConfigSpec {
-            /**
-             * Configuration for a nameserver that can resolve ts.net DNS names
-             * associated with in-cluster proxies for Tailscale egress Services and
-             * Tailscale Ingresses. The operator will always deploy this nameserver
-             * when a DNSConfig is applied.
-             */
             nameserver: outputs.tailscale.v1alpha1.DNSConfigSpecNameserver
         }
 
@@ -218,10 +731,7 @@ export namespace tailscale {
          * when a DNSConfig is applied.
          */
         export interface DNSConfigSpecNameserver {
-            /**
-             * Nameserver image. Defaults to tailscale/k8s-nameserver:unstable.
-             */
-            image?: outputs.tailscale.v1alpha1.DNSConfigSpecNameserverImage
+            image: outputs.tailscale.v1alpha1.DNSConfigSpecNameserverImage
         }
 
         /**
@@ -231,11 +741,44 @@ export namespace tailscale {
             /**
              * Repo defaults to tailscale/k8s-nameserver.
              */
-            repo?: string
+            repo: string
             /**
              * Tag defaults to unstable.
              */
-            tag?: string
+            tag: string
+        }
+
+        /**
+         * Nameserver image. Defaults to tailscale/k8s-nameserver:unstable.
+         */
+        export interface DNSConfigSpecNameserverImagePatch {
+            /**
+             * Repo defaults to tailscale/k8s-nameserver.
+             */
+            repo: string
+            /**
+             * Tag defaults to unstable.
+             */
+            tag: string
+        }
+
+        /**
+         * Configuration for a nameserver that can resolve ts.net DNS names
+         * associated with in-cluster proxies for Tailscale egress Services and
+         * Tailscale Ingresses. The operator will always deploy this nameserver
+         * when a DNSConfig is applied.
+         */
+        export interface DNSConfigSpecNameserverPatch {
+            image: outputs.tailscale.v1alpha1.DNSConfigSpecNameserverImagePatch
+        }
+
+        /**
+         * Spec describes the desired DNS configuration.
+         * More info:
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface DNSConfigSpecPatch {
+            nameserver: outputs.tailscale.v1alpha1.DNSConfigSpecNameserverPatch
         }
 
         /**
@@ -243,11 +786,8 @@ export namespace tailscale {
          * and managed by the Tailscale operator.
          */
         export interface DNSConfigStatus {
-            conditions?: outputs.tailscale.v1alpha1.DNSConfigStatusConditions[]
-            /**
-             * Nameserver describes the status of nameserver cluster resources.
-             */
-            nameserver?: outputs.tailscale.v1alpha1.DNSConfigStatusNameserver
+            conditions: outputs.tailscale.v1alpha1.DNSConfigStatusConditions[]
+            nameserver: outputs.tailscale.v1alpha1.DNSConfigStatusNameserver
         }
 
         /**
@@ -269,7 +809,45 @@ export namespace tailscale {
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: number
+            observedGeneration: number
+            /**
+             * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+             * Producers of specific condition types may define expected values and meanings for this field,
+             * and whether the values are considered a guaranteed API.
+             * The value should be a CamelCase string.
+             * This field may not be empty.
+             */
+            reason: string
+            /**
+             * status of the condition, one of True, False, Unknown.
+             */
+            status: string
+            /**
+             * type of condition in CamelCase or in foo.example.com/CamelCase.
+             */
+            type: string
+        }
+
+        /**
+         * Condition contains details for one aspect of the current state of this API Resource.
+         */
+        export interface DNSConfigStatusConditionsPatch {
+            /**
+             * lastTransitionTime is the last time the condition transitioned from one status to another.
+             * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+             */
+            lastTransitionTime: string
+            /**
+             * message is a human readable message indicating details about the transition.
+             * This may be an empty string.
+             */
+            message: string
+            /**
+             * observedGeneration represents the .metadata.generation that the condition was set based upon.
+             * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+             * with respect to the current state of the instance.
+             */
+            observedGeneration: number
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -300,7 +878,59 @@ export namespace tailscale {
              * proxies.
              * The IP address will change if you delete and recreate the DNSConfig.
              */
-            ip?: string
+            ip: string
+        }
+
+        /**
+         * Nameserver describes the status of nameserver cluster resources.
+         */
+        export interface DNSConfigStatusNameserverPatch {
+            /**
+             * IP is the ClusterIP of the Service fronting the deployed ts.net nameserver.
+             * Currently you must manually update your cluster DNS config to add
+             * this address as a stub nameserver for ts.net for cluster workloads to be
+             * able to resolve MagicDNS names associated with egress or Ingress
+             * proxies.
+             * The IP address will change if you delete and recreate the DNSConfig.
+             */
+            ip: string
+        }
+
+        /**
+         * Status describes the status of the DNSConfig. This is set
+         * and managed by the Tailscale operator.
+         */
+        export interface DNSConfigStatusPatch {
+            conditions: outputs.tailscale.v1alpha1.DNSConfigStatusConditionsPatch[]
+            nameserver: outputs.tailscale.v1alpha1.DNSConfigStatusNameserverPatch
+        }
+
+        /**
+         * ProxyClass describes a set of configuration parameters that can be applied to
+         * proxy resources created by the Tailscale Kubernetes operator.
+         * To apply a given ProxyClass to resources created for a tailscale Ingress or
+         * Service, use tailscale.com/proxy-class=<proxyclass-name> label. To apply a
+         * given ProxyClass to resources created for a Connector, use
+         * connector.spec.proxyClass field.
+         * ProxyClass is a cluster scoped resource.
+         * More info:
+         * https://tailscale.com/kb/1445/kubernetes-operator-customization#cluster-resource-customization-using-proxyclass-custom-resource
+         */
+        export interface ProxyClass {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion: 'tailscale.com/v1alpha1'
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: 'ProxyClass'
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata: outputs.meta.v1.ObjectMeta
+            spec: outputs.tailscale.v1alpha1.ProxyClassSpec
+            status: outputs.tailscale.v1alpha1.ProxyClassStatus
         }
 
         /**
@@ -308,26 +938,9 @@ export namespace tailscale {
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
         export interface ProxyClassSpec {
-            /**
-             * Configuration for proxy metrics. Metrics are currently not supported
-             * for egress proxies and for Ingress proxies that have been configured
-             * with tailscale.com/experimental-forward-cluster-traffic-via-ingress
-             * annotation. Note that the metrics are currently considered unstable
-             * and will likely change in breaking ways in the future - we only
-             * recommend that you use those for debugging purposes.
-             */
-            metrics?: outputs.tailscale.v1alpha1.ProxyClassSpecMetrics
-            /**
-             * Configuration parameters for the proxy's StatefulSet. Tailscale
-             * Kubernetes operator deploys a StatefulSet for each of the user
-             * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
-             */
-            statefulSet?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSet
-            /**
-             * TailscaleConfig contains options to configure the tailscale-specific
-             * parameters of proxies.
-             */
-            tailscale?: outputs.tailscale.v1alpha1.ProxyClassSpecTailscale
+            metrics: outputs.tailscale.v1alpha1.ProxyClassSpecMetrics
+            statefulSet: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSet
+            tailscale: outputs.tailscale.v1alpha1.ProxyClassSpecTailscale
         }
 
         /**
@@ -352,16 +965,32 @@ export namespace tailscale {
              * Defaults to false.
              */
             enable: boolean
+            serviceMonitor: outputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitor
+        }
+
+        /**
+         * Configuration for proxy metrics. Metrics are currently not supported
+         * for egress proxies and for Ingress proxies that have been configured
+         * with tailscale.com/experimental-forward-cluster-traffic-via-ingress
+         * annotation. Note that the metrics are currently considered unstable
+         * and will likely change in breaking ways in the future - we only
+         * recommend that you use those for debugging purposes.
+         */
+        export interface ProxyClassSpecMetricsPatch {
             /**
-             * Enable to create a Prometheus ServiceMonitor for scraping the proxy's Tailscale metrics.
-             * The ServiceMonitor will select the metrics Service that gets created when metrics are enabled.
-             * The ingested metrics for each Service monitor will have labels to identify the proxy:
-             * ts_proxy_type: ingress_service|ingress_resource|connector|proxygroup
-             * ts_proxy_parent_name: name of the parent resource (i.e name of the Connector, Tailscale Ingress, Tailscale Service or ProxyGroup)
-             * ts_proxy_parent_namespace: namespace of the parent resource (if the parent resource is not cluster scoped)
-             * job: ts_<proxy type>_[<parent namespace>]_<parent_name>
+             * Setting enable to true will make the proxy serve Tailscale metrics
+             * at <pod-ip>:9002/metrics.
+             * A metrics Service named <proxy-statefulset>-metrics will also be created in the operator's namespace and will
+             * serve the metrics at <service-ip>:9002/metrics.
+             *
+             * In 1.78.x and 1.80.x, this field also serves as the default value for
+             * .spec.statefulSet.pod.tailscaleContainer.debug.enable. From 1.82.0, both
+             * fields will independently default to false.
+             *
+             * Defaults to false.
              */
-            serviceMonitor?: outputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitor
+            enable: boolean
+            serviceMonitor: outputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitorPatch
         }
 
         /**
@@ -381,6 +1010,32 @@ export namespace tailscale {
         }
 
         /**
+         * Enable to create a Prometheus ServiceMonitor for scraping the proxy's Tailscale metrics.
+         * The ServiceMonitor will select the metrics Service that gets created when metrics are enabled.
+         * The ingested metrics for each Service monitor will have labels to identify the proxy:
+         * ts_proxy_type: ingress_service|ingress_resource|connector|proxygroup
+         * ts_proxy_parent_name: name of the parent resource (i.e name of the Connector, Tailscale Ingress, Tailscale Service or ProxyGroup)
+         * ts_proxy_parent_namespace: namespace of the parent resource (if the parent resource is not cluster scoped)
+         * job: ts_<proxy type>_[<parent namespace>]_<parent_name>
+         */
+        export interface ProxyClassSpecMetricsServiceMonitorPatch {
+            /**
+             * If Enable is set to true, a Prometheus ServiceMonitor will be created. Enable can only be set to true if metrics are enabled.
+             */
+            enable: boolean
+        }
+
+        /**
+         * Specification of the desired state of the ProxyClass resource.
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface ProxyClassSpecPatch {
+            metrics: outputs.tailscale.v1alpha1.ProxyClassSpecMetricsPatch
+            statefulSet: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPatch
+            tailscale: outputs.tailscale.v1alpha1.ProxyClassSpecTailscalePatch
+        }
+
+        /**
          * Configuration parameters for the proxy's StatefulSet. Tailscale
          * Kubernetes operator deploys a StatefulSet for each of the user
          * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
@@ -395,7 +1050,7 @@ export namespace tailscale {
              * Annotations must be valid Kubernetes annotations.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            annotations?: { [key: string]: string }
+            annotations: { [key: string]: string }
             /**
              * Labels that will be added to the StatefulSet created for the proxy.
              * Any labels specified here will be merged with the default labels
@@ -405,23 +1060,44 @@ export namespace tailscale {
              * Label keys and values must be valid Kubernetes label keys and values.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
-            labels?: { [key: string]: string }
+            labels: { [key: string]: string }
+            pod: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPod
+        }
+
+        /**
+         * Configuration parameters for the proxy's StatefulSet. Tailscale
+         * Kubernetes operator deploys a StatefulSet for each of the user
+         * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
+         */
+        export interface ProxyClassSpecStatefulSetPatch {
             /**
-             * Configuration for the proxy Pod.
+             * Annotations that will be added to the StatefulSet created for the proxy.
+             * Any Annotations specified here will be merged with the default annotations
+             * applied to the StatefulSet by the Tailscale Kubernetes operator as
+             * well as any other annotations that might have been applied by other
+             * actors.
+             * Annotations must be valid Kubernetes annotations.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            pod?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPod
+            annotations: { [key: string]: string }
+            /**
+             * Labels that will be added to the StatefulSet created for the proxy.
+             * Any labels specified here will be merged with the default labels
+             * applied to the StatefulSet by the Tailscale Kubernetes operator as
+             * well as any other labels that might have been applied by other
+             * actors.
+             * Label keys and values must be valid Kubernetes label keys and values.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels: { [key: string]: string }
+            pod: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodPatch
         }
 
         /**
          * Configuration for the proxy Pod.
          */
         export interface ProxyClassSpecStatefulSetPod {
-            /**
-             * Proxy Pod's affinity rules.
-             * By default, the Tailscale Kubernetes operator does not apply any affinity rules.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
-             */
-            affinity?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinity
+            affinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinity
             /**
              * Annotations that will be added to the proxy Pod.
              * Any annotations specified here will be merged with the default
@@ -429,12 +1105,12 @@ export namespace tailscale {
              * Annotations must be valid Kubernetes annotations.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            annotations?: { [key: string]: string }
+            annotations: { [key: string]: string }
             /**
              * Proxy Pod's image pull Secrets.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
              */
-            imagePullSecrets?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecrets[]
+            imagePullSecrets: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecrets[]
             /**
              * Labels that will be added to the proxy Pod.
              * Any labels specified here will be merged with the default labels
@@ -442,47 +1118,35 @@ export namespace tailscale {
              * Label keys and values must be valid Kubernetes label keys and values.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
-            labels?: { [key: string]: string }
+            labels: { [key: string]: string }
             /**
              * Proxy Pod's node name.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            nodeName?: string
+            nodeName: string
             /**
              * Proxy Pod's node selector.
              * By default Tailscale Kubernetes operator does not apply any node
              * selector.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            nodeSelector?: { [key: string]: string }
-            /**
-             * Proxy Pod's security context.
-             * By default Tailscale Kubernetes operator does not apply any Pod
-             * security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
-             */
-            securityContext?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContext
-            /**
-             * Configuration for the proxy container running tailscale.
-             */
-            tailscaleContainer?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainer
-            /**
-             * Configuration for the proxy init container that enables forwarding.
-             */
-            tailscaleInitContainer?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainer
+            nodeSelector: { [key: string]: string }
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContext
+            tailscaleContainer: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainer
+            tailscaleInitContainer: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainer
             /**
              * Proxy Pod's tolerations.
              * By default Tailscale Kubernetes operator does not apply any
              * tolerations.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            tolerations?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerations[]
+            tolerations: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerations[]
             /**
              * Proxy Pod's topology spread constraints.
              * By default Tailscale Kubernetes operator does not apply any topology spread constraints.
              * https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
              */
-            topologySpreadConstraints?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraints[]
+            topologySpreadConstraints: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraints[]
         }
 
         /**
@@ -491,18 +1155,9 @@ export namespace tailscale {
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
          */
         export interface ProxyClassSpecStatefulSetPodAffinity {
-            /**
-             * Describes node affinity scheduling rules for the pod.
-             */
-            nodeAffinity?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinity
-            /**
-             * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAffinity?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinity
-            /**
-             * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAntiAffinity?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinity
+            nodeAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinity
+            podAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinity
+            podAntiAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinity
         }
 
         /**
@@ -520,15 +1175,27 @@ export namespace tailscale {
              * "weight" to the sum if the node matches the corresponding matchExpressions; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution
+        }
+
+        /**
+         * Describes node affinity scheduling rules for the pod.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPatch {
             /**
-             * If the affinity requirements specified by this field are not met at
-             * scheduling time, the pod will not be scheduled onto the node.
-             * If the affinity requirements specified by this field cease to be met
-             * at some point during pod execution (e.g. due to an update), the system
-             * may or may not try to eventually evict the pod from its node.
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node matches the corresponding matchExpressions; the
+             * node(s) with the highest sum are the most preferred.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch
         }
 
         /**
@@ -536,10 +1203,19 @@ export namespace tailscale {
          * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
          */
         export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * A node selector term, associated with the corresponding weight.
-             */
             preference: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference
+            /**
+             * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * An empty preferred scheduling term matches all objects with implicit weight 0
+         * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            preference: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch
             /**
              * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
              */
@@ -553,11 +1229,11 @@ export namespace tailscale {
             /**
              * A list of node selector requirements by node's labels.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions[]
             /**
              * A list of node selector requirements by node's fields.
              */
-            matchFields?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields[]
+            matchFields: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields[]
         }
 
         /**
@@ -581,7 +1257,31 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
         }
 
         /**
@@ -605,7 +1305,45 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A node selector term, associated with the corresponding weight.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch[]
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch[]
         }
 
         /**
@@ -631,11 +1369,11 @@ export namespace tailscale {
             /**
              * A list of node selector requirements by node's labels.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions[]
             /**
              * A list of node selector requirements by node's fields.
              */
-            matchFields?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields[]
+            matchFields: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields[]
         }
 
         /**
@@ -659,7 +1397,31 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
         }
 
         /**
@@ -683,7 +1445,72 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A null or empty node selector term matches no objects. The requirements of
+         * them are ANDed.
+         * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch[]
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch[]
+        }
+
+        /**
+         * If the affinity requirements specified by this field are not met at
+         * scheduling time, the pod will not be scheduled onto the node.
+         * If the affinity requirements specified by this field cease to be met
+         * at some point during pod execution (e.g. due to an update), the system
+         * may or may not try to eventually evict the pod from its node.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            /**
+             * Required. A list of node selector terms. The terms are ORed.
+             */
+            nodeSelectorTerms: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch[]
+        }
+
+        /**
+         * Proxy Pod's affinity rules.
+         * By default, the Tailscale Kubernetes operator does not apply any affinity rules.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPatch {
+            nodeAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPatch
+            podAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPatch
+            podAntiAffinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPatch
         }
 
         /**
@@ -701,7 +1528,7 @@ export namespace tailscale {
              * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
             /**
              * If the affinity requirements specified by this field are not met at
              * scheduling time, the pod will not be scheduled onto the node.
@@ -711,17 +1538,54 @@ export namespace tailscale {
              * When there are multiple elements, the lists of nodes corresponding to each
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+        }
+
+        /**
+         * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            /**
+             * If the affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch[]
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
         export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
             podAffinityTerm: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
@@ -733,11 +1597,7 @@ export namespace tailscale {
          * Required. A pod affinity term, associated with the corresponding weight.
          */
         export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -749,7 +1609,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -761,22 +1621,15 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -795,13 +1648,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -824,7 +1677,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -838,13 +1731,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -867,23 +1760,57 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
         }
 
         /**
-         * Defines a set of pods (namely those matching the labelSelector
-         * relative to the given namespace(s)) that this pod should be
-         * co-located (affinity) or not co-located (anti-affinity) with,
-         * where co-located is defined as running on a node whose value of
-         * the label with key <topologyKey> matches that of any node on which
-         * a pod of the set of pods is running
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
             /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
+             * key is the label key that the selector applies to.
              */
-            labelSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Required. A pod affinity term, associated with the corresponding weight.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -895,7 +1822,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -907,22 +1834,67 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -941,13 +1913,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -970,7 +1942,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -984,13 +1996,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1013,7 +2025,102 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
         }
 
         /**
@@ -1031,7 +2138,7 @@ export namespace tailscale {
              * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
             /**
              * If the anti-affinity requirements specified by this field are not met at
              * scheduling time, the pod will not be scheduled onto the node.
@@ -1041,17 +2148,54 @@ export namespace tailscale {
              * When there are multiple elements, the lists of nodes corresponding to each
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+        }
+
+        /**
+         * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the anti-affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling anti-affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            /**
+             * If the anti-affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the anti-affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch[]
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
         export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
             podAffinityTerm: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
@@ -1063,11 +2207,7 @@ export namespace tailscale {
          * Required. A pod affinity term, associated with the corresponding weight.
          */
         export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1079,7 +2219,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1091,22 +2231,15 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -1125,13 +2258,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1154,7 +2287,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1168,13 +2341,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1197,23 +2370,57 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
         }
 
         /**
-         * Defines a set of pods (namely those matching the labelSelector
-         * relative to the given namespace(s)) that this pod should be
-         * co-located (affinity) or not co-located (anti-affinity) with,
-         * where co-located is defined as running on a node whose value of
-         * the label with key <topologyKey> matches that of any node on which
-         * a pod of the set of pods is running
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
             /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
+             * key is the label key that the selector applies to.
              */
-            labelSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Required. A pod affinity term, associated with the corresponding weight.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1225,7 +2432,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1237,22 +2444,67 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -1271,13 +2523,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1300,7 +2552,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1314,13 +2606,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -1343,7 +2635,102 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
         }
 
         /**
@@ -1358,18 +2745,78 @@ export namespace tailscale {
              * almost certainly wrong.
              * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
              */
-            name?: string
+            name: string
         }
+
         /**
-         * proxyClassSpecStatefulSetPodImagePullSecretsProvideDefaults sets the appropriate defaults for ProxyClassSpecStatefulSetPodImagePullSecrets
+         * LocalObjectReference contains enough information to let you locate the
+         * referenced object inside the same namespace.
          */
-        export function proxyClassSpecStatefulSetPodImagePullSecretsProvideDefaults(
-            val: ProxyClassSpecStatefulSetPodImagePullSecrets,
-        ): ProxyClassSpecStatefulSetPodImagePullSecrets {
-            return {
-                ...val,
-                name: val.name ?? '',
-            }
+        export interface ProxyClassSpecStatefulSetPodImagePullSecretsPatch {
+            /**
+             * Name of the referent.
+             * This field is effectively required, but due to backwards compatibility is
+             * allowed to be empty. Instances of this type with an empty value here are
+             * almost certainly wrong.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+             */
+            name: string
+        }
+
+        /**
+         * Configuration for the proxy Pod.
+         */
+        export interface ProxyClassSpecStatefulSetPodPatch {
+            affinity: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPatch
+            /**
+             * Annotations that will be added to the proxy Pod.
+             * Any annotations specified here will be merged with the default
+             * annotations applied to the Pod by the Tailscale Kubernetes operator.
+             * Annotations must be valid Kubernetes annotations.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
+             */
+            annotations: { [key: string]: string }
+            /**
+             * Proxy Pod's image pull Secrets.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+             */
+            imagePullSecrets: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecretsPatch[]
+            /**
+             * Labels that will be added to the proxy Pod.
+             * Any labels specified here will be merged with the default labels
+             * applied to the Pod by the Tailscale Kubernetes operator.
+             * Label keys and values must be valid Kubernetes label keys and values.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels: { [key: string]: string }
+            /**
+             * Proxy Pod's node name.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeName: string
+            /**
+             * Proxy Pod's node selector.
+             * By default Tailscale Kubernetes operator does not apply any node
+             * selector.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeSelector: { [key: string]: string }
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextPatch
+            tailscaleContainer: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerPatch
+            tailscaleInitContainer: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerPatch
+            /**
+             * Proxy Pod's tolerations.
+             * By default Tailscale Kubernetes operator does not apply any
+             * tolerations.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            tolerations: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerationsPatch[]
+            /**
+             * Proxy Pod's topology spread constraints.
+             * By default Tailscale Kubernetes operator does not apply any topology spread constraints.
+             * https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+             */
+            topologySpreadConstraints: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsPatch[]
         }
 
         /**
@@ -1379,11 +2826,7 @@ export namespace tailscale {
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
          */
         export interface ProxyClassSpecStatefulSetPodSecurityContext {
-            /**
-             * appArmorProfile is the AppArmor options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfile
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfile
             /**
              * A special supplemental group that applies to all containers in a pod.
              * Some volume types allow the Kubelet to change the ownership of that volume
@@ -1396,7 +2839,7 @@ export namespace tailscale {
              * If unset, the Kubelet will not modify the ownership and permissions of any volume.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            fsGroup?: number
+            fsGroup: number
             /**
              * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
              * before being exposed inside Pod. This field will only apply to
@@ -1406,7 +2849,7 @@ export namespace tailscale {
              * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            fsGroupChangePolicy?: string
+            fsGroupChangePolicy: string
             /**
              * The GID to run the entrypoint of the container process.
              * Uses runtime default if unset.
@@ -1415,7 +2858,7 @@ export namespace tailscale {
              * for that container.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsGroup?: number
+            runAsGroup: number
             /**
              * Indicates that the container must run as a non-root user.
              * If true, the Kubelet will validate the image at runtime to ensure that it
@@ -1424,7 +2867,7 @@ export namespace tailscale {
              * May also be set in SecurityContext.  If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsNonRoot?: boolean
+            runAsNonRoot: boolean
             /**
              * The UID to run the entrypoint of the container process.
              * Defaults to user specified in image metadata if unspecified.
@@ -1433,21 +2876,9 @@ export namespace tailscale {
              * for that container.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsUser?: number
-            /**
-             * The SELinux context to be applied to all containers.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in SecurityContext.  If set in
-             * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
-             * takes precedence for that container.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptions
-            /**
-             * The seccomp options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfile
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptions
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfile
             /**
              * A list of groups applied to the first process run in each container, in addition
              * to the container's primary GID, the fsGroup (if specified), and group memberships
@@ -1457,20 +2888,14 @@ export namespace tailscale {
              * even if they are not included in this list.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            supplementalGroups?: number[]
+            supplementalGroups: number[]
             /**
              * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
              * sysctls (by the container runtime) might fail to launch.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            sysctls?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctls[]
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options within a container's SecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptions
+            sysctls: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctls[]
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptions
         }
 
         /**
@@ -1484,7 +2909,7 @@ export namespace tailscale {
              * Must match the loaded name of the profile.
              * Must be set if and only if type is "Localhost".
              */
-            localhostProfile?: string
+            localhostProfile: string
             /**
              * type indicates which kind of AppArmor profile will be applied.
              * Valid options are:
@@ -1493,6 +2918,107 @@ export namespace tailscale {
              *   Unconfined - no AppArmor enforcement.
              */
             type: string
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile: string
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type: string
+        }
+
+        /**
+         * Proxy Pod's security context.
+         * By default Tailscale Kubernetes operator does not apply any Pod
+         * security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextPatch {
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfilePatch
+            /**
+             * A special supplemental group that applies to all containers in a pod.
+             * Some volume types allow the Kubelet to change the ownership of that volume
+             * to be owned by the pod:
+             *
+             * 1. The owning GID will be the FSGroup
+             * 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+             * 3. The permission bits are OR'd with rw-rw----
+             *
+             * If unset, the Kubelet will not modify the ownership and permissions of any volume.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroup: number
+            /**
+             * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+             * before being exposed inside Pod. This field will only apply to
+             * volume types which support fsGroup based ownership(and permissions).
+             * It will have no effect on ephemeral volume types such as: secret, configmaps
+             * and emptydir.
+             * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroupChangePolicy: string
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup: number
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot: boolean
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfilePatch
+            /**
+             * A list of groups applied to the first process run in each container, in addition
+             * to the container's primary GID, the fsGroup (if specified), and group memberships
+             * defined in the container image for the uid of the container process. If unspecified,
+             * no additional groups are added to any container. Note that group memberships
+             * defined in the container image for the uid of the container process are still effective,
+             * even if they are not included in this list.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            supplementalGroups: number[]
+            /**
+             * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+             * sysctls (by the container runtime) might fail to launch.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            sysctls: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctlsPatch[]
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsPatch
         }
 
         /**
@@ -1507,19 +3033,46 @@ export namespace tailscale {
             /**
              * Level is SELinux level label that applies to the container.
              */
-            level?: string
+            level: string
             /**
              * Role is a SELinux role label that applies to the container.
              */
-            role?: string
+            role: string
             /**
              * Type is a SELinux type label that applies to the container.
              */
-            type?: string
+            type: string
             /**
              * User is a SELinux user label that applies to the container.
              */
-            user?: string
+            user: string
+        }
+
+        /**
+         * The SELinux context to be applied to all containers.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in SecurityContext.  If set in
+         * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+         * takes precedence for that container.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level: string
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role: string
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type: string
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user: string
         }
 
         /**
@@ -1533,7 +3086,30 @@ export namespace tailscale {
              * Must be a descending path, relative to the kubelet's configured seccomp profile location.
              * Must be set if type is "Localhost". Must NOT be set for any other type.
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type: string
+        }
+
+        /**
+         * The seccomp options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of seccomp profile will be applied.
              * Valid options are:
@@ -1560,6 +3136,20 @@ export namespace tailscale {
         }
 
         /**
+         * Sysctl defines a kernel parameter to be set
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSysctlsPatch {
+            /**
+             * Name of a property to set
+             */
+            name: string
+            /**
+             * Value of a property to set
+             */
+            value: string
+        }
+
+        /**
          * The Windows specific settings applied to all containers.
          * If unspecified, the options within a container's SecurityContext will be used.
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
@@ -1571,36 +3161,65 @@ export namespace tailscale {
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
              * GMSA credential spec named by the GMSACredentialSpecName field.
              */
-            gmsaCredentialSpec?: string
+            gmsaCredentialSpec: string
             /**
              * GMSACredentialSpecName is the name of the GMSA credential spec to use.
              */
-            gmsaCredentialSpecName?: string
+            gmsaCredentialSpecName: string
             /**
              * HostProcess determines if a container should be run as a 'Host Process' container.
              * All of a Pod's containers must have the same effective HostProcess value
              * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
              * In addition, if HostProcess is true then HostNetwork must also be set to true.
              */
-            hostProcess?: boolean
+            hostProcess: boolean
             /**
              * The UserName in Windows to run the entrypoint of the container process.
              * Defaults to the user specified in image metadata if unspecified.
              * May also be set in PodSecurityContext. If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsUserName?: string
+            runAsUserName: string
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options within a container's SecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsPatch {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec: string
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName: string
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess: boolean
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName: string
         }
 
         /**
          * Configuration for the proxy container running tailscale.
          */
         export interface ProxyClassSpecStatefulSetPodTailscaleContainer {
-            /**
-             * Configuration for enabling extra debug information in the container.
-             * Not recommended for production use.
-             */
-            debug?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebug
+            debug: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebug
             /**
              * List of environment variables to set in the container.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
@@ -1610,7 +3229,7 @@ export namespace tailscale {
              * variables (i.e TS_USERSPACE) is not recommended and might break in
              * the future.
              */
-            env?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnv[]
+            env: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnv[]
             /**
              * Container image name. By default images are pulled from
              * docker.io/tailscale/tailscale, but the official images are also
@@ -1620,32 +3239,14 @@ export namespace tailscale {
              * Deployment.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            image?: string
+            image: string
             /**
              * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            imagePullPolicy?: string
-            /**
-             * Container resource requirements.
-             * By default Tailscale Kubernetes operator does not apply any resource
-             * requirements. The amount of resources required wil depend on the
-             * amount of resources the operator needs to parse, usage patterns and
-             * cluster size.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResources
-            /**
-             * Container security context.
-             * Security context specified here will override the security context set by the operator.
-             * By default the operator sets the Tailscale container and the Tailscale init container to privileged
-             * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
-             * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
-             * installing device plugin in your cluster and configuring the proxies tun device to be created
-             * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContext
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResources
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContext
         }
 
         /**
@@ -1665,7 +3266,27 @@ export namespace tailscale {
              * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
              * this setting will default to false, and no requests will be proxied.
              */
-            enable?: boolean
+            enable: boolean
+        }
+
+        /**
+         * Configuration for enabling extra debug information in the container.
+         * Not recommended for production use.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerDebugPatch {
+            /**
+             * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
+             * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
+             * 9001 is a container port named "debug". The endpoints and their responses
+             * may change in backwards incompatible ways in the future, and should not
+             * be considered stable.
+             *
+             * In 1.78.x and 1.80.x, this setting will default to the value of
+             * .spec.metrics.enable, and requests to the "metrics" port matching the
+             * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
+             * this setting will default to false, and no requests will be proxied.
+             */
+            enable: boolean
         }
 
         export interface ProxyClassSpecStatefulSetPodTailscaleContainerEnv {
@@ -1683,7 +3304,59 @@ export namespace tailscale {
              * be expanded, regardless of whether the variable exists or not. Defaults
              * to "".
              */
-            value?: string
+            value: string
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name: string
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value: string
+        }
+
+        /**
+         * Configuration for the proxy container running tailscale.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerPatch {
+            debug: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebugPatch
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnvPatch[]
+            /**
+             * Container image name. By default images are pulled from
+             * docker.io/tailscale/tailscale, but the official images are also
+             * available at ghcr.io/tailscale/tailscale. Specifying image name here
+             * will override any proxy image values specified via the Kubernetes
+             * operator's Helm chart values or PROXY_IMAGE env var in the operator
+             * Deployment.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image: string
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesPatch
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextPatch
         }
 
         /**
@@ -1704,19 +3377,19 @@ export namespace tailscale {
              *
              * This field is immutable. It can only be set for containers.
              */
-            claims?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaims[]
+            claims: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaims[]
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: { [key: string]: number | string }
+            limits: { [key: string]: number | string }
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: { [key: string]: number | string }
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -1729,6 +3402,51 @@ export namespace tailscale {
              * inside a container.
              */
             name: string
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name: string
+        }
+
+        /**
+         * Container resource requirements.
+         * By default Tailscale Kubernetes operator does not apply any resource
+         * requirements. The amount of resources required wil depend on the
+         * amount of resources the operator needs to parse, usage patterns and
+         * cluster size.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsPatch[]
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits: { [key: string]: number | string }
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -1751,26 +3469,16 @@ export namespace tailscale {
              * 2) has CAP_SYS_ADMIN
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            allowPrivilegeEscalation?: boolean
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfile
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilities
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfile
+            capabilities: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilities
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
              * Defaults to false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            privileged?: boolean
+            privileged: boolean
             /**
              * procMount denotes the type of proc mount to use for the containers.
              * The default is DefaultProcMount which uses the container runtime defaults for
@@ -1778,13 +3486,13 @@ export namespace tailscale {
              * This requires the ProcMountType feature flag to be enabled.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            procMount?: string
+            procMount: string
             /**
              * Whether this container has a read-only root filesystem.
              * Default is false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            readOnlyRootFilesystem?: boolean
+            readOnlyRootFilesystem: boolean
             /**
              * The GID to run the entrypoint of the container process.
              * Uses runtime default if unset.
@@ -1792,7 +3500,7 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsGroup?: number
+            runAsGroup: number
             /**
              * Indicates that the container must run as a non-root user.
              * If true, the Kubelet will validate the image at runtime to ensure that it
@@ -1801,7 +3509,7 @@ export namespace tailscale {
              * May also be set in PodSecurityContext.  If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsNonRoot?: boolean
+            runAsNonRoot: boolean
             /**
              * The UID to run the entrypoint of the container process.
              * Defaults to user specified in image metadata if unspecified.
@@ -1809,29 +3517,10 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsUser?: number
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptions
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfile
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptions
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptions
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfile
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptions
         }
 
         /**
@@ -1846,7 +3535,30 @@ export namespace tailscale {
              * Must match the loaded name of the profile.
              * Must be set if and only if type is "Localhost".
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type: string
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of AppArmor profile will be applied.
              * Valid options are:
@@ -1866,11 +3578,101 @@ export namespace tailscale {
             /**
              * Added capabilities
              */
-            add?: string[]
+            add: string[]
             /**
              * Removed capabilities
              */
-            drop?: string[]
+            drop: string[]
+        }
+
+        /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add: string[]
+            /**
+             * Removed capabilities
+             */
+            drop: string[]
+        }
+
+        /**
+         * Container security context.
+         * Security context specified here will override the security context set by the operator.
+         * By default the operator sets the Tailscale container and the Tailscale init container to privileged
+         * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
+         * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
+         * installing device plugin in your cluster and configuring the proxies tun device to be created
+         * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfilePatch
+            capabilities: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesPatch
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged: boolean
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount: string
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem: boolean
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup: number
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot: boolean
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsPatch
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfilePatch
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsPatch
         }
 
         /**
@@ -1884,19 +3686,45 @@ export namespace tailscale {
             /**
              * Level is SELinux level label that applies to the container.
              */
-            level?: string
+            level: string
             /**
              * Role is a SELinux role label that applies to the container.
              */
-            role?: string
+            role: string
             /**
              * Type is a SELinux type label that applies to the container.
              */
-            type?: string
+            type: string
             /**
              * User is a SELinux user label that applies to the container.
              */
-            user?: string
+            user: string
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsPatch {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level: string
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role: string
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type: string
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user: string
         }
 
         /**
@@ -1912,7 +3740,32 @@ export namespace tailscale {
              * Must be a descending path, relative to the kubelet's configured seccomp profile location.
              * Must be set if type is "Localhost". Must NOT be set for any other type.
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type: string
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of seccomp profile will be applied.
              * Valid options are:
@@ -1936,36 +3789,65 @@ export namespace tailscale {
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
              * GMSA credential spec named by the GMSACredentialSpecName field.
              */
-            gmsaCredentialSpec?: string
+            gmsaCredentialSpec: string
             /**
              * GMSACredentialSpecName is the name of the GMSA credential spec to use.
              */
-            gmsaCredentialSpecName?: string
+            gmsaCredentialSpecName: string
             /**
              * HostProcess determines if a container should be run as a 'Host Process' container.
              * All of a Pod's containers must have the same effective HostProcess value
              * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
              * In addition, if HostProcess is true then HostNetwork must also be set to true.
              */
-            hostProcess?: boolean
+            hostProcess: boolean
             /**
              * The UserName in Windows to run the entrypoint of the container process.
              * Defaults to the user specified in image metadata if unspecified.
              * May also be set in PodSecurityContext. If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsUserName?: string
+            runAsUserName: string
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsPatch {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec: string
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName: string
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess: boolean
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName: string
         }
 
         /**
          * Configuration for the proxy init container that enables forwarding.
          */
         export interface ProxyClassSpecStatefulSetPodTailscaleInitContainer {
-            /**
-             * Configuration for enabling extra debug information in the container.
-             * Not recommended for production use.
-             */
-            debug?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebug
+            debug: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebug
             /**
              * List of environment variables to set in the container.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
@@ -1975,7 +3857,7 @@ export namespace tailscale {
              * variables (i.e TS_USERSPACE) is not recommended and might break in
              * the future.
              */
-            env?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnv[]
+            env: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnv[]
             /**
              * Container image name. By default images are pulled from
              * docker.io/tailscale/tailscale, but the official images are also
@@ -1985,32 +3867,14 @@ export namespace tailscale {
              * Deployment.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            image?: string
+            image: string
             /**
              * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            imagePullPolicy?: string
-            /**
-             * Container resource requirements.
-             * By default Tailscale Kubernetes operator does not apply any resource
-             * requirements. The amount of resources required wil depend on the
-             * amount of resources the operator needs to parse, usage patterns and
-             * cluster size.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResources
-            /**
-             * Container security context.
-             * Security context specified here will override the security context set by the operator.
-             * By default the operator sets the Tailscale container and the Tailscale init container to privileged
-             * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
-             * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
-             * installing device plugin in your cluster and configuring the proxies tun device to be created
-             * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContext
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResources
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContext
         }
 
         /**
@@ -2030,7 +3894,27 @@ export namespace tailscale {
              * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
              * this setting will default to false, and no requests will be proxied.
              */
-            enable?: boolean
+            enable: boolean
+        }
+
+        /**
+         * Configuration for enabling extra debug information in the container.
+         * Not recommended for production use.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugPatch {
+            /**
+             * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
+             * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
+             * 9001 is a container port named "debug". The endpoints and their responses
+             * may change in backwards incompatible ways in the future, and should not
+             * be considered stable.
+             *
+             * In 1.78.x and 1.80.x, this setting will default to the value of
+             * .spec.metrics.enable, and requests to the "metrics" port matching the
+             * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
+             * this setting will default to false, and no requests will be proxied.
+             */
+            enable: boolean
         }
 
         export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerEnv {
@@ -2048,7 +3932,59 @@ export namespace tailscale {
              * be expanded, regardless of whether the variable exists or not. Defaults
              * to "".
              */
-            value?: string
+            value: string
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name: string
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value: string
+        }
+
+        /**
+         * Configuration for the proxy init container that enables forwarding.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerPatch {
+            debug: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugPatch
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvPatch[]
+            /**
+             * Container image name. By default images are pulled from
+             * docker.io/tailscale/tailscale, but the official images are also
+             * available at ghcr.io/tailscale/tailscale. Specifying image name here
+             * will override any proxy image values specified via the Kubernetes
+             * operator's Helm chart values or PROXY_IMAGE env var in the operator
+             * Deployment.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image: string
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesPatch
+            securityContext: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextPatch
         }
 
         /**
@@ -2069,19 +4005,19 @@ export namespace tailscale {
              *
              * This field is immutable. It can only be set for containers.
              */
-            claims?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaims[]
+            claims: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaims[]
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: { [key: string]: number | string }
+            limits: { [key: string]: number | string }
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: { [key: string]: number | string }
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -2094,6 +4030,51 @@ export namespace tailscale {
              * inside a container.
              */
             name: string
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name: string
+        }
+
+        /**
+         * Container resource requirements.
+         * By default Tailscale Kubernetes operator does not apply any resource
+         * requirements. The amount of resources required wil depend on the
+         * amount of resources the operator needs to parse, usage patterns and
+         * cluster size.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsPatch[]
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits: { [key: string]: number | string }
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -2116,26 +4097,16 @@ export namespace tailscale {
              * 2) has CAP_SYS_ADMIN
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            allowPrivilegeEscalation?: boolean
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfile
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilities
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfile
+            capabilities: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilities
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
              * Defaults to false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            privileged?: boolean
+            privileged: boolean
             /**
              * procMount denotes the type of proc mount to use for the containers.
              * The default is DefaultProcMount which uses the container runtime defaults for
@@ -2143,13 +4114,13 @@ export namespace tailscale {
              * This requires the ProcMountType feature flag to be enabled.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            procMount?: string
+            procMount: string
             /**
              * Whether this container has a read-only root filesystem.
              * Default is false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            readOnlyRootFilesystem?: boolean
+            readOnlyRootFilesystem: boolean
             /**
              * The GID to run the entrypoint of the container process.
              * Uses runtime default if unset.
@@ -2157,7 +4128,7 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsGroup?: number
+            runAsGroup: number
             /**
              * Indicates that the container must run as a non-root user.
              * If true, the Kubelet will validate the image at runtime to ensure that it
@@ -2166,7 +4137,7 @@ export namespace tailscale {
              * May also be set in PodSecurityContext.  If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsNonRoot?: boolean
+            runAsNonRoot: boolean
             /**
              * The UID to run the entrypoint of the container process.
              * Defaults to user specified in image metadata if unspecified.
@@ -2174,29 +4145,10 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsUser?: number
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptions
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfile
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptions
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptions
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfile
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptions
         }
 
         /**
@@ -2211,7 +4163,30 @@ export namespace tailscale {
              * Must match the loaded name of the profile.
              * Must be set if and only if type is "Localhost".
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type: string
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of AppArmor profile will be applied.
              * Valid options are:
@@ -2231,11 +4206,101 @@ export namespace tailscale {
             /**
              * Added capabilities
              */
-            add?: string[]
+            add: string[]
             /**
              * Removed capabilities
              */
-            drop?: string[]
+            drop: string[]
+        }
+
+        /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add: string[]
+            /**
+             * Removed capabilities
+             */
+            drop: string[]
+        }
+
+        /**
+         * Container security context.
+         * Security context specified here will override the security context set by the operator.
+         * By default the operator sets the Tailscale container and the Tailscale init container to privileged
+         * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
+         * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
+         * installing device plugin in your cluster and configuring the proxies tun device to be created
+         * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfilePatch
+            capabilities: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesPatch
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged: boolean
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount: string
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem: boolean
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup: number
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot: boolean
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsPatch
+            seccompProfile: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfilePatch
+            windowsOptions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsPatch
         }
 
         /**
@@ -2249,19 +4314,45 @@ export namespace tailscale {
             /**
              * Level is SELinux level label that applies to the container.
              */
-            level?: string
+            level: string
             /**
              * Role is a SELinux role label that applies to the container.
              */
-            role?: string
+            role: string
             /**
              * Type is a SELinux type label that applies to the container.
              */
-            type?: string
+            type: string
             /**
              * User is a SELinux user label that applies to the container.
              */
-            user?: string
+            user: string
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsPatch {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level: string
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role: string
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type: string
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user: string
         }
 
         /**
@@ -2277,7 +4368,32 @@ export namespace tailscale {
              * Must be a descending path, relative to the kubelet's configured seccomp profile location.
              * Must be set if type is "Localhost". Must NOT be set for any other type.
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type: string
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of seccomp profile will be applied.
              * Valid options are:
@@ -2301,25 +4417,58 @@ export namespace tailscale {
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
              * GMSA credential spec named by the GMSACredentialSpecName field.
              */
-            gmsaCredentialSpec?: string
+            gmsaCredentialSpec: string
             /**
              * GMSACredentialSpecName is the name of the GMSA credential spec to use.
              */
-            gmsaCredentialSpecName?: string
+            gmsaCredentialSpecName: string
             /**
              * HostProcess determines if a container should be run as a 'Host Process' container.
              * All of a Pod's containers must have the same effective HostProcess value
              * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
              * In addition, if HostProcess is true then HostNetwork must also be set to true.
              */
-            hostProcess?: boolean
+            hostProcess: boolean
             /**
              * The UserName in Windows to run the entrypoint of the container process.
              * Defaults to the user specified in image metadata if unspecified.
              * May also be set in PodSecurityContext. If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsUserName?: string
+            runAsUserName: string
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsPatch {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec: string
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName: string
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess: boolean
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName: string
         }
 
         /**
@@ -2331,43 +4480,74 @@ export namespace tailscale {
              * Effect indicates the taint effect to match. Empty means match all taint effects.
              * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect?: string
+            effect: string
             /**
              * Key is the taint key that the toleration applies to. Empty means match all taint keys.
              * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
              */
-            key?: string
+            key: string
             /**
              * Operator represents a key's relationship to the value.
              * Valid operators are Exists and Equal. Defaults to Equal.
              * Exists is equivalent to wildcard for value, so that a pod can
              * tolerate all taints of a particular category.
              */
-            operator?: string
+            operator: string
             /**
              * TolerationSeconds represents the period of time the toleration (which must be
              * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
              * it is not set, which means tolerate the taint forever (do not evict). Zero and
              * negative values will be treated as 0 (evict immediately) by the system.
              */
-            tolerationSeconds?: number
+            tolerationSeconds: number
             /**
              * Value is the taint value the toleration matches to.
              * If the operator is Exists, the value should be empty, otherwise just a regular string.
              */
-            value?: string
+            value: string
+        }
+
+        /**
+         * The pod this Toleration is attached to tolerates any taint that matches
+         * the triple <key,value,effect> using the matching operator <operator>.
+         */
+        export interface ProxyClassSpecStatefulSetPodTolerationsPatch {
+            /**
+             * Effect indicates the taint effect to match. Empty means match all taint effects.
+             * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect: string
+            /**
+             * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+             * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+             */
+            key: string
+            /**
+             * Operator represents a key's relationship to the value.
+             * Valid operators are Exists and Equal. Defaults to Equal.
+             * Exists is equivalent to wildcard for value, so that a pod can
+             * tolerate all taints of a particular category.
+             */
+            operator: string
+            /**
+             * TolerationSeconds represents the period of time the toleration (which must be
+             * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+             * it is not set, which means tolerate the taint forever (do not evict). Zero and
+             * negative values will be treated as 0 (evict immediately) by the system.
+             */
+            tolerationSeconds: number
+            /**
+             * Value is the taint value the toleration matches to.
+             * If the operator is Exists, the value should be empty, otherwise just a regular string.
+             */
+            value: string
         }
 
         /**
          * TopologySpreadConstraint specifies how to spread matching pods among the given topology.
          */
         export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraints {
-            /**
-             * LabelSelector is used to find matching pods.
-             * Pods that match this label selector are counted to determine the number of pods
-             * in their corresponding topology domain.
-             */
-            labelSelector?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelector
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelector
             /**
              * MatchLabelKeys is a set of pod label keys to select the pods over which
              * spreading will be calculated. The keys are used to lookup values from the
@@ -2380,7 +4560,7 @@ export namespace tailscale {
              *
              * This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MaxSkew describes the degree to which pods may be unevenly distributed.
              * When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
@@ -2422,7 +4602,7 @@ export namespace tailscale {
              * because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
              * it will violate MaxSkew.
              */
-            minDomains?: number
+            minDomains: number
             /**
              * NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
              * when calculating pod topology spread skew. Options are:
@@ -2432,7 +4612,7 @@ export namespace tailscale {
              * If this value is nil, the behavior is equivalent to the Honor policy.
              * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
              */
-            nodeAffinityPolicy?: string
+            nodeAffinityPolicy: string
             /**
              * NodeTaintsPolicy indicates how we will treat node taints when calculating
              * pod topology spread skew. Options are:
@@ -2443,7 +4623,7 @@ export namespace tailscale {
              * If this value is nil, the behavior is equivalent to the Ignore policy.
              * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
              */
-            nodeTaintsPolicy?: string
+            nodeTaintsPolicy: string
             /**
              * TopologyKey is the key of node labels. Nodes that have a label with this key
              * and identical values are considered to be in the same topology.
@@ -2489,13 +4669,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -2518,7 +4698,165 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * LabelSelector is used to find matching pods.
+         * Pods that match this label selector are counted to determine the number of pods
+         * in their corresponding topology domain.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * TopologySpreadConstraint specifies how to spread matching pods among the given topology.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsPatch {
+            labelSelector: outputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorPatch
+            /**
+             * MatchLabelKeys is a set of pod label keys to select the pods over which
+             * spreading will be calculated. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are ANDed with labelSelector
+             * to select the group of existing pods over which spreading will be calculated
+             * for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.
+             * MatchLabelKeys cannot be set when LabelSelector isn't set.
+             * Keys that don't exist in the incoming pod labels will
+             * be ignored. A null or empty list means only match against labelSelector.
+             *
+             * This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
+             */
+            matchLabelKeys: string[]
+            /**
+             * MaxSkew describes the degree to which pods may be unevenly distributed.
+             * When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+             * between the number of matching pods in the target topology and the global minimum.
+             * The global minimum is the minimum number of matching pods in an eligible domain
+             * or zero if the number of eligible domains is less than MinDomains.
+             * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+             * labelSelector spread as 2/2/1:
+             * In this case, the global minimum is 1.
+             * | zone1 | zone2 | zone3 |
+             * |  P P  |  P P  |   P   |
+             * - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 2/2/2;
+             * scheduling it onto zone1(zone2) would make the ActualSkew(3-1) on zone1(zone2)
+             * violate MaxSkew(1).
+             * - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+             * When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
+             * to topologies that satisfy it.
+             * It's a required field. Default value is 1 and 0 is not allowed.
+             */
+            maxSkew: number
+            /**
+             * MinDomains indicates a minimum number of eligible domains.
+             * When the number of eligible domains with matching topology keys is less than minDomains,
+             * Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
+             * And when the number of eligible domains with matching topology keys equals or greater than minDomains,
+             * this value has no effect on scheduling.
+             * As a result, when the number of eligible domains is less than minDomains,
+             * scheduler won't schedule more than maxSkew Pods to those domains.
+             * If value is nil, the constraint behaves as if MinDomains is equal to 1.
+             * Valid values are integers greater than 0.
+             * When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
+             *
+             * For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same
+             * labelSelector spread as 2/2/2:
+             * | zone1 | zone2 | zone3 |
+             * |  P P  |  P P  |  P P  |
+             * The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0.
+             * In this situation, new pod with the same labelSelector cannot be scheduled,
+             * because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
+             * it will violate MaxSkew.
+             */
+            minDomains: number
+            /**
+             * NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
+             * when calculating pod topology spread skew. Options are:
+             * - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
+             * - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
+             *
+             * If this value is nil, the behavior is equivalent to the Honor policy.
+             * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+             */
+            nodeAffinityPolicy: string
+            /**
+             * NodeTaintsPolicy indicates how we will treat node taints when calculating
+             * pod topology spread skew. Options are:
+             * - Honor: nodes without taints, along with tainted nodes for which the incoming pod
+             * has a toleration, are included.
+             * - Ignore: node taints are ignored. All nodes are included.
+             *
+             * If this value is nil, the behavior is equivalent to the Ignore policy.
+             * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+             */
+            nodeTaintsPolicy: string
+            /**
+             * TopologyKey is the key of node labels. Nodes that have a label with this key
+             * and identical values are considered to be in the same topology.
+             * We consider each <key, value> as a "bucket", and try to put balanced number
+             * of pods into each bucket.
+             * We define a domain as a particular instance of a topology.
+             * Also, we define an eligible domain as a domain whose nodes meet the requirements of
+             * nodeAffinityPolicy and nodeTaintsPolicy.
+             * e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
+             * And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
+             * It's a required field.
+             */
+            topologyKey: string
+            /**
+             * WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+             * the spread constraint.
+             * - DoNotSchedule (default) tells the scheduler not to schedule it.
+             * - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+             *   but giving higher precedence to topologies that would help reduce the
+             *   skew.
+             * A constraint is considered "Unsatisfiable" for an incoming pod
+             * if and only if every possible node assignment for that pod would violate
+             * "MaxSkew" on some topology.
+             * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+             * labelSelector spread as 3/1/1:
+             * | zone1 | zone2 | zone3 |
+             * | P P P |   P   |   P   |
+             * If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled
+             * to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies
+             * MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler
+             * won't make it *more* imbalanced.
+             * It's a required field.
+             */
+            whenUnsatisfiable: string
         }
 
         /**
@@ -2534,7 +4872,23 @@ export namespace tailscale {
              * https://tailscale.com/kb/1019/subnets#use-your-subnet-routes-from-other-devices
              * Defaults to false.
              */
-            acceptRoutes?: boolean
+            acceptRoutes: boolean
+        }
+
+        /**
+         * TailscaleConfig contains options to configure the tailscale-specific
+         * parameters of proxies.
+         */
+        export interface ProxyClassSpecTailscalePatch {
+            /**
+             * AcceptRoutes can be set to true to make the proxy instance accept
+             * routes advertized by other nodes on the tailnet, such as subnet
+             * routes.
+             * This is equivalent of passing --accept-routes flag to a tailscale Linux client.
+             * https://tailscale.com/kb/1019/subnets#use-your-subnet-routes-from-other-devices
+             * Defaults to false.
+             */
+            acceptRoutes: boolean
         }
 
         /**
@@ -2546,7 +4900,7 @@ export namespace tailscale {
              * List of status conditions to indicate the status of the ProxyClass.
              * Known condition types are `ProxyClassReady`.
              */
-            conditions?: outputs.tailscale.v1alpha1.ProxyClassStatusConditions[]
+            conditions: outputs.tailscale.v1alpha1.ProxyClassStatusConditions[]
         }
 
         /**
@@ -2568,7 +4922,7 @@ export namespace tailscale {
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: number
+            observedGeneration: number
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -2588,6 +4942,73 @@ export namespace tailscale {
         }
 
         /**
+         * Condition contains details for one aspect of the current state of this API Resource.
+         */
+        export interface ProxyClassStatusConditionsPatch {
+            /**
+             * lastTransitionTime is the last time the condition transitioned from one status to another.
+             * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+             */
+            lastTransitionTime: string
+            /**
+             * message is a human readable message indicating details about the transition.
+             * This may be an empty string.
+             */
+            message: string
+            /**
+             * observedGeneration represents the .metadata.generation that the condition was set based upon.
+             * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+             * with respect to the current state of the instance.
+             */
+            observedGeneration: number
+            /**
+             * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+             * Producers of specific condition types may define expected values and meanings for this field,
+             * and whether the values are considered a guaranteed API.
+             * The value should be a CamelCase string.
+             * This field may not be empty.
+             */
+            reason: string
+            /**
+             * status of the condition, one of True, False, Unknown.
+             */
+            status: string
+            /**
+             * type of condition in CamelCase or in foo.example.com/CamelCase.
+             */
+            type: string
+        }
+
+        /**
+         * Status of the ProxyClass. This is set and managed automatically.
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface ProxyClassStatusPatch {
+            /**
+             * List of status conditions to indicate the status of the ProxyClass.
+             * Known condition types are `ProxyClassReady`.
+             */
+            conditions: outputs.tailscale.v1alpha1.ProxyClassStatusConditionsPatch[]
+        }
+
+        export interface ProxyGroup {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion: 'tailscale.com/v1alpha1'
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: 'ProxyGroup'
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata: outputs.meta.v1.ObjectMeta
+            spec: outputs.tailscale.v1alpha1.ProxyGroupSpec
+            status: outputs.tailscale.v1alpha1.ProxyGroupStatus
+        }
+
+        /**
          * Spec describes the desired ProxyGroup instances.
          */
         export interface ProxyGroupSpec {
@@ -2598,7 +5019,7 @@ export namespace tailscale {
              * HostnamePrefix can contain lower case letters, numbers and dashes, it
              * must not start with a dash and must be between 1 and 62 characters long.
              */
-            hostnamePrefix?: string
+            hostnamePrefix: string
             /**
              * ProxyClass is the name of the ProxyClass custom resource that contains
              * configuration options that should be applied to the resources created
@@ -2606,12 +5027,12 @@ export namespace tailscale {
              * configured, the operator will create resources with the default
              * configuration.
              */
-            proxyClass?: string
+            proxyClass: string
             /**
              * Replicas specifies how many replicas to create the StatefulSet with.
              * Defaults to 2.
              */
-            replicas?: number
+            replicas: number
             /**
              * Tags that the Tailscale devices will be tagged with. Defaults to [tag:k8s].
              * If you specify custom tags here, make sure you also make the operator
@@ -2620,7 +5041,47 @@ export namespace tailscale {
              * Tags cannot be changed once a ProxyGroup device has been created.
              * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
              */
-            tags?: string[]
+            tags: string[]
+            /**
+             * Type of the ProxyGroup proxies. Currently the only supported type is egress.
+             */
+            type: string
+        }
+
+        /**
+         * Spec describes the desired ProxyGroup instances.
+         */
+        export interface ProxyGroupSpecPatch {
+            /**
+             * HostnamePrefix is the hostname prefix to use for tailnet devices created
+             * by the ProxyGroup. Each device will have the integer number from its
+             * StatefulSet pod appended to this prefix to form the full hostname.
+             * HostnamePrefix can contain lower case letters, numbers and dashes, it
+             * must not start with a dash and must be between 1 and 62 characters long.
+             */
+            hostnamePrefix: string
+            /**
+             * ProxyClass is the name of the ProxyClass custom resource that contains
+             * configuration options that should be applied to the resources created
+             * for this ProxyGroup. If unset, and there is no default ProxyClass
+             * configured, the operator will create resources with the default
+             * configuration.
+             */
+            proxyClass: string
+            /**
+             * Replicas specifies how many replicas to create the StatefulSet with.
+             * Defaults to 2.
+             */
+            replicas: number
+            /**
+             * Tags that the Tailscale devices will be tagged with. Defaults to [tag:k8s].
+             * If you specify custom tags here, make sure you also make the operator
+             * an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a ProxyGroup device has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+             */
+            tags: string[]
             /**
              * Type of the ProxyGroup proxies. Currently the only supported type is egress.
              */
@@ -2636,11 +5097,11 @@ export namespace tailscale {
              * List of status conditions to indicate the status of the ProxyGroup
              * resources. Known condition types are `ProxyGroupReady`.
              */
-            conditions?: outputs.tailscale.v1alpha1.ProxyGroupStatusConditions[]
+            conditions: outputs.tailscale.v1alpha1.ProxyGroupStatusConditions[]
             /**
              * List of tailnet devices associated with the ProxyGroup StatefulSet.
              */
-            devices?: outputs.tailscale.v1alpha1.ProxyGroupStatusDevices[]
+            devices: outputs.tailscale.v1alpha1.ProxyGroupStatusDevices[]
         }
 
         /**
@@ -2662,7 +5123,45 @@ export namespace tailscale {
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: number
+            observedGeneration: number
+            /**
+             * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+             * Producers of specific condition types may define expected values and meanings for this field,
+             * and whether the values are considered a guaranteed API.
+             * The value should be a CamelCase string.
+             * This field may not be empty.
+             */
+            reason: string
+            /**
+             * status of the condition, one of True, False, Unknown.
+             */
+            status: string
+            /**
+             * type of condition in CamelCase or in foo.example.com/CamelCase.
+             */
+            type: string
+        }
+
+        /**
+         * Condition contains details for one aspect of the current state of this API Resource.
+         */
+        export interface ProxyGroupStatusConditionsPatch {
+            /**
+             * lastTransitionTime is the last time the condition transitioned from one status to another.
+             * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+             */
+            lastTransitionTime: string
+            /**
+             * message is a human readable message indicating details about the transition.
+             * This may be an empty string.
+             */
+            message: string
+            /**
+             * observedGeneration represents the .metadata.generation that the condition was set based upon.
+             * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+             * with respect to the current state of the instance.
+             */
+            observedGeneration: number
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -2692,7 +5191,54 @@ export namespace tailscale {
              * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
              * assigned to the device.
              */
-            tailnetIPs?: string[]
+            tailnetIPs: string[]
+        }
+
+        export interface ProxyGroupStatusDevicesPatch {
+            /**
+             * Hostname is the fully qualified domain name of the device.
+             * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
+             * node.
+             */
+            hostname: string
+            /**
+             * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
+             * assigned to the device.
+             */
+            tailnetIPs: string[]
+        }
+
+        /**
+         * ProxyGroupStatus describes the status of the ProxyGroup resources. This is
+         * set and managed by the Tailscale operator.
+         */
+        export interface ProxyGroupStatusPatch {
+            /**
+             * List of status conditions to indicate the status of the ProxyGroup
+             * resources. Known condition types are `ProxyGroupReady`.
+             */
+            conditions: outputs.tailscale.v1alpha1.ProxyGroupStatusConditionsPatch[]
+            /**
+             * List of tailnet devices associated with the ProxyGroup StatefulSet.
+             */
+            devices: outputs.tailscale.v1alpha1.ProxyGroupStatusDevicesPatch[]
+        }
+
+        export interface Recorder {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion: 'tailscale.com/v1alpha1'
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: 'Recorder'
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata: outputs.meta.v1.ObjectMeta
+            spec: outputs.tailscale.v1alpha1.RecorderSpec
+            status: outputs.tailscale.v1alpha1.RecorderStatus
         }
 
         /**
@@ -2705,18 +5251,9 @@ export namespace tailscale {
              * Corresponds to --ui tsrecorder flag https://tailscale.com/kb/1246/tailscale-ssh-session-recording#deploy-a-recorder-node.
              * Required if S3 storage is not set up, to ensure that recordings are accessible.
              */
-            enableUI?: boolean
-            /**
-             * Configuration parameters for the Recorder's StatefulSet. The operator
-             * deploys a StatefulSet for each Recorder resource.
-             */
-            statefulSet?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSet
-            /**
-             * Configure where to store session recordings. By default, recordings will
-             * be stored in a local ephemeral volume, and will not be persisted past the
-             * lifetime of a specific pod.
-             */
-            storage?: outputs.tailscale.v1alpha1.RecorderSpecStorage
+            enableUI: boolean
+            statefulSet: outputs.tailscale.v1alpha1.RecorderSpecStatefulSet
+            storage: outputs.tailscale.v1alpha1.RecorderSpecStorage
             /**
              * Tags that the Tailscale device will be tagged with. Defaults to [tag:k8s].
              * If you specify custom tags here, make sure you also make the operator
@@ -2725,7 +5262,31 @@ export namespace tailscale {
              * Tags cannot be changed once a Recorder node has been created.
              * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
              */
-            tags?: string[]
+            tags: string[]
+        }
+
+        /**
+         * Spec describes the desired recorder instance.
+         */
+        export interface RecorderSpecPatch {
+            /**
+             * Set to true to enable the Recorder UI. The UI lists and plays recorded sessions.
+             * The UI will be served at <MagicDNS name of the recorder>:443. Defaults to false.
+             * Corresponds to --ui tsrecorder flag https://tailscale.com/kb/1246/tailscale-ssh-session-recording#deploy-a-recorder-node.
+             * Required if S3 storage is not set up, to ensure that recordings are accessible.
+             */
+            enableUI: boolean
+            statefulSet: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPatch
+            storage: outputs.tailscale.v1alpha1.RecorderSpecStoragePatch
+            /**
+             * Tags that the Tailscale device will be tagged with. Defaults to [tag:k8s].
+             * If you specify custom tags here, make sure you also make the operator
+             * an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a Recorder node has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+             */
+            tags: string[]
         }
 
         /**
@@ -2739,70 +5300,76 @@ export namespace tailscale {
              * applied to the StatefulSet by the operator.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            annotations?: { [key: string]: string }
+            annotations: { [key: string]: string }
             /**
              * Labels that will be added to the StatefulSet created for the Recorder.
              * Any labels specified here will be merged with the default labels applied
              * to the StatefulSet by the operator.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
-            labels?: { [key: string]: string }
+            labels: { [key: string]: string }
+            pod: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPod
+        }
+
+        /**
+         * Configuration parameters for the Recorder's StatefulSet. The operator
+         * deploys a StatefulSet for each Recorder resource.
+         */
+        export interface RecorderSpecStatefulSetPatch {
             /**
-             * Configuration for pods created by the Recorder's StatefulSet.
+             * Annotations that will be added to the StatefulSet created for the Recorder.
+             * Any Annotations specified here will be merged with the default annotations
+             * applied to the StatefulSet by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            pod?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPod
+            annotations: { [key: string]: string }
+            /**
+             * Labels that will be added to the StatefulSet created for the Recorder.
+             * Any labels specified here will be merged with the default labels applied
+             * to the StatefulSet by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels: { [key: string]: string }
+            pod: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodPatch
         }
 
         /**
          * Configuration for pods created by the Recorder's StatefulSet.
          */
         export interface RecorderSpecStatefulSetPod {
-            /**
-             * Affinity rules for Recorder Pods. By default, the operator does not
-             * apply any affinity rules.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
-             */
-            affinity?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinity
+            affinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinity
             /**
              * Annotations that will be added to Recorder Pods. Any annotations
              * specified here will be merged with the default annotations applied to
              * the Pod by the operator.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            annotations?: { [key: string]: string }
-            /**
-             * Configuration for the Recorder container running tailscale.
-             */
-            container?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainer
+            annotations: { [key: string]: string }
+            container: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainer
             /**
              * Image pull Secrets for Recorder Pods.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
              */
-            imagePullSecrets?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecrets[]
+            imagePullSecrets: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecrets[]
             /**
              * Labels that will be added to Recorder Pods. Any labels specified here
              * will be merged with the default labels applied to the Pod by the operator.
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
-            labels?: { [key: string]: string }
+            labels: { [key: string]: string }
             /**
              * Node selector rules for Recorder Pods. By default, the operator does
              * not apply any node selector rules.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            nodeSelector?: { [key: string]: string }
-            /**
-             * Security context for Recorder Pods. By default, the operator does not
-             * apply any Pod security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
-             */
-            securityContext?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContext
+            nodeSelector: { [key: string]: string }
+            securityContext: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContext
             /**
              * Tolerations for Recorder Pods. By default, the operator does not apply
              * any tolerations.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            tolerations?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerations[]
+            tolerations: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerations[]
         }
 
         /**
@@ -2811,18 +5378,9 @@ export namespace tailscale {
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
          */
         export interface RecorderSpecStatefulSetPodAffinity {
-            /**
-             * Describes node affinity scheduling rules for the pod.
-             */
-            nodeAffinity?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinity
-            /**
-             * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAffinity?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinity
-            /**
-             * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAntiAffinity?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinity
+            nodeAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinity
+            podAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinity
+            podAntiAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinity
         }
 
         /**
@@ -2840,15 +5398,27 @@ export namespace tailscale {
              * "weight" to the sum if the node matches the corresponding matchExpressions; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution
+        }
+
+        /**
+         * Describes node affinity scheduling rules for the pod.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPatch {
             /**
-             * If the affinity requirements specified by this field are not met at
-             * scheduling time, the pod will not be scheduled onto the node.
-             * If the affinity requirements specified by this field cease to be met
-             * at some point during pod execution (e.g. due to an update), the system
-             * may or may not try to eventually evict the pod from its node.
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node matches the corresponding matchExpressions; the
+             * node(s) with the highest sum are the most preferred.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch
         }
 
         /**
@@ -2856,10 +5426,19 @@ export namespace tailscale {
          * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
          */
         export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * A node selector term, associated with the corresponding weight.
-             */
             preference: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference
+            /**
+             * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * An empty preferred scheduling term matches all objects with implicit weight 0
+         * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            preference: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch
             /**
              * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
              */
@@ -2873,11 +5452,11 @@ export namespace tailscale {
             /**
              * A list of node selector requirements by node's labels.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions[]
             /**
              * A list of node selector requirements by node's fields.
              */
-            matchFields?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields[]
+            matchFields: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields[]
         }
 
         /**
@@ -2901,7 +5480,31 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
         }
 
         /**
@@ -2925,7 +5528,45 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A node selector term, associated with the corresponding weight.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch[]
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch[]
         }
 
         /**
@@ -2951,11 +5592,11 @@ export namespace tailscale {
             /**
              * A list of node selector requirements by node's labels.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions[]
             /**
              * A list of node selector requirements by node's fields.
              */
-            matchFields?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields[]
+            matchFields: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields[]
         }
 
         /**
@@ -2979,7 +5620,31 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
         }
 
         /**
@@ -3003,7 +5668,72 @@ export namespace tailscale {
              * array must have a single element, which will be interpreted as an integer.
              * This array is replaced during a strategic merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key: string
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator: string
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A null or empty node selector term matches no objects. The requirements of
+         * them are ANDed.
+         * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch[]
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch[]
+        }
+
+        /**
+         * If the affinity requirements specified by this field are not met at
+         * scheduling time, the pod will not be scheduled onto the node.
+         * If the affinity requirements specified by this field cease to be met
+         * at some point during pod execution (e.g. due to an update), the system
+         * may or may not try to eventually evict the pod from its node.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            /**
+             * Required. A list of node selector terms. The terms are ORed.
+             */
+            nodeSelectorTerms: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch[]
+        }
+
+        /**
+         * Affinity rules for Recorder Pods. By default, the operator does not
+         * apply any affinity rules.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPatch {
+            nodeAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPatch
+            podAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPatch
+            podAntiAffinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPatch
         }
 
         /**
@@ -3021,7 +5751,7 @@ export namespace tailscale {
              * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
             /**
              * If the affinity requirements specified by this field are not met at
              * scheduling time, the pod will not be scheduled onto the node.
@@ -3031,17 +5761,54 @@ export namespace tailscale {
              * When there are multiple elements, the lists of nodes corresponding to each
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+        }
+
+        /**
+         * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            /**
+             * If the affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch[]
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
         export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
             podAffinityTerm: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
@@ -3053,11 +5820,7 @@ export namespace tailscale {
          * Required. A pod affinity term, associated with the corresponding weight.
          */
         export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3069,7 +5832,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3081,22 +5844,15 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -3115,13 +5871,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3144,7 +5900,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3158,13 +5954,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3187,23 +5983,57 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
         }
 
         /**
-         * Defines a set of pods (namely those matching the labelSelector
-         * relative to the given namespace(s)) that this pod should be
-         * co-located (affinity) or not co-located (anti-affinity) with,
-         * where co-located is defined as running on a node whose value of
-         * the label with key <topologyKey> matches that of any node on which
-         * a pod of the set of pods is running
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
             /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
+             * key is the label key that the selector applies to.
              */
-            labelSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Required. A pod affinity term, associated with the corresponding weight.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3215,7 +6045,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3227,22 +6057,67 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -3261,13 +6136,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3290,7 +6165,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3304,13 +6219,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3333,7 +6248,102 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
         }
 
         /**
@@ -3351,7 +6361,7 @@ export namespace tailscale {
              * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
              * node(s) with the highest sum are the most preferred.
              */
-            preferredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution[]
             /**
              * If the anti-affinity requirements specified by this field are not met at
              * scheduling time, the pod will not be scheduled onto the node.
@@ -3361,17 +6371,54 @@ export namespace tailscale {
              * When there are multiple elements, the lists of nodes corresponding to each
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution[]
+        }
+
+        /**
+         * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the anti-affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling anti-affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch[]
+            /**
+             * If the anti-affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the anti-affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch[]
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
         export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
             podAffinityTerm: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight: number
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
@@ -3383,11 +6430,7 @@ export namespace tailscale {
          * Required. A pod affinity term, associated with the corresponding weight.
          */
         export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3399,7 +6442,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3411,22 +6454,15 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -3445,13 +6481,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3474,7 +6510,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3488,13 +6564,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3517,23 +6593,57 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
         }
 
         /**
-         * Defines a set of pods (namely those matching the labelSelector
-         * relative to the given namespace(s)) that this pod should be
-         * co-located (affinity) or not co-located (anti-affinity) with,
-         * where co-located is defined as running on a node whose value of
-         * the label with key <topologyKey> matches that of any node on which
-         * a pod of the set of pods is running
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
             /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
+             * key is the label key that the selector applies to.
              */
-            labelSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Required. A pod affinity term, associated with the corresponding weight.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3545,7 +6655,7 @@ export namespace tailscale {
              * Also, matchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            matchLabelKeys?: string[]
+            matchLabelKeys: string[]
             /**
              * MismatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3557,22 +6667,67 @@ export namespace tailscale {
              * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            mismatchLabelKeys?: string[]
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
              * and the ones selected by namespaceSelector.
              * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            namespaces?: string[]
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
             /**
              * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
              * the labelSelector in the specified namespaces, where co-located is defined as running on a node
@@ -3591,13 +6746,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3620,7 +6775,47 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3634,13 +6829,13 @@ export namespace tailscale {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
-            matchExpressions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions[]
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
              * map is equivalent to an element of matchExpressions, whose key field is "key", the
              * operator is "In", and the values array contains only "value". The requirements are ANDed.
              */
-            matchLabels?: { [key: string]: string }
+            matchLabels: { [key: string]: string }
         }
 
         /**
@@ -3663,7 +6858,102 @@ export namespace tailscale {
              * the values array must be empty. This array is replaced during a strategic
              * merge patch.
              */
-            values?: string[]
+            values: string[]
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key: string
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator: string
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values: string[]
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch[]
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels: { [key: string]: string }
+        }
+
+        /**
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch
+            /**
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            matchLabelKeys: string[]
+            /**
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
+             */
+            mismatchLabelKeys: string[]
+            namespaceSelector: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch
+            /**
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
+             */
+            namespaces: string[]
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey: string
         }
 
         /**
@@ -3679,32 +6969,21 @@ export namespace tailscale {
              * variables (i.e TS_USERSPACE) is not recommended and might break in
              * the future.
              */
-            env?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnv[]
+            env: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnv[]
             /**
              * Container image name including tag. Defaults to docker.io/tailscale/tsrecorder
              * with the same tag as the operator, but the official images are also
              * available at ghcr.io/tailscale/tsrecorder.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            image?: string
+            image: string
             /**
              * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
-            imagePullPolicy?: string
-            /**
-             * Container resource requirements.
-             * By default, the operator does not apply any resource requirements. The
-             * amount of resources required wil depend on the volume of recordings sent.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResources
-            /**
-             * Container security context. By default, the operator does not apply any
-             * container security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContext
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResources
+            securityContext: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContext
         }
 
         export interface RecorderSpecStatefulSetPodContainerEnv {
@@ -3722,7 +7001,55 @@ export namespace tailscale {
              * be expanded, regardless of whether the variable exists or not. Defaults
              * to "".
              */
-            value?: string
+            value: string
+        }
+
+        export interface RecorderSpecStatefulSetPodContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name: string
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value: string
+        }
+
+        /**
+         * Configuration for the Recorder container running tailscale.
+         */
+        export interface RecorderSpecStatefulSetPodContainerPatch {
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnvPatch[]
+            /**
+             * Container image name including tag. Defaults to docker.io/tailscale/tsrecorder
+             * with the same tag as the operator, but the official images are also
+             * available at ghcr.io/tailscale/tsrecorder.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image: string
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy: string
+            resources: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesPatch
+            securityContext: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextPatch
         }
 
         /**
@@ -3741,19 +7068,19 @@ export namespace tailscale {
              *
              * This field is immutable. It can only be set for containers.
              */
-            claims?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaims[]
+            claims: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaims[]
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: { [key: string]: number | string }
+            limits: { [key: string]: number | string }
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: { [key: string]: number | string }
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -3766,6 +7093,49 @@ export namespace tailscale {
              * inside a container.
              */
             name: string
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface RecorderSpecStatefulSetPodContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name: string
+        }
+
+        /**
+         * Container resource requirements.
+         * By default, the operator does not apply any resource requirements. The
+         * amount of resources required wil depend on the volume of recordings sent.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface RecorderSpecStatefulSetPodContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaimsPatch[]
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits: { [key: string]: number | string }
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests: { [key: string]: number | string }
         }
 
         /**
@@ -3783,26 +7153,16 @@ export namespace tailscale {
              * 2) has CAP_SYS_ADMIN
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            allowPrivilegeEscalation?: boolean
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfile
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilities
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfile
+            capabilities: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilities
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
              * Defaults to false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            privileged?: boolean
+            privileged: boolean
             /**
              * procMount denotes the type of proc mount to use for the containers.
              * The default is DefaultProcMount which uses the container runtime defaults for
@@ -3810,13 +7170,13 @@ export namespace tailscale {
              * This requires the ProcMountType feature flag to be enabled.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            procMount?: string
+            procMount: string
             /**
              * Whether this container has a read-only root filesystem.
              * Default is false.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            readOnlyRootFilesystem?: boolean
+            readOnlyRootFilesystem: boolean
             /**
              * The GID to run the entrypoint of the container process.
              * Uses runtime default if unset.
@@ -3824,7 +7184,7 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsGroup?: number
+            runAsGroup: number
             /**
              * Indicates that the container must run as a non-root user.
              * If true, the Kubelet will validate the image at runtime to ensure that it
@@ -3833,7 +7193,7 @@ export namespace tailscale {
              * May also be set in PodSecurityContext.  If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsNonRoot?: boolean
+            runAsNonRoot: boolean
             /**
              * The UID to run the entrypoint of the container process.
              * Defaults to user specified in image metadata if unspecified.
@@ -3841,29 +7201,10 @@ export namespace tailscale {
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsUser?: number
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptions
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfile
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptions
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptions
+            seccompProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfile
+            windowsOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptions
         }
 
         /**
@@ -3878,7 +7219,30 @@ export namespace tailscale {
              * Must match the loaded name of the profile.
              * Must be set if and only if type is "Localhost".
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type: string
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of AppArmor profile will be applied.
              * Valid options are:
@@ -3898,11 +7262,96 @@ export namespace tailscale {
             /**
              * Added capabilities
              */
-            add?: string[]
+            add: string[]
             /**
              * Removed capabilities
              */
-            drop?: string[]
+            drop: string[]
+        }
+
+        /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add: string[]
+            /**
+             * Removed capabilities
+             */
+            drop: string[]
+        }
+
+        /**
+         * Container security context. By default, the operator does not apply any
+         * container security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation: boolean
+            appArmorProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfilePatch
+            capabilities: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesPatch
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged: boolean
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount: string
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem: boolean
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup: number
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot: boolean
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsPatch
+            seccompProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfilePatch
+            windowsOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsPatch
         }
 
         /**
@@ -3916,19 +7365,45 @@ export namespace tailscale {
             /**
              * Level is SELinux level label that applies to the container.
              */
-            level?: string
+            level: string
             /**
              * Role is a SELinux role label that applies to the container.
              */
-            role?: string
+            role: string
             /**
              * Type is a SELinux type label that applies to the container.
              */
-            type?: string
+            type: string
             /**
              * User is a SELinux user label that applies to the container.
              */
-            user?: string
+            user: string
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsPatch {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level: string
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role: string
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type: string
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user: string
         }
 
         /**
@@ -3944,7 +7419,32 @@ export namespace tailscale {
              * Must be a descending path, relative to the kubelet's configured seccomp profile location.
              * Must be set if type is "Localhost". Must NOT be set for any other type.
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type: string
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of seccomp profile will be applied.
              * Valid options are:
@@ -3968,25 +7468,58 @@ export namespace tailscale {
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
              * GMSA credential spec named by the GMSACredentialSpecName field.
              */
-            gmsaCredentialSpec?: string
+            gmsaCredentialSpec: string
             /**
              * GMSACredentialSpecName is the name of the GMSA credential spec to use.
              */
-            gmsaCredentialSpecName?: string
+            gmsaCredentialSpecName: string
             /**
              * HostProcess determines if a container should be run as a 'Host Process' container.
              * All of a Pod's containers must have the same effective HostProcess value
              * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
              * In addition, if HostProcess is true then HostNetwork must also be set to true.
              */
-            hostProcess?: boolean
+            hostProcess: boolean
             /**
              * The UserName in Windows to run the entrypoint of the container process.
              * Defaults to the user specified in image metadata if unspecified.
              * May also be set in PodSecurityContext. If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsUserName?: string
+            runAsUserName: string
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsPatch {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec: string
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName: string
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess: boolean
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName: string
         }
 
         /**
@@ -4001,18 +7534,61 @@ export namespace tailscale {
              * almost certainly wrong.
              * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
              */
-            name?: string
+            name: string
         }
+
         /**
-         * recorderSpecStatefulSetPodImagePullSecretsProvideDefaults sets the appropriate defaults for RecorderSpecStatefulSetPodImagePullSecrets
+         * LocalObjectReference contains enough information to let you locate the
+         * referenced object inside the same namespace.
          */
-        export function recorderSpecStatefulSetPodImagePullSecretsProvideDefaults(
-            val: RecorderSpecStatefulSetPodImagePullSecrets,
-        ): RecorderSpecStatefulSetPodImagePullSecrets {
-            return {
-                ...val,
-                name: val.name ?? '',
-            }
+        export interface RecorderSpecStatefulSetPodImagePullSecretsPatch {
+            /**
+             * Name of the referent.
+             * This field is effectively required, but due to backwards compatibility is
+             * allowed to be empty. Instances of this type with an empty value here are
+             * almost certainly wrong.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+             */
+            name: string
+        }
+
+        /**
+         * Configuration for pods created by the Recorder's StatefulSet.
+         */
+        export interface RecorderSpecStatefulSetPodPatch {
+            affinity: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPatch
+            /**
+             * Annotations that will be added to Recorder Pods. Any annotations
+             * specified here will be merged with the default annotations applied to
+             * the Pod by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
+             */
+            annotations: { [key: string]: string }
+            container: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerPatch
+            /**
+             * Image pull Secrets for Recorder Pods.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+             */
+            imagePullSecrets: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecretsPatch[]
+            /**
+             * Labels that will be added to Recorder Pods. Any labels specified here
+             * will be merged with the default labels applied to the Pod by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels: { [key: string]: string }
+            /**
+             * Node selector rules for Recorder Pods. By default, the operator does
+             * not apply any node selector rules.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeSelector: { [key: string]: string }
+            securityContext: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextPatch
+            /**
+             * Tolerations for Recorder Pods. By default, the operator does not apply
+             * any tolerations.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            tolerations: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerationsPatch[]
         }
 
         /**
@@ -4021,11 +7597,7 @@ export namespace tailscale {
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
          */
         export interface RecorderSpecStatefulSetPodSecurityContext {
-            /**
-             * appArmorProfile is the AppArmor options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfile
+            appArmorProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfile
             /**
              * A special supplemental group that applies to all containers in a pod.
              * Some volume types allow the Kubelet to change the ownership of that volume
@@ -4038,7 +7610,7 @@ export namespace tailscale {
              * If unset, the Kubelet will not modify the ownership and permissions of any volume.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            fsGroup?: number
+            fsGroup: number
             /**
              * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
              * before being exposed inside Pod. This field will only apply to
@@ -4048,7 +7620,7 @@ export namespace tailscale {
              * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            fsGroupChangePolicy?: string
+            fsGroupChangePolicy: string
             /**
              * The GID to run the entrypoint of the container process.
              * Uses runtime default if unset.
@@ -4057,7 +7629,7 @@ export namespace tailscale {
              * for that container.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsGroup?: number
+            runAsGroup: number
             /**
              * Indicates that the container must run as a non-root user.
              * If true, the Kubelet will validate the image at runtime to ensure that it
@@ -4066,7 +7638,7 @@ export namespace tailscale {
              * May also be set in SecurityContext.  If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsNonRoot?: boolean
+            runAsNonRoot: boolean
             /**
              * The UID to run the entrypoint of the container process.
              * Defaults to user specified in image metadata if unspecified.
@@ -4075,21 +7647,9 @@ export namespace tailscale {
              * for that container.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            runAsUser?: number
-            /**
-             * The SELinux context to be applied to all containers.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in SecurityContext.  If set in
-             * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
-             * takes precedence for that container.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptions
-            /**
-             * The seccomp options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfile
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptions
+            seccompProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfile
             /**
              * A list of groups applied to the first process run in each container, in addition
              * to the container's primary GID, the fsGroup (if specified), and group memberships
@@ -4099,20 +7659,14 @@ export namespace tailscale {
              * even if they are not included in this list.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            supplementalGroups?: number[]
+            supplementalGroups: number[]
             /**
              * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
              * sysctls (by the container runtime) might fail to launch.
              * Note that this field cannot be set when spec.os.name is windows.
              */
-            sysctls?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctls[]
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options within a container's SecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptions
+            sysctls: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctls[]
+            windowsOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptions
         }
 
         /**
@@ -4126,7 +7680,7 @@ export namespace tailscale {
              * Must match the loaded name of the profile.
              * Must be set if and only if type is "Localhost".
              */
-            localhostProfile?: string
+            localhostProfile: string
             /**
              * type indicates which kind of AppArmor profile will be applied.
              * Valid options are:
@@ -4135,6 +7689,106 @@ export namespace tailscale {
              *   Unconfined - no AppArmor enforcement.
              */
             type: string
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile: string
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type: string
+        }
+
+        /**
+         * Security context for Recorder Pods. By default, the operator does not
+         * apply any Pod security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextPatch {
+            appArmorProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfilePatch
+            /**
+             * A special supplemental group that applies to all containers in a pod.
+             * Some volume types allow the Kubelet to change the ownership of that volume
+             * to be owned by the pod:
+             *
+             * 1. The owning GID will be the FSGroup
+             * 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+             * 3. The permission bits are OR'd with rw-rw----
+             *
+             * If unset, the Kubelet will not modify the ownership and permissions of any volume.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroup: number
+            /**
+             * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+             * before being exposed inside Pod. This field will only apply to
+             * volume types which support fsGroup based ownership(and permissions).
+             * It will have no effect on ephemeral volume types such as: secret, configmaps
+             * and emptydir.
+             * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroupChangePolicy: string
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup: number
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot: boolean
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser: number
+            seLinuxOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch
+            seccompProfile: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfilePatch
+            /**
+             * A list of groups applied to the first process run in each container, in addition
+             * to the container's primary GID, the fsGroup (if specified), and group memberships
+             * defined in the container image for the uid of the container process. If unspecified,
+             * no additional groups are added to any container. Note that group memberships
+             * defined in the container image for the uid of the container process are still effective,
+             * even if they are not included in this list.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            supplementalGroups: number[]
+            /**
+             * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+             * sysctls (by the container runtime) might fail to launch.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            sysctls: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctlsPatch[]
+            windowsOptions: outputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptionsPatch
         }
 
         /**
@@ -4149,19 +7803,46 @@ export namespace tailscale {
             /**
              * Level is SELinux level label that applies to the container.
              */
-            level?: string
+            level: string
             /**
              * Role is a SELinux role label that applies to the container.
              */
-            role?: string
+            role: string
             /**
              * Type is a SELinux type label that applies to the container.
              */
-            type?: string
+            type: string
             /**
              * User is a SELinux user label that applies to the container.
              */
-            user?: string
+            user: string
+        }
+
+        /**
+         * The SELinux context to be applied to all containers.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in SecurityContext.  If set in
+         * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+         * takes precedence for that container.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level: string
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role: string
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type: string
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user: string
         }
 
         /**
@@ -4175,7 +7856,30 @@ export namespace tailscale {
              * Must be a descending path, relative to the kubelet's configured seccomp profile location.
              * Must be set if type is "Localhost". Must NOT be set for any other type.
              */
-            localhostProfile?: string
+            localhostProfile: string
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type: string
+        }
+
+        /**
+         * The seccomp options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile: string
             /**
              * type indicates which kind of seccomp profile will be applied.
              * Valid options are:
@@ -4202,6 +7906,20 @@ export namespace tailscale {
         }
 
         /**
+         * Sysctl defines a kernel parameter to be set
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSysctlsPatch {
+            /**
+             * Name of a property to set
+             */
+            name: string
+            /**
+             * Value of a property to set
+             */
+            value: string
+        }
+
+        /**
          * The Windows specific settings applied to all containers.
          * If unspecified, the options within a container's SecurityContext will be used.
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
@@ -4213,25 +7931,58 @@ export namespace tailscale {
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
              * GMSA credential spec named by the GMSACredentialSpecName field.
              */
-            gmsaCredentialSpec?: string
+            gmsaCredentialSpec: string
             /**
              * GMSACredentialSpecName is the name of the GMSA credential spec to use.
              */
-            gmsaCredentialSpecName?: string
+            gmsaCredentialSpecName: string
             /**
              * HostProcess determines if a container should be run as a 'Host Process' container.
              * All of a Pod's containers must have the same effective HostProcess value
              * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
              * In addition, if HostProcess is true then HostNetwork must also be set to true.
              */
-            hostProcess?: boolean
+            hostProcess: boolean
             /**
              * The UserName in Windows to run the entrypoint of the container process.
              * Defaults to the user specified in image metadata if unspecified.
              * May also be set in PodSecurityContext. If set in both SecurityContext and
              * PodSecurityContext, the value specified in SecurityContext takes precedence.
              */
-            runAsUserName?: string
+            runAsUserName: string
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options within a container's SecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextWindowsOptionsPatch {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec: string
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName: string
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess: boolean
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName: string
         }
 
         /**
@@ -4243,31 +7994,67 @@ export namespace tailscale {
              * Effect indicates the taint effect to match. Empty means match all taint effects.
              * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
              */
-            effect?: string
+            effect: string
             /**
              * Key is the taint key that the toleration applies to. Empty means match all taint keys.
              * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
              */
-            key?: string
+            key: string
             /**
              * Operator represents a key's relationship to the value.
              * Valid operators are Exists and Equal. Defaults to Equal.
              * Exists is equivalent to wildcard for value, so that a pod can
              * tolerate all taints of a particular category.
              */
-            operator?: string
+            operator: string
             /**
              * TolerationSeconds represents the period of time the toleration (which must be
              * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
              * it is not set, which means tolerate the taint forever (do not evict). Zero and
              * negative values will be treated as 0 (evict immediately) by the system.
              */
-            tolerationSeconds?: number
+            tolerationSeconds: number
             /**
              * Value is the taint value the toleration matches to.
              * If the operator is Exists, the value should be empty, otherwise just a regular string.
              */
-            value?: string
+            value: string
+        }
+
+        /**
+         * The pod this Toleration is attached to tolerates any taint that matches
+         * the triple <key,value,effect> using the matching operator <operator>.
+         */
+        export interface RecorderSpecStatefulSetPodTolerationsPatch {
+            /**
+             * Effect indicates the taint effect to match. Empty means match all taint effects.
+             * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect: string
+            /**
+             * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+             * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+             */
+            key: string
+            /**
+             * Operator represents a key's relationship to the value.
+             * Valid operators are Exists and Equal. Defaults to Equal.
+             * Exists is equivalent to wildcard for value, so that a pod can
+             * tolerate all taints of a particular category.
+             */
+            operator: string
+            /**
+             * TolerationSeconds represents the period of time the toleration (which must be
+             * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+             * it is not set, which means tolerate the taint forever (do not evict). Zero and
+             * negative values will be treated as 0 (evict immediately) by the system.
+             */
+            tolerationSeconds: number
+            /**
+             * Value is the taint value the toleration matches to.
+             * If the operator is Exists, the value should be empty, otherwise just a regular string.
+             */
+            value: string
         }
 
         /**
@@ -4276,11 +8063,16 @@ export namespace tailscale {
          * lifetime of a specific pod.
          */
         export interface RecorderSpecStorage {
-            /**
-             * Configure an S3-compatible API for storage. Required if the UI is not
-             * enabled, to ensure that recordings are accessible.
-             */
-            s3?: outputs.tailscale.v1alpha1.RecorderSpecStorageS3
+            s3: outputs.tailscale.v1alpha1.RecorderSpecStorageS3
+        }
+
+        /**
+         * Configure where to store session recordings. By default, recordings will
+         * be stored in a local ephemeral volume, and will not be persisted past the
+         * lifetime of a specific pod.
+         */
+        export interface RecorderSpecStoragePatch {
+            s3: outputs.tailscale.v1alpha1.RecorderSpecStorageS3Patch
         }
 
         /**
@@ -4292,17 +8084,12 @@ export namespace tailscale {
              * Bucket name to write to. The bucket is expected to be used solely for
              * recordings, as there is no stable prefix for written object names.
              */
-            bucket?: string
-            /**
-             * Configure environment variable credentials for managing objects in the
-             * configured bucket. If not set, tsrecorder will try to acquire credentials
-             * first from the file system and then the STS API.
-             */
-            credentials?: outputs.tailscale.v1alpha1.RecorderSpecStorageS3Credentials
+            bucket: string
+            credentials: outputs.tailscale.v1alpha1.RecorderSpecStorageS3Credentials
             /**
              * S3-compatible endpoint, e.g. s3.us-east-1.amazonaws.com.
              */
-            endpoint?: string
+            endpoint: string
         }
 
         /**
@@ -4311,11 +8098,16 @@ export namespace tailscale {
          * first from the file system and then the STS API.
          */
         export interface RecorderSpecStorageS3Credentials {
-            /**
-             * Use a Kubernetes Secret from the operator's namespace as the source of
-             * credentials.
-             */
-            secret?: outputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecret
+            secret: outputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecret
+        }
+
+        /**
+         * Configure environment variable credentials for managing objects in the
+         * configured bucket. If not set, tsrecorder will try to acquire credentials
+         * first from the file system and then the STS API.
+         */
+        export interface RecorderSpecStorageS3CredentialsPatch {
+            secret: outputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecretPatch
         }
 
         /**
@@ -4330,7 +8122,39 @@ export namespace tailscale {
              * should include keys for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY if
              * using a static access key.
              */
-            name?: string
+            name: string
+        }
+
+        /**
+         * Use a Kubernetes Secret from the operator's namespace as the source of
+         * credentials.
+         */
+        export interface RecorderSpecStorageS3CredentialsSecretPatch {
+            /**
+             * The name of a Kubernetes Secret in the operator's namespace that contains
+             * credentials for writing to the configured bucket. Each key-value pair
+             * from the secret's data will be mounted as an environment variable. It
+             * should include keys for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY if
+             * using a static access key.
+             */
+            name: string
+        }
+
+        /**
+         * Configure an S3-compatible API for storage. Required if the UI is not
+         * enabled, to ensure that recordings are accessible.
+         */
+        export interface RecorderSpecStorageS3Patch {
+            /**
+             * Bucket name to write to. The bucket is expected to be used solely for
+             * recordings, as there is no stable prefix for written object names.
+             */
+            bucket: string
+            credentials: outputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsPatch
+            /**
+             * S3-compatible endpoint, e.g. s3.us-east-1.amazonaws.com.
+             */
+            endpoint: string
         }
 
         /**
@@ -4342,11 +8166,11 @@ export namespace tailscale {
              * List of status conditions to indicate the status of the Recorder.
              * Known condition types are `RecorderReady`.
              */
-            conditions?: outputs.tailscale.v1alpha1.RecorderStatusConditions[]
+            conditions: outputs.tailscale.v1alpha1.RecorderStatusConditions[]
             /**
              * List of tailnet devices associated with the Recorder StatefulSet.
              */
-            devices?: outputs.tailscale.v1alpha1.RecorderStatusDevices[]
+            devices: outputs.tailscale.v1alpha1.RecorderStatusDevices[]
         }
 
         /**
@@ -4368,7 +8192,45 @@ export namespace tailscale {
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
              * with respect to the current state of the instance.
              */
-            observedGeneration?: number
+            observedGeneration: number
+            /**
+             * reason contains a programmatic identifier indicating the reason for the condition's last transition.
+             * Producers of specific condition types may define expected values and meanings for this field,
+             * and whether the values are considered a guaranteed API.
+             * The value should be a CamelCase string.
+             * This field may not be empty.
+             */
+            reason: string
+            /**
+             * status of the condition, one of True, False, Unknown.
+             */
+            status: string
+            /**
+             * type of condition in CamelCase or in foo.example.com/CamelCase.
+             */
+            type: string
+        }
+
+        /**
+         * Condition contains details for one aspect of the current state of this API Resource.
+         */
+        export interface RecorderStatusConditionsPatch {
+            /**
+             * lastTransitionTime is the last time the condition transitioned from one status to another.
+             * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+             */
+            lastTransitionTime: string
+            /**
+             * message is a human readable message indicating details about the transition.
+             * This may be an empty string.
+             */
+            message: string
+            /**
+             * observedGeneration represents the .metadata.generation that the condition was set based upon.
+             * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+             * with respect to the current state of the instance.
+             */
+            observedGeneration: number
             /**
              * reason contains a programmatic identifier indicating the reason for the condition's last transition.
              * Producers of specific condition types may define expected values and meanings for this field,
@@ -4398,13 +8260,49 @@ export namespace tailscale {
              * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
              * assigned to the device.
              */
-            tailnetIPs?: string[]
+            tailnetIPs: string[]
             /**
              * URL where the UI is available if enabled for replaying recordings. This
              * will be an HTTPS MagicDNS URL. You must be connected to the same tailnet
              * as the recorder to access it.
              */
-            url?: string
+            url: string
+        }
+
+        export interface RecorderStatusDevicesPatch {
+            /**
+             * Hostname is the fully qualified domain name of the device.
+             * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
+             * node.
+             */
+            hostname: string
+            /**
+             * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
+             * assigned to the device.
+             */
+            tailnetIPs: string[]
+            /**
+             * URL where the UI is available if enabled for replaying recordings. This
+             * will be an HTTPS MagicDNS URL. You must be connected to the same tailnet
+             * as the recorder to access it.
+             */
+            url: string
+        }
+
+        /**
+         * RecorderStatus describes the status of the recorder. This is set
+         * and managed by the Tailscale operator.
+         */
+        export interface RecorderStatusPatch {
+            /**
+             * List of status conditions to indicate the status of the Recorder.
+             * Known condition types are `RecorderReady`.
+             */
+            conditions: outputs.tailscale.v1alpha1.RecorderStatusConditionsPatch[]
+            /**
+             * List of tailnet devices associated with the Recorder StatefulSet.
+             */
+            devices: outputs.tailscale.v1alpha1.RecorderStatusDevicesPatch[]
         }
     }
 }

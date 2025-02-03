@@ -6,8 +6,6 @@ import * as inputs from '../../types/input'
 import * as outputs from '../../types/output'
 import * as utilities from '../../utilities'
 
-import { ObjectMeta } from '../../meta/v1'
-
 export class ProxyGroup extends pulumi.CustomResource {
     /**
      * Get an existing ProxyGroup resource's state with the given name, ID, and optional extra
@@ -39,18 +37,20 @@ export class ProxyGroup extends pulumi.CustomResource {
         return obj['__pulumiType'] === ProxyGroup.__pulumiType
     }
 
-    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1' | undefined>
-    public readonly kind!: pulumi.Output<'ProxyGroup' | undefined>
-    public readonly metadata!: pulumi.Output<ObjectMeta | undefined>
     /**
-     * Spec describes the desired ProxyGroup instances.
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
+    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1'>
+    /**
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+     */
+    public readonly kind!: pulumi.Output<'ProxyGroup'>
+    /**
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+     */
+    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMeta>
     public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyGroupSpec>
-    /**
-     * ProxyGroupStatus describes the status of the ProxyGroup resources. This is
-     * set and managed by the Tailscale operator.
-     */
-    public readonly status!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyGroupStatus | undefined>
+    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyGroupStatus>
 
     /**
      * Create a ProxyGroup resource with the given unique name, arguments, and options.
@@ -67,7 +67,7 @@ export class ProxyGroup extends pulumi.CustomResource {
             resourceInputs['kind'] = 'ProxyGroup'
             resourceInputs['metadata'] = args ? args.metadata : undefined
             resourceInputs['spec'] = args ? args.spec : undefined
-            resourceInputs['status'] = args ? args.status : undefined
+            resourceInputs['status'] = undefined /*out*/
         } else {
             resourceInputs['apiVersion'] = undefined /*out*/
             resourceInputs['kind'] = undefined /*out*/
@@ -84,16 +84,17 @@ export class ProxyGroup extends pulumi.CustomResource {
  * The set of arguments for constructing a ProxyGroup resource.
  */
 export interface ProxyGroupArgs {
+    /**
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+     */
     apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+    /**
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+     */
     kind?: pulumi.Input<'ProxyGroup'>
-    metadata?: pulumi.Input<ObjectMeta>
     /**
-     * Spec describes the desired ProxyGroup instances.
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupSpecArgs>
-    /**
-     * ProxyGroupStatus describes the status of the ProxyGroup resources. This is
-     * set and managed by the Tailscale operator.
-     */
-    status?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatusArgs>
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupSpec>
 }

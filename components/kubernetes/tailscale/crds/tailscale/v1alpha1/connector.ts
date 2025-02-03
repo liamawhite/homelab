@@ -6,8 +6,6 @@ import * as inputs from '../../types/input'
 import * as outputs from '../../types/output'
 import * as utilities from '../../utilities'
 
-import { ObjectMeta } from '../../meta/v1'
-
 /**
  * Connector defines a Tailscale node that will be deployed in the cluster. The
  * node can be configured to act as a Tailscale subnet router and/or a Tailscale
@@ -47,20 +45,20 @@ export class Connector extends pulumi.CustomResource {
         return obj['__pulumiType'] === Connector.__pulumiType
     }
 
-    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1' | undefined>
-    public readonly kind!: pulumi.Output<'Connector' | undefined>
-    public readonly metadata!: pulumi.Output<ObjectMeta | undefined>
     /**
-     * ConnectorSpec describes the desired Tailscale component.
-     * More info:
-     * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
+    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1'>
+    /**
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+     */
+    public readonly kind!: pulumi.Output<'Connector'>
+    /**
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+     */
+    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMeta>
     public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.ConnectorSpec>
-    /**
-     * ConnectorStatus describes the status of the Connector. This is set
-     * and managed by the Tailscale operator.
-     */
-    public readonly status!: pulumi.Output<outputs.tailscale.v1alpha1.ConnectorStatus | undefined>
+    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.ConnectorStatus>
 
     /**
      * Create a Connector resource with the given unique name, arguments, and options.
@@ -77,7 +75,7 @@ export class Connector extends pulumi.CustomResource {
             resourceInputs['kind'] = 'Connector'
             resourceInputs['metadata'] = args ? args.metadata : undefined
             resourceInputs['spec'] = args ? args.spec : undefined
-            resourceInputs['status'] = args ? args.status : undefined
+            resourceInputs['status'] = undefined /*out*/
         } else {
             resourceInputs['apiVersion'] = undefined /*out*/
             resourceInputs['kind'] = undefined /*out*/
@@ -94,18 +92,17 @@ export class Connector extends pulumi.CustomResource {
  * The set of arguments for constructing a Connector resource.
  */
 export interface ConnectorArgs {
+    /**
+     * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+     */
     apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+    /**
+     * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+     */
     kind?: pulumi.Input<'Connector'>
-    metadata?: pulumi.Input<ObjectMeta>
     /**
-     * ConnectorSpec describes the desired Tailscale component.
-     * More info:
-     * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+     * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecArgs>
-    /**
-     * ConnectorStatus describes the status of the Connector. This is set
-     * and managed by the Tailscale operator.
-     */
-    status?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorStatusArgs>
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpec>
 }
