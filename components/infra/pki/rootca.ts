@@ -4,7 +4,10 @@ import { SelfSignedCert } from '@pulumi/tls/selfSignedCert'
 import { CertificateAuthorityCert } from './cacert'
 import { IntermediateCertificateAuthority } from './intermediateca'
 
-export class RootCertificateAuthority extends pulumi.ComponentResource implements CertificateAuthorityCert {
+export class RootCertificateAuthority
+    extends pulumi.ComponentResource
+    implements CertificateAuthorityCert
+{
     readonly rootCert: pulumi.Input<string>
 
     readonly cert: pulumi.Input<string>
@@ -38,6 +41,8 @@ export class RootCertificateAuthority extends pulumi.ComponentResource implement
         this.key = pk.privateKeyPem
         this.algorithm = cert.keyAlgorithm
     }
-    public issueIntermediateCA = (name: string): IntermediateCertificateAuthority =>
+    public issueIntermediateCA = (
+        name: string,
+    ): IntermediateCertificateAuthority =>
         new IntermediateCertificateAuthority(name, { parent: this })
 }

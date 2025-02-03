@@ -1,6 +1,6 @@
-import * as path from "path";
-import { versions } from "../../../../.versions";
-import { cleanDestinationDirectory, crd2pulumi } from "../../../../libs/gen";
+import * as path from 'path'
+import { versions } from '../../../../.versions'
+import { cleanDestinationDirectory, crd2pulumi } from '../../../../libs/gen'
 
 const CERTMANAGER_URL = `https://github.com/cert-manager/cert-manager/releases/download/v${versions.certManager}/cert-manager.crds.yaml`
 

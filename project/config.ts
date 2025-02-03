@@ -1,5 +1,5 @@
-import * as pulumi from '@pulumi/pulumi';
-import { remote } from '@pulumi/command/types/input';
+import * as pulumi from '@pulumi/pulumi'
+import { remote } from '@pulumi/command/types/input'
 
 interface K3s {
     clusterToken: pulumi.Input<string>
@@ -21,7 +21,7 @@ export function loadConfig() {
     return {
         clusterToken: k3s.clusterToken,
         nodes: {
-            'rp0': cfg.requireObject<remote.ConnectionArgs>('rp0'),
+            rp0: cfg.requireObject<remote.ConnectionArgs>('rp0'),
         },
         tailscale: cfg.requireObject<Tailscale>('tailscale'),
     }

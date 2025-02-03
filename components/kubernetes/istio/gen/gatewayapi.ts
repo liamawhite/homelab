@@ -1,6 +1,11 @@
-import * as path from "path";
-import { versions } from "../../../../.versions";
-import { cleanDestinationDirectory, crd2pulumi, createTmpdir, downloadToFile } from "../../../../libs/gen";
+import * as path from 'path'
+import { versions } from '../../../../.versions'
+import {
+    cleanDestinationDirectory,
+    crd2pulumi,
+    createTmpdir,
+    downloadToFile,
+} from '../../../../libs/gen'
 
 export const GATEWAY_API_URL = `https://github.com/kubernetes-sigs/gateway-api/releases/download/v${versions.gatewayApi}/standard-install.yaml`
 
