@@ -25,10 +25,7 @@ export class BGPAdvertisement extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): BGPAdvertisement {
-        return new BGPAdvertisement(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new BGPAdvertisement(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */

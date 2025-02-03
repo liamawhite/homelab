@@ -106,9 +106,7 @@ const _module = {
             case 'kubernetes:cert-manager.io/v1:CertificateRequest':
                 return new CertificateRequest(name, <any>undefined, { urn })
             case 'kubernetes:cert-manager.io/v1:CertificateRequestList':
-                return new CertificateRequestList(name, <any>undefined, {
-                    urn,
-                })
+                return new CertificateRequestList(name, <any>undefined, { urn })
             case 'kubernetes:cert-manager.io/v1:CertificateRequestPatch':
                 return new CertificateRequestPatch(name, <any>undefined, {
                     urn,

@@ -1,5 +1,6 @@
 import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
+import { versions } from '../../../.versions'
 
 export class MetalLb extends pulumi.ComponentResource {
     readonly namespace: pulumi.Output<string>
@@ -26,7 +27,7 @@ export class MetalLb extends pulumi.ComponentResource {
             {
                 namespace: namespace.metadata.name,
                 chart: 'metallb',
-                version: '0.14.9',
+                version: versions.metallb,
                 repositoryOpts: { repo: 'https://metallb.github.io/metallb' },
             },
             localOpts,

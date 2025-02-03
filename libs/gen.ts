@@ -32,6 +32,15 @@ export async function downloadToFile(url: string, filePath: string) {
     await fs.writeFile(filePath, fileData)
 }
 
+export function untarFile(file: string) {
+    execSync(`tar -xvzf ${file} -C ${path.dirname(file)}`)
+}
+
+export async function helmTemplate(source: string, destination: string) {
+    await fs.mkdir(path.dirname(destination), { recursive: true })
+    execSync(`helm template crdgen ${source} > ${destination}`)
+}
+
 export async function crd2pulumi(args: {
     destination: string
     sources: string[]
