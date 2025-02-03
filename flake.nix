@@ -13,12 +13,12 @@
         {
           devShells.default = pkgs.mkShell {
             buildInputs = [
-              git
-              yarn
-              nodejs_23
-              kubernetes-helm
               crd2pulumi
+              git
+              jq
+              kubernetes-helm
               k9s
+              nodejs_23
             ];
           };
         }

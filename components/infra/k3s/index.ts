@@ -6,6 +6,7 @@ export class K3s extends pulumi.ComponentResource {
 
     constructor(name: string, args: K3sArgs, opts?: pulumi.ComponentResourceOptions) {
         super("homelab:cluster:k3s", name, {}, opts)
+        const localOpts = { ...opts, parent: this }
 
         if (args.servers.length === 0) {
             throw new Error("At least one server node is required")
@@ -33,7 +34,7 @@ export class K3s extends pulumi.ComponentResource {
                     pulumi.interpolate`${serverCmd} --server https://${args.servers[0].address}:6443`,
                 update: serverCmd,
                 delete: `sudo /usr/local/bin/k3s-uninstall.sh`,
-            }, { deleteBeforeReplace: true, dependsOn: acc })
+            }, { ...localOpts, deleteBeforeReplace: true, dependsOn: [...acc, server] })
             return [...acc, curr]
         }, [] as remote.Command[])
 
@@ -41,7 +42,7 @@ export class K3s extends pulumi.ComponentResource {
         const retrieveKubeconfig = new remote.Command(`${name}-kubeconfig`, {
             connection: args.servers[0].connection,
             create: `sudo cat /etc/rancher/k3s/k3s.yaml`,
-        }, { dependsOn: cmds }).stdout
+        }, { ...localOpts, dependsOn: cmds }).stdout
         const kubeconfig = pulumi.all([args.servers[0].address, retrieveKubeconfig]).apply(([address, config]) => {
             return config.replace('127.0.0.1', address)
         })
@@ -51,7 +52,7 @@ export class K3s extends pulumi.ComponentResource {
     }
 }
 
-interface Node {
+interface Node extends pulumi.Resource {
     address: pulumi.Input<string>
     connection: types.input.remote.ConnectionArgs
 }

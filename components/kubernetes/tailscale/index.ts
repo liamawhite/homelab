@@ -8,12 +8,12 @@ export class TailscaleOperator extends pulumi.ComponentResource {
         super("homelab:kubernetes:tailscaleoperator", name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
-        const namespace = new k8s.core.v1.Namespace(`${name}-tailscale`, {
+        const namespace = new k8s.core.v1.Namespace(name, {
             metadata: { name: "tailscale-system" },
         }, localOpts)
         this.namespace = namespace.metadata.name
 
-        const install = new k8s.helm.v4.Chart(`${name}-tailscale`, {
+        const install = new k8s.helm.v4.Chart(name, {
             namespace: namespace.metadata.name,
             chart: "tailscale-operator",
             version: "1.78.3",

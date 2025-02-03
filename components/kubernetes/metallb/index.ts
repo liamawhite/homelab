@@ -8,12 +8,12 @@ export class MetalLb extends pulumi.ComponentResource {
         super("homelab:kubernetes:metallb", name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
-        const namespace = new k8s.core.v1.Namespace(`${name}-metallb`, {
+        const namespace = new k8s.core.v1.Namespace(name, {
             metadata: { name: "metallb-system" },
         }, localOpts)
         this.namespace = namespace.metadata.name
 
-        const install = new k8s.helm.v4.Chart(`${name}-metallb`, {
+        const install = new k8s.helm.v4.Chart(name, {
             namespace: namespace.metadata.name,
             chart: "metallb",
             version: "0.14.9",
@@ -24,7 +24,5 @@ export class MetalLb extends pulumi.ComponentResource {
     }
 }
 
-export interface MetalLbArgs {
-    addresses?: string[]
-}
+export interface MetalLbArgs { }
 

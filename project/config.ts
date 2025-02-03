@@ -21,7 +21,7 @@ export function loadConfig() {
     return {
         clusterToken: k3s.clusterToken,
         nodes: {
-            'rpi-0': cfg.requireObject<remote.ConnectionArgs>('rpi-0'),
+            'rp0': cfg.requireObject<remote.ConnectionArgs>('rp0'),
         },
         tailscale: cfg.requireObject<Tailscale>('tailscale'),
     }
