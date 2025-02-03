@@ -1,8 +1,8 @@
-import axios from "axios";
-import { execSync } from "child_process";
-import * as fs from "fs/promises";
-import * as os from "os";
-import * as path from "path";
+import axios from 'axios'
+import { execSync } from 'child_process'
+import * as fs from 'fs/promises'
+import * as os from 'os'
+import * as path from 'path'
 
 export async function createTmpdir(suffix: string) {
     const tmpdir = os.tmpdir()
@@ -33,11 +33,13 @@ export async function downloadToFile(url: string, filePath: string) {
 }
 
 export async function crd2pulumi(args: {
-    destination: string,
-    sources: string[],
+    destination: string
+    sources: string[]
 }) {
     const { destination, sources } = args
-    execSync(`crd2pulumi --nodejsPath ${destination} --force ${sources.join(' ')}`)
+    execSync(
+        `crd2pulumi --nodejsPath ${destination} --force ${sources.join(' ')}`,
+    )
 
     // Remove generated files we don't need
     await fs.rm(path.join(destination, 'tsconfig.json'))

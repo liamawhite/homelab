@@ -1,12 +1,12 @@
-import * as pulumi from "@pulumi/pulumi";
-import * as fs from "fs";
-import * as path from "path";
-import { loadConfig } from "./config";
-import { configureNetwork } from "./network";
-import { configureCluster } from "./cluster";
-import { configureVpn } from "./vpn";
-import { configureDns } from "./dns";
-import { configurePki } from "./pki";
+import * as pulumi from '@pulumi/pulumi'
+import * as fs from 'fs'
+import * as path from 'path'
+import { loadConfig } from './config'
+import { configureNetwork } from './network'
+import { configureCluster } from './cluster'
+import { configureVpn } from './vpn'
+import { configureDns } from './dns'
+import { configurePki } from './pki'
 
 const cfg = loadConfig()
 
@@ -18,13 +18,16 @@ const dns = configureDns({ ...cfg, cluster, network, pki })
 
 // Write the kubeconfig to a file at repo root so we can use it easily
 // This is gitignored so it won't be checked in
-cluster.kubeconfig.apply(cfg => fs.writeFileSync(path.join(__dirname, '../', 'kubeconfig'), cfg))
+cluster.kubeconfig.apply(cfg =>
+    fs.writeFileSync(path.join(__dirname, '../', 'kubeconfig'), cfg),
+)
 
 // Write the root CA cert to a file at repo root so we can easliy load it into machines
 // This is gitignored so it won't be checked in but doesn't really matter if it is
-pulumi.output(pki.ca.cert).apply(pem => fs.writeFileSync(path.join(__dirname, '../', 'ca.pem'), pem))
+pulumi
+    .output(pki.ca.cert)
+    .apply(pem => fs.writeFileSync(path.join(__dirname, '../', 'ca.pem'), pem))
 
 export const passwords = {
     pihole: dns.pihole.password,
 }
-
