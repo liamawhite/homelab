@@ -5,4 +5,5 @@ export const versions = {
     istio: '1.24.2',
     metallb: '0.14.9',
     pihole: '2024.07.0',
+    tailscale: '1.78.3',
 }

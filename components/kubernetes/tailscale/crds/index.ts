@@ -18,7 +18,7 @@ export { tailscale, types }
 pulumi.runtime.registerResourcePackage('crds', {
     version: utilities.getVersion(),
     constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
-        if (type !== 'pulumi:providers:crds') {
+        if (type !== 'pulumi:providers:kubernetes') {
             throw new Error(`unknown provider type ${type}`)
         }
         return new Provider(name, <any>undefined, { urn })

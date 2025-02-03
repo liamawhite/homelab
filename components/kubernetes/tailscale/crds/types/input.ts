@@ -5,35 +5,354 @@ import * as pulumi from '@pulumi/pulumi'
 import * as inputs from '../types/input'
 import * as outputs from '../types/output'
 
-import * as utilities from '../utilities'
+export namespace meta {
+    export namespace v1 {
+        /**
+         * ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
+         */
+        export interface ListMeta {
+            /**
+             * continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message.
+             */
+            continue?: pulumi.Input<string>
+            /**
+             * remainingItemCount is the number of subsequent items in the list which are not included in this list response. If the list request contained label or field selectors, then the number of remaining items is unknown and the field will be left unset and omitted during serialization. If the list is complete (either because it is not chunking or because this is the last chunk), then there are no more remaining items and this field will be left unset and omitted during serialization. Servers older than v1.15 do not set this field. The intended use of the remainingItemCount is *estimating* the size of a collection. Clients should not rely on the remainingItemCount to be set or to be exact.
+             */
+            remainingItemCount?: pulumi.Input<number>
+            /**
+             * String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string>
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string>
+        }
 
-import { ObjectMeta } from '../meta/v1'
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntry {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion?: pulumi.Input<string>
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType?: pulumi.Input<string>
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1?: any
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager?: pulumi.Input<string>
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation?: pulumi.Input<string>
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource?: pulumi.Input<string>
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time?: pulumi.Input<string>
+        }
+
+        /**
+         * ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
+         */
+        export interface ManagedFieldsEntryPatch {
+            /**
+             * APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted.
+             */
+            apiVersion?: pulumi.Input<string>
+            /**
+             * FieldsType is the discriminator for the different fields format and version. There is currently only one possible value: "FieldsV1"
+             */
+            fieldsType?: pulumi.Input<string>
+            /**
+             * FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
+             */
+            fieldsV1?: any
+            /**
+             * Manager is an identifier of the workflow managing these fields.
+             */
+            manager?: pulumi.Input<string>
+            /**
+             * Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'.
+             */
+            operation?: pulumi.Input<string>
+            /**
+             * Subresource is the name of the subresource used to update that object, or empty string if the object was updated through the main resource. The value of this field is used to distinguish between managers, even if they share the same name. For example, a status update will be distinct from a regular update using the same manager name. Note that the APIVersion field is not related to the Subresource field and it always corresponds to the version of the main resource.
+             */
+            subresource?: pulumi.Input<string>
+            /**
+             * Time is the timestamp of when the ManagedFields entry was added. The timestamp will also be updated if a field is added, the manager changes any of the owned fields value or removes a field. The timestamp does not update when a field is removed from the entry because another manager took it over.
+             */
+            time?: pulumi.Input<string>
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMeta {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp?: pulumi.Input<string>
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds?: pulumi.Input<number>
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp?: pulumi.Input<string>
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName?: pulumi.Input<string>
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation?: pulumi.Input<number>
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntry>[]>
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string>
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace?: pulumi.Input<string>
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReference>[]>
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string>
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string>
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string>
+        }
+
+        /**
+         * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+         */
+        export interface ObjectMetaPatch {
+            /**
+             * Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations
+             */
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+             *
+             * Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            creationTimestamp?: pulumi.Input<string>
+            /**
+             * Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.
+             */
+            deletionGracePeriodSeconds?: pulumi.Input<number>
+            /**
+             * DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
+             *
+             * Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            deletionTimestamp?: pulumi.Input<string>
+            /**
+             * Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. Finalizers may be processed and removed in any order.  Order is NOT enforced because it introduces significant risk of stuck finalizers. finalizers is a shared field, any actor with permission can reorder it. If the finalizer list is processed in order, then this can lead to a situation in which the component responsible for the first finalizer in the list is waiting for a signal (field value, external system, or other) produced by a component responsible for a finalizer later in the list, resulting in a deadlock. Without enforced ordering finalizers are free to order amongst themselves and are not vulnerable to ordering changes in the list.
+             */
+            finalizers?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
+             *
+             * If this field is specified and the generated name exists, the server will return a 409.
+             *
+             * Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
+             */
+            generateName?: pulumi.Input<string>
+            /**
+             * A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.
+             */
+            generation?: pulumi.Input<number>
+            /**
+             * Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
+             */
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntryPatch>[]>
+            /**
+             * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string>
+            /**
+             * Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
+             *
+             * Must be a DNS_LABEL. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces
+             */
+            namespace?: pulumi.Input<string>
+            /**
+             * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
+             */
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReferencePatch>[]>
+            /**
+             * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
+             *
+             * Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+             */
+            resourceVersion?: pulumi.Input<string>
+            /**
+             * Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
+             */
+            selfLink?: pulumi.Input<string>
+            /**
+             * UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.
+             *
+             * Populated by the system. Read-only. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string>
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReference {
+            /**
+             * API version of the referent.
+             */
+            apiVersion: pulumi.Input<string>
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion?: pulumi.Input<boolean>
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller?: pulumi.Input<boolean>
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind: pulumi.Input<string>
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name: pulumi.Input<string>
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid: pulumi.Input<string>
+        }
+
+        /**
+         * OwnerReference contains enough information to let you identify an owning object. An owning object must be in the same namespace as the dependent, or be cluster-scoped, so there is no namespace field.
+         */
+        export interface OwnerReferencePatch {
+            /**
+             * API version of the referent.
+             */
+            apiVersion?: pulumi.Input<string>
+            /**
+             * If true, AND if the owner has the "foregroundDeletion" finalizer, then the owner cannot be deleted from the key-value store until this reference is removed. See https://kubernetes.io/docs/concepts/architecture/garbage-collection/#foreground-deletion for how the garbage collector interacts with this field and enforces the foreground deletion. Defaults to false. To set this field, a user needs "delete" permission of the owner, otherwise 422 (Unprocessable Entity) will be returned.
+             */
+            blockOwnerDeletion?: pulumi.Input<boolean>
+            /**
+             * If true, this reference points to the managing controller.
+             */
+            controller?: pulumi.Input<boolean>
+            /**
+             * Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<string>
+            /**
+             * Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
+             */
+            name?: pulumi.Input<string>
+            /**
+             * UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#uids
+             */
+            uid?: pulumi.Input<string>
+        }
+    }
+}
 
 export namespace tailscale {
     export namespace v1alpha1 {
+        /**
+         * Connector defines a Tailscale node that will be deployed in the cluster. The
+         * node can be configured to act as a Tailscale subnet router and/or a Tailscale
+         * exit node.
+         * Connector is a cluster-scoped resource.
+         * More info:
+         * https://tailscale.com/kb/1441/kubernetes-operator-connector
+         */
+        export interface Connector {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<'Connector'>
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+            spec?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpec>
+            status?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorStatus>
+        }
+
         /**
          * ConnectorSpec describes the desired Tailscale component.
          * More info:
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
-        export interface ConnectorSpecArgs {
-            /**
-             * AppConnector defines whether the Connector device should act as a Tailscale app connector. A Connector that is
-             * configured as an app connector cannot be a subnet router or an exit node. If this field is unset, the
-             * Connector does not act as an app connector.
-             * Note that you will need to manually configure the permissions and the domains for the app connector via the
-             * Admin panel.
-             * Note also that the main tested and supported use case of this config option is to deploy an app connector on
-             * Kubernetes to access SaaS applications available on the public internet. Using the app connector to expose
-             * cluster workloads or other internal workloads to tailnet might work, but this is not a use case that we have
-             * tested or optimised for.
-             * If you are using the app connector to access SaaS applications because you need a predictable egress IP that
-             * can be whitelisted, it is also your responsibility to ensure that cluster traffic from the connector flows
-             * via that predictable IP, for example by enforcing that cluster egress traffic is routed via an egress NAT
-             * device with a static IP address.
-             * https://tailscale.com/kb/1281/app-connectors
-             */
-            appConnector?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecAppConnectorArgs>
+        export interface ConnectorSpec {
+            appConnector?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecAppConnector>
             /**
              * ExitNode defines whether the Connector device should act as a Tailscale exit node. Defaults to false.
              * This field is mutually exclusive with the appConnector field.
@@ -55,14 +374,7 @@ export namespace tailscale {
              * create resources with the default configuration.
              */
             proxyClass?: pulumi.Input<string>
-            /**
-             * SubnetRouter defines subnet routes that the Connector device should
-             * expose to tailnet as a Tailscale subnet router.
-             * https://tailscale.com/kb/1019/subnets/
-             * If this field is unset, the device does not get configured as a Tailscale subnet router.
-             * This field is mutually exclusive with the appConnector field.
-             */
-            subnetRouter?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecSubnetRouterArgs>
+            subnetRouter?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecSubnetRouter>
             /**
              * Tags that the Tailscale node will be tagged with.
              * Defaults to [tag:k8s].
@@ -94,7 +406,7 @@ export namespace tailscale {
          * device with a static IP address.
          * https://tailscale.com/kb/1281/app-connectors
          */
-        export interface ConnectorSpecAppConnectorArgs {
+        export interface ConnectorSpecAppConnector {
             /**
              * Routes are optional preconfigured routes for the domains routed via the app connector.
              * If not set, routes for the domains will be discovered dynamically.
@@ -106,33 +418,121 @@ export namespace tailscale {
         }
 
         /**
+         * AppConnector defines whether the Connector device should act as a Tailscale app connector. A Connector that is
+         * configured as an app connector cannot be a subnet router or an exit node. If this field is unset, the
+         * Connector does not act as an app connector.
+         * Note that you will need to manually configure the permissions and the domains for the app connector via the
+         * Admin panel.
+         * Note also that the main tested and supported use case of this config option is to deploy an app connector on
+         * Kubernetes to access SaaS applications available on the public internet. Using the app connector to expose
+         * cluster workloads or other internal workloads to tailnet might work, but this is not a use case that we have
+         * tested or optimised for.
+         * If you are using the app connector to access SaaS applications because you need a predictable egress IP that
+         * can be whitelisted, it is also your responsibility to ensure that cluster traffic from the connector flows
+         * via that predictable IP, for example by enforcing that cluster egress traffic is routed via an egress NAT
+         * device with a static IP address.
+         * https://tailscale.com/kb/1281/app-connectors
+         */
+        export interface ConnectorSpecAppConnectorPatch {
+            /**
+             * Routes are optional preconfigured routes for the domains routed via the app connector.
+             * If not set, routes for the domains will be discovered dynamically.
+             * If set, the app connector will immediately be able to route traffic using the preconfigured routes, but may
+             * also dynamically discover other routes.
+             * https://tailscale.com/kb/1332/apps-best-practices#preconfiguration
+             */
+            routes?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * ConnectorSpec describes the desired Tailscale component.
+         * More info:
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface ConnectorSpecPatch {
+            appConnector?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecAppConnectorPatch>
+            /**
+             * ExitNode defines whether the Connector device should act as a Tailscale exit node. Defaults to false.
+             * This field is mutually exclusive with the appConnector field.
+             * https://tailscale.com/kb/1103/exit-nodes
+             */
+            exitNode?: pulumi.Input<boolean>
+            /**
+             * Hostname is the tailnet hostname that should be assigned to the
+             * Connector node. If unset, hostname defaults to <connector
+             * name>-connector. Hostname can contain lower case letters, numbers and
+             * dashes, it must not start or end with a dash and must be between 2
+             * and 63 characters long.
+             */
+            hostname?: pulumi.Input<string>
+            /**
+             * ProxyClass is the name of the ProxyClass custom resource that
+             * contains configuration options that should be applied to the
+             * resources created for this Connector. If unset, the operator will
+             * create resources with the default configuration.
+             */
+            proxyClass?: pulumi.Input<string>
+            subnetRouter?: pulumi.Input<inputs.tailscale.v1alpha1.ConnectorSpecSubnetRouterPatch>
+            /**
+             * Tags that the Tailscale node will be tagged with.
+             * Defaults to [tag:k8s].
+             * To autoapprove the subnet routes or exit node defined by a Connector,
+             * you can configure Tailscale ACLs to give these tags the necessary
+             * permissions.
+             * See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+             * If you specify custom tags here, you must also make the operator an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a Connector node has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+             */
+            tags?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
          * SubnetRouter defines subnet routes that the Connector device should
          * expose to tailnet as a Tailscale subnet router.
          * https://tailscale.com/kb/1019/subnets/
          * If this field is unset, the device does not get configured as a Tailscale subnet router.
          * This field is mutually exclusive with the appConnector field.
          */
-        export interface ConnectorSpecSubnetRouterArgs {
+        export interface ConnectorSpecSubnetRouter {
             /**
              * AdvertiseRoutes refer to CIDRs that the subnet router should make
              * available. Route values must be strings that represent a valid IPv4
              * or IPv6 CIDR range. Values can be Tailscale 4via6 subnet routes.
              * https://tailscale.com/kb/1201/4via6-subnets/
              */
-            advertiseRoutes: pulumi.Input<pulumi.Input<string>[]>
+            advertiseRoutes?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * SubnetRouter defines subnet routes that the Connector device should
+         * expose to tailnet as a Tailscale subnet router.
+         * https://tailscale.com/kb/1019/subnets/
+         * If this field is unset, the device does not get configured as a Tailscale subnet router.
+         * This field is mutually exclusive with the appConnector field.
+         */
+        export interface ConnectorSpecSubnetRouterPatch {
+            /**
+             * AdvertiseRoutes refer to CIDRs that the subnet router should make
+             * available. Route values must be strings that represent a valid IPv4
+             * or IPv6 CIDR range. Values can be Tailscale 4via6 subnet routes.
+             * https://tailscale.com/kb/1201/4via6-subnets/
+             */
+            advertiseRoutes?: pulumi.Input<pulumi.Input<string>[]>
         }
 
         /**
          * ConnectorStatus describes the status of the Connector. This is set
          * and managed by the Tailscale operator.
          */
-        export interface ConnectorStatusArgs {
+        export interface ConnectorStatus {
             /**
              * List of status conditions to indicate the status of the Connector.
              * Known condition types are `ConnectorReady`.
              */
             conditions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ConnectorStatusConditionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ConnectorStatusConditions>[]
             >
             /**
              * Hostname is the fully qualified domain name of the Connector node.
@@ -163,17 +563,17 @@ export namespace tailscale {
         /**
          * Condition contains details for one aspect of the current state of this API Resource.
          */
-        export interface ConnectorStatusConditionsArgs {
+        export interface ConnectorStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>
+            lastTransitionTime?: pulumi.Input<string>
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>
+            message?: pulumi.Input<string>
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -187,15 +587,60 @@ export namespace tailscale {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>
+            reason?: pulumi.Input<string>
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>
+            status?: pulumi.Input<string>
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * DNSConfig can be deployed to cluster to make a subset of Tailscale MagicDNS
+         * names resolvable by cluster workloads. Use this if: A) you need to refer to
+         * tailnet services, exposed to cluster via Tailscale Kubernetes operator egress
+         * proxies by the MagicDNS names of those tailnet services (usually because the
+         * services run over HTTPS)
+         * B) you have exposed a cluster workload to the tailnet using Tailscale Ingress
+         * and you also want to refer to the workload from within the cluster over the
+         * Ingress's MagicDNS name (usually because you have some callback component
+         * that needs to use the same URL as that used by a non-cluster client on
+         * tailnet).
+         * When a DNSConfig is applied to a cluster, Tailscale Kubernetes operator will
+         * deploy a nameserver for ts.net DNS names and automatically populate it with records
+         * for any Tailscale egress or Ingress proxies deployed to that cluster.
+         * Currently you must manually update your cluster DNS configuration to add the
+         * IP address of the deployed nameserver as a ts.net stub nameserver.
+         * Instructions for how to do it:
+         * https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/#configuration-of-stub-domain-and-upstream-nameserver-using-coredns (for CoreDNS),
+         * https://cloud.google.com/kubernetes-engine/docs/how-to/kube-dns (for kube-dns).
+         * Tailscale Kubernetes operator will write the address of a Service fronting
+         * the nameserver to dsnconfig.status.nameserver.ip.
+         * DNSConfig is a singleton - you must not create more than one.
+         * NB: if you want cluster workloads to be able to refer to Tailscale Ingress
+         * using its MagicDNS name, you must also annotate the Ingress resource with
+         * tailscale.com/experimental-forward-cluster-traffic-via-ingress annotation to
+         * ensure that the proxy created for the Ingress listens on its Pod IP address.
+         * NB: Clusters where Pods get assigned IPv6 addresses only are currently not supported.
+         */
+        export interface DNSConfig {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<'DNSConfig'>
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+            spec?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpec>
+            status?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigStatus>
         }
 
         /**
@@ -203,14 +648,8 @@ export namespace tailscale {
          * More info:
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
-        export interface DNSConfigSpecArgs {
-            /**
-             * Configuration for a nameserver that can resolve ts.net DNS names
-             * associated with in-cluster proxies for Tailscale egress Services and
-             * Tailscale Ingresses. The operator will always deploy this nameserver
-             * when a DNSConfig is applied.
-             */
-            nameserver: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserverArgs>
+        export interface DNSConfigSpec {
+            nameserver?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserver>
         }
 
         /**
@@ -219,17 +658,14 @@ export namespace tailscale {
          * Tailscale Ingresses. The operator will always deploy this nameserver
          * when a DNSConfig is applied.
          */
-        export interface DNSConfigSpecNameserverArgs {
-            /**
-             * Nameserver image. Defaults to tailscale/k8s-nameserver:unstable.
-             */
-            image?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserverImageArgs>
+        export interface DNSConfigSpecNameserver {
+            image?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserverImage>
         }
 
         /**
          * Nameserver image. Defaults to tailscale/k8s-nameserver:unstable.
          */
-        export interface DNSConfigSpecNameserverImageArgs {
+        export interface DNSConfigSpecNameserverImage {
             /**
              * Repo defaults to tailscale/k8s-nameserver.
              */
@@ -241,33 +677,63 @@ export namespace tailscale {
         }
 
         /**
+         * Nameserver image. Defaults to tailscale/k8s-nameserver:unstable.
+         */
+        export interface DNSConfigSpecNameserverImagePatch {
+            /**
+             * Repo defaults to tailscale/k8s-nameserver.
+             */
+            repo?: pulumi.Input<string>
+            /**
+             * Tag defaults to unstable.
+             */
+            tag?: pulumi.Input<string>
+        }
+
+        /**
+         * Configuration for a nameserver that can resolve ts.net DNS names
+         * associated with in-cluster proxies for Tailscale egress Services and
+         * Tailscale Ingresses. The operator will always deploy this nameserver
+         * when a DNSConfig is applied.
+         */
+        export interface DNSConfigSpecNameserverPatch {
+            image?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserverImagePatch>
+        }
+
+        /**
+         * Spec describes the desired DNS configuration.
+         * More info:
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface DNSConfigSpecPatch {
+            nameserver?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecNameserverPatch>
+        }
+
+        /**
          * Status describes the status of the DNSConfig. This is set
          * and managed by the Tailscale operator.
          */
-        export interface DNSConfigStatusArgs {
+        export interface DNSConfigStatus {
             conditions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigStatusConditionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigStatusConditions>[]
             >
-            /**
-             * Nameserver describes the status of nameserver cluster resources.
-             */
-            nameserver?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigStatusNameserverArgs>
+            nameserver?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigStatusNameserver>
         }
 
         /**
          * Condition contains details for one aspect of the current state of this API Resource.
          */
-        export interface DNSConfigStatusConditionsArgs {
+        export interface DNSConfigStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>
+            lastTransitionTime?: pulumi.Input<string>
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>
+            message?: pulumi.Input<string>
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -281,21 +747,21 @@ export namespace tailscale {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>
+            reason?: pulumi.Input<string>
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>
+            status?: pulumi.Input<string>
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
         }
 
         /**
          * Nameserver describes the status of nameserver cluster resources.
          */
-        export interface DNSConfigStatusNameserverArgs {
+        export interface DNSConfigStatusNameserver {
             /**
              * IP is the ClusterIP of the Service fronting the deployed ts.net nameserver.
              * Currently you must manually update your cluster DNS config to add
@@ -308,30 +774,41 @@ export namespace tailscale {
         }
 
         /**
+         * ProxyClass describes a set of configuration parameters that can be applied to
+         * proxy resources created by the Tailscale Kubernetes operator.
+         * To apply a given ProxyClass to resources created for a tailscale Ingress or
+         * Service, use tailscale.com/proxy-class=<proxyclass-name> label. To apply a
+         * given ProxyClass to resources created for a Connector, use
+         * connector.spec.proxyClass field.
+         * ProxyClass is a cluster scoped resource.
+         * More info:
+         * https://tailscale.com/kb/1445/kubernetes-operator-customization#cluster-resource-customization-using-proxyclass-custom-resource
+         */
+        export interface ProxyClass {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<'ProxyClass'>
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+            spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpec>
+            status?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassStatus>
+        }
+
+        /**
          * Specification of the desired state of the ProxyClass resource.
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
-        export interface ProxyClassSpecArgs {
-            /**
-             * Configuration for proxy metrics. Metrics are currently not supported
-             * for egress proxies and for Ingress proxies that have been configured
-             * with tailscale.com/experimental-forward-cluster-traffic-via-ingress
-             * annotation. Note that the metrics are currently considered unstable
-             * and will likely change in breaking ways in the future - we only
-             * recommend that you use those for debugging purposes.
-             */
-            metrics?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetricsArgs>
-            /**
-             * Configuration parameters for the proxy's StatefulSet. Tailscale
-             * Kubernetes operator deploys a StatefulSet for each of the user
-             * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
-             */
-            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetArgs>
-            /**
-             * TailscaleConfig contains options to configure the tailscale-specific
-             * parameters of proxies.
-             */
-            tailscale?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecTailscaleArgs>
+        export interface ProxyClassSpec {
+            metrics?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetrics>
+            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSet>
+            tailscale?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecTailscale>
         }
 
         /**
@@ -342,7 +819,7 @@ export namespace tailscale {
          * and will likely change in breaking ways in the future - we only
          * recommend that you use those for debugging purposes.
          */
-        export interface ProxyClassSpecMetricsArgs {
+        export interface ProxyClassSpecMetrics {
             /**
              * Setting enable to true will make the proxy serve Tailscale metrics
              * at <pod-ip>:9002/metrics.
@@ -355,17 +832,33 @@ export namespace tailscale {
              *
              * Defaults to false.
              */
-            enable: pulumi.Input<boolean>
+            enable?: pulumi.Input<boolean>
+            serviceMonitor?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitor>
+        }
+
+        /**
+         * Configuration for proxy metrics. Metrics are currently not supported
+         * for egress proxies and for Ingress proxies that have been configured
+         * with tailscale.com/experimental-forward-cluster-traffic-via-ingress
+         * annotation. Note that the metrics are currently considered unstable
+         * and will likely change in breaking ways in the future - we only
+         * recommend that you use those for debugging purposes.
+         */
+        export interface ProxyClassSpecMetricsPatch {
             /**
-             * Enable to create a Prometheus ServiceMonitor for scraping the proxy's Tailscale metrics.
-             * The ServiceMonitor will select the metrics Service that gets created when metrics are enabled.
-             * The ingested metrics for each Service monitor will have labels to identify the proxy:
-             * ts_proxy_type: ingress_service|ingress_resource|connector|proxygroup
-             * ts_proxy_parent_name: name of the parent resource (i.e name of the Connector, Tailscale Ingress, Tailscale Service or ProxyGroup)
-             * ts_proxy_parent_namespace: namespace of the parent resource (if the parent resource is not cluster scoped)
-             * job: ts_<proxy type>_[<parent namespace>]_<parent_name>
+             * Setting enable to true will make the proxy serve Tailscale metrics
+             * at <pod-ip>:9002/metrics.
+             * A metrics Service named <proxy-statefulset>-metrics will also be created in the operator's namespace and will
+             * serve the metrics at <service-ip>:9002/metrics.
+             *
+             * In 1.78.x and 1.80.x, this field also serves as the default value for
+             * .spec.statefulSet.pod.tailscaleContainer.debug.enable. From 1.82.0, both
+             * fields will independently default to false.
+             *
+             * Defaults to false.
              */
-            serviceMonitor?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitorArgs>
+            enable?: pulumi.Input<boolean>
+            serviceMonitor?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetricsServiceMonitorPatch>
         }
 
         /**
@@ -377,11 +870,37 @@ export namespace tailscale {
          * ts_proxy_parent_namespace: namespace of the parent resource (if the parent resource is not cluster scoped)
          * job: ts_<proxy type>_[<parent namespace>]_<parent_name>
          */
-        export interface ProxyClassSpecMetricsServiceMonitorArgs {
+        export interface ProxyClassSpecMetricsServiceMonitor {
             /**
              * If Enable is set to true, a Prometheus ServiceMonitor will be created. Enable can only be set to true if metrics are enabled.
              */
-            enable: pulumi.Input<boolean>
+            enable?: pulumi.Input<boolean>
+        }
+
+        /**
+         * Enable to create a Prometheus ServiceMonitor for scraping the proxy's Tailscale metrics.
+         * The ServiceMonitor will select the metrics Service that gets created when metrics are enabled.
+         * The ingested metrics for each Service monitor will have labels to identify the proxy:
+         * ts_proxy_type: ingress_service|ingress_resource|connector|proxygroup
+         * ts_proxy_parent_name: name of the parent resource (i.e name of the Connector, Tailscale Ingress, Tailscale Service or ProxyGroup)
+         * ts_proxy_parent_namespace: namespace of the parent resource (if the parent resource is not cluster scoped)
+         * job: ts_<proxy type>_[<parent namespace>]_<parent_name>
+         */
+        export interface ProxyClassSpecMetricsServiceMonitorPatch {
+            /**
+             * If Enable is set to true, a Prometheus ServiceMonitor will be created. Enable can only be set to true if metrics are enabled.
+             */
+            enable?: pulumi.Input<boolean>
+        }
+
+        /**
+         * Specification of the desired state of the ProxyClass resource.
+         * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+         */
+        export interface ProxyClassSpecPatch {
+            metrics?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecMetricsPatch>
+            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPatch>
+            tailscale?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecTailscalePatch>
         }
 
         /**
@@ -389,7 +908,7 @@ export namespace tailscale {
          * Kubernetes operator deploys a StatefulSet for each of the user
          * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
          */
-        export interface ProxyClassSpecStatefulSetArgs {
+        export interface ProxyClassSpecStatefulSet {
             /**
              * Annotations that will be added to the StatefulSet created for the proxy.
              * Any Annotations specified here will be merged with the default annotations
@@ -410,22 +929,43 @@ export namespace tailscale {
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
             labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            pod?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPod>
+        }
+
+        /**
+         * Configuration parameters for the proxy's StatefulSet. Tailscale
+         * Kubernetes operator deploys a StatefulSet for each of the user
+         * configured proxies (Tailscale Ingress, Tailscale Service, Connector).
+         */
+        export interface ProxyClassSpecStatefulSetPatch {
             /**
-             * Configuration for the proxy Pod.
+             * Annotations that will be added to the StatefulSet created for the proxy.
+             * Any Annotations specified here will be merged with the default annotations
+             * applied to the StatefulSet by the Tailscale Kubernetes operator as
+             * well as any other annotations that might have been applied by other
+             * actors.
+             * Annotations must be valid Kubernetes annotations.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            pod?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodArgs>
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * Labels that will be added to the StatefulSet created for the proxy.
+             * Any labels specified here will be merged with the default labels
+             * applied to the StatefulSet by the Tailscale Kubernetes operator as
+             * well as any other labels that might have been applied by other
+             * actors.
+             * Label keys and values must be valid Kubernetes label keys and values.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            pod?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodPatch>
         }
 
         /**
          * Configuration for the proxy Pod.
          */
-        export interface ProxyClassSpecStatefulSetPodArgs {
-            /**
-             * Proxy Pod's affinity rules.
-             * By default, the Tailscale Kubernetes operator does not apply any affinity rules.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
-             */
-            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityArgs>
+        export interface ProxyClassSpecStatefulSetPod {
+            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinity>
             /**
              * Annotations that will be added to the proxy Pod.
              * Any annotations specified here will be merged with the default
@@ -439,7 +979,7 @@ export namespace tailscale {
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
              */
             imagePullSecrets?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecretsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecrets>[]
             >
             /**
              * Labels that will be added to the proxy Pod.
@@ -460,24 +1000,10 @@ export namespace tailscale {
              * selector.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
-            /**
-             * Proxy Pod's security context.
-             * By default Tailscale Kubernetes operator does not apply any Pod
-             * security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
-             */
-            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextArgs>
-            /**
-             * Configuration for the proxy container running tailscale.
-             */
-            tailscaleContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerArgs>
-            /**
-             * Configuration for the proxy init container that enables forwarding.
-             */
-            tailscaleInitContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerArgs>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContext>
+            tailscaleContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainer>
+            tailscaleInitContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainer>
             /**
              * Proxy Pod's tolerations.
              * By default Tailscale Kubernetes operator does not apply any
@@ -485,7 +1011,7 @@ export namespace tailscale {
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
             tolerations?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerationsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerations>[]
             >
             /**
              * Proxy Pod's topology spread constraints.
@@ -493,7 +1019,7 @@ export namespace tailscale {
              * https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
              */
             topologySpreadConstraints?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraints>[]
             >
         }
 
@@ -502,25 +1028,16 @@ export namespace tailscale {
          * By default, the Tailscale Kubernetes operator does not apply any affinity rules.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityArgs {
-            /**
-             * Describes node affinity scheduling rules for the pod.
-             */
-            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityArgs>
-            /**
-             * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityArgs>
-            /**
-             * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinity {
+            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinity>
+            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinity>
+            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinity>
         }
 
         /**
          * Describes node affinity scheduling rules for the pod.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the affinity expressions specified by this field, but it may choose
@@ -533,48 +1050,71 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution>
+        }
+
+        /**
+         * Describes node affinity scheduling rules for the pod.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPatch {
             /**
-             * If the affinity requirements specified by this field are not met at
-             * scheduling time, the pod will not be scheduled onto the node.
-             * If the affinity requirements specified by this field cease to be met
-             * at some point during pod execution (e.g. due to an update), the system
-             * may or may not try to eventually evict the pod from its node.
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node matches the corresponding matchExpressions; the
+             * node(s) with the highest sum are the most preferred.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>
         }
 
         /**
          * An empty preferred scheduling term matches all objects with implicit weight 0
          * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A node selector term, associated with the corresponding weight.
-             */
-            preference: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            preference?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference>
             /**
              * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * An empty preferred scheduling term matches all objects with implicit weight 0
+         * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            preference?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch>
+            /**
+             * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * A node selector term, associated with the corresponding weight.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference {
             /**
              * A list of node selector requirements by node's labels.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions>[]
             >
             /**
              * A list of node selector requirements by node's fields.
              */
             matchFields?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields>[]
             >
         }
 
@@ -582,16 +1122,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -606,16 +1146,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -624,6 +1164,72 @@ export namespace tailscale {
              * This array is replaced during a strategic merge patch.
              */
             values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector term, associated with the corresponding weight.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch>[]
+            >
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch>[]
+            >
         }
 
         /**
@@ -633,12 +1239,12 @@ export namespace tailscale {
          * at some point during pod execution (e.g. due to an update), the system
          * may or may not try to eventually evict the pod from its node.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution {
             /**
              * Required. A list of node selector terms. The terms are ORed.
              */
-            nodeSelectorTerms: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsArgs>[]
+            nodeSelectorTerms?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms>[]
             >
         }
 
@@ -647,18 +1253,18 @@ export namespace tailscale {
          * them are ANDed.
          * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms {
             /**
              * A list of node selector requirements by node's labels.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions>[]
             >
             /**
              * A list of node selector requirements by node's fields.
              */
             matchFields?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields>[]
             >
         }
 
@@ -666,16 +1272,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -690,16 +1296,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -711,9 +1317,104 @@ export namespace tailscale {
         }
 
         /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A null or empty node selector term matches no objects. The requirements of
+         * them are ANDed.
+         * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch>[]
+            >
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch>[]
+            >
+        }
+
+        /**
+         * If the affinity requirements specified by this field are not met at
+         * scheduling time, the pod will not be scheduled onto the node.
+         * If the affinity requirements specified by this field cease to be met
+         * at some point during pod execution (e.g. due to an update), the system
+         * may or may not try to eventually evict the pod from its node.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            /**
+             * Required. A list of node selector terms. The terms are ORed.
+             */
+            nodeSelectorTerms?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch>[]
+            >
+        }
+
+        /**
+         * Proxy Pod's affinity rules.
+         * By default, the Tailscale Kubernetes operator does not apply any affinity rules.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPatch {
+            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityNodeAffinityPatch>
+            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPatch>
+            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPatch>
+        }
+
+        /**
          * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the affinity expressions specified by this field, but it may choose
@@ -726,7 +1427,7 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
             /**
              * If the affinity requirements specified by this field are not met at
@@ -738,34 +1439,71 @@ export namespace tailscale {
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
             requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution>[]
+            >
+        }
+
+        /**
+         * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            /**
+             * If the affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>[]
             >
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
-            podAffinityTerm: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm>
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch>
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -790,14 +1528,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -812,19 +1543,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -838,16 +1569,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -864,12 +1705,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -880,26 +1721,50 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
@@ -910,12 +1775,8 @@ export namespace tailscale {
          * the label with key <topologyKey> matches that of any node on which
          * a pod of the set of pods is running
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -940,14 +1801,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -962,19 +1816,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -988,16 +1842,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -1014,12 +1978,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -1030,32 +1994,61 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the anti-affinity expressions specified by this field, but it may choose
@@ -1068,7 +2061,7 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
             /**
              * If the anti-affinity requirements specified by this field are not met at
@@ -1080,34 +2073,71 @@ export namespace tailscale {
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
             requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution>[]
+            >
+        }
+
+        /**
+         * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the anti-affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling anti-affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            /**
+             * If the anti-affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the anti-affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>[]
             >
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
-            podAffinityTerm: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm>
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch>
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1132,14 +2162,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -1154,19 +2177,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -1180,16 +2203,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -1206,12 +2339,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -1222,26 +2355,50 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
@@ -1252,12 +2409,8 @@ export namespace tailscale {
          * the label with key <topologyKey> matches that of any node on which
          * a pod of the set of pods is running
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs>
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -1282,14 +2435,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -1304,19 +2450,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -1330,16 +2476,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -1356,12 +2612,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -1372,33 +2628,62 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
          */
-        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * LocalObjectReference contains enough information to let you locate the
          * referenced object inside the same namespace.
          */
-        export interface ProxyClassSpecStatefulSetPodImagePullSecretsArgs {
+        export interface ProxyClassSpecStatefulSetPodImagePullSecrets {
             /**
              * Name of the referent.
              * This field is effectively required, but due to backwards compatibility is
@@ -1408,16 +2693,82 @@ export namespace tailscale {
              */
             name?: pulumi.Input<string>
         }
+
         /**
-         * proxyClassSpecStatefulSetPodImagePullSecretsArgsProvideDefaults sets the appropriate defaults for ProxyClassSpecStatefulSetPodImagePullSecretsArgs
+         * LocalObjectReference contains enough information to let you locate the
+         * referenced object inside the same namespace.
          */
-        export function proxyClassSpecStatefulSetPodImagePullSecretsArgsProvideDefaults(
-            val: ProxyClassSpecStatefulSetPodImagePullSecretsArgs,
-        ): ProxyClassSpecStatefulSetPodImagePullSecretsArgs {
-            return {
-                ...val,
-                name: val.name ?? '',
-            }
+        export interface ProxyClassSpecStatefulSetPodImagePullSecretsPatch {
+            /**
+             * Name of the referent.
+             * This field is effectively required, but due to backwards compatibility is
+             * allowed to be empty. Instances of this type with an empty value here are
+             * almost certainly wrong.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Configuration for the proxy Pod.
+         */
+        export interface ProxyClassSpecStatefulSetPodPatch {
+            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodAffinityPatch>
+            /**
+             * Annotations that will be added to the proxy Pod.
+             * Any annotations specified here will be merged with the default
+             * annotations applied to the Pod by the Tailscale Kubernetes operator.
+             * Annotations must be valid Kubernetes annotations.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
+             */
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * Proxy Pod's image pull Secrets.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+             */
+            imagePullSecrets?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodImagePullSecretsPatch>[]
+            >
+            /**
+             * Labels that will be added to the proxy Pod.
+             * Any labels specified here will be merged with the default labels
+             * applied to the Pod by the Tailscale Kubernetes operator.
+             * Label keys and values must be valid Kubernetes label keys and values.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * Proxy Pod's node name.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeName?: pulumi.Input<string>
+            /**
+             * Proxy Pod's node selector.
+             * By default Tailscale Kubernetes operator does not apply any node
+             * selector.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextPatch>
+            tailscaleContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerPatch>
+            tailscaleInitContainer?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerPatch>
+            /**
+             * Proxy Pod's tolerations.
+             * By default Tailscale Kubernetes operator does not apply any
+             * tolerations.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            tolerations?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTolerationsPatch>[]
+            >
+            /**
+             * Proxy Pod's topology spread constraints.
+             * By default Tailscale Kubernetes operator does not apply any topology spread constraints.
+             * https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+             */
+            topologySpreadConstraints?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsPatch>[]
+            >
         }
 
         /**
@@ -1426,12 +2777,8 @@ export namespace tailscale {
          * security context.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextArgs {
-            /**
-             * appArmorProfile is the AppArmor options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfileArgs>
+        export interface ProxyClassSpecStatefulSetPodSecurityContext {
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfile>
             /**
              * A special supplemental group that applies to all containers in a pod.
              * Some volume types allow the Kubelet to change the ownership of that volume
@@ -1482,20 +2829,8 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             runAsUser?: pulumi.Input<number>
-            /**
-             * The SELinux context to be applied to all containers.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in SecurityContext.  If set in
-             * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
-             * takes precedence for that container.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsArgs>
-            /**
-             * The seccomp options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfileArgs>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptions>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfile>
             /**
              * A list of groups applied to the first process run in each container, in addition
              * to the container's primary GID, the fsGroup (if specified), and group memberships
@@ -1512,22 +2847,16 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             sysctls?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctlsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctls>[]
             >
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options within a container's SecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsArgs>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptions>
         }
 
         /**
          * appArmorProfile is the AppArmor options to use by the containers in this pod.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfile {
             /**
              * localhostProfile indicates a profile loaded on the node that should be used.
              * The profile must be preconfigured on the node to work.
@@ -1542,7 +2871,110 @@ export namespace tailscale {
              *   RuntimeDefault - the container runtime's default profile.
              *   Unconfined - no AppArmor enforcement.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * Proxy Pod's security context.
+         * By default Tailscale Kubernetes operator does not apply any Pod
+         * security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextPatch {
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextAppArmorProfilePatch>
+            /**
+             * A special supplemental group that applies to all containers in a pod.
+             * Some volume types allow the Kubelet to change the ownership of that volume
+             * to be owned by the pod:
+             *
+             * 1. The owning GID will be the FSGroup
+             * 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+             * 3. The permission bits are OR'd with rw-rw----
+             *
+             * If unset, the Kubelet will not modify the ownership and permissions of any volume.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroup?: pulumi.Input<number>
+            /**
+             * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+             * before being exposed inside Pod. This field will only apply to
+             * volume types which support fsGroup based ownership(and permissions).
+             * It will have no effect on ephemeral volume types such as: secret, configmaps
+             * and emptydir.
+             * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroupChangePolicy?: pulumi.Input<string>
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup?: pulumi.Input<number>
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot?: pulumi.Input<boolean>
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser?: pulumi.Input<number>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSeccompProfilePatch>
+            /**
+             * A list of groups applied to the first process run in each container, in addition
+             * to the container's primary GID, the fsGroup (if specified), and group memberships
+             * defined in the container image for the uid of the container process. If unspecified,
+             * no additional groups are added to any container. Note that group memberships
+             * defined in the container image for the uid of the container process are still effective,
+             * even if they are not included in this list.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            supplementalGroups?: pulumi.Input<pulumi.Input<number>[]>
+            /**
+             * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+             * sysctls (by the container runtime) might fail to launch.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            sysctls?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextSysctlsPatch>[]
+            >
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsPatch>
         }
 
         /**
@@ -1553,7 +2985,34 @@ export namespace tailscale {
          * takes precedence for that container.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptions {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level?: pulumi.Input<string>
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role?: pulumi.Input<string>
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type?: pulumi.Input<string>
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user?: pulumi.Input<string>
+        }
+
+        /**
+         * The SELinux context to be applied to all containers.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in SecurityContext.  If set in
+         * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+         * takes precedence for that container.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch {
             /**
              * Level is SELinux level label that applies to the container.
              */
@@ -1576,7 +3035,7 @@ export namespace tailscale {
          * The seccomp options to use by the containers in this pod.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextSeccompProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeccompProfile {
             /**
              * localhostProfile indicates a profile defined in a file on the node should be used.
              * The profile must be preconfigured on the node to work.
@@ -1592,21 +3051,58 @@ export namespace tailscale {
              * RuntimeDefault - the container runtime default profile should be used.
              * Unconfined - no profile should be applied.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * The seccomp options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
          * Sysctl defines a kernel parameter to be set
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextSysctlsArgs {
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSysctls {
             /**
              * Name of a property to set
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
             /**
              * Value of a property to set
              */
-            value: pulumi.Input<string>
+            value?: pulumi.Input<string>
+        }
+
+        /**
+         * Sysctl defines a kernel parameter to be set
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextSysctlsPatch {
+            /**
+             * Name of a property to set
+             */
+            name?: pulumi.Input<string>
+            /**
+             * Value of a property to set
+             */
+            value?: pulumi.Input<string>
         }
 
         /**
@@ -1615,7 +3111,40 @@ export namespace tailscale {
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is linux.
          */
-        export interface ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodSecurityContextWindowsOptions {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec?: pulumi.Input<string>
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName?: pulumi.Input<string>
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess?: pulumi.Input<boolean>
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName?: pulumi.Input<string>
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options within a container's SecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodSecurityContextWindowsOptionsPatch {
             /**
              * GMSACredentialSpec is where the GMSA admission webhook
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
@@ -1645,12 +3174,8 @@ export namespace tailscale {
         /**
          * Configuration for the proxy container running tailscale.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerArgs {
-            /**
-             * Configuration for enabling extra debug information in the container.
-             * Not recommended for production use.
-             */
-            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebugArgs>
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainer {
+            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebug>
             /**
              * List of environment variables to set in the container.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
@@ -1661,7 +3186,7 @@ export namespace tailscale {
              * the future.
              */
             env?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnvArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnv>[]
             >
             /**
              * Container image name. By default images are pulled from
@@ -1678,33 +3203,15 @@ export namespace tailscale {
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
             imagePullPolicy?: pulumi.Input<string>
-            /**
-             * Container resource requirements.
-             * By default Tailscale Kubernetes operator does not apply any resource
-             * requirements. The amount of resources required wil depend on the
-             * amount of resources the operator needs to parse, usage patterns and
-             * cluster size.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesArgs>
-            /**
-             * Container security context.
-             * Security context specified here will override the security context set by the operator.
-             * By default the operator sets the Tailscale container and the Tailscale init container to privileged
-             * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
-             * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
-             * installing device plugin in your cluster and configuring the proxies tun device to be created
-             * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextArgs>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResources>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContext>
         }
 
         /**
          * Configuration for enabling extra debug information in the container.
          * Not recommended for production use.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerDebugArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerDebug {
             /**
              * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
              * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
@@ -1720,11 +3227,49 @@ export namespace tailscale {
             enable?: pulumi.Input<boolean>
         }
 
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerEnvArgs {
+        /**
+         * Configuration for enabling extra debug information in the container.
+         * Not recommended for production use.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerDebugPatch {
+            /**
+             * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
+             * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
+             * 9001 is a container port named "debug". The endpoints and their responses
+             * may change in backwards incompatible ways in the future, and should not
+             * be considered stable.
+             *
+             * In 1.78.x and 1.80.x, this setting will default to the value of
+             * .spec.metrics.enable, and requests to the "metrics" port matching the
+             * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
+             * this setting will default to false, and no requests will be proxied.
+             */
+            enable?: pulumi.Input<boolean>
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerEnv {
             /**
              * Name of the environment variable. Must be a C_IDENTIFIER.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value?: pulumi.Input<string>
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name?: pulumi.Input<string>
             /**
              * Variable references $(VAR_NAME) are expanded using the previously defined
              *  environment variables in the container and any service environment
@@ -1739,6 +3284,42 @@ export namespace tailscale {
         }
 
         /**
+         * Configuration for the proxy container running tailscale.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerPatch {
+            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerDebugPatch>
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerEnvPatch>[]
+            >
+            /**
+             * Container image name. By default images are pulled from
+             * docker.io/tailscale/tailscale, but the official images are also
+             * available at ghcr.io/tailscale/tailscale. Specifying image name here
+             * will override any proxy image values specified via the Kubernetes
+             * operator's Helm chart values or PROXY_IMAGE env var in the operator
+             * Deployment.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image?: pulumi.Input<string>
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy?: pulumi.Input<string>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesPatch>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextPatch>
+        }
+
+        /**
          * Container resource requirements.
          * By default Tailscale Kubernetes operator does not apply any resource
          * requirements. The amount of resources required wil depend on the
@@ -1746,7 +3327,7 @@ export namespace tailscale {
          * cluster size.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResources {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims,
              * that are used by this container.
@@ -1757,36 +3338,79 @@ export namespace tailscale {
              * This field is immutable. It can only be set for containers.
              */
             claims?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaims>[]
             >
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
          * ResourceClaim references one entry in PodSpec.ResourceClaims.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaims {
             /**
              * Name must match the name of one entry in pod.spec.resourceClaims of
              * the Pod where this field is used. It makes that resource available
              * inside a container.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Container resource requirements.
+         * By default Tailscale Kubernetes operator does not apply any resource
+         * requirements. The amount of resources required wil depend on the
+         * amount of resources the operator needs to parse, usage patterns and
+         * cluster size.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerResourcesClaimsPatch>[]
+            >
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
@@ -1799,7 +3423,7 @@ export namespace tailscale {
          * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContext {
             /**
              * AllowPrivilegeEscalation controls whether a process can gain more
              * privileges than its parent process. This bool directly controls if
@@ -1810,18 +3434,8 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             allowPrivilegeEscalation?: pulumi.Input<boolean>
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfileArgs>
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesArgs>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfile>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilities>
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
@@ -1868,28 +3482,9 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             runAsUser?: pulumi.Input<number>
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsArgs>
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfileArgs>
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsArgs>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptions>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfile>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptions>
         }
 
         /**
@@ -1897,7 +3492,7 @@ export namespace tailscale {
          * overrides the pod's appArmorProfile.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfile {
             /**
              * localhostProfile indicates a profile loaded on the node that should be used.
              * The profile must be preconfigured on the node to work.
@@ -1912,7 +3507,30 @@ export namespace tailscale {
              *   RuntimeDefault - the container runtime's default profile.
              *   Unconfined - no AppArmor enforcement.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -1920,7 +3538,7 @@ export namespace tailscale {
          * Defaults to the default set of capabilities granted by the container runtime.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilities {
             /**
              * Added capabilities
              */
@@ -1932,13 +3550,129 @@ export namespace tailscale {
         }
 
         /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * Removed capabilities
+             */
+            drop?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * Container security context.
+         * Security context specified here will override the security context set by the operator.
+         * By default the operator sets the Tailscale container and the Tailscale init container to privileged
+         * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
+         * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
+         * installing device plugin in your cluster and configuring the proxies tun device to be created
+         * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation?: pulumi.Input<boolean>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextAppArmorProfilePatch>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextCapabilitiesPatch>
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged?: pulumi.Input<boolean>
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount?: pulumi.Input<string>
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem?: pulumi.Input<boolean>
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup?: pulumi.Input<number>
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot?: pulumi.Input<boolean>
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser?: pulumi.Input<number>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsPatch>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfilePatch>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsPatch>
+        }
+
+        /**
          * The SELinux context to be applied to the container.
          * If unspecified, the container runtime will allocate a random SELinux context for each
          * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
          * PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptions {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level?: pulumi.Input<string>
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role?: pulumi.Input<string>
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type?: pulumi.Input<string>
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user?: pulumi.Input<string>
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeLinuxOptionsPatch {
             /**
              * Level is SELinux level label that applies to the container.
              */
@@ -1963,7 +3697,7 @@ export namespace tailscale {
          * override the pod options.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfile {
             /**
              * localhostProfile indicates a profile defined in a file on the node should be used.
              * The profile must be preconfigured on the node to work.
@@ -1979,7 +3713,32 @@ export namespace tailscale {
              * RuntimeDefault - the container runtime default profile should be used.
              * Unconfined - no profile should be applied.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -1988,7 +3747,40 @@ export namespace tailscale {
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is linux.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptions {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec?: pulumi.Input<string>
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName?: pulumi.Input<string>
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess?: pulumi.Input<boolean>
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName?: pulumi.Input<string>
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleContainerSecurityContextWindowsOptionsPatch {
             /**
              * GMSACredentialSpec is where the GMSA admission webhook
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
@@ -2018,12 +3810,8 @@ export namespace tailscale {
         /**
          * Configuration for the proxy init container that enables forwarding.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerArgs {
-            /**
-             * Configuration for enabling extra debug information in the container.
-             * Not recommended for production use.
-             */
-            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugArgs>
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainer {
+            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebug>
             /**
              * List of environment variables to set in the container.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
@@ -2034,7 +3822,7 @@ export namespace tailscale {
              * the future.
              */
             env?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnv>[]
             >
             /**
              * Container image name. By default images are pulled from
@@ -2051,33 +3839,15 @@ export namespace tailscale {
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
             imagePullPolicy?: pulumi.Input<string>
-            /**
-             * Container resource requirements.
-             * By default Tailscale Kubernetes operator does not apply any resource
-             * requirements. The amount of resources required wil depend on the
-             * amount of resources the operator needs to parse, usage patterns and
-             * cluster size.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesArgs>
-            /**
-             * Container security context.
-             * Security context specified here will override the security context set by the operator.
-             * By default the operator sets the Tailscale container and the Tailscale init container to privileged
-             * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
-             * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
-             * installing device plugin in your cluster and configuring the proxies tun device to be created
-             * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextArgs>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResources>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContext>
         }
 
         /**
          * Configuration for enabling extra debug information in the container.
          * Not recommended for production use.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerDebug {
             /**
              * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
              * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
@@ -2093,11 +3863,49 @@ export namespace tailscale {
             enable?: pulumi.Input<boolean>
         }
 
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvArgs {
+        /**
+         * Configuration for enabling extra debug information in the container.
+         * Not recommended for production use.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugPatch {
+            /**
+             * Enable tailscaled's HTTP pprof endpoints at <pod-ip>:9001/debug/pprof/
+             * and internal debug metrics endpoint at <pod-ip>:9001/debug/metrics, where
+             * 9001 is a container port named "debug". The endpoints and their responses
+             * may change in backwards incompatible ways in the future, and should not
+             * be considered stable.
+             *
+             * In 1.78.x and 1.80.x, this setting will default to the value of
+             * .spec.metrics.enable, and requests to the "metrics" port matching the
+             * mux pattern /debug/ will be forwarded to the "debug" port. In 1.82.x,
+             * this setting will default to false, and no requests will be proxied.
+             */
+            enable?: pulumi.Input<boolean>
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerEnv {
             /**
              * Name of the environment variable. Must be a C_IDENTIFIER.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value?: pulumi.Input<string>
+        }
+
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name?: pulumi.Input<string>
             /**
              * Variable references $(VAR_NAME) are expanded using the previously defined
              *  environment variables in the container and any service environment
@@ -2112,6 +3920,42 @@ export namespace tailscale {
         }
 
         /**
+         * Configuration for the proxy init container that enables forwarding.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerPatch {
+            debug?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerDebugPatch>
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerEnvPatch>[]
+            >
+            /**
+             * Container image name. By default images are pulled from
+             * docker.io/tailscale/tailscale, but the official images are also
+             * available at ghcr.io/tailscale/tailscale. Specifying image name here
+             * will override any proxy image values specified via the Kubernetes
+             * operator's Helm chart values or PROXY_IMAGE env var in the operator
+             * Deployment.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image?: pulumi.Input<string>
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy?: pulumi.Input<string>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesPatch>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextPatch>
+        }
+
+        /**
          * Container resource requirements.
          * By default Tailscale Kubernetes operator does not apply any resource
          * requirements. The amount of resources required wil depend on the
@@ -2119,7 +3963,7 @@ export namespace tailscale {
          * cluster size.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResources {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims,
              * that are used by this container.
@@ -2130,36 +3974,79 @@ export namespace tailscale {
              * This field is immutable. It can only be set for containers.
              */
             claims?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaims>[]
             >
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
          * ResourceClaim references one entry in PodSpec.ResourceClaims.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaims {
             /**
              * Name must match the name of one entry in pod.spec.resourceClaims of
              * the Pod where this field is used. It makes that resource available
              * inside a container.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Container resource requirements.
+         * By default Tailscale Kubernetes operator does not apply any resource
+         * requirements. The amount of resources required wil depend on the
+         * amount of resources the operator needs to parse, usage patterns and
+         * cluster size.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerResourcesClaimsPatch>[]
+            >
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
@@ -2172,7 +4059,7 @@ export namespace tailscale {
          * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContext {
             /**
              * AllowPrivilegeEscalation controls whether a process can gain more
              * privileges than its parent process. This bool directly controls if
@@ -2183,18 +4070,8 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             allowPrivilegeEscalation?: pulumi.Input<boolean>
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfileArgs>
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesArgs>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfile>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilities>
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
@@ -2241,28 +4118,9 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             runAsUser?: pulumi.Input<number>
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsArgs>
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfileArgs>
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsArgs>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptions>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfile>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptions>
         }
 
         /**
@@ -2270,7 +4128,7 @@ export namespace tailscale {
          * overrides the pod's appArmorProfile.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfile {
             /**
              * localhostProfile indicates a profile loaded on the node that should be used.
              * The profile must be preconfigured on the node to work.
@@ -2285,7 +4143,30 @@ export namespace tailscale {
              *   RuntimeDefault - the container runtime's default profile.
              *   Unconfined - no AppArmor enforcement.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -2293,7 +4174,7 @@ export namespace tailscale {
          * Defaults to the default set of capabilities granted by the container runtime.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilities {
             /**
              * Added capabilities
              */
@@ -2305,13 +4186,129 @@ export namespace tailscale {
         }
 
         /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * Removed capabilities
+             */
+            drop?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * Container security context.
+         * Security context specified here will override the security context set by the operator.
+         * By default the operator sets the Tailscale container and the Tailscale init container to privileged
+         * for proxies created for Tailscale ingress and egress Service, Connector and ProxyGroup.
+         * You can reduce the permissions of the Tailscale container to cap NET_ADMIN by
+         * installing device plugin in your cluster and configuring the proxies tun device to be created
+         * by the device plugin, see  https://github.com/tailscale/tailscale/issues/10814#issuecomment-2479977752
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation?: pulumi.Input<boolean>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextAppArmorProfilePatch>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextCapabilitiesPatch>
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged?: pulumi.Input<boolean>
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount?: pulumi.Input<string>
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem?: pulumi.Input<boolean>
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup?: pulumi.Input<number>
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot?: pulumi.Input<boolean>
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser?: pulumi.Input<number>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsPatch>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfilePatch>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsPatch>
+        }
+
+        /**
          * The SELinux context to be applied to the container.
          * If unspecified, the container runtime will allocate a random SELinux context for each
          * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
          * PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptions {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level?: pulumi.Input<string>
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role?: pulumi.Input<string>
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type?: pulumi.Input<string>
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user?: pulumi.Input<string>
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeLinuxOptionsPatch {
             /**
              * Level is SELinux level label that applies to the container.
              */
@@ -2336,7 +4333,7 @@ export namespace tailscale {
          * override the pod options.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfileArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfile {
             /**
              * localhostProfile indicates a profile defined in a file on the node should be used.
              * The profile must be preconfigured on the node to work.
@@ -2352,7 +4349,32 @@ export namespace tailscale {
              * RuntimeDefault - the container runtime default profile should be used.
              * Unconfined - no profile should be applied.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -2361,7 +4383,40 @@ export namespace tailscale {
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is linux.
          */
-        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsArgs {
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptions {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec?: pulumi.Input<string>
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName?: pulumi.Input<string>
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess?: pulumi.Input<boolean>
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName?: pulumi.Input<string>
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface ProxyClassSpecStatefulSetPodTailscaleInitContainerSecurityContextWindowsOptionsPatch {
             /**
              * GMSACredentialSpec is where the GMSA admission webhook
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
@@ -2392,7 +4447,43 @@ export namespace tailscale {
          * The pod this Toleration is attached to tolerates any taint that matches
          * the triple <key,value,effect> using the matching operator <operator>.
          */
-        export interface ProxyClassSpecStatefulSetPodTolerationsArgs {
+        export interface ProxyClassSpecStatefulSetPodTolerations {
+            /**
+             * Effect indicates the taint effect to match. Empty means match all taint effects.
+             * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string>
+            /**
+             * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+             * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Operator represents a key's relationship to the value.
+             * Valid operators are Exists and Equal. Defaults to Equal.
+             * Exists is equivalent to wildcard for value, so that a pod can
+             * tolerate all taints of a particular category.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * TolerationSeconds represents the period of time the toleration (which must be
+             * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+             * it is not set, which means tolerate the taint forever (do not evict). Zero and
+             * negative values will be treated as 0 (evict immediately) by the system.
+             */
+            tolerationSeconds?: pulumi.Input<number>
+            /**
+             * Value is the taint value the toleration matches to.
+             * If the operator is Exists, the value should be empty, otherwise just a regular string.
+             */
+            value?: pulumi.Input<string>
+        }
+
+        /**
+         * The pod this Toleration is attached to tolerates any taint that matches
+         * the triple <key,value,effect> using the matching operator <operator>.
+         */
+        export interface ProxyClassSpecStatefulSetPodTolerationsPatch {
             /**
              * Effect indicates the taint effect to match. Empty means match all taint effects.
              * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
@@ -2427,13 +4518,8 @@ export namespace tailscale {
         /**
          * TopologySpreadConstraint specifies how to spread matching pods among the given topology.
          */
-        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsArgs {
-            /**
-             * LabelSelector is used to find matching pods.
-             * Pods that match this label selector are counted to determine the number of pods
-             * in their corresponding topology domain.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorArgs>
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraints {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select the pods over which
              * spreading will be calculated. The keys are used to lookup values from the
@@ -2466,7 +4552,7 @@ export namespace tailscale {
              * to topologies that satisfy it.
              * It's a required field. Default value is 1 and 0 is not allowed.
              */
-            maxSkew: pulumi.Input<number>
+            maxSkew?: pulumi.Input<number>
             /**
              * MinDomains indicates a minimum number of eligible domains.
              * When the number of eligible domains with matching topology keys is less than minDomains,
@@ -2522,7 +4608,7 @@ export namespace tailscale {
              * And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
              * It's a required field.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
             /**
              * WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
              * the spread constraint.
@@ -2543,7 +4629,7 @@ export namespace tailscale {
              * won't make it *more* imbalanced.
              * It's a required field.
              */
-            whenUnsatisfiable: pulumi.Input<string>
+            whenUnsatisfiable?: pulumi.Input<string>
         }
 
         /**
@@ -2551,12 +4637,12 @@ export namespace tailscale {
          * Pods that match this label selector are counted to determine the number of pods
          * in their corresponding topology domain.
          */
-        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorArgs {
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -2570,16 +4656,16 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsArgs {
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -2590,10 +4676,186 @@ export namespace tailscale {
         }
 
         /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * LabelSelector is used to find matching pods.
+         * Pods that match this label selector are counted to determine the number of pods
+         * in their corresponding topology domain.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * TopologySpreadConstraint specifies how to spread matching pods among the given topology.
+         */
+        export interface ProxyClassSpecStatefulSetPodTopologySpreadConstraintsPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpecStatefulSetPodTopologySpreadConstraintsLabelSelectorPatch>
+            /**
+             * MatchLabelKeys is a set of pod label keys to select the pods over which
+             * spreading will be calculated. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are ANDed with labelSelector
+             * to select the group of existing pods over which spreading will be calculated
+             * for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.
+             * MatchLabelKeys cannot be set when LabelSelector isn't set.
+             * Keys that don't exist in the incoming pod labels will
+             * be ignored. A null or empty list means only match against labelSelector.
+             *
+             * This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
+             */
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * MaxSkew describes the degree to which pods may be unevenly distributed.
+             * When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+             * between the number of matching pods in the target topology and the global minimum.
+             * The global minimum is the minimum number of matching pods in an eligible domain
+             * or zero if the number of eligible domains is less than MinDomains.
+             * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+             * labelSelector spread as 2/2/1:
+             * In this case, the global minimum is 1.
+             * | zone1 | zone2 | zone3 |
+             * |  P P  |  P P  |   P   |
+             * - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 2/2/2;
+             * scheduling it onto zone1(zone2) would make the ActualSkew(3-1) on zone1(zone2)
+             * violate MaxSkew(1).
+             * - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+             * When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
+             * to topologies that satisfy it.
+             * It's a required field. Default value is 1 and 0 is not allowed.
+             */
+            maxSkew?: pulumi.Input<number>
+            /**
+             * MinDomains indicates a minimum number of eligible domains.
+             * When the number of eligible domains with matching topology keys is less than minDomains,
+             * Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
+             * And when the number of eligible domains with matching topology keys equals or greater than minDomains,
+             * this value has no effect on scheduling.
+             * As a result, when the number of eligible domains is less than minDomains,
+             * scheduler won't schedule more than maxSkew Pods to those domains.
+             * If value is nil, the constraint behaves as if MinDomains is equal to 1.
+             * Valid values are integers greater than 0.
+             * When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
+             *
+             * For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same
+             * labelSelector spread as 2/2/2:
+             * | zone1 | zone2 | zone3 |
+             * |  P P  |  P P  |  P P  |
+             * The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0.
+             * In this situation, new pod with the same labelSelector cannot be scheduled,
+             * because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
+             * it will violate MaxSkew.
+             */
+            minDomains?: pulumi.Input<number>
+            /**
+             * NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
+             * when calculating pod topology spread skew. Options are:
+             * - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
+             * - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
+             *
+             * If this value is nil, the behavior is equivalent to the Honor policy.
+             * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+             */
+            nodeAffinityPolicy?: pulumi.Input<string>
+            /**
+             * NodeTaintsPolicy indicates how we will treat node taints when calculating
+             * pod topology spread skew. Options are:
+             * - Honor: nodes without taints, along with tainted nodes for which the incoming pod
+             * has a toleration, are included.
+             * - Ignore: node taints are ignored. All nodes are included.
+             *
+             * If this value is nil, the behavior is equivalent to the Ignore policy.
+             * This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+             */
+            nodeTaintsPolicy?: pulumi.Input<string>
+            /**
+             * TopologyKey is the key of node labels. Nodes that have a label with this key
+             * and identical values are considered to be in the same topology.
+             * We consider each <key, value> as a "bucket", and try to put balanced number
+             * of pods into each bucket.
+             * We define a domain as a particular instance of a topology.
+             * Also, we define an eligible domain as a domain whose nodes meet the requirements of
+             * nodeAffinityPolicy and nodeTaintsPolicy.
+             * e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
+             * And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
+             * It's a required field.
+             */
+            topologyKey?: pulumi.Input<string>
+            /**
+             * WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+             * the spread constraint.
+             * - DoNotSchedule (default) tells the scheduler not to schedule it.
+             * - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+             *   but giving higher precedence to topologies that would help reduce the
+             *   skew.
+             * A constraint is considered "Unsatisfiable" for an incoming pod
+             * if and only if every possible node assignment for that pod would violate
+             * "MaxSkew" on some topology.
+             * For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+             * labelSelector spread as 3/1/1:
+             * | zone1 | zone2 | zone3 |
+             * | P P P |   P   |   P   |
+             * If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled
+             * to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies
+             * MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler
+             * won't make it *more* imbalanced.
+             * It's a required field.
+             */
+            whenUnsatisfiable?: pulumi.Input<string>
+        }
+
+        /**
          * TailscaleConfig contains options to configure the tailscale-specific
          * parameters of proxies.
          */
-        export interface ProxyClassSpecTailscaleArgs {
+        export interface ProxyClassSpecTailscale {
+            /**
+             * AcceptRoutes can be set to true to make the proxy instance accept
+             * routes advertized by other nodes on the tailnet, such as subnet
+             * routes.
+             * This is equivalent of passing --accept-routes flag to a tailscale Linux client.
+             * https://tailscale.com/kb/1019/subnets#use-your-subnet-routes-from-other-devices
+             * Defaults to false.
+             */
+            acceptRoutes?: pulumi.Input<boolean>
+        }
+
+        /**
+         * TailscaleConfig contains options to configure the tailscale-specific
+         * parameters of proxies.
+         */
+        export interface ProxyClassSpecTailscalePatch {
             /**
              * AcceptRoutes can be set to true to make the proxy instance accept
              * routes advertized by other nodes on the tailnet, such as subnet
@@ -2609,30 +4871,30 @@ export namespace tailscale {
          * Status of the ProxyClass. This is set and managed automatically.
          * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
          */
-        export interface ProxyClassStatusArgs {
+        export interface ProxyClassStatus {
             /**
              * List of status conditions to indicate the status of the ProxyClass.
              * Known condition types are `ProxyClassReady`.
              */
             conditions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassStatusConditionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassStatusConditions>[]
             >
         }
 
         /**
          * Condition contains details for one aspect of the current state of this API Resource.
          */
-        export interface ProxyClassStatusConditionsArgs {
+        export interface ProxyClassStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>
+            lastTransitionTime?: pulumi.Input<string>
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>
+            message?: pulumi.Input<string>
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -2646,21 +4908,38 @@ export namespace tailscale {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>
+            reason?: pulumi.Input<string>
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>
+            status?: pulumi.Input<string>
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        export interface ProxyGroup {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<'ProxyGroup'>
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+            spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupSpec>
+            status?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatus>
         }
 
         /**
          * Spec describes the desired ProxyGroup instances.
          */
-        export interface ProxyGroupSpecArgs {
+        export interface ProxyGroupSpec {
             /**
              * HostnamePrefix is the hostname prefix to use for tailnet devices created
              * by the ProxyGroup. Each device will have the integer number from its
@@ -2694,43 +4973,83 @@ export namespace tailscale {
             /**
              * Type of the ProxyGroup proxies. Currently the only supported type is egress.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * Spec describes the desired ProxyGroup instances.
+         */
+        export interface ProxyGroupSpecPatch {
+            /**
+             * HostnamePrefix is the hostname prefix to use for tailnet devices created
+             * by the ProxyGroup. Each device will have the integer number from its
+             * StatefulSet pod appended to this prefix to form the full hostname.
+             * HostnamePrefix can contain lower case letters, numbers and dashes, it
+             * must not start with a dash and must be between 1 and 62 characters long.
+             */
+            hostnamePrefix?: pulumi.Input<string>
+            /**
+             * ProxyClass is the name of the ProxyClass custom resource that contains
+             * configuration options that should be applied to the resources created
+             * for this ProxyGroup. If unset, and there is no default ProxyClass
+             * configured, the operator will create resources with the default
+             * configuration.
+             */
+            proxyClass?: pulumi.Input<string>
+            /**
+             * Replicas specifies how many replicas to create the StatefulSet with.
+             * Defaults to 2.
+             */
+            replicas?: pulumi.Input<number>
+            /**
+             * Tags that the Tailscale devices will be tagged with. Defaults to [tag:k8s].
+             * If you specify custom tags here, make sure you also make the operator
+             * an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a ProxyGroup device has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+             */
+            tags?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * Type of the ProxyGroup proxies. Currently the only supported type is egress.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
          * ProxyGroupStatus describes the status of the ProxyGroup resources. This is
          * set and managed by the Tailscale operator.
          */
-        export interface ProxyGroupStatusArgs {
+        export interface ProxyGroupStatus {
             /**
              * List of status conditions to indicate the status of the ProxyGroup
              * resources. Known condition types are `ProxyGroupReady`.
              */
             conditions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatusConditionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatusConditions>[]
             >
             /**
              * List of tailnet devices associated with the ProxyGroup StatefulSet.
              */
             devices?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatusDevicesArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupStatusDevices>[]
             >
         }
 
         /**
          * Condition contains details for one aspect of the current state of this API Resource.
          */
-        export interface ProxyGroupStatusConditionsArgs {
+        export interface ProxyGroupStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>
+            lastTransitionTime?: pulumi.Input<string>
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>
+            message?: pulumi.Input<string>
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -2744,24 +5063,24 @@ export namespace tailscale {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>
+            reason?: pulumi.Input<string>
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>
+            status?: pulumi.Input<string>
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
         }
 
-        export interface ProxyGroupStatusDevicesArgs {
+        export interface ProxyGroupStatusDevices {
             /**
              * Hostname is the fully qualified domain name of the device.
              * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
              * node.
              */
-            hostname: pulumi.Input<string>
+            hostname?: pulumi.Input<string>
             /**
              * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
              * assigned to the device.
@@ -2769,10 +5088,27 @@ export namespace tailscale {
             tailnetIPs?: pulumi.Input<pulumi.Input<string>[]>
         }
 
+        export interface Recorder {
+            /**
+             * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+             */
+            apiVersion?: pulumi.Input<'tailscale.com/v1alpha1'>
+            /**
+             * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+             */
+            kind?: pulumi.Input<'Recorder'>
+            /**
+             * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+             */
+            metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
+            spec?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpec>
+            status?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderStatus>
+        }
+
         /**
          * Spec describes the desired recorder instance.
          */
-        export interface RecorderSpecArgs {
+        export interface RecorderSpec {
             /**
              * Set to true to enable the Recorder UI. The UI lists and plays recorded sessions.
              * The UI will be served at <MagicDNS name of the recorder>:443. Defaults to false.
@@ -2780,17 +5116,32 @@ export namespace tailscale {
              * Required if S3 storage is not set up, to ensure that recordings are accessible.
              */
             enableUI?: pulumi.Input<boolean>
+            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSet>
+            storage?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorage>
             /**
-             * Configuration parameters for the Recorder's StatefulSet. The operator
-             * deploys a StatefulSet for each Recorder resource.
+             * Tags that the Tailscale device will be tagged with. Defaults to [tag:k8s].
+             * If you specify custom tags here, make sure you also make the operator
+             * an owner of these tags.
+             * See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+             * Tags cannot be changed once a Recorder node has been created.
+             * Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
              */
-            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetArgs>
+            tags?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * Spec describes the desired recorder instance.
+         */
+        export interface RecorderSpecPatch {
             /**
-             * Configure where to store session recordings. By default, recordings will
-             * be stored in a local ephemeral volume, and will not be persisted past the
-             * lifetime of a specific pod.
+             * Set to true to enable the Recorder UI. The UI lists and plays recorded sessions.
+             * The UI will be served at <MagicDNS name of the recorder>:443. Defaults to false.
+             * Corresponds to --ui tsrecorder flag https://tailscale.com/kb/1246/tailscale-ssh-session-recording#deploy-a-recorder-node.
+             * Required if S3 storage is not set up, to ensure that recordings are accessible.
              */
-            storage?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageArgs>
+            enableUI?: pulumi.Input<boolean>
+            statefulSet?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPatch>
+            storage?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStoragePatch>
             /**
              * Tags that the Tailscale device will be tagged with. Defaults to [tag:k8s].
              * If you specify custom tags here, make sure you also make the operator
@@ -2806,7 +5157,7 @@ export namespace tailscale {
          * Configuration parameters for the Recorder's StatefulSet. The operator
          * deploys a StatefulSet for each Recorder resource.
          */
-        export interface RecorderSpecStatefulSetArgs {
+        export interface RecorderSpecStatefulSet {
             /**
              * Annotations that will be added to the StatefulSet created for the Recorder.
              * Any Annotations specified here will be merged with the default annotations
@@ -2821,22 +5172,36 @@ export namespace tailscale {
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
              */
             labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            pod?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPod>
+        }
+
+        /**
+         * Configuration parameters for the Recorder's StatefulSet. The operator
+         * deploys a StatefulSet for each Recorder resource.
+         */
+        export interface RecorderSpecStatefulSetPatch {
             /**
-             * Configuration for pods created by the Recorder's StatefulSet.
+             * Annotations that will be added to the StatefulSet created for the Recorder.
+             * Any Annotations specified here will be merged with the default annotations
+             * applied to the StatefulSet by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
-            pod?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodArgs>
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * Labels that will be added to the StatefulSet created for the Recorder.
+             * Any labels specified here will be merged with the default labels applied
+             * to the StatefulSet by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            pod?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodPatch>
         }
 
         /**
          * Configuration for pods created by the Recorder's StatefulSet.
          */
-        export interface RecorderSpecStatefulSetPodArgs {
-            /**
-             * Affinity rules for Recorder Pods. By default, the operator does not
-             * apply any affinity rules.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
-             */
-            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityArgs>
+        export interface RecorderSpecStatefulSetPod {
+            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinity>
             /**
              * Annotations that will be added to Recorder Pods. Any annotations
              * specified here will be merged with the default annotations applied to
@@ -2844,16 +5209,13 @@ export namespace tailscale {
              * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
              */
             annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
-            /**
-             * Configuration for the Recorder container running tailscale.
-             */
-            container?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerArgs>
+            container?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainer>
             /**
              * Image pull Secrets for Recorder Pods.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
              */
             imagePullSecrets?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecretsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecrets>[]
             >
             /**
              * Labels that will be added to Recorder Pods. Any labels specified here
@@ -2866,22 +5228,15 @@ export namespace tailscale {
              * not apply any node selector rules.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
-            /**
-             * Security context for Recorder Pods. By default, the operator does not
-             * apply any Pod security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
-             */
-            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextArgs>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContext>
             /**
              * Tolerations for Recorder Pods. By default, the operator does not apply
              * any tolerations.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
              */
             tolerations?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerationsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerations>[]
             >
         }
 
@@ -2890,25 +5245,16 @@ export namespace tailscale {
          * apply any affinity rules.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
          */
-        export interface RecorderSpecStatefulSetPodAffinityArgs {
-            /**
-             * Describes node affinity scheduling rules for the pod.
-             */
-            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityArgs>
-            /**
-             * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityArgs>
-            /**
-             * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
-             */
-            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityArgs>
+        export interface RecorderSpecStatefulSetPodAffinity {
+            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinity>
+            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinity>
+            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinity>
         }
 
         /**
          * Describes node affinity scheduling rules for the pod.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the affinity expressions specified by this field, but it may choose
@@ -2921,48 +5267,71 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution>
+        }
+
+        /**
+         * Describes node affinity scheduling rules for the pod.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPatch {
             /**
-             * If the affinity requirements specified by this field are not met at
-             * scheduling time, the pod will not be scheduled onto the node.
-             * If the affinity requirements specified by this field cease to be met
-             * at some point during pod execution (e.g. due to an update), the system
-             * may or may not try to eventually evict the pod from its node.
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node matches the corresponding matchExpressions; the
+             * node(s) with the highest sum are the most preferred.
              */
-            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>
         }
 
         /**
          * An empty preferred scheduling term matches all objects with implicit weight 0
          * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A node selector term, associated with the corresponding weight.
-             */
-            preference: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceArgs>
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            preference?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference>
             /**
              * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * An empty preferred scheduling term matches all objects with implicit weight 0
+         * (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            preference?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch>
+            /**
+             * Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * A node selector term, associated with the corresponding weight.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreference {
             /**
              * A list of node selector requirements by node's labels.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions>[]
             >
             /**
              * A list of node selector requirements by node's fields.
              */
             matchFields?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields>[]
             >
         }
 
@@ -2970,16 +5339,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressions {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -2994,16 +5363,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3012,6 +5381,72 @@ export namespace tailscale {
              * This array is replaced during a strategic merge patch.
              */
             values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFields {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector term, associated with the corresponding weight.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferencePatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchExpressionsPatch>[]
+            >
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPreferredDuringSchedulingIgnoredDuringExecutionPreferenceMatchFieldsPatch>[]
+            >
         }
 
         /**
@@ -3021,12 +5456,12 @@ export namespace tailscale {
          * at some point during pod execution (e.g. due to an update), the system
          * may or may not try to eventually evict the pod from its node.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecution {
             /**
              * Required. A list of node selector terms. The terms are ORed.
              */
-            nodeSelectorTerms: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsArgs>[]
+            nodeSelectorTerms?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms>[]
             >
         }
 
@@ -3035,18 +5470,18 @@ export namespace tailscale {
          * them are ANDed.
          * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTerms {
             /**
              * A list of node selector requirements by node's labels.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions>[]
             >
             /**
              * A list of node selector requirements by node's fields.
              */
             matchFields?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields>[]
             >
         }
 
@@ -3054,16 +5489,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressions {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3078,16 +5513,16 @@ export namespace tailscale {
          * A node selector requirement is a selector that contains values, a key, and an operator
          * that relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch {
             /**
              * The label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * Represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
             /**
              * An array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3099,9 +5534,104 @@ export namespace tailscale {
         }
 
         /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFields {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A node selector requirement is a selector that contains values, a key, and an operator
+         * that relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch {
+            /**
+             * The label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists, DoesNotExist. Gt, and Lt.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * An array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. If the operator is Gt or Lt, the values
+             * array must have a single element, which will be interpreted as an integer.
+             * This array is replaced during a strategic merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A null or empty node selector term matches no objects. The requirements of
+         * them are ANDed.
+         * The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch {
+            /**
+             * A list of node selector requirements by node's labels.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchExpressionsPatch>[]
+            >
+            /**
+             * A list of node selector requirements by node's fields.
+             */
+            matchFields?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsMatchFieldsPatch>[]
+            >
+        }
+
+        /**
+         * If the affinity requirements specified by this field are not met at
+         * scheduling time, the pod will not be scheduled onto the node.
+         * If the affinity requirements specified by this field cease to be met
+         * at some point during pod execution (e.g. due to an update), the system
+         * may or may not try to eventually evict the pod from its node.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            /**
+             * Required. A list of node selector terms. The terms are ORed.
+             */
+            nodeSelectorTerms?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityRequiredDuringSchedulingIgnoredDuringExecutionNodeSelectorTermsPatch>[]
+            >
+        }
+
+        /**
+         * Affinity rules for Recorder Pods. By default, the operator does not
+         * apply any affinity rules.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#affinity
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPatch {
+            nodeAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityNodeAffinityPatch>
+            podAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPatch>
+            podAntiAffinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPatch>
+        }
+
+        /**
          * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the affinity expressions specified by this field, but it may choose
@@ -3114,7 +5644,7 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
             /**
              * If the affinity requirements specified by this field are not met at
@@ -3126,34 +5656,71 @@ export namespace tailscale {
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
             requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution>[]
+            >
+        }
+
+        /**
+         * Describes pod affinity scheduling rules (e.g. co-locate this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            /**
+             * If the affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>[]
             >
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
-            podAffinityTerm: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm>
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch>
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3178,14 +5745,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -3200,19 +5760,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3226,16 +5786,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3252,12 +5922,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3268,26 +5938,50 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
@@ -3298,12 +5992,8 @@ export namespace tailscale {
          * the label with key <topologyKey> matches that of any node on which
          * a pod of the set of pods is running
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3328,14 +6018,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -3350,19 +6033,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3376,16 +6059,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3402,12 +6195,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3418,32 +6211,61 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinity {
             /**
              * The scheduler will prefer to schedule pods to nodes that satisfy
              * the anti-affinity expressions specified by this field, but it may choose
@@ -3456,7 +6278,7 @@ export namespace tailscale {
              * node(s) with the highest sum are the most preferred.
              */
             preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution>[]
             >
             /**
              * If the anti-affinity requirements specified by this field are not met at
@@ -3468,34 +6290,71 @@ export namespace tailscale {
              * podAffinityTerm are intersected, i.e. all terms must be satisfied.
              */
             requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution>[]
+            >
+        }
+
+        /**
+         * Describes pod anti-affinity scheduling rules (e.g. avoid putting this pod in the same node, zone, etc. as some other pod(s)).
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPatch {
+            /**
+             * The scheduler will prefer to schedule pods to nodes that satisfy
+             * the anti-affinity expressions specified by this field, but it may choose
+             * a node that violates one or more of the expressions. The node that is
+             * most preferred is the one with the greatest sum of weights, i.e.
+             * for each node that meets all of the scheduling requirements (resource
+             * request, requiredDuringScheduling anti-affinity expressions, etc.),
+             * compute a sum by iterating through the elements of this field and adding
+             * "weight" to the sum if the node has pods which matches the corresponding podAffinityTerm; the
+             * node(s) with the highest sum are the most preferred.
+             */
+            preferredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch>[]
+            >
+            /**
+             * If the anti-affinity requirements specified by this field are not met at
+             * scheduling time, the pod will not be scheduled onto the node.
+             * If the anti-affinity requirements specified by this field cease to be met
+             * at some point during pod execution (e.g. due to a pod label update), the
+             * system may or may not try to eventually evict the pod from its node.
+             * When there are multiple elements, the lists of nodes corresponding to each
+             * podAffinityTerm are intersected, i.e. all terms must be satisfied.
+             */
+            requiredDuringSchedulingIgnoredDuringExecution?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch>[]
             >
         }
 
         /**
          * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * Required. A pod affinity term, associated with the corresponding weight.
-             */
-            podAffinityTerm: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecution {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm>
             /**
              * weight associated with matching the corresponding podAffinityTerm,
              * in the range 1-100.
              */
-            weight: pulumi.Input<number>
+            weight?: pulumi.Input<number>
+        }
+
+        /**
+         * The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPatch {
+            podAffinityTerm?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch>
+            /**
+             * weight associated with matching the corresponding podAffinityTerm,
+             * in the range 1-100.
+             */
+            weight?: pulumi.Input<number>
         }
 
         /**
          * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTerm {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3520,14 +6379,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -3542,19 +6394,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3568,16 +6420,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3594,12 +6556,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3610,26 +6572,50 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Required. A pod affinity term, associated with the corresponding weight.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityPreferredDuringSchedulingIgnoredDuringExecutionPodAffinityTermNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
@@ -3640,12 +6626,8 @@ export namespace tailscale {
          * the label with key <topologyKey> matches that of any node on which
          * a pod of the set of pods is running
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionArgs {
-            /**
-             * A label query over a set of resources, in this case pods.
-             * If it's null, this PodAffinityTerm matches with no Pods.
-             */
-            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs>
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecution {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector>
             /**
              * MatchLabelKeys is a set of pod label keys to select which pods will
              * be taken into consideration. The keys are used to lookup values from the
@@ -3670,14 +6652,7 @@ export namespace tailscale {
              * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
             mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
-            /**
-             * A label query over the set of namespaces that the term applies to.
-             * The term is applied to the union of the namespaces selected by this field
-             * and the ones listed in the namespaces field.
-             * null selector and null or empty namespaces list means "this pod's namespace".
-             * An empty selector ({}) matches all namespaces.
-             */
-            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector>
             /**
              * namespaces specifies a static list of namespace names that the term applies to.
              * The term is applied to the union of the namespaces listed in this field
@@ -3692,19 +6667,19 @@ export namespace tailscale {
              * selected pods is running.
              * Empty topologyKey is not allowed.
              */
-            topologyKey: pulumi.Input<string>
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * A label query over a set of resources, in this case pods.
          * If it's null, this PodAffinityTerm matches with no Pods.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelector {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3718,16 +6693,126 @@ export namespace tailscale {
          * A label selector requirement is a selector that contains values, a key, and an operator that
          * relates the key and values.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressions {
             /**
              * key is the label key that the selector applies to.
              */
-            key: pulumi.Input<string>
+            key?: pulumi.Input<string>
             /**
              * operator represents a key's relationship to a set of values.
              * Valid operators are In, NotIn, Exists and DoesNotExist.
              */
-            operator: pulumi.Input<string>
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label query over a set of resources, in this case pods.
+         * If it's null, this PodAffinityTerm matches with no Pods.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorMatchExpressionsPatch>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label query over the set of namespaces that the term applies to.
+         * The term is applied to the union of the namespaces selected by this field
+         * and the ones listed in the namespaces field.
+         * null selector and null or empty namespaces list means "this pod's namespace".
+         * An empty selector ({}) matches all namespaces.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelector {
+            /**
+             * matchExpressions is a list of label selector requirements. The requirements are ANDed.
+             */
+            matchExpressions?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions>[]
+            >
+            /**
+             * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+             * map is equivalent to an element of matchExpressions, whose key field is "key", the
+             * operator is "In", and the values array contains only "value". The requirements are ANDed.
+             */
+            matchLabels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressions {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * values is an array of string values. If the operator is In or NotIn,
+             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
+             * the values array must be empty. This array is replaced during a strategic
+             * merge patch.
+             */
+            values?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * A label selector requirement is a selector that contains values, a key, and an operator that
+         * relates the key and values.
+         */
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch {
+            /**
+             * key is the label key that the selector applies to.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * operator represents a key's relationship to a set of values.
+             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             */
+            operator?: pulumi.Input<string>
             /**
              * values is an array of string values. If the operator is In or NotIn,
              * the values array must be non-empty. If the operator is Exists or DoesNotExist,
@@ -3744,12 +6829,12 @@ export namespace tailscale {
          * null selector and null or empty namespaces list means "this pod's namespace".
          * An empty selector ({}) matches all namespaces.
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch {
             /**
              * matchExpressions is a list of label selector requirements. The requirements are ANDed.
              */
             matchExpressions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsPatch>[]
             >
             /**
              * matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
@@ -3760,32 +6845,61 @@ export namespace tailscale {
         }
 
         /**
-         * A label selector requirement is a selector that contains values, a key, and an operator that
-         * relates the key and values.
+         * Defines a set of pods (namely those matching the labelSelector
+         * relative to the given namespace(s)) that this pod should be
+         * co-located (affinity) or not co-located (anti-affinity) with,
+         * where co-located is defined as running on a node whose value of
+         * the label with key <topologyKey> matches that of any node on which
+         * a pod of the set of pods is running
          */
-        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorMatchExpressionsArgs {
+        export interface RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionPatch {
+            labelSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionLabelSelectorPatch>
             /**
-             * key is the label key that the selector applies to.
+             * MatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key in (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both matchLabelKeys and labelSelector.
+             * Also, matchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            key: pulumi.Input<string>
+            matchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
             /**
-             * operator represents a key's relationship to a set of values.
-             * Valid operators are In, NotIn, Exists and DoesNotExist.
+             * MismatchLabelKeys is a set of pod label keys to select which pods will
+             * be taken into consideration. The keys are used to lookup values from the
+             * incoming pod labels, those key-value labels are merged with `labelSelector` as `key notin (value)`
+             * to select the group of existing pods which pods will be taken into consideration
+             * for the incoming pod's pod (anti) affinity. Keys that don't exist in the incoming
+             * pod labels will be ignored. The default value is empty.
+             * The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
+             * Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
+             * This is an alpha field and requires enabling MatchLabelKeysInPodAffinity feature gate.
              */
-            operator: pulumi.Input<string>
+            mismatchLabelKeys?: pulumi.Input<pulumi.Input<string>[]>
+            namespaceSelector?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPodAntiAffinityRequiredDuringSchedulingIgnoredDuringExecutionNamespaceSelectorPatch>
             /**
-             * values is an array of string values. If the operator is In or NotIn,
-             * the values array must be non-empty. If the operator is Exists or DoesNotExist,
-             * the values array must be empty. This array is replaced during a strategic
-             * merge patch.
+             * namespaces specifies a static list of namespace names that the term applies to.
+             * The term is applied to the union of the namespaces listed in this field
+             * and the ones selected by namespaceSelector.
+             * null or empty namespaces list and null namespaceSelector means "this pod's namespace".
              */
-            values?: pulumi.Input<pulumi.Input<string>[]>
+            namespaces?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching
+             * the labelSelector in the specified namespaces, where co-located is defined as running on a node
+             * whose value of the label with key topologyKey matches that of any node on which any of the
+             * selected pods is running.
+             * Empty topologyKey is not allowed.
+             */
+            topologyKey?: pulumi.Input<string>
         }
 
         /**
          * Configuration for the Recorder container running tailscale.
          */
-        export interface RecorderSpecStatefulSetPodContainerArgs {
+        export interface RecorderSpecStatefulSetPodContainer {
             /**
              * List of environment variables to set in the container.
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
@@ -3796,7 +6910,7 @@ export namespace tailscale {
              * the future.
              */
             env?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnvArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnv>[]
             >
             /**
              * Container image name including tag. Defaults to docker.io/tailscale/tsrecorder
@@ -3810,26 +6924,33 @@ export namespace tailscale {
              * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
              */
             imagePullPolicy?: pulumi.Input<string>
-            /**
-             * Container resource requirements.
-             * By default, the operator does not apply any resource requirements. The
-             * amount of resources required wil depend on the volume of recordings sent.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
-             */
-            resources?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesArgs>
-            /**
-             * Container security context. By default, the operator does not apply any
-             * container security context.
-             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
-             */
-            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextArgs>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResources>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContext>
         }
 
-        export interface RecorderSpecStatefulSetPodContainerEnvArgs {
+        export interface RecorderSpecStatefulSetPodContainerEnv {
             /**
              * Name of the environment variable. Must be a C_IDENTIFIER.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+            /**
+             * Variable references $(VAR_NAME) are expanded using the previously defined
+             *  environment variables in the container and any service environment
+             * variables. If a variable cannot be resolved, the reference in the input
+             * string will be unchanged. Double $$ are reduced to a single $, which
+             * allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+             * produce the string literal "$(VAR_NAME)". Escaped references will never
+             * be expanded, regardless of whether the variable exists or not. Defaults
+             * to "".
+             */
+            value?: pulumi.Input<string>
+        }
+
+        export interface RecorderSpecStatefulSetPodContainerEnvPatch {
+            /**
+             * Name of the environment variable. Must be a C_IDENTIFIER.
+             */
+            name?: pulumi.Input<string>
             /**
              * Variable references $(VAR_NAME) are expanded using the previously defined
              *  environment variables in the container and any service environment
@@ -3844,12 +6965,44 @@ export namespace tailscale {
         }
 
         /**
+         * Configuration for the Recorder container running tailscale.
+         */
+        export interface RecorderSpecStatefulSetPodContainerPatch {
+            /**
+             * List of environment variables to set in the container.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#environment-variables
+             * Note that environment variables provided here will take precedence
+             * over Tailscale-specific environment variables set by the operator,
+             * however running proxies with custom values for Tailscale environment
+             * variables (i.e TS_USERSPACE) is not recommended and might break in
+             * the future.
+             */
+            env?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerEnvPatch>[]
+            >
+            /**
+             * Container image name including tag. Defaults to docker.io/tailscale/tsrecorder
+             * with the same tag as the operator, but the official images are also
+             * available at ghcr.io/tailscale/tsrecorder.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            image?: pulumi.Input<string>
+            /**
+             * Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#image
+             */
+            imagePullPolicy?: pulumi.Input<string>
+            resources?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesPatch>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextPatch>
+        }
+
+        /**
          * Container resource requirements.
          * By default, the operator does not apply any resource requirements. The
          * amount of resources required wil depend on the volume of recordings sent.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
          */
-        export interface RecorderSpecStatefulSetPodContainerResourcesArgs {
+        export interface RecorderSpecStatefulSetPodContainerResources {
             /**
              * Claims lists the names of resources, defined in spec.resourceClaims,
              * that are used by this container.
@@ -3860,36 +7013,77 @@ export namespace tailscale {
              * This field is immutable. It can only be set for containers.
              */
             claims?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaimsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaims>[]
             >
             /**
              * Limits describes the maximum amount of compute resources allowed.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            limits?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
             /**
              * Requests describes the minimum amount of compute resources required.
              * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
              * otherwise to an implementation-defined value. Requests cannot exceed Limits.
              * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
              */
-            requests?: pulumi.Input<{
-                [key: string]: pulumi.Input<number | string>
-            }>
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
          * ResourceClaim references one entry in PodSpec.ResourceClaims.
          */
-        export interface RecorderSpecStatefulSetPodContainerResourcesClaimsArgs {
+        export interface RecorderSpecStatefulSetPodContainerResourcesClaims {
             /**
              * Name must match the name of one entry in pod.spec.resourceClaims of
              * the Pod where this field is used. It makes that resource available
              * inside a container.
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * ResourceClaim references one entry in PodSpec.ResourceClaims.
+         */
+        export interface RecorderSpecStatefulSetPodContainerResourcesClaimsPatch {
+            /**
+             * Name must match the name of one entry in pod.spec.resourceClaims of
+             * the Pod where this field is used. It makes that resource available
+             * inside a container.
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Container resource requirements.
+         * By default, the operator does not apply any resource requirements. The
+         * amount of resources required wil depend on the volume of recordings sent.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#resources
+         */
+        export interface RecorderSpecStatefulSetPodContainerResourcesPatch {
+            /**
+             * Claims lists the names of resources, defined in spec.resourceClaims,
+             * that are used by this container.
+             *
+             * This is an alpha field and requires enabling the
+             * DynamicResourceAllocation feature gate.
+             *
+             * This field is immutable. It can only be set for containers.
+             */
+            claims?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerResourcesClaimsPatch>[]
+            >
+            /**
+             * Limits describes the maximum amount of compute resources allowed.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            limits?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
+            /**
+             * Requests describes the minimum amount of compute resources required.
+             * If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+             * otherwise to an implementation-defined value. Requests cannot exceed Limits.
+             * More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+             */
+            requests?: pulumi.Input<{ [key: string]: pulumi.Input<number | string> }>
         }
 
         /**
@@ -3897,7 +7091,7 @@ export namespace tailscale {
          * container security context.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContext {
             /**
              * AllowPrivilegeEscalation controls whether a process can gain more
              * privileges than its parent process. This bool directly controls if
@@ -3908,18 +7102,8 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             allowPrivilegeEscalation?: pulumi.Input<boolean>
-            /**
-             * appArmorProfile is the AppArmor options to use by this container. If set, this profile
-             * overrides the pod's appArmorProfile.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfileArgs>
-            /**
-             * The capabilities to add/drop when running containers.
-             * Defaults to the default set of capabilities granted by the container runtime.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesArgs>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfile>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilities>
             /**
              * Run container in privileged mode.
              * Processes in privileged containers are essentially equivalent to root on the host.
@@ -3966,28 +7150,9 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             runAsUser?: pulumi.Input<number>
-            /**
-             * The SELinux context to be applied to the container.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
-             * PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsArgs>
-            /**
-             * The seccomp options to use by this container. If seccomp options are
-             * provided at both the pod & container level, the container options
-             * override the pod options.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfileArgs>
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options from the PodSecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsArgs>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptions>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfile>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptions>
         }
 
         /**
@@ -3995,7 +7160,7 @@ export namespace tailscale {
          * overrides the pod's appArmorProfile.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfileArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfile {
             /**
              * localhostProfile indicates a profile loaded on the node that should be used.
              * The profile must be preconfigured on the node to work.
@@ -4010,7 +7175,30 @@ export namespace tailscale {
              *   RuntimeDefault - the container runtime's default profile.
              *   Unconfined - no AppArmor enforcement.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by this container. If set, this profile
+         * overrides the pod's appArmorProfile.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -4018,7 +7206,7 @@ export namespace tailscale {
          * Defaults to the default set of capabilities granted by the container runtime.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextCapabilities {
             /**
              * Added capabilities
              */
@@ -4030,13 +7218,124 @@ export namespace tailscale {
         }
 
         /**
+         * The capabilities to add/drop when running containers.
+         * Defaults to the default set of capabilities granted by the container runtime.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesPatch {
+            /**
+             * Added capabilities
+             */
+            add?: pulumi.Input<pulumi.Input<string>[]>
+            /**
+             * Removed capabilities
+             */
+            drop?: pulumi.Input<pulumi.Input<string>[]>
+        }
+
+        /**
+         * Container security context. By default, the operator does not apply any
+         * container security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextPatch {
+            /**
+             * AllowPrivilegeEscalation controls whether a process can gain more
+             * privileges than its parent process. This bool directly controls if
+             * the no_new_privs flag will be set on the container process.
+             * AllowPrivilegeEscalation is true always when the container is:
+             * 1) run as Privileged
+             * 2) has CAP_SYS_ADMIN
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            allowPrivilegeEscalation?: pulumi.Input<boolean>
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextAppArmorProfilePatch>
+            capabilities?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextCapabilitiesPatch>
+            /**
+             * Run container in privileged mode.
+             * Processes in privileged containers are essentially equivalent to root on the host.
+             * Defaults to false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            privileged?: pulumi.Input<boolean>
+            /**
+             * procMount denotes the type of proc mount to use for the containers.
+             * The default is DefaultProcMount which uses the container runtime defaults for
+             * readonly paths and masked paths.
+             * This requires the ProcMountType feature flag to be enabled.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            procMount?: pulumi.Input<string>
+            /**
+             * Whether this container has a read-only root filesystem.
+             * Default is false.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            readOnlyRootFilesystem?: pulumi.Input<boolean>
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup?: pulumi.Input<number>
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot?: pulumi.Input<boolean>
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser?: pulumi.Input<number>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsPatch>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfilePatch>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsPatch>
+        }
+
+        /**
          * The SELinux context to be applied to the container.
          * If unspecified, the container runtime will allocate a random SELinux context for each
          * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
          * PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptions {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level?: pulumi.Input<string>
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role?: pulumi.Input<string>
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type?: pulumi.Input<string>
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user?: pulumi.Input<string>
+        }
+
+        /**
+         * The SELinux context to be applied to the container.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in PodSecurityContext.  If set in both SecurityContext and
+         * PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeLinuxOptionsPatch {
             /**
              * Level is SELinux level label that applies to the container.
              */
@@ -4061,7 +7360,7 @@ export namespace tailscale {
          * override the pod options.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfileArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfile {
             /**
              * localhostProfile indicates a profile defined in a file on the node should be used.
              * The profile must be preconfigured on the node to work.
@@ -4077,7 +7376,32 @@ export namespace tailscale {
              * RuntimeDefault - the container runtime default profile should be used.
              * Unconfined - no profile should be applied.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * The seccomp options to use by this container. If seccomp options are
+         * provided at both the pod & container level, the container options
+         * override the pod options.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
@@ -4086,7 +7410,40 @@ export namespace tailscale {
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is linux.
          */
-        export interface RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsArgs {
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptions {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec?: pulumi.Input<string>
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName?: pulumi.Input<string>
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess?: pulumi.Input<boolean>
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName?: pulumi.Input<string>
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options from the PodSecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface RecorderSpecStatefulSetPodContainerSecurityContextWindowsOptionsPatch {
             /**
              * GMSACredentialSpec is where the GMSA admission webhook
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
@@ -4117,7 +7474,7 @@ export namespace tailscale {
          * LocalObjectReference contains enough information to let you locate the
          * referenced object inside the same namespace.
          */
-        export interface RecorderSpecStatefulSetPodImagePullSecretsArgs {
+        export interface RecorderSpecStatefulSetPodImagePullSecrets {
             /**
              * Name of the referent.
              * This field is effectively required, but due to backwards compatibility is
@@ -4127,16 +7484,63 @@ export namespace tailscale {
              */
             name?: pulumi.Input<string>
         }
+
         /**
-         * recorderSpecStatefulSetPodImagePullSecretsArgsProvideDefaults sets the appropriate defaults for RecorderSpecStatefulSetPodImagePullSecretsArgs
+         * LocalObjectReference contains enough information to let you locate the
+         * referenced object inside the same namespace.
          */
-        export function recorderSpecStatefulSetPodImagePullSecretsArgsProvideDefaults(
-            val: RecorderSpecStatefulSetPodImagePullSecretsArgs,
-        ): RecorderSpecStatefulSetPodImagePullSecretsArgs {
-            return {
-                ...val,
-                name: val.name ?? '',
-            }
+        export interface RecorderSpecStatefulSetPodImagePullSecretsPatch {
+            /**
+             * Name of the referent.
+             * This field is effectively required, but due to backwards compatibility is
+             * allowed to be empty. Instances of this type with an empty value here are
+             * almost certainly wrong.
+             * More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Configuration for pods created by the Recorder's StatefulSet.
+         */
+        export interface RecorderSpecStatefulSetPodPatch {
+            affinity?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodAffinityPatch>
+            /**
+             * Annotations that will be added to Recorder Pods. Any annotations
+             * specified here will be merged with the default annotations applied to
+             * the Pod by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
+             */
+            annotations?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            container?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodContainerPatch>
+            /**
+             * Image pull Secrets for Recorder Pods.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+             */
+            imagePullSecrets?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodImagePullSecretsPatch>[]
+            >
+            /**
+             * Labels that will be added to Recorder Pods. Any labels specified here
+             * will be merged with the default labels applied to the Pod by the operator.
+             * https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#syntax-and-character-set
+             */
+            labels?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            /**
+             * Node selector rules for Recorder Pods. By default, the operator does
+             * not apply any node selector rules.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
+            securityContext?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextPatch>
+            /**
+             * Tolerations for Recorder Pods. By default, the operator does not apply
+             * any tolerations.
+             * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#scheduling
+             */
+            tolerations?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodTolerationsPatch>[]
+            >
         }
 
         /**
@@ -4144,12 +7548,8 @@ export namespace tailscale {
          * apply any Pod security context.
          * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextArgs {
-            /**
-             * appArmorProfile is the AppArmor options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfileArgs>
+        export interface RecorderSpecStatefulSetPodSecurityContext {
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfile>
             /**
              * A special supplemental group that applies to all containers in a pod.
              * Some volume types allow the Kubelet to change the ownership of that volume
@@ -4200,20 +7600,8 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             runAsUser?: pulumi.Input<number>
-            /**
-             * The SELinux context to be applied to all containers.
-             * If unspecified, the container runtime will allocate a random SELinux context for each
-             * container.  May also be set in SecurityContext.  If set in
-             * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
-             * takes precedence for that container.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsArgs>
-            /**
-             * The seccomp options to use by the containers in this pod.
-             * Note that this field cannot be set when spec.os.name is windows.
-             */
-            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfileArgs>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptions>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfile>
             /**
              * A list of groups applied to the first process run in each container, in addition
              * to the container's primary GID, the fsGroup (if specified), and group memberships
@@ -4230,22 +7618,16 @@ export namespace tailscale {
              * Note that this field cannot be set when spec.os.name is windows.
              */
             sysctls?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctlsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctls>[]
             >
-            /**
-             * The Windows specific settings applied to all containers.
-             * If unspecified, the options within a container's SecurityContext will be used.
-             * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
-             * Note that this field cannot be set when spec.os.name is linux.
-             */
-            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptionsArgs>
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptions>
         }
 
         /**
          * appArmorProfile is the AppArmor options to use by the containers in this pod.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextAppArmorProfileArgs {
+        export interface RecorderSpecStatefulSetPodSecurityContextAppArmorProfile {
             /**
              * localhostProfile indicates a profile loaded on the node that should be used.
              * The profile must be preconfigured on the node to work.
@@ -4260,7 +7642,109 @@ export namespace tailscale {
              *   RuntimeDefault - the container runtime's default profile.
              *   Unconfined - no AppArmor enforcement.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * appArmorProfile is the AppArmor options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextAppArmorProfilePatch {
+            /**
+             * localhostProfile indicates a profile loaded on the node that should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must match the loaded name of the profile.
+             * Must be set if and only if type is "Localhost".
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of AppArmor profile will be applied.
+             * Valid options are:
+             *   Localhost - a profile pre-loaded on the node.
+             *   RuntimeDefault - the container runtime's default profile.
+             *   Unconfined - no AppArmor enforcement.
+             */
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * Security context for Recorder Pods. By default, the operator does not
+         * apply any Pod security context.
+         * https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-2
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextPatch {
+            appArmorProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextAppArmorProfilePatch>
+            /**
+             * A special supplemental group that applies to all containers in a pod.
+             * Some volume types allow the Kubelet to change the ownership of that volume
+             * to be owned by the pod:
+             *
+             * 1. The owning GID will be the FSGroup
+             * 2. The setgid bit is set (new files created in the volume will be owned by FSGroup)
+             * 3. The permission bits are OR'd with rw-rw----
+             *
+             * If unset, the Kubelet will not modify the ownership and permissions of any volume.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroup?: pulumi.Input<number>
+            /**
+             * fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+             * before being exposed inside Pod. This field will only apply to
+             * volume types which support fsGroup based ownership(and permissions).
+             * It will have no effect on ephemeral volume types such as: secret, configmaps
+             * and emptydir.
+             * Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            fsGroupChangePolicy?: pulumi.Input<string>
+            /**
+             * The GID to run the entrypoint of the container process.
+             * Uses runtime default if unset.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsGroup?: pulumi.Input<number>
+            /**
+             * Indicates that the container must run as a non-root user.
+             * If true, the Kubelet will validate the image at runtime to ensure that it
+             * does not run as UID 0 (root) and fail to start the container if it does.
+             * If unset or false, no such validation will be performed.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsNonRoot?: pulumi.Input<boolean>
+            /**
+             * The UID to run the entrypoint of the container process.
+             * Defaults to user specified in image metadata if unspecified.
+             * May also be set in SecurityContext.  If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence
+             * for that container.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            runAsUser?: pulumi.Input<number>
+            seLinuxOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch>
+            seccompProfile?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSeccompProfilePatch>
+            /**
+             * A list of groups applied to the first process run in each container, in addition
+             * to the container's primary GID, the fsGroup (if specified), and group memberships
+             * defined in the container image for the uid of the container process. If unspecified,
+             * no additional groups are added to any container. Note that group memberships
+             * defined in the container image for the uid of the container process are still effective,
+             * even if they are not included in this list.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            supplementalGroups?: pulumi.Input<pulumi.Input<number>[]>
+            /**
+             * Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported
+             * sysctls (by the container runtime) might fail to launch.
+             * Note that this field cannot be set when spec.os.name is windows.
+             */
+            sysctls?: pulumi.Input<
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextSysctlsPatch>[]
+            >
+            windowsOptions?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStatefulSetPodSecurityContextWindowsOptionsPatch>
         }
 
         /**
@@ -4271,7 +7755,34 @@ export namespace tailscale {
          * takes precedence for that container.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsArgs {
+        export interface RecorderSpecStatefulSetPodSecurityContextSeLinuxOptions {
+            /**
+             * Level is SELinux level label that applies to the container.
+             */
+            level?: pulumi.Input<string>
+            /**
+             * Role is a SELinux role label that applies to the container.
+             */
+            role?: pulumi.Input<string>
+            /**
+             * Type is a SELinux type label that applies to the container.
+             */
+            type?: pulumi.Input<string>
+            /**
+             * User is a SELinux user label that applies to the container.
+             */
+            user?: pulumi.Input<string>
+        }
+
+        /**
+         * The SELinux context to be applied to all containers.
+         * If unspecified, the container runtime will allocate a random SELinux context for each
+         * container.  May also be set in SecurityContext.  If set in
+         * both SecurityContext and PodSecurityContext, the value specified in SecurityContext
+         * takes precedence for that container.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSeLinuxOptionsPatch {
             /**
              * Level is SELinux level label that applies to the container.
              */
@@ -4294,7 +7805,7 @@ export namespace tailscale {
          * The seccomp options to use by the containers in this pod.
          * Note that this field cannot be set when spec.os.name is windows.
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextSeccompProfileArgs {
+        export interface RecorderSpecStatefulSetPodSecurityContextSeccompProfile {
             /**
              * localhostProfile indicates a profile defined in a file on the node should be used.
              * The profile must be preconfigured on the node to work.
@@ -4310,21 +7821,58 @@ export namespace tailscale {
              * RuntimeDefault - the container runtime default profile should be used.
              * Unconfined - no profile should be applied.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
+        }
+
+        /**
+         * The seccomp options to use by the containers in this pod.
+         * Note that this field cannot be set when spec.os.name is windows.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSeccompProfilePatch {
+            /**
+             * localhostProfile indicates a profile defined in a file on the node should be used.
+             * The profile must be preconfigured on the node to work.
+             * Must be a descending path, relative to the kubelet's configured seccomp profile location.
+             * Must be set if type is "Localhost". Must NOT be set for any other type.
+             */
+            localhostProfile?: pulumi.Input<string>
+            /**
+             * type indicates which kind of seccomp profile will be applied.
+             * Valid options are:
+             *
+             * Localhost - a profile defined in a file on the node should be used.
+             * RuntimeDefault - the container runtime default profile should be used.
+             * Unconfined - no profile should be applied.
+             */
+            type?: pulumi.Input<string>
         }
 
         /**
          * Sysctl defines a kernel parameter to be set
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextSysctlsArgs {
+        export interface RecorderSpecStatefulSetPodSecurityContextSysctls {
             /**
              * Name of a property to set
              */
-            name: pulumi.Input<string>
+            name?: pulumi.Input<string>
             /**
              * Value of a property to set
              */
-            value: pulumi.Input<string>
+            value?: pulumi.Input<string>
+        }
+
+        /**
+         * Sysctl defines a kernel parameter to be set
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextSysctlsPatch {
+            /**
+             * Name of a property to set
+             */
+            name?: pulumi.Input<string>
+            /**
+             * Value of a property to set
+             */
+            value?: pulumi.Input<string>
         }
 
         /**
@@ -4333,7 +7881,40 @@ export namespace tailscale {
          * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
          * Note that this field cannot be set when spec.os.name is linux.
          */
-        export interface RecorderSpecStatefulSetPodSecurityContextWindowsOptionsArgs {
+        export interface RecorderSpecStatefulSetPodSecurityContextWindowsOptions {
+            /**
+             * GMSACredentialSpec is where the GMSA admission webhook
+             * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
+             * GMSA credential spec named by the GMSACredentialSpecName field.
+             */
+            gmsaCredentialSpec?: pulumi.Input<string>
+            /**
+             * GMSACredentialSpecName is the name of the GMSA credential spec to use.
+             */
+            gmsaCredentialSpecName?: pulumi.Input<string>
+            /**
+             * HostProcess determines if a container should be run as a 'Host Process' container.
+             * All of a Pod's containers must have the same effective HostProcess value
+             * (it is not allowed to have a mix of HostProcess containers and non-HostProcess containers).
+             * In addition, if HostProcess is true then HostNetwork must also be set to true.
+             */
+            hostProcess?: pulumi.Input<boolean>
+            /**
+             * The UserName in Windows to run the entrypoint of the container process.
+             * Defaults to the user specified in image metadata if unspecified.
+             * May also be set in PodSecurityContext. If set in both SecurityContext and
+             * PodSecurityContext, the value specified in SecurityContext takes precedence.
+             */
+            runAsUserName?: pulumi.Input<string>
+        }
+
+        /**
+         * The Windows specific settings applied to all containers.
+         * If unspecified, the options within a container's SecurityContext will be used.
+         * If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
+         * Note that this field cannot be set when spec.os.name is linux.
+         */
+        export interface RecorderSpecStatefulSetPodSecurityContextWindowsOptionsPatch {
             /**
              * GMSACredentialSpec is where the GMSA admission webhook
              * (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
@@ -4364,7 +7945,43 @@ export namespace tailscale {
          * The pod this Toleration is attached to tolerates any taint that matches
          * the triple <key,value,effect> using the matching operator <operator>.
          */
-        export interface RecorderSpecStatefulSetPodTolerationsArgs {
+        export interface RecorderSpecStatefulSetPodTolerations {
+            /**
+             * Effect indicates the taint effect to match. Empty means match all taint effects.
+             * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+             */
+            effect?: pulumi.Input<string>
+            /**
+             * Key is the taint key that the toleration applies to. Empty means match all taint keys.
+             * If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+             */
+            key?: pulumi.Input<string>
+            /**
+             * Operator represents a key's relationship to the value.
+             * Valid operators are Exists and Equal. Defaults to Equal.
+             * Exists is equivalent to wildcard for value, so that a pod can
+             * tolerate all taints of a particular category.
+             */
+            operator?: pulumi.Input<string>
+            /**
+             * TolerationSeconds represents the period of time the toleration (which must be
+             * of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+             * it is not set, which means tolerate the taint forever (do not evict). Zero and
+             * negative values will be treated as 0 (evict immediately) by the system.
+             */
+            tolerationSeconds?: pulumi.Input<number>
+            /**
+             * Value is the taint value the toleration matches to.
+             * If the operator is Exists, the value should be empty, otherwise just a regular string.
+             */
+            value?: pulumi.Input<string>
+        }
+
+        /**
+         * The pod this Toleration is attached to tolerates any taint that matches
+         * the triple <key,value,effect> using the matching operator <operator>.
+         */
+        export interface RecorderSpecStatefulSetPodTolerationsPatch {
             /**
              * Effect indicates the taint effect to match. Empty means match all taint effects.
              * When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
@@ -4401,30 +8018,30 @@ export namespace tailscale {
          * be stored in a local ephemeral volume, and will not be persisted past the
          * lifetime of a specific pod.
          */
-        export interface RecorderSpecStorageArgs {
-            /**
-             * Configure an S3-compatible API for storage. Required if the UI is not
-             * enabled, to ensure that recordings are accessible.
-             */
-            s3?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3Args>
+        export interface RecorderSpecStorage {
+            s3?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3>
+        }
+
+        /**
+         * Configure where to store session recordings. By default, recordings will
+         * be stored in a local ephemeral volume, and will not be persisted past the
+         * lifetime of a specific pod.
+         */
+        export interface RecorderSpecStoragePatch {
+            s3?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3Patch>
         }
 
         /**
          * Configure an S3-compatible API for storage. Required if the UI is not
          * enabled, to ensure that recordings are accessible.
          */
-        export interface RecorderSpecStorageS3Args {
+        export interface RecorderSpecStorageS3 {
             /**
              * Bucket name to write to. The bucket is expected to be used solely for
              * recordings, as there is no stable prefix for written object names.
              */
             bucket?: pulumi.Input<string>
-            /**
-             * Configure environment variable credentials for managing objects in the
-             * configured bucket. If not set, tsrecorder will try to acquire credentials
-             * first from the file system and then the STS API.
-             */
-            credentials?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsArgs>
+            credentials?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3Credentials>
             /**
              * S3-compatible endpoint, e.g. s3.us-east-1.amazonaws.com.
              */
@@ -4436,19 +8053,24 @@ export namespace tailscale {
          * configured bucket. If not set, tsrecorder will try to acquire credentials
          * first from the file system and then the STS API.
          */
-        export interface RecorderSpecStorageS3CredentialsArgs {
-            /**
-             * Use a Kubernetes Secret from the operator's namespace as the source of
-             * credentials.
-             */
-            secret?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecretArgs>
+        export interface RecorderSpecStorageS3Credentials {
+            secret?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecret>
+        }
+
+        /**
+         * Configure environment variable credentials for managing objects in the
+         * configured bucket. If not set, tsrecorder will try to acquire credentials
+         * first from the file system and then the STS API.
+         */
+        export interface RecorderSpecStorageS3CredentialsPatch {
+            secret?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsSecretPatch>
         }
 
         /**
          * Use a Kubernetes Secret from the operator's namespace as the source of
          * credentials.
          */
-        export interface RecorderSpecStorageS3CredentialsSecretArgs {
+        export interface RecorderSpecStorageS3CredentialsSecret {
             /**
              * The name of a Kubernetes Secret in the operator's namespace that contains
              * credentials for writing to the configured bucket. Each key-value pair
@@ -4460,39 +8082,69 @@ export namespace tailscale {
         }
 
         /**
+         * Use a Kubernetes Secret from the operator's namespace as the source of
+         * credentials.
+         */
+        export interface RecorderSpecStorageS3CredentialsSecretPatch {
+            /**
+             * The name of a Kubernetes Secret in the operator's namespace that contains
+             * credentials for writing to the configured bucket. Each key-value pair
+             * from the secret's data will be mounted as an environment variable. It
+             * should include keys for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY if
+             * using a static access key.
+             */
+            name?: pulumi.Input<string>
+        }
+
+        /**
+         * Configure an S3-compatible API for storage. Required if the UI is not
+         * enabled, to ensure that recordings are accessible.
+         */
+        export interface RecorderSpecStorageS3Patch {
+            /**
+             * Bucket name to write to. The bucket is expected to be used solely for
+             * recordings, as there is no stable prefix for written object names.
+             */
+            bucket?: pulumi.Input<string>
+            credentials?: pulumi.Input<inputs.tailscale.v1alpha1.RecorderSpecStorageS3CredentialsPatch>
+            /**
+             * S3-compatible endpoint, e.g. s3.us-east-1.amazonaws.com.
+             */
+            endpoint?: pulumi.Input<string>
+        }
+
+        /**
          * RecorderStatus describes the status of the recorder. This is set
          * and managed by the Tailscale operator.
          */
-        export interface RecorderStatusArgs {
+        export interface RecorderStatus {
             /**
              * List of status conditions to indicate the status of the Recorder.
              * Known condition types are `RecorderReady`.
              */
             conditions?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderStatusConditionsArgs>[]
+                pulumi.Input<inputs.tailscale.v1alpha1.RecorderStatusConditions>[]
             >
             /**
              * List of tailnet devices associated with the Recorder StatefulSet.
              */
-            devices?: pulumi.Input<
-                pulumi.Input<inputs.tailscale.v1alpha1.RecorderStatusDevicesArgs>[]
-            >
+            devices?: pulumi.Input<pulumi.Input<inputs.tailscale.v1alpha1.RecorderStatusDevices>[]>
         }
 
         /**
          * Condition contains details for one aspect of the current state of this API Resource.
          */
-        export interface RecorderStatusConditionsArgs {
+        export interface RecorderStatusConditions {
             /**
              * lastTransitionTime is the last time the condition transitioned from one status to another.
              * This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
              */
-            lastTransitionTime: pulumi.Input<string>
+            lastTransitionTime?: pulumi.Input<string>
             /**
              * message is a human readable message indicating details about the transition.
              * This may be an empty string.
              */
-            message: pulumi.Input<string>
+            message?: pulumi.Input<string>
             /**
              * observedGeneration represents the .metadata.generation that the condition was set based upon.
              * For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
@@ -4506,24 +8158,24 @@ export namespace tailscale {
              * The value should be a CamelCase string.
              * This field may not be empty.
              */
-            reason: pulumi.Input<string>
+            reason?: pulumi.Input<string>
             /**
              * status of the condition, one of True, False, Unknown.
              */
-            status: pulumi.Input<string>
+            status?: pulumi.Input<string>
             /**
              * type of condition in CamelCase or in foo.example.com/CamelCase.
              */
-            type: pulumi.Input<string>
+            type?: pulumi.Input<string>
         }
 
-        export interface RecorderStatusDevicesArgs {
+        export interface RecorderStatusDevices {
             /**
              * Hostname is the fully qualified domain name of the device.
              * If MagicDNS is enabled in your tailnet, it is the MagicDNS name of the
              * node.
              */
-            hostname: pulumi.Input<string>
+            hostname?: pulumi.Input<string>
             /**
              * TailnetIPs is the set of tailnet IP addresses (both IPv4 and IPv6)
              * assigned to the device.

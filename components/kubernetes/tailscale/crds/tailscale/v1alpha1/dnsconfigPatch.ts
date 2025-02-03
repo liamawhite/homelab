@@ -7,6 +7,12 @@ import * as outputs from '../../types/output'
 import * as utilities from '../../utilities'
 
 /**
+ * Patch resources are used to modify existing Kubernetes resources by using
+ * Server-Side Apply updates. The name of the resource must be specified, but all other properties are optional. More than
+ * one patch may be applied to the same resource, and a random FieldManager name will be used for each Patch resource.
+ * Conflicts will result in an error by default, but can be forced using the "pulumi.com/patchForce" annotation. See the
+ * [Server-Side Apply Docs](https://www.pulumi.com/registry/packages/kubernetes/how-to-guides/managing-resources-with-server-side-apply/) for
+ * additional information about using Server-Side Apply to manage Kubernetes resources with Pulumi.
  * DNSConfig can be deployed to cluster to make a subset of Tailscale MagicDNS
  * names resolvable by cluster workloads. Use this if: A) you need to refer to
  * tailnet services, exposed to cluster via Tailscale Kubernetes operator egress
@@ -34,9 +40,9 @@ import * as utilities from '../../utilities'
  * ensure that the proxy created for the Ingress listens on its Pod IP address.
  * NB: Clusters where Pods get assigned IPv6 addresses only are currently not supported.
  */
-export class DNSConfig extends pulumi.CustomResource {
+export class DNSConfigPatch extends pulumi.CustomResource {
     /**
-     * Get an existing DNSConfig resource's state with the given name, ID, and optional extra
+     * Get an existing DNSConfigPatch resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
@@ -47,22 +53,22 @@ export class DNSConfig extends pulumi.CustomResource {
         name: string,
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
-    ): DNSConfig {
-        return new DNSConfig(name, undefined as any, { ...opts, id: id })
+    ): DNSConfigPatch {
+        return new DNSConfigPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:DNSConfig'
+    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:DNSConfigPatch'
 
     /**
-     * Returns true if the given object is an instance of DNSConfig.  This is designed to work even
+     * Returns true if the given object is an instance of DNSConfigPatch.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is DNSConfig {
+    public static isInstance(obj: any): obj is DNSConfigPatch {
         if (obj === undefined || obj === null) {
             return false
         }
-        return obj['__pulumiType'] === DNSConfig.__pulumiType
+        return obj['__pulumiType'] === DNSConfigPatch.__pulumiType
     }
 
     /**
@@ -76,18 +82,18 @@ export class DNSConfig extends pulumi.CustomResource {
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMeta>
-    public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.DNSConfigSpec>
-    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.DNSConfigStatus>
+    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMetaPatch>
+    public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.DNSConfigSpecPatch>
+    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.DNSConfigStatusPatch>
 
     /**
-     * Create a DNSConfig resource with the given unique name, arguments, and options.
+     * Create a DNSConfigPatch resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: DNSConfigArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args?: DNSConfigPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
@@ -104,14 +110,14 @@ export class DNSConfig extends pulumi.CustomResource {
             resourceInputs['status'] = undefined /*out*/
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts)
-        super(DNSConfig.__pulumiType, name, resourceInputs, opts)
+        super(DNSConfigPatch.__pulumiType, name, resourceInputs, opts)
     }
 }
 
 /**
- * The set of arguments for constructing a DNSConfig resource.
+ * The set of arguments for constructing a DNSConfigPatch resource.
  */
-export interface DNSConfigArgs {
+export interface DNSConfigPatchArgs {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
@@ -123,6 +129,6 @@ export interface DNSConfigArgs {
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
-    spec?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpec>
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMetaPatch>
+    spec?: pulumi.Input<inputs.tailscale.v1alpha1.DNSConfigSpecPatch>
 }

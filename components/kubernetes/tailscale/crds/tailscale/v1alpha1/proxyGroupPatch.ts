@@ -7,19 +7,16 @@ import * as outputs from '../../types/output'
 import * as utilities from '../../utilities'
 
 /**
- * ProxyClass describes a set of configuration parameters that can be applied to
- * proxy resources created by the Tailscale Kubernetes operator.
- * To apply a given ProxyClass to resources created for a tailscale Ingress or
- * Service, use tailscale.com/proxy-class=<proxyclass-name> label. To apply a
- * given ProxyClass to resources created for a Connector, use
- * connector.spec.proxyClass field.
- * ProxyClass is a cluster scoped resource.
- * More info:
- * https://tailscale.com/kb/1445/kubernetes-operator-customization#cluster-resource-customization-using-proxyclass-custom-resource
+ * Patch resources are used to modify existing Kubernetes resources by using
+ * Server-Side Apply updates. The name of the resource must be specified, but all other properties are optional. More than
+ * one patch may be applied to the same resource, and a random FieldManager name will be used for each Patch resource.
+ * Conflicts will result in an error by default, but can be forced using the "pulumi.com/patchForce" annotation. See the
+ * [Server-Side Apply Docs](https://www.pulumi.com/registry/packages/kubernetes/how-to-guides/managing-resources-with-server-side-apply/) for
+ * additional information about using Server-Side Apply to manage Kubernetes resources with Pulumi.
  */
-export class ProxyClass extends pulumi.CustomResource {
+export class ProxyGroupPatch extends pulumi.CustomResource {
     /**
-     * Get an existing ProxyClass resource's state with the given name, ID, and optional extra
+     * Get an existing ProxyGroupPatch resource's state with the given name, ID, and optional extra
      * properties used to qualify the lookup.
      *
      * @param name The _unique_ name of the resulting resource.
@@ -30,22 +27,22 @@ export class ProxyClass extends pulumi.CustomResource {
         name: string,
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
-    ): ProxyClass {
-        return new ProxyClass(name, undefined as any, { ...opts, id: id })
+    ): ProxyGroupPatch {
+        return new ProxyGroupPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:ProxyClass'
+    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:ProxyGroupPatch'
 
     /**
-     * Returns true if the given object is an instance of ProxyClass.  This is designed to work even
+     * Returns true if the given object is an instance of ProxyGroupPatch.  This is designed to work even
      * when multiple copies of the Pulumi SDK have been loaded into the same process.
      */
-    public static isInstance(obj: any): obj is ProxyClass {
+    public static isInstance(obj: any): obj is ProxyGroupPatch {
         if (obj === undefined || obj === null) {
             return false
         }
-        return obj['__pulumiType'] === ProxyClass.__pulumiType
+        return obj['__pulumiType'] === ProxyGroupPatch.__pulumiType
     }
 
     /**
@@ -55,27 +52,27 @@ export class ProxyClass extends pulumi.CustomResource {
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    public readonly kind!: pulumi.Output<'ProxyClass'>
+    public readonly kind!: pulumi.Output<'ProxyGroup'>
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMeta>
-    public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyClassSpec>
-    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyClassStatus>
+    public readonly metadata!: pulumi.Output<outputs.meta.v1.ObjectMetaPatch>
+    public readonly spec!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyGroupSpecPatch>
+    public readonly /*out*/ status!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyGroupStatusPatch>
 
     /**
-     * Create a ProxyClass resource with the given unique name, arguments, and options.
+     * Create a ProxyGroupPatch resource with the given unique name, arguments, and options.
      *
      * @param name The _unique_ name of the resource.
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(name: string, args?: ProxyClassArgs, opts?: pulumi.CustomResourceOptions) {
+    constructor(name: string, args?: ProxyGroupPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
             resourceInputs['apiVersion'] = 'tailscale.com/v1alpha1'
-            resourceInputs['kind'] = 'ProxyClass'
+            resourceInputs['kind'] = 'ProxyGroup'
             resourceInputs['metadata'] = args ? args.metadata : undefined
             resourceInputs['spec'] = args ? args.spec : undefined
             resourceInputs['status'] = undefined /*out*/
@@ -87,14 +84,14 @@ export class ProxyClass extends pulumi.CustomResource {
             resourceInputs['status'] = undefined /*out*/
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts)
-        super(ProxyClass.__pulumiType, name, resourceInputs, opts)
+        super(ProxyGroupPatch.__pulumiType, name, resourceInputs, opts)
     }
 }
 
 /**
- * The set of arguments for constructing a ProxyClass resource.
+ * The set of arguments for constructing a ProxyGroupPatch resource.
  */
-export interface ProxyClassArgs {
+export interface ProxyGroupPatchArgs {
     /**
      * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
      */
@@ -102,10 +99,10 @@ export interface ProxyClassArgs {
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
-    kind?: pulumi.Input<'ProxyClass'>
+    kind?: pulumi.Input<'ProxyGroup'>
     /**
      * Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
      */
-    metadata?: pulumi.Input<inputs.meta.v1.ObjectMeta>
-    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyClassSpec>
+    metadata?: pulumi.Input<inputs.meta.v1.ObjectMetaPatch>
+    spec?: pulumi.Input<inputs.tailscale.v1alpha1.ProxyGroupSpecPatch>
 }

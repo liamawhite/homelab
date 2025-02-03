@@ -10,25 +10,75 @@ export type Connector = import('./connector').Connector
 export const Connector: typeof import('./connector').Connector = null as any
 utilities.lazyLoad(exports, ['Connector'], () => require('./connector'))
 
+export { ConnectorListArgs } from './connectorList'
+export type ConnectorList = import('./connectorList').ConnectorList
+export const ConnectorList: typeof import('./connectorList').ConnectorList = null as any
+utilities.lazyLoad(exports, ['ConnectorList'], () => require('./connectorList'))
+
+export { ConnectorPatchArgs } from './connectorPatch'
+export type ConnectorPatch = import('./connectorPatch').ConnectorPatch
+export const ConnectorPatch: typeof import('./connectorPatch').ConnectorPatch = null as any
+utilities.lazyLoad(exports, ['ConnectorPatch'], () => require('./connectorPatch'))
+
 export { DNSConfigArgs } from './dnsconfig'
 export type DNSConfig = import('./dnsconfig').DNSConfig
 export const DNSConfig: typeof import('./dnsconfig').DNSConfig = null as any
 utilities.lazyLoad(exports, ['DNSConfig'], () => require('./dnsconfig'))
+
+export { DNSConfigListArgs } from './dnsconfigList'
+export type DNSConfigList = import('./dnsconfigList').DNSConfigList
+export const DNSConfigList: typeof import('./dnsconfigList').DNSConfigList = null as any
+utilities.lazyLoad(exports, ['DNSConfigList'], () => require('./dnsconfigList'))
+
+export { DNSConfigPatchArgs } from './dnsconfigPatch'
+export type DNSConfigPatch = import('./dnsconfigPatch').DNSConfigPatch
+export const DNSConfigPatch: typeof import('./dnsconfigPatch').DNSConfigPatch = null as any
+utilities.lazyLoad(exports, ['DNSConfigPatch'], () => require('./dnsconfigPatch'))
 
 export { ProxyClassArgs } from './proxyClass'
 export type ProxyClass = import('./proxyClass').ProxyClass
 export const ProxyClass: typeof import('./proxyClass').ProxyClass = null as any
 utilities.lazyLoad(exports, ['ProxyClass'], () => require('./proxyClass'))
 
+export { ProxyClassListArgs } from './proxyClassList'
+export type ProxyClassList = import('./proxyClassList').ProxyClassList
+export const ProxyClassList: typeof import('./proxyClassList').ProxyClassList = null as any
+utilities.lazyLoad(exports, ['ProxyClassList'], () => require('./proxyClassList'))
+
+export { ProxyClassPatchArgs } from './proxyClassPatch'
+export type ProxyClassPatch = import('./proxyClassPatch').ProxyClassPatch
+export const ProxyClassPatch: typeof import('./proxyClassPatch').ProxyClassPatch = null as any
+utilities.lazyLoad(exports, ['ProxyClassPatch'], () => require('./proxyClassPatch'))
+
 export { ProxyGroupArgs } from './proxyGroup'
 export type ProxyGroup = import('./proxyGroup').ProxyGroup
 export const ProxyGroup: typeof import('./proxyGroup').ProxyGroup = null as any
 utilities.lazyLoad(exports, ['ProxyGroup'], () => require('./proxyGroup'))
 
+export { ProxyGroupListArgs } from './proxyGroupList'
+export type ProxyGroupList = import('./proxyGroupList').ProxyGroupList
+export const ProxyGroupList: typeof import('./proxyGroupList').ProxyGroupList = null as any
+utilities.lazyLoad(exports, ['ProxyGroupList'], () => require('./proxyGroupList'))
+
+export { ProxyGroupPatchArgs } from './proxyGroupPatch'
+export type ProxyGroupPatch = import('./proxyGroupPatch').ProxyGroupPatch
+export const ProxyGroupPatch: typeof import('./proxyGroupPatch').ProxyGroupPatch = null as any
+utilities.lazyLoad(exports, ['ProxyGroupPatch'], () => require('./proxyGroupPatch'))
+
 export { RecorderArgs } from './recorder'
 export type Recorder = import('./recorder').Recorder
 export const Recorder: typeof import('./recorder').Recorder = null as any
 utilities.lazyLoad(exports, ['Recorder'], () => require('./recorder'))
+
+export { RecorderListArgs } from './recorderList'
+export type RecorderList = import('./recorderList').RecorderList
+export const RecorderList: typeof import('./recorderList').RecorderList = null as any
+utilities.lazyLoad(exports, ['RecorderList'], () => require('./recorderList'))
+
+export { RecorderPatchArgs } from './recorderPatch'
+export type RecorderPatch = import('./recorderPatch').RecorderPatch
+export const RecorderPatch: typeof import('./recorderPatch').RecorderPatch = null as any
+utilities.lazyLoad(exports, ['RecorderPatch'], () => require('./recorderPatch'))
 
 const _module = {
     version: utilities.getVersion(),
@@ -36,14 +86,34 @@ const _module = {
         switch (type) {
             case 'kubernetes:tailscale.com/v1alpha1:Connector':
                 return new Connector(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ConnectorList':
+                return new ConnectorList(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ConnectorPatch':
+                return new ConnectorPatch(name, <any>undefined, { urn })
             case 'kubernetes:tailscale.com/v1alpha1:DNSConfig':
                 return new DNSConfig(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:DNSConfigList':
+                return new DNSConfigList(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:DNSConfigPatch':
+                return new DNSConfigPatch(name, <any>undefined, { urn })
             case 'kubernetes:tailscale.com/v1alpha1:ProxyClass':
                 return new ProxyClass(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ProxyClassList':
+                return new ProxyClassList(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ProxyClassPatch':
+                return new ProxyClassPatch(name, <any>undefined, { urn })
             case 'kubernetes:tailscale.com/v1alpha1:ProxyGroup':
                 return new ProxyGroup(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ProxyGroupList':
+                return new ProxyGroupList(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:ProxyGroupPatch':
+                return new ProxyGroupPatch(name, <any>undefined, { urn })
             case 'kubernetes:tailscale.com/v1alpha1:Recorder':
                 return new Recorder(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:RecorderList':
+                return new RecorderList(name, <any>undefined, { urn })
+            case 'kubernetes:tailscale.com/v1alpha1:RecorderPatch':
+                return new RecorderPatch(name, <any>undefined, { urn })
             default:
                 throw new Error(`unknown resource type ${type}`)
         }
