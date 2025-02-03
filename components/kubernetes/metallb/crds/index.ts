@@ -17,11 +17,7 @@ import * as types from './types'
 export { metallb, types }
 pulumi.runtime.registerResourcePackage('crds', {
     version: utilities.getVersion(),
-    constructProvider: (
-        name: string,
-        type: string,
-        urn: string,
-    ): pulumi.ProviderResource => {
+    constructProvider: (name: string, type: string, urn: string): pulumi.ProviderResource => {
         if (type !== 'pulumi:providers:kubernetes') {
             throw new Error(`unknown provider type ${type}`)
         }

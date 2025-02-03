@@ -23,15 +23,11 @@ export class ClusterIssuerList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): ClusterIssuerList {
-        return new ClusterIssuerList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new ClusterIssuerList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:ClusterIssuerList'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:ClusterIssuerList'
 
     /**
      * Returns true if the given object is an instance of ClusterIssuerList.  This is designed to work even
@@ -51,9 +47,7 @@ export class ClusterIssuerList extends pulumi.CustomResource {
     /**
      * List of clusterissuers. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.cert_manager.v1.ClusterIssuer[]
-    >
+    public readonly items!: pulumi.Output<outputs.cert_manager.v1.ClusterIssuer[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -70,11 +64,7 @@ export class ClusterIssuerList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ClusterIssuerListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ClusterIssuerListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

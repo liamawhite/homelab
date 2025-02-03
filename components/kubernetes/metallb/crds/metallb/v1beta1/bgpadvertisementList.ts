@@ -23,15 +23,11 @@ export class BGPAdvertisementList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): BGPAdvertisementList {
-        return new BGPAdvertisementList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new BGPAdvertisementList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:BGPAdvertisementList'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:BGPAdvertisementList'
 
     /**
      * Returns true if the given object is an instance of BGPAdvertisementList.  This is designed to work even
@@ -51,9 +47,7 @@ export class BGPAdvertisementList extends pulumi.CustomResource {
     /**
      * List of bgpadvertisements. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.metallb.v1beta1.BGPAdvertisement[]
-    >
+    public readonly items!: pulumi.Output<outputs.metallb.v1beta1.BGPAdvertisement[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */

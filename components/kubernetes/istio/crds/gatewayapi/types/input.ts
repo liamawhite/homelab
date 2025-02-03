@@ -162,15 +162,11 @@ export namespace gateway {
              * Gateway has the AllowedRoutes field, and ReferenceGrant provides a
              * generic way to enable other kinds of cross-namespace reference.
              */
-            parentRefs?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecParentRefs>[]
-            >
+            parentRefs?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecParentRefs>[]>
             /**
              * Rules are a list of GRPC matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRules>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRules>[]>
         }
 
         /**
@@ -516,9 +512,7 @@ export namespace gateway {
             /**
              * Rules are a list of GRPC matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesPatch>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesPatch>[]>
         }
 
         /**
@@ -586,9 +580,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            filters?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesFilters>[]
-            >
+            filters?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesFilters>[]>
             /**
              * Matches define conditions used for matching the rule against incoming
              * gRPC requests. Each match is independent, i.e. this rule will be matched
@@ -640,9 +632,7 @@ export namespace gateway {
              * matching precedence MUST be granted to the first matching rule meeting
              * the above criteria.
              */
-            matches?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesMatches>[]
-            >
+            matches?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesMatches>[]>
         }
 
         /**
@@ -2608,9 +2598,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            filters?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesFiltersPatch>[]
-            >
+            filters?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesFiltersPatch>[]>
             /**
              * Matches define conditions used for matching the rule against incoming
              * gRPC requests. Each match is independent, i.e. this rule will be matched
@@ -2662,9 +2650,7 @@ export namespace gateway {
              * matching precedence MUST be granted to the first matching rule meeting
              * the above criteria.
              */
-            matches?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesMatchesPatch>[]
-            >
+            matches?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteSpecRulesMatchesPatch>[]>
         }
 
         /**
@@ -2687,9 +2673,7 @@ export namespace gateway {
              * A maximum of 32 Gateways will be represented in this list. An empty list
              * means the route has not been attached to any Gateway.
              */
-            parents?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GRPCRouteStatusParents>[]
-            >
+            parents?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GRPCRouteStatusParents>[]>
         }
 
         /**
@@ -3148,9 +3132,7 @@ export namespace gateway {
              *
              * Support: Extended
              */
-            addresses?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewaySpecAddresses>[]
-            >
+            addresses?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewaySpecAddresses>[]>
             /**
              * GatewayClassName used for this Gateway. This is the name of a
              * GatewayClass resource.
@@ -3276,9 +3258,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            listeners?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewaySpecListeners>[]
-            >
+            listeners?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewaySpecListeners>[]>
         }
 
         /**
@@ -4061,9 +4041,7 @@ export namespace gateway {
              *
              * Support: Extended
              */
-            addresses?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewaySpecAddressesPatch>[]
-            >
+            addresses?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewaySpecAddressesPatch>[]>
             /**
              * GatewayClassName used for this Gateway. This is the name of a
              * GatewayClass resource.
@@ -4189,9 +4167,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            listeners?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewaySpecListenersPatch>[]
-            >
+            listeners?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewaySpecListenersPatch>[]>
         }
 
         /**
@@ -4209,9 +4185,7 @@ export namespace gateway {
              *   * a combination of specified and dynamic addresses are assigned
              *   * a specified address was unusable (e.g. already in use)
              */
-            addresses?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewayStatusAddresses>[]
-            >
+            addresses?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewayStatusAddresses>[]>
             /**
              * Conditions describe the current conditions of the Gateway.
              *
@@ -4226,15 +4200,11 @@ export namespace gateway {
              * * "Programmed"
              * * "Ready"
              */
-            conditions?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewayStatusConditions>[]
-            >
+            conditions?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewayStatusConditions>[]>
             /**
              * Listeners provide status for each unique listener port defined in the Spec.
              */
-            listeners?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.GatewayStatusListeners>[]
-            >
+            listeners?: pulumi.Input<pulumi.Input<inputs.gateway.v1.GatewayStatusListeners>[]>
         }
 
         /**
@@ -4529,15 +4499,11 @@ export namespace gateway {
              * Gateway has the AllowedRoutes field, and ReferenceGrant provides a
              * generic way to enable other kinds of cross-namespace reference.
              */
-            parentRefs?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecParentRefs>[]
-            >
+            parentRefs?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecParentRefs>[]>
             /**
              * Rules are a list of HTTP matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRules>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRules>[]>
         }
 
         /**
@@ -4886,9 +4852,7 @@ export namespace gateway {
             /**
              * Rules are a list of HTTP matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesPatch>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesPatch>[]>
         }
 
         /**
@@ -4975,9 +4939,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            filters?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesFilters>[]
-            >
+            filters?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesFilters>[]>
             /**
              * Matches define conditions used for matching the rule against incoming
              * HTTP requests. Each match is independent, i.e. this rule will be matched
@@ -5036,9 +4998,7 @@ export namespace gateway {
              * When no rules matching a request have been successfully attached to the
              * parent a request is coming from, a HTTP 404 status code MUST be returned.
              */
-            matches?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesMatches>[]
-            >
+            matches?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesMatches>[]>
             timeouts?: pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesTimeouts>
         }
 
@@ -7914,9 +7874,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            filters?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesFiltersPatch>[]
-            >
+            filters?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesFiltersPatch>[]>
             /**
              * Matches define conditions used for matching the rule against incoming
              * HTTP requests. Each match is independent, i.e. this rule will be matched
@@ -7975,9 +7933,7 @@ export namespace gateway {
              * When no rules matching a request have been successfully attached to the
              * parent a request is coming from, a HTTP 404 status code MUST be returned.
              */
-            matches?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesMatchesPatch>[]
-            >
+            matches?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesMatchesPatch>[]>
             timeouts?: pulumi.Input<inputs.gateway.v1.HTTPRouteSpecRulesTimeoutsPatch>
         }
 
@@ -8111,9 +8067,7 @@ export namespace gateway {
              * A maximum of 32 Gateways will be represented in this list. An empty list
              * means the route has not been attached to any Gateway.
              */
-            parents?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1.HTTPRouteStatusParents>[]
-            >
+            parents?: pulumi.Input<pulumi.Input<inputs.gateway.v1.HTTPRouteStatusParents>[]>
         }
 
         /**
@@ -8574,9 +8528,7 @@ export namespace gateway {
              *
              * Support: Extended
              */
-            addresses?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.GatewaySpecAddresses>[]
-            >
+            addresses?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.GatewaySpecAddresses>[]>
             /**
              * GatewayClassName used for this Gateway. This is the name of a
              * GatewayClass resource.
@@ -8702,9 +8654,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            listeners?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.GatewaySpecListeners>[]
-            >
+            listeners?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.GatewaySpecListeners>[]>
         }
 
         /**
@@ -9635,9 +9585,7 @@ export namespace gateway {
              *   * a combination of specified and dynamic addresses are assigned
              *   * a specified address was unusable (e.g. already in use)
              */
-            addresses?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.GatewayStatusAddresses>[]
-            >
+            addresses?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.GatewayStatusAddresses>[]>
             /**
              * Conditions describe the current conditions of the Gateway.
              *
@@ -9658,9 +9606,7 @@ export namespace gateway {
             /**
              * Listeners provide status for each unique listener port defined in the Spec.
              */
-            listeners?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.GatewayStatusListeners>[]
-            >
+            listeners?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.GatewayStatusListeners>[]>
         }
 
         /**
@@ -9961,9 +9907,7 @@ export namespace gateway {
             /**
              * Rules are a list of HTTP matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRules>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRules>[]>
         }
 
         /**
@@ -10312,9 +10256,7 @@ export namespace gateway {
             /**
              * Rules are a list of HTTP matchers, filters and actions.
              */
-            rules?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesPatch>[]
-            >
+            rules?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesPatch>[]>
         }
 
         /**
@@ -10401,9 +10343,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            filters?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesFilters>[]
-            >
+            filters?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesFilters>[]>
             /**
              * Matches define conditions used for matching the rule against incoming
              * HTTP requests. Each match is independent, i.e. this rule will be matched
@@ -10462,9 +10402,7 @@ export namespace gateway {
              * When no rules matching a request have been successfully attached to the
              * parent a request is coming from, a HTTP 404 status code MUST be returned.
              */
-            matches?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesMatches>[]
-            >
+            matches?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesMatches>[]>
             timeouts?: pulumi.Input<inputs.gateway.v1beta1.HTTPRouteSpecRulesTimeouts>
         }
 
@@ -13537,9 +13475,7 @@ export namespace gateway {
              * A maximum of 32 Gateways will be represented in this list. An empty list
              * means the route has not been attached to any Gateway.
              */
-            parents?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.HTTPRouteStatusParents>[]
-            >
+            parents?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.HTTPRouteStatusParents>[]>
         }
 
         /**
@@ -13778,9 +13714,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            from?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecFrom>[]
-            >
+            from?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecFrom>[]>
             /**
              * To describes the resources that may be referenced by the resources
              * described in "From". Each entry in this list MUST be considered to be an
@@ -13789,9 +13723,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            to?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecTo>[]
-            >
+            to?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecTo>[]>
         }
 
         /**
@@ -13880,9 +13812,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            from?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecFromPatch>[]
-            >
+            from?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecFromPatch>[]>
             /**
              * To describes the resources that may be referenced by the resources
              * described in "From". Each entry in this list MUST be considered to be an
@@ -13891,9 +13821,7 @@ export namespace gateway {
              *
              * Support: Core
              */
-            to?: pulumi.Input<
-                pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecToPatch>[]
-            >
+            to?: pulumi.Input<pulumi.Input<inputs.gateway.v1beta1.ReferenceGrantSpecToPatch>[]>
         }
 
         /**
@@ -14095,9 +14023,7 @@ export namespace meta {
             /**
              * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
              */
-            managedFields?: pulumi.Input<
-                pulumi.Input<inputs.meta.v1.ManagedFieldsEntry>[]
-            >
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntry>[]>
             /**
              * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
              */
@@ -14111,9 +14037,7 @@ export namespace meta {
             /**
              * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
              */
-            ownerReferences?: pulumi.Input<
-                pulumi.Input<inputs.meta.v1.OwnerReference>[]
-            >
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReference>[]>
             /**
              * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
              *
@@ -14179,9 +14103,7 @@ export namespace meta {
             /**
              * ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
              */
-            managedFields?: pulumi.Input<
-                pulumi.Input<inputs.meta.v1.ManagedFieldsEntryPatch>[]
-            >
+            managedFields?: pulumi.Input<pulumi.Input<inputs.meta.v1.ManagedFieldsEntryPatch>[]>
             /**
              * Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
              */
@@ -14195,9 +14117,7 @@ export namespace meta {
             /**
              * List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller.
              */
-            ownerReferences?: pulumi.Input<
-                pulumi.Input<inputs.meta.v1.OwnerReferencePatch>[]
-            >
+            ownerReferences?: pulumi.Input<pulumi.Input<inputs.meta.v1.OwnerReferencePatch>[]>
             /**
              * An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
              *

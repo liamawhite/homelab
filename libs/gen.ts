@@ -41,14 +41,9 @@ export async function helmTemplate(source: string, destination: string) {
     execSync(`helm template crdgen ${source} > ${destination}`)
 }
 
-export async function crd2pulumi(args: {
-    destination: string
-    sources: string[]
-}) {
+export async function crd2pulumi(args: { destination: string; sources: string[] }) {
     const { destination, sources } = args
-    execSync(
-        `crd2pulumi --nodejsPath ${destination} --force ${sources.join(' ')}`,
-    )
+    execSync(`crd2pulumi --nodejsPath ${destination} --force ${sources.join(' ')}`)
 
     // Remove generated files we don't need
     await fs.rm(path.join(destination, 'tsconfig.json'))

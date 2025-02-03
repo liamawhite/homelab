@@ -18,9 +18,7 @@ const dns = configureDns({ ...cfg, cluster, network, pki })
 
 // Write the kubeconfig to a file at repo root so we can use it easily
 // This is gitignored so it won't be checked in
-cluster.kubeconfig.apply(cfg =>
-    fs.writeFileSync(path.join(__dirname, '../', 'kubeconfig'), cfg),
-)
+cluster.kubeconfig.apply(cfg => fs.writeFileSync(path.join(__dirname, '../', 'kubeconfig'), cfg))
 
 // Write the root CA cert to a file at repo root so we can easliy load it into machines
 // This is gitignored so it won't be checked in but doesn't really matter if it is

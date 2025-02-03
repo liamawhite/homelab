@@ -36,8 +36,7 @@ export class HTTPRoutePatch extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:gateway.networking.k8s.io/v1:HTTPRoutePatch'
+    public static readonly __pulumiType = 'kubernetes:gateway.networking.k8s.io/v1:HTTPRoutePatch'
 
     /**
      * Returns true if the given object is an instance of HTTPRoutePatch.  This is designed to work even
@@ -72,11 +71,7 @@ export class HTTPRoutePatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: HTTPRoutePatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: HTTPRoutePatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
@@ -94,11 +89,7 @@ export class HTTPRoutePatch extends pulumi.CustomResource {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts)
         const aliasOpts = {
-            aliases: [
-                {
-                    type: 'kubernetes:gateway.networking.k8s.io/v1beta1:HTTPRoutePatch',
-                },
-            ],
+            aliases: [{ type: 'kubernetes:gateway.networking.k8s.io/v1beta1:HTTPRoutePatch' }],
         }
         opts = pulumi.mergeOptions(opts, aliasOpts)
         super(HTTPRoutePatch.__pulumiType, name, resourceInputs, opts)

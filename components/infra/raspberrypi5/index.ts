@@ -8,11 +8,7 @@ export class RaspberryPi extends pulumi.ComponentResource {
     readonly address: pulumi.Input<string>
     readonly connection: types.input.remote.ConnectionArgs
 
-    constructor(
-        name: string,
-        args: RaspberryPiArgs,
-        opts?: pulumi.ComponentResourceOptions,
-    ) {
+    constructor(name: string, args: RaspberryPiArgs, opts?: pulumi.ComponentResourceOptions) {
         super('homelab:machine:raspberrypi5', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
@@ -21,10 +17,7 @@ export class RaspberryPi extends pulumi.ComponentResource {
 
         // Enable NVMe over PCIe
         // Have to use a command because the file is owned by root
-        const configTxt = fs.readFileSync(
-            path.join(__dirname, 'config.txt'),
-            'utf-8',
-        )
+        const configTxt = fs.readFileSync(path.join(__dirname, 'config.txt'), 'utf-8')
         const configCopy = new remote.Command(
             `${name}-config-copy`,
             {
@@ -36,10 +29,7 @@ export class RaspberryPi extends pulumi.ComponentResource {
 
         // Enable boot from NVMe
         // Have to use a command because the file is owned by root
-        const eepromConf = fs.readFileSync(
-            path.join(__dirname, 'eeprom.conf'),
-            'utf-8',
-        )
+        const eepromConf = fs.readFileSync(path.join(__dirname, 'eeprom.conf'), 'utf-8')
         const eepromCopy = new remote.Command(
             `${name}-eeprom-copy`,
             {

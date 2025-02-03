@@ -37,8 +37,7 @@ export class ProxyClass extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:tailscale.com/v1alpha1:ProxyClass'
+    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:ProxyClass'
 
     /**
      * Returns true if the given object is an instance of ProxyClass.  This is designed to work even
@@ -51,9 +50,7 @@ export class ProxyClass extends pulumi.CustomResource {
         return obj['__pulumiType'] === ProxyClass.__pulumiType
     }
 
-    public readonly apiVersion!: pulumi.Output<
-        'tailscale.com/v1alpha1' | undefined
-    >
+    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1' | undefined>
     public readonly kind!: pulumi.Output<'ProxyClass' | undefined>
     public readonly metadata!: pulumi.Output<ObjectMeta | undefined>
     /**
@@ -65,9 +62,7 @@ export class ProxyClass extends pulumi.CustomResource {
      * Status of the ProxyClass. This is set and managed automatically.
      * https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
      */
-    public readonly status!: pulumi.Output<
-        outputs.tailscale.v1alpha1.ProxyClassStatus | undefined
-    >
+    public readonly status!: pulumi.Output<outputs.tailscale.v1alpha1.ProxyClassStatus | undefined>
 
     /**
      * Create a ProxyClass resource with the given unique name, arguments, and options.
@@ -76,11 +71,7 @@ export class ProxyClass extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ProxyClassArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ProxyClassArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

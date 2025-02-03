@@ -3,9 +3,7 @@ import { CertManager } from '../components/kubernetes/certmanager'
 import { PrivateClusterIssuer } from '../components/kubernetes/certmanager/privateissuer'
 import { configureCluster } from './cluster'
 
-export function configurePki({
-    provider,
-}: ReturnType<typeof configureCluster>) {
+export function configurePki({ provider }: ReturnType<typeof configureCluster>) {
     const ca = new RootCertificateAuthority('Homelab Root CA')
 
     const certmanager = new CertManager('cert-manager', {}, { provider })

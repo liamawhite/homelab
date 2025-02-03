@@ -272,9 +272,7 @@ export class Pihole extends pulumi.ComponentResource {
                             protocol: 'HTTPS',
                             tls: {
                                 mode: 'Terminate',
-                                certificateRefs: [
-                                    { name: cert.spec.secretName },
-                                ],
+                                certificateRefs: [{ name: cert.spec.secretName }],
                             },
                             allowedRoutes: { namespaces: { from: 'Same' } },
                         },
@@ -292,9 +290,7 @@ export class Pihole extends pulumi.ComponentResource {
                     namespace: this.namespace,
                 },
                 spec: {
-                    parentRefs: [
-                        { name: gw.metadata.name, sectionName: 'http' },
-                    ],
+                    parentRefs: [{ name: gw.metadata.name, sectionName: 'http' }],
                     rules: [
                         {
                             filters: [
@@ -321,9 +317,7 @@ export class Pihole extends pulumi.ComponentResource {
                     namespace: this.namespace,
                 },
                 spec: {
-                    parentRefs: [
-                        { name: gw.metadata.name, sectionName: 'https' },
-                    ],
+                    parentRefs: [{ name: gw.metadata.name, sectionName: 'https' }],
                     rules: [
                         // redirect root to /admin because I forget this all the time
                         {
@@ -342,9 +336,7 @@ export class Pihole extends pulumi.ComponentResource {
                             ],
                         },
                         {
-                            backendRefs: [
-                                { name: http.metadata.name, port: 8080 },
-                            ],
+                            backendRefs: [{ name: http.metadata.name, port: 8080 }],
                         },
                     ],
                 },

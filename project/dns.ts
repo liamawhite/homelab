@@ -22,8 +22,7 @@ export function configureDns({
             web: { hostname: 'pihole.homelab', issuer: pki.issuer.issuerRef() },
             dns: {
                 annotations: {
-                    'metallb.universe.tf/address-pool':
-                        network.dnsPool.metadata.name,
+                    'metallb.universe.tf/address-pool': network.dnsPool.metadata.name,
                 },
             },
         },

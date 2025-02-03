@@ -12,45 +12,30 @@ utilities.lazyLoad(exports, ['BFDProfile'], () => require('./bfdprofile'))
 
 export { BFDProfileListArgs } from './bfdprofileList'
 export type BFDProfileList = import('./bfdprofileList').BFDProfileList
-export const BFDProfileList: typeof import('./bfdprofileList').BFDProfileList =
-    null as any
-utilities.lazyLoad(exports, ['BFDProfileList'], () =>
-    require('./bfdprofileList'),
-)
+export const BFDProfileList: typeof import('./bfdprofileList').BFDProfileList = null as any
+utilities.lazyLoad(exports, ['BFDProfileList'], () => require('./bfdprofileList'))
 
 export { BFDProfilePatchArgs } from './bfdprofilePatch'
 export type BFDProfilePatch = import('./bfdprofilePatch').BFDProfilePatch
-export const BFDProfilePatch: typeof import('./bfdprofilePatch').BFDProfilePatch =
-    null as any
-utilities.lazyLoad(exports, ['BFDProfilePatch'], () =>
-    require('./bfdprofilePatch'),
-)
+export const BFDProfilePatch: typeof import('./bfdprofilePatch').BFDProfilePatch = null as any
+utilities.lazyLoad(exports, ['BFDProfilePatch'], () => require('./bfdprofilePatch'))
 
 export { BGPAdvertisementArgs } from './bgpadvertisement'
 export type BGPAdvertisement = import('./bgpadvertisement').BGPAdvertisement
-export const BGPAdvertisement: typeof import('./bgpadvertisement').BGPAdvertisement =
-    null as any
-utilities.lazyLoad(exports, ['BGPAdvertisement'], () =>
-    require('./bgpadvertisement'),
-)
+export const BGPAdvertisement: typeof import('./bgpadvertisement').BGPAdvertisement = null as any
+utilities.lazyLoad(exports, ['BGPAdvertisement'], () => require('./bgpadvertisement'))
 
 export { BGPAdvertisementListArgs } from './bgpadvertisementList'
-export type BGPAdvertisementList =
-    import('./bgpadvertisementList').BGPAdvertisementList
+export type BGPAdvertisementList = import('./bgpadvertisementList').BGPAdvertisementList
 export const BGPAdvertisementList: typeof import('./bgpadvertisementList').BGPAdvertisementList =
     null as any
-utilities.lazyLoad(exports, ['BGPAdvertisementList'], () =>
-    require('./bgpadvertisementList'),
-)
+utilities.lazyLoad(exports, ['BGPAdvertisementList'], () => require('./bgpadvertisementList'))
 
 export { BGPAdvertisementPatchArgs } from './bgpadvertisementPatch'
-export type BGPAdvertisementPatch =
-    import('./bgpadvertisementPatch').BGPAdvertisementPatch
+export type BGPAdvertisementPatch = import('./bgpadvertisementPatch').BGPAdvertisementPatch
 export const BGPAdvertisementPatch: typeof import('./bgpadvertisementPatch').BGPAdvertisementPatch =
     null as any
-utilities.lazyLoad(exports, ['BGPAdvertisementPatch'], () =>
-    require('./bgpadvertisementPatch'),
-)
+utilities.lazyLoad(exports, ['BGPAdvertisementPatch'], () => require('./bgpadvertisementPatch'))
 
 export { BGPPeerArgs } from './bgppeer'
 export type BGPPeer = import('./bgppeer').BGPPeer
@@ -59,14 +44,12 @@ utilities.lazyLoad(exports, ['BGPPeer'], () => require('./bgppeer'))
 
 export { BGPPeerListArgs } from './bgppeerList'
 export type BGPPeerList = import('./bgppeerList').BGPPeerList
-export const BGPPeerList: typeof import('./bgppeerList').BGPPeerList =
-    null as any
+export const BGPPeerList: typeof import('./bgppeerList').BGPPeerList = null as any
 utilities.lazyLoad(exports, ['BGPPeerList'], () => require('./bgppeerList'))
 
 export { BGPPeerPatchArgs } from './bgppeerPatch'
 export type BGPPeerPatch = import('./bgppeerPatch').BGPPeerPatch
-export const BGPPeerPatch: typeof import('./bgppeerPatch').BGPPeerPatch =
-    null as any
+export const BGPPeerPatch: typeof import('./bgppeerPatch').BGPPeerPatch = null as any
 utilities.lazyLoad(exports, ['BGPPeerPatch'], () => require('./bgppeerPatch'))
 
 export { CommunityArgs } from './community'
@@ -76,92 +59,63 @@ utilities.lazyLoad(exports, ['Community'], () => require('./community'))
 
 export { CommunityListArgs } from './communityList'
 export type CommunityList = import('./communityList').CommunityList
-export const CommunityList: typeof import('./communityList').CommunityList =
-    null as any
+export const CommunityList: typeof import('./communityList').CommunityList = null as any
 utilities.lazyLoad(exports, ['CommunityList'], () => require('./communityList'))
 
 export { CommunityPatchArgs } from './communityPatch'
 export type CommunityPatch = import('./communityPatch').CommunityPatch
-export const CommunityPatch: typeof import('./communityPatch').CommunityPatch =
-    null as any
-utilities.lazyLoad(exports, ['CommunityPatch'], () =>
-    require('./communityPatch'),
-)
+export const CommunityPatch: typeof import('./communityPatch').CommunityPatch = null as any
+utilities.lazyLoad(exports, ['CommunityPatch'], () => require('./communityPatch'))
 
 export { IPAddressPoolArgs } from './ipaddressPool'
 export type IPAddressPool = import('./ipaddressPool').IPAddressPool
-export const IPAddressPool: typeof import('./ipaddressPool').IPAddressPool =
-    null as any
+export const IPAddressPool: typeof import('./ipaddressPool').IPAddressPool = null as any
 utilities.lazyLoad(exports, ['IPAddressPool'], () => require('./ipaddressPool'))
 
 export { IPAddressPoolListArgs } from './ipaddressPoolList'
 export type IPAddressPoolList = import('./ipaddressPoolList').IPAddressPoolList
-export const IPAddressPoolList: typeof import('./ipaddressPoolList').IPAddressPoolList =
-    null as any
-utilities.lazyLoad(exports, ['IPAddressPoolList'], () =>
-    require('./ipaddressPoolList'),
-)
+export const IPAddressPoolList: typeof import('./ipaddressPoolList').IPAddressPoolList = null as any
+utilities.lazyLoad(exports, ['IPAddressPoolList'], () => require('./ipaddressPoolList'))
 
 export { IPAddressPoolPatchArgs } from './ipaddressPoolPatch'
-export type IPAddressPoolPatch =
-    import('./ipaddressPoolPatch').IPAddressPoolPatch
+export type IPAddressPoolPatch = import('./ipaddressPoolPatch').IPAddressPoolPatch
 export const IPAddressPoolPatch: typeof import('./ipaddressPoolPatch').IPAddressPoolPatch =
     null as any
-utilities.lazyLoad(exports, ['IPAddressPoolPatch'], () =>
-    require('./ipaddressPoolPatch'),
-)
+utilities.lazyLoad(exports, ['IPAddressPoolPatch'], () => require('./ipaddressPoolPatch'))
 
 export { L2AdvertisementArgs } from './l2advertisement'
 export type L2Advertisement = import('./l2advertisement').L2Advertisement
-export const L2Advertisement: typeof import('./l2advertisement').L2Advertisement =
-    null as any
-utilities.lazyLoad(exports, ['L2Advertisement'], () =>
-    require('./l2advertisement'),
-)
+export const L2Advertisement: typeof import('./l2advertisement').L2Advertisement = null as any
+utilities.lazyLoad(exports, ['L2Advertisement'], () => require('./l2advertisement'))
 
 export { L2AdvertisementListArgs } from './l2advertisementList'
-export type L2AdvertisementList =
-    import('./l2advertisementList').L2AdvertisementList
+export type L2AdvertisementList = import('./l2advertisementList').L2AdvertisementList
 export const L2AdvertisementList: typeof import('./l2advertisementList').L2AdvertisementList =
     null as any
-utilities.lazyLoad(exports, ['L2AdvertisementList'], () =>
-    require('./l2advertisementList'),
-)
+utilities.lazyLoad(exports, ['L2AdvertisementList'], () => require('./l2advertisementList'))
 
 export { L2AdvertisementPatchArgs } from './l2advertisementPatch'
-export type L2AdvertisementPatch =
-    import('./l2advertisementPatch').L2AdvertisementPatch
+export type L2AdvertisementPatch = import('./l2advertisementPatch').L2AdvertisementPatch
 export const L2AdvertisementPatch: typeof import('./l2advertisementPatch').L2AdvertisementPatch =
     null as any
-utilities.lazyLoad(exports, ['L2AdvertisementPatch'], () =>
-    require('./l2advertisementPatch'),
-)
+utilities.lazyLoad(exports, ['L2AdvertisementPatch'], () => require('./l2advertisementPatch'))
 
 export { ServiceL2StatusArgs } from './serviceL2Status'
 export type ServiceL2Status = import('./serviceL2Status').ServiceL2Status
-export const ServiceL2Status: typeof import('./serviceL2Status').ServiceL2Status =
-    null as any
-utilities.lazyLoad(exports, ['ServiceL2Status'], () =>
-    require('./serviceL2Status'),
-)
+export const ServiceL2Status: typeof import('./serviceL2Status').ServiceL2Status = null as any
+utilities.lazyLoad(exports, ['ServiceL2Status'], () => require('./serviceL2Status'))
 
 export { ServiceL2StatusListArgs } from './serviceL2StatusList'
-export type ServiceL2StatusList =
-    import('./serviceL2StatusList').ServiceL2StatusList
+export type ServiceL2StatusList = import('./serviceL2StatusList').ServiceL2StatusList
 export const ServiceL2StatusList: typeof import('./serviceL2StatusList').ServiceL2StatusList =
     null as any
-utilities.lazyLoad(exports, ['ServiceL2StatusList'], () =>
-    require('./serviceL2StatusList'),
-)
+utilities.lazyLoad(exports, ['ServiceL2StatusList'], () => require('./serviceL2StatusList'))
 
 export { ServiceL2StatusPatchArgs } from './serviceL2StatusPatch'
-export type ServiceL2StatusPatch =
-    import('./serviceL2StatusPatch').ServiceL2StatusPatch
+export type ServiceL2StatusPatch = import('./serviceL2StatusPatch').ServiceL2StatusPatch
 export const ServiceL2StatusPatch: typeof import('./serviceL2StatusPatch').ServiceL2StatusPatch =
     null as any
-utilities.lazyLoad(exports, ['ServiceL2StatusPatch'], () =>
-    require('./serviceL2StatusPatch'),
-)
+utilities.lazyLoad(exports, ['ServiceL2StatusPatch'], () => require('./serviceL2StatusPatch'))
 
 const _module = {
     version: utilities.getVersion(),

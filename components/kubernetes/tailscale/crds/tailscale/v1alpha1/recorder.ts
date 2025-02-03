@@ -26,8 +26,7 @@ export class Recorder extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:tailscale.com/v1alpha1:Recorder'
+    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:Recorder'
 
     /**
      * Returns true if the given object is an instance of Recorder.  This is designed to work even
@@ -40,9 +39,7 @@ export class Recorder extends pulumi.CustomResource {
         return obj['__pulumiType'] === Recorder.__pulumiType
     }
 
-    public readonly apiVersion!: pulumi.Output<
-        'tailscale.com/v1alpha1' | undefined
-    >
+    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1' | undefined>
     public readonly kind!: pulumi.Output<'Recorder' | undefined>
     public readonly metadata!: pulumi.Output<ObjectMeta | undefined>
     /**
@@ -53,9 +50,7 @@ export class Recorder extends pulumi.CustomResource {
      * RecorderStatus describes the status of the recorder. This is set
      * and managed by the Tailscale operator.
      */
-    public readonly status!: pulumi.Output<
-        outputs.tailscale.v1alpha1.RecorderStatus | undefined
-    >
+    public readonly status!: pulumi.Output<outputs.tailscale.v1alpha1.RecorderStatus | undefined>
 
     /**
      * Create a Recorder resource with the given unique name, arguments, and options.
@@ -64,11 +59,7 @@ export class Recorder extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: RecorderArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: RecorderArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

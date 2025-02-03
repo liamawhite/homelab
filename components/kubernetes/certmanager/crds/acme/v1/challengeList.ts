@@ -27,8 +27,7 @@ export class ChallengeList extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:acme.cert-manager.io/v1:ChallengeList'
+    public static readonly __pulumiType = 'kubernetes:acme.cert-manager.io/v1:ChallengeList'
 
     /**
      * Returns true if the given object is an instance of ChallengeList.  This is designed to work even
@@ -65,11 +64,7 @@ export class ChallengeList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ChallengeListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ChallengeListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

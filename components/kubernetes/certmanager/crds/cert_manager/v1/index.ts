@@ -7,75 +7,52 @@ import * as utilities from '../../utilities'
 // Export members:
 export { CertificateArgs } from './certificate'
 export type Certificate = import('./certificate').Certificate
-export const Certificate: typeof import('./certificate').Certificate =
-    null as any
+export const Certificate: typeof import('./certificate').Certificate = null as any
 utilities.lazyLoad(exports, ['Certificate'], () => require('./certificate'))
 
 export { CertificateListArgs } from './certificateList'
 export type CertificateList = import('./certificateList').CertificateList
-export const CertificateList: typeof import('./certificateList').CertificateList =
-    null as any
-utilities.lazyLoad(exports, ['CertificateList'], () =>
-    require('./certificateList'),
-)
+export const CertificateList: typeof import('./certificateList').CertificateList = null as any
+utilities.lazyLoad(exports, ['CertificateList'], () => require('./certificateList'))
 
 export { CertificatePatchArgs } from './certificatePatch'
 export type CertificatePatch = import('./certificatePatch').CertificatePatch
-export const CertificatePatch: typeof import('./certificatePatch').CertificatePatch =
-    null as any
-utilities.lazyLoad(exports, ['CertificatePatch'], () =>
-    require('./certificatePatch'),
-)
+export const CertificatePatch: typeof import('./certificatePatch').CertificatePatch = null as any
+utilities.lazyLoad(exports, ['CertificatePatch'], () => require('./certificatePatch'))
 
 export { CertificateRequestArgs } from './certificateRequest'
-export type CertificateRequest =
-    import('./certificateRequest').CertificateRequest
+export type CertificateRequest = import('./certificateRequest').CertificateRequest
 export const CertificateRequest: typeof import('./certificateRequest').CertificateRequest =
     null as any
-utilities.lazyLoad(exports, ['CertificateRequest'], () =>
-    require('./certificateRequest'),
-)
+utilities.lazyLoad(exports, ['CertificateRequest'], () => require('./certificateRequest'))
 
 export { CertificateRequestListArgs } from './certificateRequestList'
-export type CertificateRequestList =
-    import('./certificateRequestList').CertificateRequestList
+export type CertificateRequestList = import('./certificateRequestList').CertificateRequestList
 export const CertificateRequestList: typeof import('./certificateRequestList').CertificateRequestList =
     null as any
-utilities.lazyLoad(exports, ['CertificateRequestList'], () =>
-    require('./certificateRequestList'),
-)
+utilities.lazyLoad(exports, ['CertificateRequestList'], () => require('./certificateRequestList'))
 
 export { CertificateRequestPatchArgs } from './certificateRequestPatch'
-export type CertificateRequestPatch =
-    import('./certificateRequestPatch').CertificateRequestPatch
+export type CertificateRequestPatch = import('./certificateRequestPatch').CertificateRequestPatch
 export const CertificateRequestPatch: typeof import('./certificateRequestPatch').CertificateRequestPatch =
     null as any
-utilities.lazyLoad(exports, ['CertificateRequestPatch'], () =>
-    require('./certificateRequestPatch'),
-)
+utilities.lazyLoad(exports, ['CertificateRequestPatch'], () => require('./certificateRequestPatch'))
 
 export { ClusterIssuerArgs } from './clusterIssuer'
 export type ClusterIssuer = import('./clusterIssuer').ClusterIssuer
-export const ClusterIssuer: typeof import('./clusterIssuer').ClusterIssuer =
-    null as any
+export const ClusterIssuer: typeof import('./clusterIssuer').ClusterIssuer = null as any
 utilities.lazyLoad(exports, ['ClusterIssuer'], () => require('./clusterIssuer'))
 
 export { ClusterIssuerListArgs } from './clusterIssuerList'
 export type ClusterIssuerList = import('./clusterIssuerList').ClusterIssuerList
-export const ClusterIssuerList: typeof import('./clusterIssuerList').ClusterIssuerList =
-    null as any
-utilities.lazyLoad(exports, ['ClusterIssuerList'], () =>
-    require('./clusterIssuerList'),
-)
+export const ClusterIssuerList: typeof import('./clusterIssuerList').ClusterIssuerList = null as any
+utilities.lazyLoad(exports, ['ClusterIssuerList'], () => require('./clusterIssuerList'))
 
 export { ClusterIssuerPatchArgs } from './clusterIssuerPatch'
-export type ClusterIssuerPatch =
-    import('./clusterIssuerPatch').ClusterIssuerPatch
+export type ClusterIssuerPatch = import('./clusterIssuerPatch').ClusterIssuerPatch
 export const ClusterIssuerPatch: typeof import('./clusterIssuerPatch').ClusterIssuerPatch =
     null as any
-utilities.lazyLoad(exports, ['ClusterIssuerPatch'], () =>
-    require('./clusterIssuerPatch'),
-)
+utilities.lazyLoad(exports, ['ClusterIssuerPatch'], () => require('./clusterIssuerPatch'))
 
 export { IssuerArgs } from './issuer'
 export type Issuer = import('./issuer').Issuer
@@ -89,8 +66,7 @@ utilities.lazyLoad(exports, ['IssuerList'], () => require('./issuerList'))
 
 export { IssuerPatchArgs } from './issuerPatch'
 export type IssuerPatch = import('./issuerPatch').IssuerPatch
-export const IssuerPatch: typeof import('./issuerPatch').IssuerPatch =
-    null as any
+export const IssuerPatch: typeof import('./issuerPatch').IssuerPatch = null as any
 utilities.lazyLoad(exports, ['IssuerPatch'], () => require('./issuerPatch'))
 
 const _module = {
@@ -108,9 +84,7 @@ const _module = {
             case 'kubernetes:cert-manager.io/v1:CertificateRequestList':
                 return new CertificateRequestList(name, <any>undefined, { urn })
             case 'kubernetes:cert-manager.io/v1:CertificateRequestPatch':
-                return new CertificateRequestPatch(name, <any>undefined, {
-                    urn,
-                })
+                return new CertificateRequestPatch(name, <any>undefined, { urn })
             case 'kubernetes:cert-manager.io/v1:ClusterIssuer':
                 return new ClusterIssuer(name, <any>undefined, { urn })
             case 'kubernetes:cert-manager.io/v1:ClusterIssuerList':

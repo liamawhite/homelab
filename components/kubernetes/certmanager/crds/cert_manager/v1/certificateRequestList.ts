@@ -23,15 +23,11 @@ export class CertificateRequestList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): CertificateRequestList {
-        return new CertificateRequestList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new CertificateRequestList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:CertificateRequestList'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:CertificateRequestList'
 
     /**
      * Returns true if the given object is an instance of CertificateRequestList.  This is designed to work even
@@ -51,9 +47,7 @@ export class CertificateRequestList extends pulumi.CustomResource {
     /**
      * List of certificaterequests. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.cert_manager.v1.CertificateRequest[]
-    >
+    public readonly items!: pulumi.Output<outputs.cert_manager.v1.CertificateRequest[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -107,9 +101,7 @@ export interface CertificateRequestListArgs {
     /**
      * List of certificaterequests. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    items: pulumi.Input<
-        pulumi.Input<inputs.cert_manager.v1.CertificateRequest>[]
-    >
+    items: pulumi.Input<pulumi.Input<inputs.cert_manager.v1.CertificateRequest>[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */

@@ -54,8 +54,7 @@ export class DNSConfig extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:tailscale.com/v1alpha1:DNSConfig'
+    public static readonly __pulumiType = 'kubernetes:tailscale.com/v1alpha1:DNSConfig'
 
     /**
      * Returns true if the given object is an instance of DNSConfig.  This is designed to work even
@@ -68,9 +67,7 @@ export class DNSConfig extends pulumi.CustomResource {
         return obj['__pulumiType'] === DNSConfig.__pulumiType
     }
 
-    public readonly apiVersion!: pulumi.Output<
-        'tailscale.com/v1alpha1' | undefined
-    >
+    public readonly apiVersion!: pulumi.Output<'tailscale.com/v1alpha1' | undefined>
     public readonly kind!: pulumi.Output<'DNSConfig' | undefined>
     public readonly metadata!: pulumi.Output<ObjectMeta | undefined>
     /**
@@ -83,9 +80,7 @@ export class DNSConfig extends pulumi.CustomResource {
      * Status describes the status of the DNSConfig. This is set
      * and managed by the Tailscale operator.
      */
-    public readonly status!: pulumi.Output<
-        outputs.tailscale.v1alpha1.DNSConfigStatus | undefined
-    >
+    public readonly status!: pulumi.Output<outputs.tailscale.v1alpha1.DNSConfigStatus | undefined>
 
     /**
      * Create a DNSConfig resource with the given unique name, arguments, and options.
@@ -94,11 +89,7 @@ export class DNSConfig extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: DNSConfigArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: DNSConfigArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

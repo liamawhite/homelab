@@ -36,8 +36,7 @@ export class IssuerPatch extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:IssuerPatch'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:IssuerPatch'
 
     /**
      * Returns true if the given object is an instance of IssuerPatch.  This is designed to work even
@@ -72,11 +71,7 @@ export class IssuerPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: IssuerPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: IssuerPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

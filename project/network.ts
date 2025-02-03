@@ -11,9 +11,7 @@ import { loadConfig } from './config'
 export function configureNetwork({
     cluster,
     tailscale,
-}: { cluster: ReturnType<typeof configureCluster> } & ReturnType<
-    typeof loadConfig
->) {
+}: { cluster: ReturnType<typeof configureCluster> } & ReturnType<typeof loadConfig>) {
     const opts = { provider: cluster.provider }
 
     const metallb = new MetalLb('metallb', {}, opts)
@@ -64,13 +62,6 @@ export function configureNetwork({
 
     return {
         dnsPool: dnsPool,
-        ready: [
-            metallb,
-            ipPool,
-            dnsPool,
-            advertisment,
-            tailscaleOperator,
-            istio,
-        ],
+        ready: [metallb, ipPool, dnsPool, advertisment, tailscaleOperator, istio],
     }
 }

@@ -12,14 +12,12 @@ utilities.lazyLoad(exports, ['BGPPeer'], () => require('./bgppeer'))
 
 export { BGPPeerListArgs } from './bgppeerList'
 export type BGPPeerList = import('./bgppeerList').BGPPeerList
-export const BGPPeerList: typeof import('./bgppeerList').BGPPeerList =
-    null as any
+export const BGPPeerList: typeof import('./bgppeerList').BGPPeerList = null as any
 utilities.lazyLoad(exports, ['BGPPeerList'], () => require('./bgppeerList'))
 
 export { BGPPeerPatchArgs } from './bgppeerPatch'
 export type BGPPeerPatch = import('./bgppeerPatch').BGPPeerPatch
-export const BGPPeerPatch: typeof import('./bgppeerPatch').BGPPeerPatch =
-    null as any
+export const BGPPeerPatch: typeof import('./bgppeerPatch').BGPPeerPatch = null as any
 utilities.lazyLoad(exports, ['BGPPeerPatch'], () => require('./bgppeerPatch'))
 
 const _module = {

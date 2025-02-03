@@ -4,11 +4,7 @@ import { remote, types } from '@pulumi/command'
 export class K3s extends pulumi.ComponentResource {
     readonly kubeconfig: pulumi.Output<string>
 
-    constructor(
-        name: string,
-        args: K3sArgs,
-        opts?: pulumi.ComponentResourceOptions,
-    ) {
+    constructor(name: string, args: K3sArgs, opts?: pulumi.ComponentResourceOptions) {
         super('homelab:cluster:k3s', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 

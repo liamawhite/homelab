@@ -33,8 +33,7 @@ export class OrderPatch extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:acme.cert-manager.io/v1:OrderPatch'
+    public static readonly __pulumiType = 'kubernetes:acme.cert-manager.io/v1:OrderPatch'
 
     /**
      * Returns true if the given object is an instance of OrderPatch.  This is designed to work even
@@ -69,11 +68,7 @@ export class OrderPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: OrderPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: OrderPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

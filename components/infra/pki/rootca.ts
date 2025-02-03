@@ -41,8 +41,6 @@ export class RootCertificateAuthority
         this.key = pk.privateKeyPem
         this.algorithm = cert.keyAlgorithm
     }
-    public issueIntermediateCA = (
-        name: string,
-    ): IntermediateCertificateAuthority =>
+    public issueIntermediateCA = (name: string): IntermediateCertificateAuthority =>
         new IntermediateCertificateAuthority(name, { parent: this })
 }

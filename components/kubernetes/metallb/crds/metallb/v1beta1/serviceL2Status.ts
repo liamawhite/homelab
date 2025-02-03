@@ -27,8 +27,7 @@ export class ServiceL2Status extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:ServiceL2Status'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:ServiceL2Status'
 
     /**
      * Returns true if the given object is an instance of ServiceL2Status.  This is designed to work even
@@ -66,11 +65,7 @@ export class ServiceL2Status extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ServiceL2StatusArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ServiceL2StatusArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

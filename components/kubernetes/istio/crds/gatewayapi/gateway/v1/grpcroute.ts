@@ -53,8 +53,7 @@ export class GRPCRoute extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:gateway.networking.k8s.io/v1:GRPCRoute'
+    public static readonly __pulumiType = 'kubernetes:gateway.networking.k8s.io/v1:GRPCRoute'
 
     /**
      * Returns true if the given object is an instance of GRPCRoute.  This is designed to work even
@@ -89,11 +88,7 @@ export class GRPCRoute extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: GRPCRouteArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: GRPCRouteArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

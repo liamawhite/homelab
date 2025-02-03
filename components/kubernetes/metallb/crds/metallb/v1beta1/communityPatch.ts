@@ -34,8 +34,7 @@ export class CommunityPatch extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:CommunityPatch'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:CommunityPatch'
 
     /**
      * Returns true if the given object is an instance of CommunityPatch.  This is designed to work even
@@ -73,11 +72,7 @@ export class CommunityPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: CommunityPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: CommunityPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
