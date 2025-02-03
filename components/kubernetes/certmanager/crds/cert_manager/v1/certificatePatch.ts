@@ -32,10 +32,7 @@ export class CertificatePatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): CertificatePatch {
-        return new CertificatePatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new CertificatePatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */

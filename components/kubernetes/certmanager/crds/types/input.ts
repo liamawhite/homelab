@@ -1552,9 +1552,7 @@ export namespace acme {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -3272,9 +3270,7 @@ export namespace acme {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -3842,9 +3838,7 @@ export namespace acme {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -5562,9 +5556,7 @@ export namespace acme {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -9418,9 +9410,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -11138,9 +11128,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -11708,9 +11696,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -13428,9 +13414,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -16479,9 +16463,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -18199,9 +18181,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -18769,9 +18749,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */
@@ -20489,9 +20467,7 @@ export namespace cert_manager {
              * Selector which must match a node's labels for the pod to be scheduled on that node.
              * More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
              */
-            nodeSelector?: pulumi.Input<{
-                [key: string]: pulumi.Input<string>
-            }>
+            nodeSelector?: pulumi.Input<{ [key: string]: pulumi.Input<string> }>
             /**
              * If specified, the pod's priorityClassName.
              */

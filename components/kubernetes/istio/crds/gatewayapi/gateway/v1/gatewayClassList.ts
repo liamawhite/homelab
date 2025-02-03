@@ -23,10 +23,7 @@ export class GatewayClassList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): GatewayClassList {
-        return new GatewayClassList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new GatewayClassList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
