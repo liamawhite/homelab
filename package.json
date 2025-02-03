@@ -2,6 +2,7 @@
     "name": "main",
     "packageManager": "yarn@4.6.0",
     "scripts": {
+        "check": "yarn gen && yarn format",
         "gen": "nix develop --command yarn tsx .gen.ts",
         "format": "nix develop --command yarn prettier --write .",
         "up": "nix develop --command pulumi up -s liam/homelab/homelab",
