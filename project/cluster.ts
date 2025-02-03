@@ -1,6 +1,6 @@
 import * as k8s from "@pulumi/kubernetes";
-import { K3s } from "../components/k3s";
-import { RaspberryPi } from "../components/raspberrypi5";
+import { K3s } from "../components/infra/k3s";
+import { RaspberryPi } from "../components/infra/raspberrypi5";
 import { loadConfig } from "./config";
 
 export function configureCluster({
@@ -8,7 +8,7 @@ export function configureCluster({
     nodes,
 }: ReturnType<typeof loadConfig>) {
     const servers = [
-        new RaspberryPi('rpi-0', { connection: nodes['rpi-0'] }),
+        new RaspberryPi('rp0', { connection: nodes['rp0'] }),
     ]
 
     const cluster = new K3s('k3s', {

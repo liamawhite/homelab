@@ -2,14 +2,22 @@
   "name": "main",
   "packageManager": "yarn@4.6.0",
   "scripts": {
-    "gen": "nix develop --command ./gen.sh",
+    "gen": "nix develop --command yarn tsx .gen.ts",
+    "up": "nix develop --command pulumi up -s liam/homelab/homelab",
+    "passwords": "nix develop --command pulumi stack output --show-secrets -s liam/homelab/homelab --json | jq -r '.passwords'",
     "k9s": "nix develop --command env KUBECONFIG=kubeconfig k9s"
   },
   "dependencies": {
-    "@pulumi/command": "0.0.1-testwindows.signing",
-    "@pulumi/kubernetes": "0.0.1-testwindows.signing",
+    "@pulumi/command": "1.0.0",
+    "@pulumi/kubernetes": "4.21.1",
     "@pulumi/pulumi": "3.147.0",
+    "@pulumi/random": "4.17.0",
     "@pulumi/tailscale": "0.17.5",
-    "@tetratelabs/pulumi-checkmate": "1.8.4"
+    "@pulumi/tls": "5.1.0",
+    "@tetratelabs/pulumi-checkmate": "1.8.4",
+    "axios": "1.7.9"
+  },
+  "devDependencies": {
+    "tsx": "4.19.2"
   }
 }

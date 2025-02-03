@@ -21,7 +21,6 @@ export function configureVpn({
         }),
     }, opts)
 
-
     return {
         ready: [acl],
     }
