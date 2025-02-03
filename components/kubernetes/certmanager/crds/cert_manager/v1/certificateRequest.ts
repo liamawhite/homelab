@@ -31,15 +31,11 @@ export class CertificateRequest extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): CertificateRequest {
-        return new CertificateRequest(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new CertificateRequest(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:CertificateRequest'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:CertificateRequest'
 
     /**
      * Returns true if the given object is an instance of CertificateRequest.  This is designed to work even
@@ -74,11 +70,7 @@ export class CertificateRequest extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: CertificateRequestArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: CertificateRequestArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

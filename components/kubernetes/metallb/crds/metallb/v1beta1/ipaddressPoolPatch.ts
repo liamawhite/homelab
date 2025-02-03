@@ -30,15 +30,11 @@ export class IPAddressPoolPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): IPAddressPoolPatch {
-        return new IPAddressPoolPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new IPAddressPoolPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:IPAddressPoolPatch'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:IPAddressPoolPatch'
 
     /**
      * Returns true if the given object is an instance of IPAddressPoolPatch.  This is designed to work even
@@ -76,11 +72,7 @@ export class IPAddressPoolPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: IPAddressPoolPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: IPAddressPoolPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

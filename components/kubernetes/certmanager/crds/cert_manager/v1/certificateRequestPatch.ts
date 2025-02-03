@@ -37,15 +37,11 @@ export class CertificateRequestPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): CertificateRequestPatch {
-        return new CertificateRequestPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new CertificateRequestPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:CertificateRequestPatch'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:CertificateRequestPatch'
 
     /**
      * Returns true if the given object is an instance of CertificateRequestPatch.  This is designed to work even

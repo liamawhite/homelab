@@ -12,36 +12,27 @@ utilities.lazyLoad(exports, ['Gateway'], () => require('./gateway'))
 
 export { GatewayClassArgs } from './gatewayClass'
 export type GatewayClass = import('./gatewayClass').GatewayClass
-export const GatewayClass: typeof import('./gatewayClass').GatewayClass =
-    null as any
+export const GatewayClass: typeof import('./gatewayClass').GatewayClass = null as any
 utilities.lazyLoad(exports, ['GatewayClass'], () => require('./gatewayClass'))
 
 export { GatewayClassListArgs } from './gatewayClassList'
 export type GatewayClassList = import('./gatewayClassList').GatewayClassList
-export const GatewayClassList: typeof import('./gatewayClassList').GatewayClassList =
-    null as any
-utilities.lazyLoad(exports, ['GatewayClassList'], () =>
-    require('./gatewayClassList'),
-)
+export const GatewayClassList: typeof import('./gatewayClassList').GatewayClassList = null as any
+utilities.lazyLoad(exports, ['GatewayClassList'], () => require('./gatewayClassList'))
 
 export { GatewayClassPatchArgs } from './gatewayClassPatch'
 export type GatewayClassPatch = import('./gatewayClassPatch').GatewayClassPatch
-export const GatewayClassPatch: typeof import('./gatewayClassPatch').GatewayClassPatch =
-    null as any
-utilities.lazyLoad(exports, ['GatewayClassPatch'], () =>
-    require('./gatewayClassPatch'),
-)
+export const GatewayClassPatch: typeof import('./gatewayClassPatch').GatewayClassPatch = null as any
+utilities.lazyLoad(exports, ['GatewayClassPatch'], () => require('./gatewayClassPatch'))
 
 export { GatewayListArgs } from './gatewayList'
 export type GatewayList = import('./gatewayList').GatewayList
-export const GatewayList: typeof import('./gatewayList').GatewayList =
-    null as any
+export const GatewayList: typeof import('./gatewayList').GatewayList = null as any
 utilities.lazyLoad(exports, ['GatewayList'], () => require('./gatewayList'))
 
 export { GatewayPatchArgs } from './gatewayPatch'
 export type GatewayPatch = import('./gatewayPatch').GatewayPatch
-export const GatewayPatch: typeof import('./gatewayPatch').GatewayPatch =
-    null as any
+export const GatewayPatch: typeof import('./gatewayPatch').GatewayPatch = null as any
 utilities.lazyLoad(exports, ['GatewayPatch'], () => require('./gatewayPatch'))
 
 export { GRPCRouteArgs } from './grpcroute'
@@ -51,17 +42,13 @@ utilities.lazyLoad(exports, ['GRPCRoute'], () => require('./grpcroute'))
 
 export { GRPCRouteListArgs } from './grpcrouteList'
 export type GRPCRouteList = import('./grpcrouteList').GRPCRouteList
-export const GRPCRouteList: typeof import('./grpcrouteList').GRPCRouteList =
-    null as any
+export const GRPCRouteList: typeof import('./grpcrouteList').GRPCRouteList = null as any
 utilities.lazyLoad(exports, ['GRPCRouteList'], () => require('./grpcrouteList'))
 
 export { GRPCRoutePatchArgs } from './grpcroutePatch'
 export type GRPCRoutePatch = import('./grpcroutePatch').GRPCRoutePatch
-export const GRPCRoutePatch: typeof import('./grpcroutePatch').GRPCRoutePatch =
-    null as any
-utilities.lazyLoad(exports, ['GRPCRoutePatch'], () =>
-    require('./grpcroutePatch'),
-)
+export const GRPCRoutePatch: typeof import('./grpcroutePatch').GRPCRoutePatch = null as any
+utilities.lazyLoad(exports, ['GRPCRoutePatch'], () => require('./grpcroutePatch'))
 
 export { HTTPRouteArgs } from './httproute'
 export type HTTPRoute = import('./httproute').HTTPRoute
@@ -70,17 +57,13 @@ utilities.lazyLoad(exports, ['HTTPRoute'], () => require('./httproute'))
 
 export { HTTPRouteListArgs } from './httprouteList'
 export type HTTPRouteList = import('./httprouteList').HTTPRouteList
-export const HTTPRouteList: typeof import('./httprouteList').HTTPRouteList =
-    null as any
+export const HTTPRouteList: typeof import('./httprouteList').HTTPRouteList = null as any
 utilities.lazyLoad(exports, ['HTTPRouteList'], () => require('./httprouteList'))
 
 export { HTTPRoutePatchArgs } from './httproutePatch'
 export type HTTPRoutePatch = import('./httproutePatch').HTTPRoutePatch
-export const HTTPRoutePatch: typeof import('./httproutePatch').HTTPRoutePatch =
-    null as any
-utilities.lazyLoad(exports, ['HTTPRoutePatch'], () =>
-    require('./httproutePatch'),
-)
+export const HTTPRoutePatch: typeof import('./httproutePatch').HTTPRoutePatch = null as any
+utilities.lazyLoad(exports, ['HTTPRoutePatch'], () => require('./httproutePatch'))
 
 const _module = {
     version: utilities.getVersion(),
@@ -115,8 +98,4 @@ const _module = {
         }
     },
 }
-pulumi.runtime.registerResourceModule(
-    'crds',
-    'gateway.networking.k8s.io/v1',
-    _module,
-)
+pulumi.runtime.registerResourceModule('crds', 'gateway.networking.k8s.io/v1', _module)

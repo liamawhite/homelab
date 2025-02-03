@@ -29,8 +29,7 @@ export class BGPAdvertisement extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:BGPAdvertisement'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:BGPAdvertisement'
 
     /**
      * Returns true if the given object is an instance of BGPAdvertisement.  This is designed to work even
@@ -68,11 +67,7 @@ export class BGPAdvertisement extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: BGPAdvertisementArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: BGPAdvertisementArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

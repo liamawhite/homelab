@@ -45,10 +45,7 @@ export class GatewayClassPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): GatewayClassPatch {
-        return new GatewayClassPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new GatewayClassPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
@@ -88,11 +85,7 @@ export class GatewayClassPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: GatewayClassPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: GatewayClassPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
@@ -110,11 +103,7 @@ export class GatewayClassPatch extends pulumi.CustomResource {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts)
         const aliasOpts = {
-            aliases: [
-                {
-                    type: 'kubernetes:gateway.networking.k8s.io/v1beta1:GatewayClassPatch',
-                },
-            ],
+            aliases: [{ type: 'kubernetes:gateway.networking.k8s.io/v1beta1:GatewayClassPatch' }],
         }
         opts = pulumi.mergeOptions(opts, aliasOpts)
         super(GatewayClassPatch.__pulumiType, name, resourceInputs, opts)

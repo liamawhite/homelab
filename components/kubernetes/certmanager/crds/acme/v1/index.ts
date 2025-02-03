@@ -12,17 +12,13 @@ utilities.lazyLoad(exports, ['Challenge'], () => require('./challenge'))
 
 export { ChallengeListArgs } from './challengeList'
 export type ChallengeList = import('./challengeList').ChallengeList
-export const ChallengeList: typeof import('./challengeList').ChallengeList =
-    null as any
+export const ChallengeList: typeof import('./challengeList').ChallengeList = null as any
 utilities.lazyLoad(exports, ['ChallengeList'], () => require('./challengeList'))
 
 export { ChallengePatchArgs } from './challengePatch'
 export type ChallengePatch = import('./challengePatch').ChallengePatch
-export const ChallengePatch: typeof import('./challengePatch').ChallengePatch =
-    null as any
-utilities.lazyLoad(exports, ['ChallengePatch'], () =>
-    require('./challengePatch'),
-)
+export const ChallengePatch: typeof import('./challengePatch').ChallengePatch = null as any
+utilities.lazyLoad(exports, ['ChallengePatch'], () => require('./challengePatch'))
 
 export { OrderArgs } from './order'
 export type Order = import('./order').Order
@@ -60,8 +56,4 @@ const _module = {
         }
     },
 }
-pulumi.runtime.registerResourceModule(
-    'crds',
-    'acme.cert-manager.io/v1',
-    _module,
-)
+pulumi.runtime.registerResourceModule('crds', 'acme.cert-manager.io/v1', _module)

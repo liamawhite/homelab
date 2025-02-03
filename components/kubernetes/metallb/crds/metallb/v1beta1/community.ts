@@ -28,8 +28,7 @@ export class Community extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:Community'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:Community'
 
     /**
      * Returns true if the given object is an instance of Community.  This is designed to work even
@@ -67,11 +66,7 @@ export class Community extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: CommunityArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: CommunityArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

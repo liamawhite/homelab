@@ -6,13 +6,7 @@ try {
     const out = execSync('tsc')
     console.log(out.toString())
 } catch (error) {
-    console.error(
-        error.message +
-            ': ' +
-            error.stdout.toString() +
-            '\n' +
-            error.stderr.toString(),
-    )
+    console.error(error.message + ': ' + error.stdout.toString() + '\n' + error.stderr.toString())
     process.exit(1)
 }
 // TypeScript is compiled to "./bin", copy package.json to that directory so it can be read in "getVersion".

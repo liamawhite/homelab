@@ -31,15 +31,11 @@ export class BGPAdvertisementPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): BGPAdvertisementPatch {
-        return new BGPAdvertisementPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new BGPAdvertisementPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:BGPAdvertisementPatch'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:BGPAdvertisementPatch'
 
     /**
      * Returns true if the given object is an instance of BGPAdvertisementPatch.  This is designed to work even

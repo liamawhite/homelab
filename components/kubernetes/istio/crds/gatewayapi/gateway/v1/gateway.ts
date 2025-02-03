@@ -28,8 +28,7 @@ export class Gateway extends pulumi.CustomResource {
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:gateway.networking.k8s.io/v1:Gateway'
+    public static readonly __pulumiType = 'kubernetes:gateway.networking.k8s.io/v1:Gateway'
 
     /**
      * Returns true if the given object is an instance of Gateway.  This is designed to work even
@@ -64,11 +63,7 @@ export class Gateway extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: GatewayArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: GatewayArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {
@@ -86,11 +81,7 @@ export class Gateway extends pulumi.CustomResource {
         }
         opts = pulumi.mergeOptions(utilities.resourceOptsDefaults(), opts)
         const aliasOpts = {
-            aliases: [
-                {
-                    type: 'kubernetes:gateway.networking.k8s.io/v1beta1:Gateway',
-                },
-            ],
+            aliases: [{ type: 'kubernetes:gateway.networking.k8s.io/v1beta1:Gateway' }],
         }
         opts = pulumi.mergeOptions(opts, aliasOpts)
         super(Gateway.__pulumiType, name, resourceInputs, opts)

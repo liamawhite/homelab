@@ -44,10 +44,7 @@ export class ReferenceGrantPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): ReferenceGrantPatch {
-        return new ReferenceGrantPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new ReferenceGrantPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
@@ -86,11 +83,7 @@ export class ReferenceGrantPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ReferenceGrantPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ReferenceGrantPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

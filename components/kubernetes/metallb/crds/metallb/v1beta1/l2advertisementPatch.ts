@@ -30,15 +30,11 @@ export class L2AdvertisementPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): L2AdvertisementPatch {
-        return new L2AdvertisementPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new L2AdvertisementPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:L2AdvertisementPatch'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:L2AdvertisementPatch'
 
     /**
      * Returns true if the given object is an instance of L2AdvertisementPatch.  This is designed to work even

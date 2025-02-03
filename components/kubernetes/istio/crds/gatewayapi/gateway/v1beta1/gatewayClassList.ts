@@ -48,9 +48,7 @@ export class GatewayClassList extends pulumi.CustomResource {
     /**
      * List of gatewayclasses. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.gateway.v1beta1.GatewayClass[]
-    >
+    public readonly items!: pulumi.Output<outputs.gateway.v1beta1.GatewayClass[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -67,11 +65,7 @@ export class GatewayClassList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: GatewayClassListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: GatewayClassListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

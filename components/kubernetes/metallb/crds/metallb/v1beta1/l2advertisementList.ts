@@ -23,15 +23,11 @@ export class L2AdvertisementList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): L2AdvertisementList {
-        return new L2AdvertisementList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new L2AdvertisementList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:L2AdvertisementList'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:L2AdvertisementList'
 
     /**
      * Returns true if the given object is an instance of L2AdvertisementList.  This is designed to work even
@@ -51,9 +47,7 @@ export class L2AdvertisementList extends pulumi.CustomResource {
     /**
      * List of l2advertisements. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.metallb.v1beta1.L2Advertisement[]
-    >
+    public readonly items!: pulumi.Output<outputs.metallb.v1beta1.L2Advertisement[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -70,11 +64,7 @@ export class L2AdvertisementList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: L2AdvertisementListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: L2AdvertisementListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

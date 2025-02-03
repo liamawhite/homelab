@@ -19,9 +19,6 @@ export async function metallb() {
     await cleanDestinationDirectory(destination)
     await downloadToFile(METALLB_URL, tmpfile)
     untarFile(tmpfile)
-    await helmTemplate(
-        path.join(tmpdir, 'metallb/charts/crds'),
-        path.join(tmpdir, 'crds.yaml'),
-    )
+    await helmTemplate(path.join(tmpdir, 'metallb/charts/crds'), path.join(tmpdir, 'crds.yaml'))
     await crd2pulumi({ destination, sources: [path.join(tmpdir, 'crds.yaml')] })
 }

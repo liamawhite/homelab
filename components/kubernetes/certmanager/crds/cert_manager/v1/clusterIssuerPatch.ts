@@ -33,15 +33,11 @@ export class ClusterIssuerPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): ClusterIssuerPatch {
-        return new ClusterIssuerPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new ClusterIssuerPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:cert-manager.io/v1:ClusterIssuerPatch'
+    public static readonly __pulumiType = 'kubernetes:cert-manager.io/v1:ClusterIssuerPatch'
 
     /**
      * Returns true if the given object is an instance of ClusterIssuerPatch.  This is designed to work even
@@ -76,11 +72,7 @@ export class ClusterIssuerPatch extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ClusterIssuerPatchArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ClusterIssuerPatchArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

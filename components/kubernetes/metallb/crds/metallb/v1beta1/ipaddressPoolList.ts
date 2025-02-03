@@ -23,15 +23,11 @@ export class IPAddressPoolList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): IPAddressPoolList {
-        return new IPAddressPoolList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new IPAddressPoolList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:IPAddressPoolList'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:IPAddressPoolList'
 
     /**
      * Returns true if the given object is an instance of IPAddressPoolList.  This is designed to work even
@@ -51,9 +47,7 @@ export class IPAddressPoolList extends pulumi.CustomResource {
     /**
      * List of ipaddresspools. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.metallb.v1beta1.IPAddressPool[]
-    >
+    public readonly items!: pulumi.Output<outputs.metallb.v1beta1.IPAddressPool[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -70,11 +64,7 @@ export class IPAddressPoolList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: IPAddressPoolListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: IPAddressPoolListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

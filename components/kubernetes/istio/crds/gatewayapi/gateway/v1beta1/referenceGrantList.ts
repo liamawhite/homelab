@@ -23,10 +23,7 @@ export class ReferenceGrantList extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): ReferenceGrantList {
-        return new ReferenceGrantList(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new ReferenceGrantList(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
@@ -51,9 +48,7 @@ export class ReferenceGrantList extends pulumi.CustomResource {
     /**
      * List of referencegrants. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
      */
-    public readonly items!: pulumi.Output<
-        outputs.gateway.v1beta1.ReferenceGrant[]
-    >
+    public readonly items!: pulumi.Output<outputs.gateway.v1beta1.ReferenceGrant[]>
     /**
      * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
      */
@@ -70,11 +65,7 @@ export class ReferenceGrantList extends pulumi.CustomResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ReferenceGrantListArgs,
-        opts?: pulumi.CustomResourceOptions,
-    ) {
+    constructor(name: string, args?: ReferenceGrantListArgs, opts?: pulumi.CustomResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         if (!opts.id) {

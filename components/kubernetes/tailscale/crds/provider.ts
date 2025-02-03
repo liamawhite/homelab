@@ -16,9 +16,7 @@ export class Provider extends pulumi.ProviderResource {
         if (obj === undefined || obj === null) {
             return false
         }
-        return (
-            obj['__pulumiType'] === 'pulumi:providers:' + Provider.__pulumiType
-        )
+        return obj['__pulumiType'] === 'pulumi:providers:' + Provider.__pulumiType
     }
 
     /**
@@ -28,11 +26,7 @@ export class Provider extends pulumi.ProviderResource {
      * @param args The arguments to use to populate this resource's properties.
      * @param opts A bag of options that control this resource's behavior.
      */
-    constructor(
-        name: string,
-        args?: ProviderArgs,
-        opts?: pulumi.ResourceOptions,
-    ) {
+    constructor(name: string, args?: ProviderArgs, opts?: pulumi.ResourceOptions) {
         let resourceInputs: pulumi.Inputs = {}
         opts = opts || {}
         {

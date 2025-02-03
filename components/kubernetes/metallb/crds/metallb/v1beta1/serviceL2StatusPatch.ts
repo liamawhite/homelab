@@ -29,15 +29,11 @@ export class ServiceL2StatusPatch extends pulumi.CustomResource {
         id: pulumi.Input<pulumi.ID>,
         opts?: pulumi.CustomResourceOptions,
     ): ServiceL2StatusPatch {
-        return new ServiceL2StatusPatch(name, undefined as any, {
-            ...opts,
-            id: id,
-        })
+        return new ServiceL2StatusPatch(name, undefined as any, { ...opts, id: id })
     }
 
     /** @internal */
-    public static readonly __pulumiType =
-        'kubernetes:metallb.io/v1beta1:ServiceL2StatusPatch'
+    public static readonly __pulumiType = 'kubernetes:metallb.io/v1beta1:ServiceL2StatusPatch'
 
     /**
      * Returns true if the given object is an instance of ServiceL2StatusPatch.  This is designed to work even
