@@ -192,6 +192,7 @@ export class Pihole extends pulumi.ComponentResource {
                 },
                 spec: {
                     type: 'LoadBalancer',
+                    externalTrafficPolicy: 'Local',
                     ports: [
                         {
                             name: 'dns-udp',
