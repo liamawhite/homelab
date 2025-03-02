@@ -1,5 +1,5 @@
 import * as pulumi from '@pulumi/pulumi'
-import { remote, types } from '@pulumi/command'
+import { remote, local, types } from '@pulumi/command'
 
 export class K3s extends pulumi.ComponentResource {
     readonly kubeconfig: pulumi.Output<string>
@@ -12,42 +12,57 @@ export class K3s extends pulumi.ComponentResource {
             throw new Error('At least one server node is required')
         }
 
-        // Build the server command
-        const serverCmd = pulumi
-            .all([args.clusterToken, args.sans])
-            .apply(([clusterToken, sans]) => {
-                let cmd = 'curl -sfL https://get.k3s.io | sh -s - server'
-                cmd += ' --disable=traefik'
-                cmd += ' --disable=servicelb'
-                cmd += ' --disable=local-storage'
-                cmd += ` --token ${clusterToken}`
-                if (sans) {
-                    sans.forEach(san => (cmd += ` --tls-san ${san}`))
-                }
-                return cmd
-            })
+        // Temporarily override DNS to avoid issues with DNS resolution when pihole is unavailable i.e. disaster recovery
+        const dnsOverrideCmd = 'echo -e "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf'
+        const curlCmd = pulumi.interpolate`curl -sfL https://get.k3s.io`
+        const serverCmd = pulumi.all([args.sans]).apply(
+            ([sans]) => pulumi.interpolate`
+            sh -s - server \
+                --disable=traefik \
+                --disable=servicelb \
+                ${sans ? sans.map(san => ` --tls-san ${san}`).join(' ') : ''}`,
+        )
 
-        // There are probably gremlins here if commands are updated?
-        const cmds = args.servers.reduce((acc, server, i) => {
-            const curr = new remote.Command(
-                `${name}-server-${i}`,
+        // Cluster initialization first, as we need to know the token for onboarding the remaining servers
+        const init = new remote.Command(
+            `${name}-init`,
+            {
+                connection: args.servers[0].connection,
+                create: pulumi.interpolate`${dnsOverrideCmd} && ${curlCmd} | ${serverCmd} --cluster-init`,
+                update: pulumi.interpolate`${curlCmd} | ${serverCmd}`,
+                delete: `sudo /usr/local/bin/k3s-uninstall.sh`,
+            },
+            { ...localOpts, deleteBeforeReplace: true },
+        )
+
+        // Get the cluster token from the initialization step
+        const token = pulumi.secret(
+            new remote.Command(
+                `${name}-token`,
                 {
-                    connection: server.connection,
-                    create:
-                        i === 0
-                            ? pulumi.interpolate`${serverCmd} --cluster-init`
-                            : pulumi.interpolate`${serverCmd} --server https://${args.servers[0].address}:6443`,
-                    update: serverCmd,
-                    delete: `sudo /usr/local/bin/k3s-uninstall.sh`,
+                    connection: args.servers[0].connection,
+                    create: `sudo cat /var/lib/rancher/k3s/server/token`,
                 },
-                {
-                    ...localOpts,
-                    deleteBeforeReplace: true,
-                    dependsOn: [...acc, server],
-                },
-            )
-            return [...acc, curr]
-        }, [] as remote.Command[])
+                { ...localOpts, dependsOn: init },
+            ).stdout,
+        )
+
+        const servers = args.servers.slice(1).map(
+            server =>
+                new remote.Command(
+                    `${name}-server-${server.name}`,
+                    {
+                        connection: server.connection,
+                        create: pulumi.interpolate`${dnsOverrideCmd} && ${curlCmd} | ${serverCmd} --server https://${args.servers[0].address}:6443 --token ${token}`,
+                        delete: `sudo /usr/local/bin/k3s-uninstall.sh`,
+                    },
+                    {
+                        ...localOpts,
+                        deleteBeforeReplace: true,
+                        dependsOn: [init],
+                    },
+                ),
+        )
 
         // Retrive the kubeconfig
         const retrieveKubeconfig = new remote.Command(
@@ -56,7 +71,7 @@ export class K3s extends pulumi.ComponentResource {
                 connection: args.servers[0].connection,
                 create: `sudo cat /etc/rancher/k3s/k3s.yaml`,
             },
-            { ...localOpts, dependsOn: cmds },
+            { ...localOpts, dependsOn: init },
         ).stdout
         const kubeconfig = pulumi
             .all([args.servers[0].address, retrieveKubeconfig])
@@ -70,6 +85,7 @@ export class K3s extends pulumi.ComponentResource {
 }
 
 interface Node extends pulumi.Resource {
+    name: string
     address: pulumi.Input<string>
     connection: types.input.remote.ConnectionArgs
 }
@@ -78,6 +94,5 @@ export interface K3sArgs {
     // All server nodes are also agent nodes
     servers: Node[]
 
-    clusterToken: pulumi.Input<string>
     sans?: pulumi.Input<string>[]
 }

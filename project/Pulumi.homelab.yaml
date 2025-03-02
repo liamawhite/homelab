@@ -1,31 +1,27 @@
 config:
-  homelab:rp0:
-    host: 192.168.1.50
-    user: liam
-    password:
-      secure: AAABAK5wRtCTH7h2FP7fiRAu3M4j6178G09tzvpyg0Tn9FvQkgl3I6wAqQ==
-  homelab:rp1:
-    host: 192.168.1.51
-    user: liam
-    password:
-      secure: AAABAIEYnwB6R5cergzToQlPtTQO+vd5eW2pGar5yiRX0e2I9AA+LilVrQ==
-  homelab:rp2:
-    host: 192.168.1.52
-    user: liam
-    password:
-      secure: AAABADUpL/s1WGP3xXkVP88eR0eZurbuRgfxgb0d8lNCT4qHcUqa4mAFAA==
-  homelab:k3s:
-    clusterToken:
-      secure: AAABANgm2aHJRCs2NbVdCH2DCJZe1JtJHHDzMyv/eTmnLHM+X+dvm/oQ4K9fLGBff6EyGa3eC2/gBffLdT+/wecWRldgglEj55oX9HAHTyZ7V3niGsysWuZ+i082T8GtYk+oCyNckfFkr3vTrMDw6KjopkFBe7dxfVis9lQU8UfZFsHsVkC+qOmU2r8=
-  homelab:tailscale:
-    admin:
-      clientId:
-        secure: AAABABTPP3Xemv3DC5msCobfpGAMvplbG/0FnQk2WvexGSmNWOy5kPI5XU+MCGaJjA==
-      clientSecret:
-        secure: AAABAHowAULto2OcHeg3BQ6tJWJVAYuy94QyW5vzYRD+d4U7kDKPWQFf/YCeOuX7vy8nBQWw/im5SxtVieVAG6NqKuh6kVa34DBKsK9gxd4WoKwg+5gDrTAO11aVGYMj
-    operator:
-      clientSecret:
-        secure: AAABAC0Apq/+DD73VK8JdLvYPE6O63IGsFiH/7md13g0UWhwREs637yOY7EgXUQfhW9BPtoT5dlSOQVRI9T6rGAH40B39mYnYV+4/eBFp6pgR36VhclOxio/jkQ1NbE=
-      clientId:
-        secure: AAABALP0jfAsxOm17ZfrxW8kyThgjH4VnvhUICb9f4UBEJw75E0cIMLqHzgDTGRLUA==
-
+    homelab:rp0:
+        host: 192.168.1.50
+        user: liam
+        password:
+            secure: AAABAK5wRtCTH7h2FP7fiRAu3M4j6178G09tzvpyg0Tn9FvQkgl3I6wAqQ==
+    homelab:rp1:
+        host: 192.168.1.51
+        user: liam
+        password:
+            secure: AAABAIEYnwB6R5cergzToQlPtTQO+vd5eW2pGar5yiRX0e2I9AA+LilVrQ==
+    homelab:rp2:
+        host: 192.168.1.52
+        user: liam
+        password:
+            secure: AAABADUpL/s1WGP3xXkVP88eR0eZurbuRgfxgb0d8lNCT4qHcUqa4mAFAA==
+    homelab:tailscale:
+        admin:
+            clientId:
+                secure: AAABABTPP3Xemv3DC5msCobfpGAMvplbG/0FnQk2WvexGSmNWOy5kPI5XU+MCGaJjA==
+            clientSecret:
+                secure: AAABAHowAULto2OcHeg3BQ6tJWJVAYuy94QyW5vzYRD+d4U7kDKPWQFf/YCeOuX7vy8nBQWw/im5SxtVieVAG6NqKuh6kVa34DBKsK9gxd4WoKwg+5gDrTAO11aVGYMj
+        operator:
+            clientSecret:
+                secure: AAABAC0Apq/+DD73VK8JdLvYPE6O63IGsFiH/7md13g0UWhwREs637yOY7EgXUQfhW9BPtoT5dlSOQVRI9T6rGAH40B39mYnYV+4/eBFp6pgR36VhclOxio/jkQ1NbE=
+            clientId:
+                secure: AAABALP0jfAsxOm17ZfrxW8kyThgjH4VnvhUICb9f4UBEJw75E0cIMLqHzgDTGRLUA==

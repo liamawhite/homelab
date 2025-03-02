@@ -29,3 +29,5 @@ pulumi
 export const passwords = {
     pihole: dns.pihole.password,
 }
+
+export const kubeconfig = cluster.kubeconfig

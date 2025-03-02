@@ -3,17 +3,15 @@ import { K3s } from '../components/infra/k3s'
 import { RaspberryPi } from '../components/infra/raspberrypi5'
 import { loadConfig } from './config'
 
-export function configureCluster({ clusterToken, nodes }: ReturnType<typeof loadConfig>) {
+export function configureCluster({ nodes }: ReturnType<typeof loadConfig>) {
     const servers = [
-        new RaspberryPi('rp0', { connection: nodes['rp0'] })
+        new RaspberryPi('rp0', { connection: nodes['rp0'] }),
+        new RaspberryPi('rp1', { connection: nodes['rp1'] }),
+        new RaspberryPi('rp2', { connection: nodes['rp2'] }),
     ]
-
-    new RaspberryPi('rp1', { connection: nodes['rp1'] })
-    new RaspberryPi('rp2', { connection: nodes['rp2'] })
 
     const cluster = new K3s('k3s', {
         servers,
-        clusterToken: clusterToken,
         sans: ['kube.local', 'kubernetes.local', 'k8s.local', 'k3s.local'],
     })
 

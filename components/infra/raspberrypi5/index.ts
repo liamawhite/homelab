@@ -5,6 +5,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as checkmate from '@tetratelabs/pulumi-checkmate'
 
 export class RaspberryPi extends pulumi.ComponentResource {
+    readonly name: string
     readonly address: pulumi.Input<string>
     readonly connection: types.input.remote.ConnectionArgs
 
@@ -12,6 +13,7 @@ export class RaspberryPi extends pulumi.ComponentResource {
         super('homelab:machine:raspberrypi5', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
+        this.name = name
         this.address = args.connection.host
         this.connection = args.connection
 
@@ -96,7 +98,6 @@ export class RaspberryPi extends pulumi.ComponentResource {
                 interval: 500,
                 commandTimeout: 1000 * (sleep + 1),
                 timeout: 1000 * 60 * 5, // give it 5 minutes to come back up
-                keepers: { date: new Date().toISOString() }, // always wait to make sure it's up before continuing
             },
             { ...localOpts, dependsOn: reboot },
         )
