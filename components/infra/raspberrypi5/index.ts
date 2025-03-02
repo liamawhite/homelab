@@ -88,12 +88,15 @@ export class RaspberryPi extends pulumi.ComponentResource {
         )
 
         // Wait for the machine to come back up
+        const sleep = 5
         const wait = new checkmate.LocalCommand(
             `${name}-wait`,
             {
-                command: pulumi.interpolate`ping -c 1 ${args.connection.host}`,
+                command: pulumi.interpolate`sleep ${sleep} && ping -c 1 ${args.connection.host}`,
                 interval: 500,
+                commandTimeout: 1000 * (sleep + 1),
                 timeout: 1000 * 60 * 5, // give it 5 minutes to come back up
+                keepers: { date: new Date().toISOString() }, // always wait to make sure it's up before continuing
             },
             { ...localOpts, dependsOn: reboot },
         )

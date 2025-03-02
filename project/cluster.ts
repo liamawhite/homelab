@@ -4,7 +4,12 @@ import { RaspberryPi } from '../components/infra/raspberrypi5'
 import { loadConfig } from './config'
 
 export function configureCluster({ clusterToken, nodes }: ReturnType<typeof loadConfig>) {
-    const servers = [new RaspberryPi('rp0', { connection: nodes['rp0'] })]
+    const servers = [
+        new RaspberryPi('rp0', { connection: nodes['rp0'] })
+    ]
+
+    new RaspberryPi('rp1', { connection: nodes['rp1'] })
+    new RaspberryPi('rp2', { connection: nodes['rp2'] })
 
     const cluster = new K3s('k3s', {
         servers,
