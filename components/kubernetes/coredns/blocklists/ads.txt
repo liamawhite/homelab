@@ -1,0 +1,13 @@
+0.0.0.0 doubleclick.net
+0.0.0.0 googleadservices.com
+0.0.0.0 googlesyndication.com
+0.0.0.0 googletagservices.com
+0.0.0.0 googletagmanager.com
+0.0.0.0 google-analytics.com
+0.0.0.0 facebook.com
+0.0.0.0 twitter.com
+0.0.0.0 amazon-adsystem.com
+0.0.0.0 adsystem.amazon.com
+0.0.0.0 ads.yahoo.com
+0.0.0.0 advertising.com
+0.0.0.0 adsense.google.com

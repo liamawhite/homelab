@@ -15,9 +15,11 @@ export function configureCluster({ nodes }: ReturnType<typeof loadConfig>) {
         sans: ['kube.local', 'kubernetes.local', 'k8s.local', 'k3s.local'],
     })
 
+    const provider = new k8s.Provider('k8s', { kubeconfig: cluster.kubeconfig })
+
     return {
         ready: [cluster],
         kubeconfig: cluster.kubeconfig,
-        provider: new k8s.Provider('k8s', { kubeconfig: cluster.kubeconfig }),
+        provider,
     }
 }

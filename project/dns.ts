@@ -1,6 +1,5 @@
 import { loadConfig } from './config'
-import { Pihole } from '../components/kubernetes/pihole'
-import { ExternalDns } from '../components/kubernetes/externaldns'
+import { CoreDns } from '../components/kubernetes/coredns'
 import { configureCluster } from './cluster'
 import { configureNetwork } from './network'
 import { configurePki } from './pki'
@@ -16,10 +15,9 @@ export function configureDns({
 } & ReturnType<typeof loadConfig>) {
     const opts = { provider: cluster.provider, dependsOn: network.ready }
 
-    const pihole = new Pihole(
-        'pihole',
+    const coredns = new CoreDns(
+        'coredns',
         {
-            web: { hostname: 'pihole.homelab', issuer: pki.issuer.issuerRef() },
             dns: {
                 annotations: {
                     'metallb.universe.tf/address-pool': network.dnsPool.metadata.name,
@@ -29,21 +27,10 @@ export function configureDns({
         opts,
     )
 
-    const externalDns = new ExternalDns(
-        'external-dns',
-        {
-            pihole: {
-                web: pihole.localAddress,
-                password: pihole.password,
-            },
-        },
-        opts,
-    )
-
     return {
-        pihole: {
-            password: pihole.password,
+        coredns: {
+            localAddress: coredns.localAddress,
         },
-        ready: [pihole, externalDns],
+        ready: [coredns],
     }
 }

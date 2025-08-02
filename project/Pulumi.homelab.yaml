@@ -3,25 +3,25 @@ config:
         host: 192.168.1.50
         user: liam
         password:
-            secure: AAABAK5wRtCTH7h2FP7fiRAu3M4j6178G09tzvpyg0Tn9FvQkgl3I6wAqQ==
+            secure: AAABAIWrsQuzjOQ8bcICPeTmvfhiEpl+ygosyHze5RTapiJgHWJWla/McQ==
     homelab:rp1:
         host: 192.168.1.51
         user: liam
         password:
-            secure: AAABAIEYnwB6R5cergzToQlPtTQO+vd5eW2pGar5yiRX0e2I9AA+LilVrQ==
+            secure: AAABAGv9Et6JliTvw0ldZ9MpGaTI/HvWplMB11PYv6f3XkMhlroPUil8xg==
     homelab:rp2:
         host: 192.168.1.52
         user: liam
         password:
-            secure: AAABADUpL/s1WGP3xXkVP88eR0eZurbuRgfxgb0d8lNCT4qHcUqa4mAFAA==
+            secure: AAABAHcG8D50gQp9oB7VhXhYVoMy0KKSAmXE3kSomgy5oxI9ZlYpYUpoFw==
     homelab:tailscale:
         admin:
             clientId:
-                secure: AAABABTPP3Xemv3DC5msCobfpGAMvplbG/0FnQk2WvexGSmNWOy5kPI5XU+MCGaJjA==
+                secure: AAABABS3oNEEEavTwqB7c1Sw3+PO+fwR4BleJkTmls3X+3d41fzKsl1qlXaMKnmrJw==
             clientSecret:
-                secure: AAABAHowAULto2OcHeg3BQ6tJWJVAYuy94QyW5vzYRD+d4U7kDKPWQFf/YCeOuX7vy8nBQWw/im5SxtVieVAG6NqKuh6kVa34DBKsK9gxd4WoKwg+5gDrTAO11aVGYMj
+                secure: AAABAKPPrfJjx01LOLJNfGRscPwjPK0hLAQn1mhcIaIBgQZMZR7sfqzrHpbmc/DD+eIepY1Ok690E9qmpmQOg6jZ82cyhRyKnbSEdz48vO5TxMyDTVI4rAuanQY4IOpD
         operator:
             clientSecret:
-                secure: AAABAC0Apq/+DD73VK8JdLvYPE6O63IGsFiH/7md13g0UWhwREs637yOY7EgXUQfhW9BPtoT5dlSOQVRI9T6rGAH40B39mYnYV+4/eBFp6pgR36VhclOxio/jkQ1NbE=
+                secure: AAABADdt4xEybENkNWSw0h2ZPAUXji56E7lQ2VK5Z3cBKpUeKT5TbsiDfX7JHl5zQhzZ+9F//qQE17WJvlxqRQDZSi757kFCFI1zMOPsbAu44CXVxx1GsLXFPXbQ9nY=
             clientId:
-                secure: AAABALP0jfAsxOm17ZfrxW8kyThgjH4VnvhUICb9f4UBEJw75E0cIMLqHzgDTGRLUA==
+                secure: AAABAB57PsMrAt5IsByOP1Vh3bv3dV89FzmxOpq2sGbbViCfddVsmSPGwuETl/JUmQ==

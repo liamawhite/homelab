@@ -18,7 +18,7 @@
               jq
               kubernetes-helm
               k9s
-              nodejs_23
+              nodejs_24
             ];
           };
         }
