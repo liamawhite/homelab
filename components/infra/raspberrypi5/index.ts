@@ -76,6 +76,16 @@ export class RaspberryPi extends pulumi.ComponentResource {
             localOpts,
         )
 
+        // Install required packages for Longhorn
+        const installPackages = new remote.Command(
+            `${name}-install-packages`,
+            {
+                connection: args.connection,
+                create: `sudo apt-get update && sudo apt-get install -y open-iscsi nfs-common`,
+            },
+            { ...localOpts, dependsOn: [cmdlineTxtWrite] },
+        )
+
         // Reboot the machine
         const reboot = new remote.Command(
             `${name}-reboot`,
@@ -85,7 +95,7 @@ export class RaspberryPi extends pulumi.ComponentResource {
             },
             {
                 ...localOpts,
-                dependsOn: [configCopy, eepromApply, cmdlineTxtWrite],
+                dependsOn: [configCopy, eepromApply, installPackages],
             },
         )
 

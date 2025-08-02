@@ -7,12 +7,14 @@ import { configureCluster } from './cluster'
 import { configureVpn } from './vpn'
 import { configureDns } from './dns'
 import { configurePki } from './pki'
+import { configureStorage } from './storage'
 
 const cfg = loadConfig()
 
 configureVpn(cfg)
 const cluster = configureCluster(cfg)
 const pki = configurePki(cluster)
+const storage = configureStorage({ cluster })
 const network = configureNetwork({ ...cfg, cluster })
 const dns = configureDns({ ...cfg, cluster, network, pki })
 
@@ -26,8 +28,6 @@ pulumi
     .output(pki.ca.cert)
     .apply(pem => fs.writeFileSync(path.join(__dirname, '../', 'ca.pem'), pem))
 
-export const passwords = {
-    pihole: dns.pihole.password,
-}
+export const passwords = {}
 
 export const kubeconfig = cluster.kubeconfig

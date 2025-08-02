@@ -5,8 +5,8 @@
         "check": "yarn gen && yarn format",
         "gen": "nix develop --command yarn tsx .gen.ts",
         "format": "nix develop --command yarn prettier --write .",
-        "up": "nix develop --command pulumi up -s liam/homelab/homelab",
-        "passwords": "nix develop --command pulumi stack output --show-secrets -s liam/homelab/homelab --json | jq -r '.passwords'",
+        "deploy": "cd project && pulumi up -yf -s liamawhite/homelab/homelab",
+        "passwords": "nix develop --command pulumi stack output --show-secrets -s liamawhite/homelab/homelab --json | jq -r '.passwords'",
         "k9s": "nix develop --command env KUBECONFIG=kubeconfig k9s"
     },
     "dependencies": {
