@@ -34,6 +34,81 @@ export class CoreDns extends pulumi.ComponentResource {
         super('homelab:kubernetes:coredns', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
+        const serviceAccount = new k8s.core.v1.ServiceAccount(
+            `${name}-sa`,
+            {
+                metadata: {
+                    name: 'coredns-external',
+                    namespace: args.namespace,
+                },
+            },
+            localOpts,
+        )
+
+        const clusterRole = new k8s.rbac.v1.ClusterRole(
+            `${name}-cr`,
+            {
+                metadata: {
+                    name: 'coredns-external',
+                },
+                rules: [
+                    {
+                        apiGroups: ['apiextensions.k8s.io'],
+                        resources: ['customresourcedefinitions'],
+                        verbs: ['get', 'list', 'watch'],
+                    },
+                    {
+                        apiGroups: ['extensions', 'networking.k8s.io'],
+                        resources: ['ingresses'],
+                        verbs: ['list', 'watch'],
+                    },
+                    {
+                        apiGroups: [''],
+                        resources: ['services', 'namespaces'],
+                        verbs: ['list', 'watch'],
+                    },
+                    {
+                        apiGroups: ['gateway.networking.k8s.io'],
+                        resources: ['*'],
+                        verbs: ['watch', 'list'],
+                    },
+                    {
+                        apiGroups: ['externaldns.k8s.io'],
+                        resources: ['dnsendpoints'],
+                        verbs: ['get', 'watch', 'list'],
+                    },
+                    {
+                        apiGroups: ['externaldns.k8s.io'],
+                        resources: ['dnsendpoints/status'],
+                        verbs: ['*'],
+                    },
+                ],
+            },
+            localOpts,
+        )
+
+        const clusterRoleBinding = new k8s.rbac.v1.ClusterRoleBinding(
+            `${name}-crb`,
+            {
+                metadata: {
+                    name: 'coredns-external',
+                },
+                roleRef: {
+                    apiGroup: 'rbac.authorization.k8s.io',
+                    kind: 'ClusterRole',
+                    name: clusterRole.metadata.name,
+                },
+                subjects: [
+                    {
+                        kind: 'ServiceAccount',
+                        name: serviceAccount.metadata.name,
+                        namespace: args.namespace,
+                    },
+                ],
+            },
+            localOpts,
+        )
+
         const configMap = new k8s.core.v1.ConfigMap(
             name,
             {
@@ -51,10 +126,12 @@ export class CoreDns extends pulumi.ComponentResource {
     hosts /etc/coredns/blocklist {
         fallthrough
     }
-    
-    # Forward homelab domains to k8s-gateway
-    forward homelab ${args.homelabTLDForwarder}
-    
+
+    # Use http routes to resolve .homelab domains
+    k8s_gateway homelab {
+        resources HTTPRoute
+    }
+
     # Forward to upstream resolvers
     forward . 1.1.1.1 8.8.8.8 {
         policy round_robin
@@ -92,6 +169,7 @@ export class CoreDns extends pulumi.ComponentResource {
                     template: {
                         metadata: { labels: { app: 'coredns-external' } },
                         spec: {
+                            serviceAccountName: serviceAccount.metadata.name,
                             containers: [
                                 {
                                     name: 'coredns',
@@ -214,9 +292,12 @@ export class CoreDns extends pulumi.ComponentResource {
         )
 
         this.registerOutputs({
+            serviceAccount,
+            clusterRole,
+            clusterRoleBinding,
+            configMap,
             deploy,
             service,
-            configMap,
         })
     }
 }

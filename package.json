@@ -17,8 +17,7 @@
         "@pulumi/tailscale": "0.17.5",
         "@pulumi/tls": "5.1.0",
         "@tetratelabs/pulumi-checkmate": "1.8.4",
-        "axios": "1.7.9",
-        "simple-git": "^3.28.0"
+        "axios": "1.7.9"
     },
     "devDependencies": {
         "prettier": "3.4.2",

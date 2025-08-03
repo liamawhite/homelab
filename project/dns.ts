@@ -1,6 +1,5 @@
 import { loadConfig } from './config'
 import { CoreDns } from '../components/kubernetes/coredns'
-import { K8sGateway } from '../components/kubernetes/k8sgateway'
 import { configureCluster } from './cluster'
 import { configureNetwork } from './network'
 import * as k8s from '@pulumi/kubernetes'
@@ -27,18 +26,7 @@ export function configureDns({
         opts,
     )
 
-    // Deploy k8s-gateway for internal .homelab domain resolution
-    const k8sGateway = new K8sGateway(
-        'k8s-gateway',
-        {
-            namespace: dnsNamespace.metadata.name,
-            domain: 'homelab',
-            clusterIP: '10.43.200.53',
-        },
-        opts,
-    )
-
-    // External CoreDNS with .homelab forwarding to k8s-gateway
+    // External CoreDNS with built-in k8s_gateway plugin
     const coredns = new CoreDns(
         'coredns',
         {
@@ -48,12 +36,12 @@ export function configureDns({
                     'metallb.universe.tf/address-pool': network.dnsPool.metadata.name,
                 },
             },
-            homelabTLDForwarder: k8sGateway.serviceIP,
+            homelabTLDForwarder: '127.0.0.1',
         },
         opts,
     )
 
     return {
-        ready: [k8sGateway, coredns],
+        ready: [coredns],
     }
 }
