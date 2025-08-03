@@ -34,7 +34,6 @@ export class CoreDns extends pulumi.ComponentResource {
         super('homelab:kubernetes:coredns', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
-
         const configMap = new k8s.core.v1.ConfigMap(
             name,
             {
