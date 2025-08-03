@@ -40,11 +40,8 @@ export class CoreDns extends pulumi.ComponentResource {
                 metadata: { namespace: args.namespace },
                 data: {
                     Corefile: pulumi.interpolate`
-homelab:53 {
-    forward . ${args.homelabTLDForwarder}
-}
-
 .:53 {
+    log
     errors
     health :8080
     ready :8181
@@ -54,6 +51,9 @@ homelab:53 {
     hosts /etc/coredns/blocklist {
         fallthrough
     }
+    
+    # Forward homelab domains to k8s-gateway
+    forward homelab ${args.homelabTLDForwarder}
     
     # Forward to upstream resolvers
     forward . 1.1.1.1 8.8.8.8 {

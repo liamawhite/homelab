@@ -24,6 +24,7 @@ export function configureStorage({
 
     return {
         longhorn,
+        defaultStorageClass: longhorn.defaultStorageClass,
         ready: [longhorn],
     }
 }
