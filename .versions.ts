@@ -1,6 +1,6 @@
 export const versions = {
     certManager: '1.16.3',
-    coredns: '1.12.2',
+    coredns: '30866819413fcb1ae812132f715bb03aa4040dcc',
     externalDns: '0.15.1',
     gatewayApi: '1.2.0',
     istio: '1.26.3',

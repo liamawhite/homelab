@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "github.com/coredns/coredns/core/plugin"
 	_ "github.com/k8s-gateway/k8s_gateway"
 
 	"github.com/coredns/coredns/core/dnsserver"

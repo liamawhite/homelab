@@ -95,7 +95,7 @@ export class CoreDns extends pulumi.ComponentResource {
                             containers: [
                                 {
                                     name: 'coredns',
-                                    image: `coredns/coredns:${versions.coredns}`,
+                                    image: `ghcr.io/liamawhite/coredns:${versions.coredns}`,
                                     args: ['-conf', '/etc/coredns/Corefile'],
                                     ports: [
                                         {
