@@ -31,6 +31,7 @@ export class K8sGateway extends pulumi.ComponentResource {
                         type: 'ClusterIP',
                         clusterIP: args.clusterIP,
                         port: 53,
+                        targetPort: 'dns-udp',
                     },
                     rbac: {
                         create: true,

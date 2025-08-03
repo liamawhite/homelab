@@ -1,6 +1,6 @@
 {
     "permissions": {
-        "allow": ["Bash(tar:*)"],
+        "allow": ["Bash(tar:*)", "WebFetch(domain:istio.io)", "WebFetch(domain:coredns.io)"],
         "deny": []
     }
 }

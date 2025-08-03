@@ -5,9 +5,11 @@ import { hostname } from '../externaldns/annotations'
 import { Certificate } from '../certmanager/crds/cert_manager/v1'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 import { versions } from '../../../.versions'
+import * as labels from '../istio/labels'
 
 export class Longhorn extends pulumi.ComponentResource {
     readonly namespace: pulumi.Output<string>
+    readonly defaultStorageClass: k8s.storage.v1.StorageClass
 
     constructor(
         name: string,
@@ -20,7 +22,10 @@ export class Longhorn extends pulumi.ComponentResource {
         const namespace = new k8s.core.v1.Namespace(
             name,
             {
-                metadata: { name: 'longhorn-system' },
+                metadata: {
+                    name: 'longhorn-system',
+                    labels: labels.namespace.enableAmbient,
+                },
             },
             localOpts,
         )
@@ -36,6 +41,13 @@ export class Longhorn extends pulumi.ComponentResource {
             },
             localOpts,
         )
+
+        const defaultStorageClass = k8s.storage.v1.StorageClass.get(
+            'longhorn-default',
+            'longhorn',
+            { ...localOpts, dependsOn: [install] },
+        )
+        this.defaultStorageClass = defaultStorageClass
 
         const cert = new Certificate(
             name,
@@ -131,6 +143,7 @@ export class Longhorn extends pulumi.ComponentResource {
 
         this.registerOutputs({
             install: install.resources,
+            defaultStorageClass,
             cert,
             gw,
             httpRedirect,
