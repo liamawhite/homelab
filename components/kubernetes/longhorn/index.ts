@@ -1,5 +1,9 @@
 import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
+import { gateway } from '../istio/crds/gatewayapi'
+import { hostname } from '../externaldns/annotations'
+import { Certificate } from '../certmanager/crds/cert_manager/v1'
+import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 import { versions } from '../../../.versions'
 
 export class Longhorn extends pulumi.ComponentResource {
@@ -33,8 +37,111 @@ export class Longhorn extends pulumi.ComponentResource {
             localOpts,
         )
 
-        this.registerOutputs({ install: install.resources })
+        const cert = new Certificate(
+            name,
+            {
+                metadata: { namespace: this.namespace },
+                spec: {
+                    dnsNames: [args.web.hostname],
+                    issuerRef: args.web.issuer,
+                    secretName: 'longhorn-cert',
+                },
+            },
+            localOpts,
+        )
+
+        const gw = new gateway.v1.Gateway(
+            name,
+            {
+                metadata: {
+                    name: 'longhorn-webui',
+                    namespace: this.namespace,
+                    annotations: hostname(args.web.hostname),
+                },
+                spec: {
+                    gatewayClassName: 'istio',
+                    listeners: [
+                        {
+                            name: 'http',
+                            port: 80,
+                            protocol: 'HTTP',
+                        },
+                        {
+                            name: 'https',
+                            port: 443,
+                            protocol: 'HTTPS',
+                            tls: {
+                                mode: 'Terminate',
+                                certificateRefs: [{ name: cert.spec.secretName }],
+                            },
+                            allowedRoutes: { namespaces: { from: 'Same' } },
+                        },
+                    ],
+                },
+            },
+            localOpts,
+        )
+
+        const httpRedirect = new gateway.v1.HTTPRoute(
+            `${name}-redirect`,
+            {
+                metadata: {
+                    name: 'longhorn-webui-httpredirect',
+                    namespace: this.namespace,
+                },
+                spec: {
+                    parentRefs: [{ name: gw.metadata.name, sectionName: 'http' }],
+                    rules: [
+                        {
+                            filters: [
+                                {
+                                    type: 'RequestRedirect',
+                                    requestRedirect: {
+                                        scheme: 'https',
+                                        statusCode: 301,
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            },
+            localOpts,
+        )
+
+        const httpRoute = new gateway.v1.HTTPRoute(
+            name,
+            {
+                metadata: {
+                    name: 'longhorn-webui',
+                    namespace: this.namespace,
+                },
+                spec: {
+                    hostnames: [args.web.hostname],
+                    parentRefs: [{ name: gw.metadata.name, sectionName: 'https' }],
+                    rules: [
+                        {
+                            backendRefs: [{ name: 'longhorn-frontend', port: 80 }],
+                        },
+                    ],
+                },
+            },
+            localOpts,
+        )
+
+        this.registerOutputs({
+            install: install.resources,
+            cert,
+            gw,
+            httpRedirect,
+            httpRoute,
+        })
     }
 }
 
-export interface LonghornArgs {}
+export interface LonghornArgs {
+    web: {
+        hostname: string
+        issuer: certmanager.v1.CertificateSpecIssuerRef
+    }
+}

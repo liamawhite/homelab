@@ -14,9 +14,9 @@ const cfg = loadConfig()
 configureVpn(cfg)
 const cluster = configureCluster(cfg)
 const pki = configurePki(cluster)
-const storage = configureStorage({ cluster })
+const storage = configureStorage({ cluster, pki })
 const network = configureNetwork({ ...cfg, cluster })
-const dns = configureDns({ ...cfg, cluster, network, pki })
+const dns = configureDns({ ...cfg, cluster, network })
 
 // Write the kubeconfig to a file at repo root so we can use it easily
 // This is gitignored so it won't be checked in

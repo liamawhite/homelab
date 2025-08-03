@@ -2,7 +2,6 @@ import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs'
 import * as path from 'path'
-import * as labels from '../istio/labels'
 import { versions } from '../../../.versions'
 
 function loadBlocklists(): string {
@@ -27,9 +26,6 @@ function loadBlocklists(): string {
 }
 
 export class CoreDns extends pulumi.ComponentResource {
-    readonly namespace: pulumi.Output<string>
-    readonly localAddress: pulumi.Output<string>
-
     constructor(
         name: string,
         args: CoreDnsArgs,
@@ -38,24 +34,18 @@ export class CoreDns extends pulumi.ComponentResource {
         super('homelab:kubernetes:coredns', name, {}, opts)
         const localOpts = { ...opts, parent: this }
 
-        const ns = new k8s.core.v1.Namespace(
-            name,
-            {
-                metadata: {
-                    name: 'coredns-external',
-                    labels: labels.namespace.enableAmbient,
-                },
-            },
-            localOpts,
-        )
-        this.namespace = ns.metadata.name
 
         const configMap = new k8s.core.v1.ConfigMap(
             name,
             {
-                metadata: { namespace: ns.metadata.name },
+                metadata: { namespace: args.namespace },
                 data: {
-                    Corefile: `.:53 {
+                    Corefile: pulumi.interpolate`
+homelab:53 {
+    forward . ${args.homelabTLDForwarder}
+}
+
+.:53 {
     errors
     health :8080
     ready :8181
@@ -88,7 +78,7 @@ export class CoreDns extends pulumi.ComponentResource {
             {
                 metadata: {
                     name: 'coredns-external',
-                    namespace: this.namespace,
+                    namespace: args.namespace,
                     labels: { app: 'coredns-external' },
                 },
                 spec: {
@@ -192,7 +182,7 @@ export class CoreDns extends pulumi.ComponentResource {
             {
                 metadata: {
                     name: 'coredns-external',
-                    namespace: this.namespace,
+                    namespace: args.namespace,
                     labels: deploy.metadata.labels,
                     annotations: args.dns?.annotations,
                 },
@@ -224,8 +214,6 @@ export class CoreDns extends pulumi.ComponentResource {
             localOpts,
         )
 
-        this.localAddress = pulumi.interpolate`${service.metadata.name}.${this.namespace}.svc.cluster.local:53`
-
         this.registerOutputs({
             deploy,
             service,
@@ -235,9 +223,11 @@ export class CoreDns extends pulumi.ComponentResource {
 }
 
 export interface CoreDnsArgs {
+    namespace: pulumi.Input<string>
     dns?: {
         annotations?: {
             [key: string]: pulumi.Input<string>
         }
     }
+    homelabTLDForwarder: pulumi.Input<string>
 }
