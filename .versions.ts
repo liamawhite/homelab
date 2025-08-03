@@ -1,6 +1,12 @@
+import { simpleGit } from 'simple-git'
+
+// Get current git commit SHA
+const git = simpleGit()
+const currentCommitSha = await git.revparse(['HEAD'])
+
 export const versions = {
     certManager: '1.16.3',
-    coredns: '30866819413fcb1ae812132f715bb03aa4040dcc',
+    coredns: currentCommitSha,
     externalDns: '0.15.1',
     gatewayApi: '1.2.0',
     istio: '1.26.3',
