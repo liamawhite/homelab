@@ -1,8 +1,7 @@
-import { simpleGit } from 'simple-git'
+import { execSync } from 'child_process'
 
-// Get current git commit SHA
-const git = simpleGit()
-const currentCommitSha = await git.revparse(['HEAD'])
+// Get current git commit SHA synchronously
+const currentCommitSha = execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim()
 
 export const versions = {
     certManager: '1.16.3',

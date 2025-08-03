@@ -1,7 +1,6 @@
 import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import { gateway } from '../istio/crds/gatewayapi'
-import { hostname } from '../externaldns/annotations'
 import { Certificate } from '../certmanager/crds/cert_manager/v1'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 import { versions } from '../../../.versions'
@@ -68,7 +67,6 @@ export class Longhorn extends pulumi.ComponentResource {
                 metadata: {
                     name: 'longhorn-webui',
                     namespace: this.namespace,
-                    annotations: hostname(args.web.hostname),
                 },
                 spec: {
                     gatewayClassName: 'istio',

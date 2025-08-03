@@ -3,10 +3,8 @@ import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs'
 import * as path from 'path'
 import { gateway } from '../istio/crds/gatewayapi'
-import { hostname } from '../externaldns/annotations'
 import { Certificate } from '../certmanager/crds/cert_manager/v1'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
-import * as labels from '../istio/labels'
 
 export interface SyncthingDevice {
     id: string
@@ -279,10 +277,10 @@ export class Syncthing extends pulumi.ComponentResource {
         )
 
         const webService = new k8s.core.v1.Service(
-            `${name}-web`,
+            `${name}-frontend`,
             {
                 metadata: {
-                    name: 'syncthing-web',
+                    name: 'syncthing-frontend',
                     namespace: args.namespace,
                     labels: statefulSet.metadata.labels,
                 },
@@ -358,7 +356,6 @@ export class Syncthing extends pulumi.ComponentResource {
                 metadata: {
                     name: 'syncthing-webui',
                     namespace: args.namespace,
-                    annotations: hostname(args.web.hostname),
                 },
                 spec: {
                     gatewayClassName: 'istio',
@@ -462,5 +459,3 @@ export interface SyncthingArgs {
     }
     declarativeConfig: SyncthingDeclarativeConfig
 }
-
-// WWRWTXL-2QLS6J7-QNSA5MZ-XLLUS4R-TKBA754-GXYFAEF-33IO7G4-LH5FIAW
