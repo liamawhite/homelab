@@ -67,12 +67,6 @@ export function configureSyncthing({
                         devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-personal-2018', 'macbookpro-docusign-2025'],
                         type: 'sendreceive',
                     },
-                    github: {
-                        id: 'github.com',
-                        path: '/var/syncthing/data/github.com',
-                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-personal-2018', 'macbookpro-docusign-2025'],
-                        type: 'sendreceive',
-                    },
                 },
             },
         },
