@@ -275,12 +275,12 @@ export class PrometheusOperator extends pulumi.ComponentResource {
                                     ],
                                     resources: {
                                         limits: {
-                                            cpu: '200m',
-                                            memory: '200Mi',
+                                            cpu: '100m',
+                                            memory: '64Mi',
                                         },
                                         requests: {
-                                            cpu: '100m',
-                                            memory: '100Mi',
+                                            cpu: '10m',
+                                            memory: '32Mi',
                                         },
                                     },
                                     securityContext: {

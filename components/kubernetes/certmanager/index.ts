@@ -29,7 +29,43 @@ export class CertManager extends pulumi.ComponentResource {
                 chart: 'cert-manager',
                 version: versions.certManager,
                 repositoryOpts: { repo: 'https://charts.jetstack.io' },
-                values: { crds: { enabled: true } },
+                values: {
+                    crds: { enabled: true },
+                    resources: {
+                        limits: {
+                            cpu: '50m',
+                            memory: '64Mi',
+                        },
+                        requests: {
+                            cpu: '5m',
+                            memory: '32Mi',
+                        },
+                    },
+                    cainjector: {
+                        resources: {
+                            limits: {
+                                cpu: '100m',
+                                memory: '128Mi',
+                            },
+                            requests: {
+                                cpu: '50m',
+                                memory: '64Mi',
+                            },
+                        },
+                    },
+                    webhook: {
+                        resources: {
+                            limits: {
+                                cpu: '50m',
+                                memory: '64Mi',
+                            },
+                            requests: {
+                                cpu: '5m',
+                                memory: '32Mi',
+                            },
+                        },
+                    },
+                },
             },
             localOpts,
         )
