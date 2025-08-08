@@ -38,6 +38,16 @@ export class TailscaleOperator extends pulumi.ComponentResource {
                     },
                     operatorConfig: {
                         hostname: args.hostname,
+                        resources: {
+                            limits: {
+                                cpu: '100m',
+                                memory: '64Mi',
+                            },
+                            requests: {
+                                cpu: '10m',
+                                memory: '32Mi',
+                            },
+                        },
                     },
                 },
             },

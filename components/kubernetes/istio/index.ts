@@ -56,6 +56,18 @@ export class Istio extends pulumi.ComponentResource {
                 repositoryOpts,
                 values: {
                     profile: 'ambient',
+                    pilot: {
+                        resources: {
+                            limits: {
+                                cpu: '200m',
+                                memory: '128Mi',
+                            },
+                            requests: {
+                                cpu: '20m',
+                                memory: '64Mi',
+                            },
+                        },
+                    },
                 },
             },
             localOpts,
@@ -78,6 +90,16 @@ export class Istio extends pulumi.ComponentResource {
                     cni: {
                         cniConfDir: '/var/lib/rancher/k3s/agent/etc/cni/net.d',
                         cniBinDir: '/var/lib/rancher/k3s/data/cni',
+                        resources: {
+                            limits: {
+                                cpu: '100m',
+                                memory: '64Mi',
+                            },
+                            requests: {
+                                cpu: '10m',
+                                memory: '32Mi',
+                            },
+                        },
                     },
                 },
             },
@@ -91,7 +113,18 @@ export class Istio extends pulumi.ComponentResource {
                 chart: 'ztunnel',
                 version: versions.istio,
                 repositoryOpts,
-                values: {},
+                values: {
+                    resources: {
+                        limits: {
+                            cpu: '200m',
+                            memory: '128Mi',
+                        },
+                        requests: {
+                            cpu: '20m',
+                            memory: '96Mi',
+                        },
+                    },
+                },
             },
             localOpts,
         )
