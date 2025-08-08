@@ -29,6 +29,32 @@ export class MetalLb extends pulumi.ComponentResource {
                 chart: 'metallb',
                 version: versions.metallb,
                 repositoryOpts: { repo: 'https://metallb.github.io/metallb' },
+                values: {
+                    controller: {
+                        resources: {
+                            limits: {
+                                cpu: '100m',
+                                memory: '128Mi',
+                            },
+                            requests: {
+                                cpu: '10m',
+                                memory: '64Mi',
+                            },
+                        },
+                    },
+                    speaker: {
+                        resources: {
+                            limits: {
+                                cpu: '200m',
+                                memory: '128Mi',
+                            },
+                            requests: {
+                                cpu: '50m',
+                                memory: '64Mi',
+                            },
+                        },
+                    },
+                },
             },
             localOpts,
         )

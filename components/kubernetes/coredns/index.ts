@@ -222,12 +222,12 @@ export class CoreDns extends pulumi.ComponentResource {
                                     },
                                     resources: {
                                         requests: {
-                                            cpu: '100m',
-                                            memory: '128Mi',
+                                            cpu: '10m',
+                                            memory: '32Mi',
                                         },
                                         limits: {
-                                            cpu: '500m',
-                                            memory: '256Mi',
+                                            cpu: '100m',
+                                            memory: '64Mi',
                                         },
                                     },
                                     volumeMounts: [

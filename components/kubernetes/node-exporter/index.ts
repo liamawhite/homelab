@@ -163,12 +163,12 @@ export class NodeExporter extends pulumi.ComponentResource {
                                     ],
                                     resources: {
                                         limits: {
-                                            cpu: '250m',
-                                            memory: '180Mi',
+                                            cpu: '100m',
+                                            memory: '64Mi',
                                         },
                                         requests: {
-                                            cpu: '102m',
-                                            memory: '180Mi',
+                                            cpu: '10m',
+                                            memory: '32Mi',
                                         },
                                     },
                                     securityContext: {
