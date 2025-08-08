@@ -1,11 +1,12 @@
 import * as k8s from '@pulumi/kubernetes'
 import { PrometheusOperator } from '../components/kubernetes/prometheus-operator'
 import { PrometheusInstance } from '../components/kubernetes/prometheus'
+import { NodeExporter } from '../components/kubernetes/node-exporter'
 import { configureCluster } from './cluster'
 import { configurePki } from './pki'
 import { configureStorage } from './storage'
 
-export function configureMonitoring({ 
+export function configureMonitoring({
     provider,
     pki,
     storage
@@ -14,7 +15,7 @@ export function configureMonitoring({
     storage: ReturnType<typeof configureStorage>
 }) {
     const opts = { provider, dependsOn: [...pki.ready, ...storage.ready] }
-    
+
     const namespace = new k8s.core.v1.Namespace(
         'monitoring-ns',
         {
@@ -24,8 +25,8 @@ export function configureMonitoring({
     )
 
     const prometheusOperator = new PrometheusOperator(
-        'prometheus-operator', 
-        { namespace: namespace.metadata.name }, 
+        'prometheus-operator',
+        { namespace: namespace.metadata.name },
         { provider }
     )
 
@@ -42,12 +43,23 @@ export function configureMonitoring({
                 issuer: pki.issuer.issuerRef(),
             },
         },
-        { ...opts, dependsOn: [prometheusOperator, namespace] }
+        { ...opts, dependsOn: [prometheusOperator] }
     )
+
+    const nodeExporter = new NodeExporter(
+        'node-exporter',
+        {
+            namespace: namespace.metadata.name,
+        },
+        { ...opts, dependsOn: [prometheusOperator] }
+    )
+
+    nodeExporter.createServiceMonitor()
 
     return {
         prometheusOperator,
         prometheus,
-        ready: [prometheusOperator, prometheus],
+        nodeExporter,
+        ready: [prometheusOperator, prometheus, nodeExporter],
     }
 }

@@ -51,8 +51,18 @@ export class PrometheusInstance extends pulumi.ComponentResource {
                 rules: [
                     {
                         apiGroups: [''],
-                        resources: ['nodes/metrics'],
+                        resources: ['nodes', 'nodes/metrics', 'services', 'endpoints', 'pods'],
+                        verbs: ['get', 'list', 'watch'],
+                    },
+                    {
+                        apiGroups: [''],
+                        resources: ['configmaps'],
                         verbs: ['get'],
+                    },
+                    {
+                        apiGroups: ['networking.k8s.io'],
+                        resources: ['ingresses'],
+                        verbs: ['get', 'list', 'watch'],
                     },
                     {
                         nonResourceURLs: ['/metrics', '/metrics/slis'],
