@@ -19,7 +19,7 @@ const pki = configurePki(cluster)
 const storage = configureStorage({ cluster, pki })
 const network = configureNetwork({ ...cfg, cluster })
 const dns = configureDns({ ...cfg, cluster, network })
-const monitoring = configureMonitoring(cluster)
+const monitoring = configureMonitoring({ ...cluster, pki, storage })
 const syncthing = configureSyncthing({ cluster, pki, storage })
 
 // Write the kubeconfig to a file at repo root so we can use it easily

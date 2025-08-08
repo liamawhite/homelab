@@ -13,6 +13,7 @@ export const versions = {
     longhorn: '1.9.1',
     metallb: '0.14.9',
     pihole: '2024.07.0',
+    prometheus: '3.5.0',
     prometheusOperator: '0.84.1',
     syncthing: '1.30.0',
     tailscale: '1.86.2',
