@@ -12,6 +12,7 @@ export const versions = {
     k8sGateway: '3.2.3', // https://github.com/k8s-gateway/k8s_gateway/pkgs/container/charts%2Fk8s-gateway/versions
     longhorn: '1.9.1',
     metallb: '0.14.9',
+    nodeExporter: '1.9.1',
     pihole: '2024.07.0',
     prometheus: '3.5.0',
     prometheusOperator: '0.84.1',
