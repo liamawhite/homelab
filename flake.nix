@@ -16,6 +16,7 @@
               crd2pulumi
               git
               jq
+              yq
               kubernetes-helm
               k9s
               nodejs_24

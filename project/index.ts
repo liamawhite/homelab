@@ -9,6 +9,7 @@ import { configureDns } from './dns'
 import { configurePki } from './pki'
 import { configureStorage } from './storage'
 import { configureSyncthing } from './syncthing'
+import { configureMonitoring } from './monitoring'
 
 const cfg = loadConfig()
 
@@ -18,6 +19,7 @@ const pki = configurePki(cluster)
 const storage = configureStorage({ cluster, pki })
 const network = configureNetwork({ ...cfg, cluster })
 const dns = configureDns({ ...cfg, cluster, network })
+const monitoring = configureMonitoring(cluster)
 const syncthing = configureSyncthing({ cluster, pki, storage })
 
 // Write the kubeconfig to a file at repo root so we can use it easily

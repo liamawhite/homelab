@@ -41,6 +41,11 @@ export async function helmTemplate(source: string, destination: string) {
     execSync(`helm template crdgen ${source} > ${destination}`)
 }
 
+export async function filterCRDsFromYaml(inputFile: string, outputFile: string) {
+    await fs.mkdir(path.dirname(outputFile), { recursive: true })
+    execSync(`yq 'select(.kind == "CustomResourceDefinition")' ${inputFile} > ${outputFile}`)
+}
+
 export async function crd2pulumi(args: { destination: string; sources: string[] }) {
     const { destination, sources } = args
     execSync(`crd2pulumi --nodejsPath ${destination} --force ${sources.join(' ')}`)
