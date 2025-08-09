@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "github.com/coredns/coredns/core/plugin"
+	_ "github.com/coredns/unbound"
 	_ "github.com/k8s-gateway/k8s_gateway"
 
 	"github.com/coredns/coredns/core/dnsserver"
@@ -28,6 +29,7 @@ var directives = []string{
 	// Actual processing plugins
 	"cache",
 	"k8s_gateway", // external
+	"unbound",
 	"forward",
 }
 
