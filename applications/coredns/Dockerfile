@@ -1,4 +1,4 @@
-# Build stage with C dependencies
+# Build stage with C dependencies for ARM64
 FROM golang:1.24-bookworm AS builder
 
 # Install libunbound development libraries and build tools
@@ -13,14 +13,17 @@ WORKDIR /app
 # Copy go mod files
 COPY go.mod go.sum ./
 
+# Download dependencies (cached layer if go.mod/go.sum unchanged)
+RUN go mod download
+
 # Copy source code
 COPY . .
 
-# Enable CGO and build the binary
+# Enable CGO and build for ARM64
 ENV CGO_ENABLED=1
 RUN go build -o coredns .
 
-# Runtime stage with minimal dependencies
+# Runtime stage with minimal dependencies for ARM64
 FROM debian:bookworm-slim
 
 # Install runtime libraries

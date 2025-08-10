@@ -7,11 +7,10 @@ SHELL := nix develop --command bash -c
 IMAGE_NAME ?= coredns
 TAG ?= dev
 
-# Build Docker image (builds inside container)
+# Build Docker image for ARM64 (builds inside container)
 docker-build:
-	docker build -t $(IMAGE_NAME):$(TAG) .
+	docker buildx build --platform linux/arm64 -t $(IMAGE_NAME):$(TAG) .
 
-# Build and push Docker image
+# Build and push Docker image for ARM64
 docker-push:
-	docker build -t $(IMAGE_NAME):$(TAG) .
-	docker push $(IMAGE_NAME):$(TAG)
+	docker buildx build --platform linux/arm64 -t $(IMAGE_NAME):$(TAG) --push .
