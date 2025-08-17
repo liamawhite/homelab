@@ -1,38 +1,31 @@
-# Build stage with C dependencies for ARM64
-FROM golang:1.24-bookworm AS builder
+# Build stage for static binary
+FROM golang:1.24-alpine AS builder
 
-# Install libunbound development libraries and build tools
-RUN apt-get update && apt-get install -y \
-    libunbound-dev \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Install ca-certificates for build
+RUN apk add --no-cache ca-certificates git
 
 # Set working directory
 WORKDIR /app
 
 # Copy go mod files
 COPY go.mod go.sum ./
-
-# Download dependencies (cached layer if go.mod/go.sum unchanged)
 RUN go mod download
 
-# Copy source code
 COPY . .
 
-# Enable CGO and build for ARM64
-ENV CGO_ENABLED=1
-RUN go build -o coredns .
+# Build static binary with all optimizations
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=arm64
+RUN go build -a -ldflags '-extldflags "-static" -s -w' -o coredns .
 
-# Runtime stage with minimal dependencies for ARM64
-FROM debian:bookworm-slim
+# Runtime stage using scratch for minimal image
+FROM scratch
 
-# Install runtime libraries
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    libunbound8 \
-    && rm -rf /var/lib/apt/lists/*
+# Copy ca-certificates from builder
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-# Copy the binary from build stage
+# Copy the static binary from build stage
 COPY --from=builder /app/coredns /coredns
 
 # Use non-root user by default

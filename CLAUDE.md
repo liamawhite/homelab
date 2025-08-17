@@ -17,7 +17,7 @@ The project uses Nix for development environment management and Yarn for package
 All commands should be run within the Nix development shell (`nix develop`) which provides:
 
 - crd2pulumi (for generating TypeScript from Kubernetes CRDs)
-- kubernetes-helm, k9s, jq, git, nodejs_23
+- kubernetes-helm, k9s, jq, yq, git, nodejs_24, go, docker, gnumake
 
 ## Project Architecture
 
@@ -64,7 +64,17 @@ This is a Pulumi-based Infrastructure as Code project that deploys a complete ho
 1. Infrastructure changes are made in TypeScript using Pulumi
 2. Run `yarn gen` to regenerate any CRD bindings if upstream charts change
 3. Use `yarn format` to ensure consistent code style
-4. Deploy with `yarn up` (requires proper Pulumi configuration)
+4. Deploy with `yarn deploy` (requires proper Pulumi configuration)
 5. Access cluster with `yarn k9s` or standard kubectl with the generated kubeconfig
 
 The project follows a modular component architecture where each service is self-contained but can depend on shared infrastructure like PKI and networking.
+
+## Troubleshooting
+
+### `no IP addresses available in range set`
+
+`ssh` into the node and run `sudo rm -rf /var/lib/cni/networks/cbr0 && sudo reboot`. See [k3s issue](https://github.com/k3s-io/k3s/issues/4682).
+
+### k3s node fails
+
+Check `systemctl status k3s.service` and `journalctl -xeu k3s.service` for details.
