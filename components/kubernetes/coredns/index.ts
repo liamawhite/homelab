@@ -132,11 +132,8 @@ export class CoreDns extends pulumi.ComponentResource {
         resources HTTPRoute
     }
 
-    # Use unbound for recursive DNS resolution with improved privacy and caching
-    unbound {
-        except homelab
-        config /etc/unbound/unbound.conf
-    }
+    # Forward all other queries to Cloudflare DNS
+    forward . 1.1.1.1
     
     cache 30
     loop
@@ -144,53 +141,6 @@ export class CoreDns extends pulumi.ComponentResource {
     loadbalance
 }`,
                     blocklist: loadBlocklists(),
-                    'unbound.conf': `
-server:
-    # Basic configuration
-    verbosity: 1
-    port: 53
-    do-ip4: yes
-    do-ip6: yes
-    do-udp: yes
-    do-tcp: yes
-    
-    # Performance tuning
-    num-threads: 2
-    msg-cache-slabs: 2
-    rrset-cache-slabs: 2
-    infra-cache-slabs: 2
-    key-cache-slabs: 2
-    
-    # Cache sizes (set to 0 to disable as recommended by CoreDNS plugin)
-    msg-cache-size: 0
-    rrset-cache-size: 0
-    
-    # Prefetch and other optimizations
-    prefetch: yes
-    prefetch-key: yes
-    rrset-roundrobin: yes
-    
-    # Security
-    hide-identity: yes
-    hide-version: yes
-    harden-glue: yes
-    harden-dnssec-stripped: yes
-    
-    # Interface binding (all interfaces)
-    interface: 0.0.0.0
-    
-    # Access control
-    access-control: 0.0.0.0/0 allow
-
-forward-zone:
-    name: "."
-    forward-addr: 1.1.1.1
-    forward-addr: 1.0.0.1
-    forward-addr: 8.8.8.8
-    forward-addr: 8.8.4.4
-    forward-addr: 9.9.9.9
-    forward-addr: 149.112.112.112
-`,
                 },
             },
             localOpts,
@@ -283,11 +233,6 @@ forward-zone:
                                             mountPath: '/etc/coredns',
                                             readOnly: true,
                                         },
-                                        {
-                                            name: 'unbound-config',
-                                            mountPath: '/etc/unbound',
-                                            readOnly: true,
-                                        },
                                     ],
                                 },
                             ],
@@ -296,18 +241,6 @@ forward-zone:
                                     name: 'config',
                                     configMap: {
                                         name: configMap.metadata.name,
-                                    },
-                                },
-                                {
-                                    name: 'unbound-config',
-                                    configMap: {
-                                        name: configMap.metadata.name,
-                                        items: [
-                                            {
-                                                key: 'unbound.conf',
-                                                path: 'unbound.conf',
-                                            },
-                                        ],
                                     },
                                 },
                             ],

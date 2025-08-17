@@ -6,7 +6,6 @@ toolchain go1.24.4
 
 require (
 	github.com/coredns/coredns v1.12.2
-	github.com/coredns/unbound v0.0.7
 	github.com/k8s-gateway/k8s_gateway v1.5.2
 )
 
@@ -113,7 +112,6 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/miekg/dns v1.1.66 // indirect
-	github.com/miekg/unbound v0.0.0-20240613151107-1f0f3b231f04 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
