@@ -51,20 +51,32 @@ export function configureSyncthing({
                         id: 'Y6NSC7H-7ISVMIQ-MG6CA4Z-TIXVGBU-CPCRHHN-EAKVOKC-RVWTF45-ZIEANQ7',
                         name: 'macstudio-personal-2023',
                     },
-                    'macbookpro-personal-2018': {
-                        id: 'OIDLC3D-EX3JH4E-FKEE2X5-YKGVYM4-7QLPPJQ-6ELD5T6-2GQB473-N6CRSAA',
-                        name: 'macbookpro-personal-2018',
-                    },
                     'macbookpro-docusign-2025': {
                         id: 'VNBUOSV-NBA7BXM-FCQ2KWS-5YIJNTQ-ZXP2LI6-6HL5ESK-UZY7RRG-7BTW3AU',
                         name: 'macbookpro-docusign-2025',
+                    },
+                    'macbookpro-personal-2025': {
+                        id: 'YFRAWME-SEF4QKB-GGUK25Q-ABHMASU-HIYZTRX-G3H2AD7-237IM24-R6SZHQG',
+                        name: 'macbookpro-personal-2025',
                     },
                 },
                 folders: {
                     personal: {
                         id: 'org/personal',
                         path: '/var/syncthing/data/org/personal',
-                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-personal-2018', 'macbookpro-docusign-2025'],
+                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
+                        type: 'sendreceive',
+                    },
+                    'notes-personal': {
+                        id: 'notes/personal',
+                        path: '/var/syncthing/data/notes/personal',
+                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
+                        type: 'sendreceive',
+                    },
+                    'notes-notedown': {
+                        id: 'notes/.notedown',
+                        path: '/var/syncthing/data/notes/notedown',
+                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
                         type: 'sendreceive',
                     },
                 },
