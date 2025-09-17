@@ -61,7 +61,7 @@ export class PrometheusOperator extends pulumi.ComponentResource {
                             'alertmanagers/status',
                             'alertmanagerconfigs',
                             'prometheuses',
-                            'prometheuses/finalizers', 
+                            'prometheuses/finalizers',
                             'prometheuses/status',
                             'prometheusagents',
                             'prometheusagents/finalizers',

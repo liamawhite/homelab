@@ -210,7 +210,7 @@ export class PrometheusInstance extends pulumi.ComponentResource {
                         },
                     ],
                     selector: {
-                        'prometheus': 'k8s',
+                        prometheus: 'k8s',
                     },
                     sessionAffinity: 'ClientIP',
                 },

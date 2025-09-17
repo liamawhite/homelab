@@ -43,7 +43,9 @@ export async function helmTemplate(source: string, destination: string) {
 
 export async function filterCRDsFromYaml(inputFile: string, outputFile: string) {
     await fs.mkdir(path.dirname(outputFile), { recursive: true })
-    execSync(`yq 'select(.kind == "CustomResourceDefinition")' ${inputFile} > ${outputFile}`)
+    execSync(
+        `yq --output-format=yaml 'select(.kind == "CustomResourceDefinition")' ${inputFile} > ${outputFile}`,
+    )
 }
 
 export async function crd2pulumi(args: { destination: string; sources: string[] }) {

@@ -5,9 +5,10 @@
         "check": "yarn gen && yarn format",
         "gen": "nix develop --command yarn tsx .gen.ts",
         "format": "nix develop --command yarn prettier --write .",
-        "deploy": "cd project && pulumi up -yf -s liamawhite/homelab/homelab",
+        "deploy": "yarn homeassistant && cd project && pulumi up -yf -s liamawhite/homelab/homelab",
         "passwords": "nix develop --command pulumi stack output --show-secrets -s liamawhite/homelab/homelab --json | jq -r '.passwords'",
-        "k9s": "nix develop --command env KUBECONFIG=kubeconfig k9s"
+        "k9s": "nix develop --command env KUBECONFIG=kubeconfig k9s",
+        "homeassistant": "nix develop --command yarn tsx components/kubernetes/homeassistant/extract-config.ts"
     },
     "dependencies": {
         "@pulumi/command": "1.0.0",
@@ -17,7 +18,8 @@
         "@pulumi/tailscale": "0.17.5",
         "@pulumi/tls": "5.1.0",
         "@tetratelabs/pulumi-checkmate": "1.8.4",
-        "axios": "1.7.9"
+        "axios": "1.7.9",
+        "js-yaml": "^4.1.0"
     },
     "devDependencies": {
         "prettier": "3.4.2",

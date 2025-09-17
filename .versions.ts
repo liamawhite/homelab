@@ -18,4 +18,5 @@ export const versions = {
     prometheusOperator: '0.84.1',
     syncthing: '1.30.0',
     tailscale: '1.86.2',
+    homeassistant: currentCommitSha,
 }

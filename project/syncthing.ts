@@ -64,19 +64,34 @@ export function configureSyncthing({
                     personal: {
                         id: 'org/personal',
                         path: '/var/syncthing/data/org/personal',
-                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
+                        devices: [
+                            'kubernetes-syncthing-mirror',
+                            'macstudio-personal-2023',
+                            'macbookpro-docusign-2025',
+                            'macbookpro-personal-2025',
+                        ],
                         type: 'sendreceive',
                     },
                     'notes-personal': {
                         id: 'notes/personal',
                         path: '/var/syncthing/data/notes/personal',
-                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
+                        devices: [
+                            'kubernetes-syncthing-mirror',
+                            'macstudio-personal-2023',
+                            'macbookpro-docusign-2025',
+                            'macbookpro-personal-2025',
+                        ],
                         type: 'sendreceive',
                     },
                     'notes-notedown': {
                         id: 'notes/.notedown',
                         path: '/var/syncthing/data/notes/notedown',
-                        devices: ['kubernetes-syncthing-mirror', 'macstudio-personal-2023', 'macbookpro-docusign-2025', 'macbookpro-personal-2025'],
+                        devices: [
+                            'kubernetes-syncthing-mirror',
+                            'macstudio-personal-2023',
+                            'macbookpro-docusign-2025',
+                            'macbookpro-personal-2025',
+                        ],
                         type: 'sendreceive',
                     },
                 },

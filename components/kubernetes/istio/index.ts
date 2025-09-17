@@ -68,6 +68,9 @@ export class Istio extends pulumi.ComponentResource {
                             },
                         },
                     },
+                    meshConfig: {
+                        accessLogFile: '/dev/stdout',
+                    },
                 },
             },
             localOpts,

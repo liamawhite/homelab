@@ -14,6 +14,15 @@ jobs:
         permissions:
             contents: read
             packages: write
+        strategy:
+            matrix:
+                app:
+                    - name: coredns
+                      directory: ./applications/coredns
+                      image: ghcr.io/liamawhite/coredns
+                    - name: homeassistant
+                      directory: ./applications/homeassistant
+                      image: ghcr.io/liamawhite/homeassistant
 
         steps:
             - name: Checkout code
@@ -34,16 +43,9 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Build and push CoreDNS Docker image
-              working-directory: ./applications/coredns
+            - name: Build and push ${{ matrix.app.name }} Docker image
+              working-directory: ${{ matrix.app.directory }}
               run: make docker-push
               env:
-                  IMAGE_NAME: ${{ env.REGISTRY }}/liamawhite/coredns
-                  TAG: ${{ github.sha }}
-
-            - name: Build and push Home Assistant Docker image
-              working-directory: ./applications/homeassistant
-              run: make docker-push
-              env:
-                  IMAGE_NAME: ${{ env.REGISTRY }}/liamawhite/homeassistant
+                  IMAGE_NAME: ${{ matrix.app.image }}
                   TAG: ${{ github.sha }}
