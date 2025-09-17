@@ -10,6 +10,7 @@ import { configurePki } from './pki'
 import { configureStorage } from './storage'
 import { configureSyncthing } from './syncthing'
 import { configureMonitoring } from './monitoring'
+import { configureHomeAssistant } from './homeassistant'
 
 const cfg = loadConfig()
 
@@ -21,6 +22,7 @@ const network = configureNetwork({ ...cfg, cluster })
 const dns = configureDns({ ...cfg, cluster, network })
 const monitoring = configureMonitoring({ ...cluster, pki, storage })
 const syncthing = configureSyncthing({ cluster, pki, storage })
+const homeassistant = configureHomeAssistant({ cluster, pki, storage })
 
 // Write the kubeconfig to a file at repo root so we can use it easily
 // This is gitignored so it won't be checked in

@@ -9,7 +9,7 @@ import { configureStorage } from './storage'
 export function configureMonitoring({
     provider,
     pki,
-    storage
+    storage,
 }: ReturnType<typeof configureCluster> & {
     pki: ReturnType<typeof configurePki>
     storage: ReturnType<typeof configureStorage>
@@ -21,13 +21,13 @@ export function configureMonitoring({
         {
             metadata: { name: 'monitoring' },
         },
-        { provider }
+        { provider },
     )
 
     const prometheusOperator = new PrometheusOperator(
         'prometheus-operator',
         { namespace: namespace.metadata.name },
-        { provider }
+        { provider },
     )
 
     const prometheus = new PrometheusInstance(
@@ -43,7 +43,7 @@ export function configureMonitoring({
                 issuer: pki.issuer.issuerRef(),
             },
         },
-        { ...opts, dependsOn: [prometheusOperator] }
+        { ...opts, dependsOn: [prometheusOperator] },
     )
 
     const nodeExporter = new NodeExporter(
@@ -51,7 +51,7 @@ export function configureMonitoring({
         {
             namespace: namespace.metadata.name,
         },
-        { ...opts, dependsOn: [prometheusOperator] }
+        { ...opts, dependsOn: [prometheusOperator] },
     )
 
     nodeExporter.createServiceMonitor()

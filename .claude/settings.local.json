@@ -1,12 +1,13 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(tar:*)",
-      "WebFetch(domain:istio.io)",
-      "WebFetch(domain:coredns.io)",
-      "Bash(kubectl --kubeconfig=kubeconfig get*)",
-      "Bash(kubectl --kubeconfig=kubeconfig logs*)"
-    ],
-    "deny": []
-  }
+    "permissions": {
+        "allow": [
+            "Bash(tar:*)",
+            "WebFetch(domain:istio.io)",
+            "WebFetch(domain:coredns.io)",
+            "Bash(kubectl --kubeconfig=kubeconfig get*)",
+            "Bash(kubectl --kubeconfig=kubeconfig logs*)",
+            "Bash(yarn check)"
+        ],
+        "deny": []
+    }
 }

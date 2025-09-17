@@ -28,8 +28,9 @@ function generateSyncthingConfig(config: SyncthingDeclarativeConfig): string {
     const template = fs.readFileSync(templatePath, 'utf8')
 
     const devicesXml = Object.entries(config.devices)
-        .map(([key, device]) =>
-            `    <device id="${device.id}" name="${device.name}" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
+        .map(
+            ([key, device]) =>
+                `    <device id="${device.id}" name="${device.name}" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
         <address>dynamic</address>
         <paused>false</paused>
         <autoAcceptFolders>false</autoAcceptFolders>
@@ -38,7 +39,7 @@ function generateSyncthingConfig(config: SyncthingDeclarativeConfig): string {
         <maxRequestKiB>0</maxRequestKiB>
         <untrusted>false</untrusted>
         <remoteGUIPort>0</remoteGUIPort>
-    </device>`
+    </device>`,
         )
         .join('\n')
 
@@ -88,9 +89,7 @@ ${devicesInFolder}
         })
         .join('\n')
 
-    return template
-        .replace('{{FOLDERS}}', foldersXml)
-        .replace('{{DEVICES}}', devicesXml)
+    return template.replace('{{FOLDERS}}', foldersXml).replace('{{DEVICES}}', devicesXml)
 }
 
 export class Syncthing extends pulumi.ComponentResource {
