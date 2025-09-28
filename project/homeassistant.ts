@@ -41,6 +41,10 @@ export function configureHomeAssistant({
             web: {
                 hostname: 'homeassistant.homelab',
                 issuer: pki.issuer.issuerRef(),
+                tailscale: {
+                    enabled: true,
+                    hostname: 'homeassistant',
+                },
             },
         },
         { ...opts, dependsOn: [namespace, ...storage.ready] },

@@ -2,8 +2,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs'
 import * as path from 'path'
-import { gateway } from '../istio/crds/gatewayapi'
-import { Certificate } from '../certmanager/crds/cert_manager/v1'
+import { Gateway } from '../gateway'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 
 export interface SyncthingDevice {
@@ -336,93 +335,15 @@ export class Syncthing extends pulumi.ComponentResource {
             localOpts,
         )
 
-        const cert = new Certificate(
+        const gateway = new Gateway(
             name,
             {
-                metadata: { namespace: args.namespace },
-                spec: {
-                    dnsNames: [args.web.hostname],
-                    issuerRef: args.web.issuer,
-                    secretName: 'syncthing-cert',
-                },
-            },
-            localOpts,
-        )
-
-        const gw = new gateway.v1.Gateway(
-            name,
-            {
-                metadata: {
-                    name: 'syncthing-webui',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    gatewayClassName: 'istio',
-                    listeners: [
-                        {
-                            name: 'http',
-                            port: 80,
-                            protocol: 'HTTP',
-                        },
-                        {
-                            name: 'https',
-                            port: 443,
-                            protocol: 'HTTPS',
-                            tls: {
-                                mode: 'Terminate',
-                                certificateRefs: [{ name: cert.spec.secretName }],
-                            },
-                            allowedRoutes: { namespaces: { from: 'Same' } },
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        const httpRedirect = new gateway.v1.HTTPRoute(
-            `${name}-redirect`,
-            {
-                metadata: {
-                    name: 'syncthing-webui-httpredirect',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'http' }],
-                    rules: [
-                        {
-                            filters: [
-                                {
-                                    type: 'RequestRedirect',
-                                    requestRedirect: {
-                                        scheme: 'https',
-                                        statusCode: 301,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        const httpRoute = new gateway.v1.HTTPRoute(
-            name,
-            {
-                metadata: {
-                    name: 'syncthing-webui',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    hostnames: [args.web.hostname],
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'https' }],
-                    rules: [
-                        {
-                            backendRefs: [{ name: webService.metadata.name, port: 8384 }],
-                        },
-                    ],
-                },
+                namespace: args.namespace,
+                hostname: args.web.hostname,
+                serviceName: webService.metadata.name,
+                servicePort: 8384,
+                issuer: args.web.issuer,
+                tailscale: args.web.tailscale,
             },
             localOpts,
         )
@@ -432,10 +353,7 @@ export class Syncthing extends pulumi.ComponentResource {
             statefulSet,
             webService,
             syncService,
-            cert,
-            gw,
-            httpRedirect,
-            httpRoute,
+            gateway,
         })
     }
 }
@@ -450,6 +368,10 @@ export interface SyncthingArgs {
     web: {
         hostname: string
         issuer: certmanager.v1.CertificateSpecIssuerRef
+        tailscale?: {
+            enabled: boolean
+            hostname?: string
+        }
     }
     sync?: {
         annotations?: {

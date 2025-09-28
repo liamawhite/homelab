@@ -44,6 +44,10 @@ export function configureMonitoring({
             web: {
                 hostname: 'prometheus.homelab',
                 issuer: pki.issuer.issuerRef(),
+                tailscale: {
+                    enabled: true,
+                    hostname: 'prometheus',
+                },
             },
         },
         { ...opts, dependsOn: [prometheusOperator] },
@@ -84,6 +88,10 @@ export function configureMonitoring({
             web: {
                 hostname: 'grafana.homelab',
                 issuer: pki.issuer.issuerRef(),
+                tailscale: {
+                    enabled: true,
+                    hostname: 'grafana',
+                },
             },
         },
         { ...opts, dependsOn: [prometheus] },
