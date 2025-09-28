@@ -2,6 +2,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs'
 import * as path from 'path'
+import { ServiceMonitor } from '../prometheus-operator/crds/monitoring/v1'
 import { versions } from '../../../.versions'
 
 function loadBlocklists(): string {
@@ -288,6 +289,30 @@ export class CoreDns extends pulumi.ComponentResource {
             localOpts,
         )
 
+        const serviceMonitor = new ServiceMonitor(
+            `${name}-servicemonitor`,
+            {
+                metadata: {
+                    name: 'coredns-external',
+                    namespace: args.namespace,
+                    labels: { app: 'coredns-external' },
+                },
+                spec: {
+                    selector: {
+                        matchLabels: { app: 'coredns-external' },
+                    },
+                    endpoints: [
+                        {
+                            port: 'metrics',
+                            interval: '30s',
+                            path: '/metrics',
+                        },
+                    ],
+                },
+            },
+            localOpts,
+        )
+
         this.registerOutputs({
             serviceAccount,
             clusterRole,
@@ -295,6 +320,7 @@ export class CoreDns extends pulumi.ComponentResource {
             configMap,
             deploy,
             service,
+            serviceMonitor,
         })
     }
 }
