@@ -1,7 +1,6 @@
 import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
-import { gateway } from '../istio/crds/gatewayapi'
-import { Certificate } from '../certmanager/crds/cert_manager/v1'
+import { Gateway } from '../gateway'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 import { Prometheus } from '../prometheus-operator/crds/monitoring/v1'
 import { versions } from '../../../.versions'
@@ -218,100 +217,16 @@ export class PrometheusInstance extends pulumi.ComponentResource {
             localOpts,
         )
 
-        // TLS Certificate
-        const cert = new Certificate(
-            'prometheus-cert',
-            {
-                metadata: {
-                    name: 'prometheus-cert',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    dnsNames: [args.web.hostname],
-                    issuerRef: args.web.issuer,
-                    secretName: 'prometheus-tls',
-                },
-            },
-            localOpts,
-        )
-
-        // Istio Gateway
-        const gw = new gateway.v1.Gateway(
+        // Gateway for web access
+        const gateway = new Gateway(
             'prometheus-gateway',
             {
-                metadata: {
-                    name: 'prometheus-gateway',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    gatewayClassName: 'istio',
-                    listeners: [
-                        {
-                            name: 'http',
-                            port: 80,
-                            protocol: 'HTTP',
-                        },
-                        {
-                            name: 'https',
-                            port: 443,
-                            protocol: 'HTTPS',
-                            tls: {
-                                mode: 'Terminate',
-                                certificateRefs: [{ name: cert.spec.secretName }],
-                            },
-                            allowedRoutes: { namespaces: { from: 'Same' } },
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        // HTTP to HTTPS redirect
-        const httpRedirect = new gateway.v1.HTTPRoute(
-            'prometheus-http-redirect',
-            {
-                metadata: {
-                    name: 'prometheus-http-redirect',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'http' }],
-                    rules: [
-                        {
-                            filters: [
-                                {
-                                    type: 'RequestRedirect',
-                                    requestRedirect: {
-                                        scheme: 'https',
-                                        statusCode: 301,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        // HTTPS HTTPRoute
-        const httpRoute = new gateway.v1.HTTPRoute(
-            'prometheus-https-route',
-            {
-                metadata: {
-                    name: 'prometheus-https-route',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    hostnames: [args.web.hostname],
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'https' }],
-                    rules: [
-                        {
-                            backendRefs: [{ name: service.metadata.name, port: 9090 }],
-                        },
-                    ],
-                },
+                namespace: args.namespace,
+                hostname: args.web.hostname,
+                serviceName: service.metadata.name,
+                servicePort: 9090,
+                issuer: args.web.issuer,
+                tailscale: args.web.tailscale,
             },
             localOpts,
         )
@@ -322,10 +237,7 @@ export class PrometheusInstance extends pulumi.ComponentResource {
             clusterRoleBinding,
             prometheus,
             service,
-            cert,
-            gw,
-            httpRedirect,
-            httpRoute,
+            gateway,
         })
     }
 }
@@ -339,5 +251,9 @@ export interface PrometheusArgs {
     web: {
         hostname: string
         issuer: certmanager.v1.CertificateSpecIssuerRef
+        tailscale?: {
+            enabled: boolean
+            hostname?: string
+        }
     }
 }

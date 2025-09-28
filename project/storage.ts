@@ -17,6 +17,10 @@ export function configureStorage({
             web: {
                 hostname: 'storage.homelab',
                 issuer: pki.issuer.issuerRef(),
+                tailscale: {
+                    enabled: true,
+                    hostname: 'storage',
+                },
             },
         },
         opts,

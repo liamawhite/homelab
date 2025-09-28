@@ -40,6 +40,10 @@ export function configureSyncthing({
             web: {
                 hostname: 'syncthing.homelab',
                 issuer: pki.issuer.issuerRef(),
+                tailscale: {
+                    enabled: true,
+                    hostname: 'syncthing',
+                },
             },
             declarativeConfig: {
                 devices: {

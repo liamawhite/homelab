@@ -8,7 +8,9 @@
             "Bash(kubectl --kubeconfig=kubeconfig logs:*)",
             "Bash(yarn check)",
             "Bash(yarn format)",
-            "Bash(yarn deploy)"
+            "Bash(yarn deploy)",
+            "WebFetch(domain:tailscale.com)",
+            "Bash(npx tsc:*)"
         ],
         "deny": []
     }

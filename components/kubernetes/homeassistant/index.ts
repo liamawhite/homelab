@@ -2,8 +2,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs'
 import * as path from 'path'
-import { gateway } from '../istio/crds/gatewayapi'
-import { Certificate } from '../certmanager/crds/cert_manager/v1'
+import { Gateway } from '../gateway'
 import { cert_manager as certmanager } from '../certmanager/crds/types/input'
 
 export class HomeAssistant extends pulumi.ComponentResource {
@@ -218,96 +217,15 @@ export class HomeAssistant extends pulumi.ComponentResource {
             localOpts,
         )
 
-        const cert = new Certificate(
+        const gateway = new Gateway(
             name,
             {
-                metadata: {
-                    name: 'homeassistant-cert',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    dnsNames: [args.web.hostname],
-                    issuerRef: args.web.issuer,
-                    secretName: 'homeassistant-tls',
-                },
-            },
-            localOpts,
-        )
-
-        const gw = new gateway.v1.Gateway(
-            name,
-            {
-                metadata: {
-                    name: 'homeassistant-gateway',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    gatewayClassName: 'istio',
-                    listeners: [
-                        {
-                            name: 'http',
-                            port: 80,
-                            protocol: 'HTTP',
-                        },
-                        {
-                            name: 'https',
-                            port: 443,
-                            protocol: 'HTTPS',
-                            tls: {
-                                mode: 'Terminate',
-                                certificateRefs: [{ name: cert.spec.secretName }],
-                            },
-                            allowedRoutes: { namespaces: { from: 'Same' } },
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        const httpRedirect = new gateway.v1.HTTPRoute(
-            `${name}-redirect`,
-            {
-                metadata: {
-                    name: 'homeassistant-http-redirect',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'http' }],
-                    rules: [
-                        {
-                            filters: [
-                                {
-                                    type: 'RequestRedirect',
-                                    requestRedirect: {
-                                        scheme: 'https',
-                                        statusCode: 301,
-                                    },
-                                },
-                            ],
-                        },
-                    ],
-                },
-            },
-            localOpts,
-        )
-
-        const httpRoute = new gateway.v1.HTTPRoute(
-            name,
-            {
-                metadata: {
-                    name: 'homeassistant-https-route',
-                    namespace: args.namespace,
-                },
-                spec: {
-                    hostnames: [args.web.hostname],
-                    parentRefs: [{ name: gw.metadata.name, sectionName: 'https' }],
-                    rules: [
-                        {
-                            backendRefs: [{ name: service.metadata.name, port: 8123 }],
-                        },
-                    ],
-                },
+                namespace: args.namespace,
+                hostname: args.web.hostname,
+                serviceName: service.metadata.name,
+                servicePort: 8123,
+                issuer: args.web.issuer,
+                tailscale: args.web.tailscale,
             },
             localOpts,
         )
@@ -316,10 +234,7 @@ export class HomeAssistant extends pulumi.ComponentResource {
             configMap,
             statefulSet,
             service,
-            cert,
-            gw,
-            httpRedirect,
-            httpRoute,
+            gateway,
         })
     }
 
@@ -375,6 +290,10 @@ export interface HomeAssistantArgs {
     web: {
         hostname: string
         issuer: certmanager.v1.CertificateSpecIssuerRef
+        tailscale?: {
+            enabled: boolean
+            hostname?: string
+        }
     }
     configuration?: string
 }
