@@ -130,12 +130,12 @@ export class PrometheusInstance extends pulumi.ComponentResource {
                     },
                     resources: {
                         requests: {
-                            memory: '64Mi',
-                            cpu: '10m',
+                            memory: '512Mi',
+                            cpu: '100m',
                         },
                         limits: {
-                            memory: '128Mi',
-                            cpu: '100m',
+                            memory: '2Gi',
+                            cpu: '1000m',
                         },
                     },
                     storage: {
