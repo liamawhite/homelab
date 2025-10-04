@@ -4,6 +4,7 @@ import { PrometheusInstance } from '../../components/kubernetes/prometheus'
 import { NodeExporter } from '../../components/kubernetes/node-exporter'
 import { KubeStateMetrics } from '../../components/kubernetes/kube-state-metrics'
 import { Grafana } from '../../components/kubernetes/grafana'
+import { Cadvisor } from '../../components/kubernetes/cadvisor'
 import { dashboards } from './dashboards'
 import { configureCluster } from '../cluster'
 import { configurePki } from '../pki'
@@ -73,6 +74,16 @@ export function configureMonitoring({
 
     kubeStateMetrics.createServiceMonitor()
 
+    const cadvisor = new Cadvisor(
+        'cadvisor',
+        {
+            namespace: namespace.metadata.name,
+        },
+        { ...opts, dependsOn: [prometheusOperator] },
+    )
+
+    cadvisor.createServiceMonitor()
+
     const grafana = new Grafana(
         'grafana',
         {
@@ -102,7 +113,8 @@ export function configureMonitoring({
         prometheus,
         nodeExporter,
         kubeStateMetrics,
+        cadvisor,
         grafana,
-        ready: [prometheusOperator, prometheus, nodeExporter, kubeStateMetrics, grafana],
+        ready: [prometheusOperator, prometheus, nodeExporter, kubeStateMetrics, cadvisor, grafana],
     }
 }

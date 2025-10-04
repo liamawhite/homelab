@@ -3,26 +3,26 @@
 # This is for reference only - actual config may need manual setup
 
 sun:
-    - title: Sun
-      options: {}
+  - title: Sun
+    options: {}
 go2rtc:
-    - title: go2rtc
-      options: {}
+  - title: go2rtc
+    options: {}
 backup:
-    - title: Backup
-      options: {}
+  - title: Backup
+    options: {}
 met:
-    - title: Home
-      options: {}
+  - title: Home
+    options: {}
 google_translate:
-    - title: Google Translate text-to-speech
-      options: {}
+  - title: Google Translate text-to-speech
+    options: {}
 radio_browser:
-    - title: Radio Browser
-      options: {}
+  - title: Radio Browser
+    options: {}
 hue:
-    - title: Hue Bridge ecb5fa9d9371
-      options: {}
+  - title: Hue Bridge ecb5fa9d9371
+    options: {}
 adaptive_lighting:
-    - title: Liam Office
-      options: {}
+  - title: Liam Office
+    options: {}
