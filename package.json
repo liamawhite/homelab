@@ -6,6 +6,8 @@
         "gen": "nix develop --command yarn tsx .gen.ts",
         "format": "nix develop --command yarn prettier --write .",
         "deploy": "yarn homeassistant && cd project && PULUMI_K8S_ENABLE_PATCH_FORCE=true pulumi up -yf -s liamawhite/homelab/homelab",
+        "cancel": "cd project && pulumi cancel -s liamawhite/homelab/homelab",
+        "refresh": "cd project && pulumi refresh -yf -s liamawhite/homelab/homelab",
         "passwords": "nix develop --command pulumi stack output --show-secrets -s liamawhite/homelab/homelab --json | jq -r '.passwords'",
         "k9s": "nix develop --command env KUBECONFIG=kubeconfig k9s",
         "homeassistant": "nix develop --command yarn tsx components/kubernetes/homeassistant/extract-config.ts"

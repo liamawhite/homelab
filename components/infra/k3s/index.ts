@@ -65,16 +65,17 @@ export class K3s extends pulumi.ComponentResource {
         )
 
         // Retrive the kubeconfig
+        const kubeconfigServerIndex = 1 // Which server to retrieve kubeconfig from (0-based index)
         const retrieveKubeconfig = new remote.Command(
             `${name}-kubeconfig`,
             {
-                connection: args.servers[0].connection,
+                connection: args.servers[kubeconfigServerIndex].connection,
                 create: `sudo cat /etc/rancher/k3s/k3s.yaml`,
             },
             { ...localOpts, dependsOn: init },
         ).stdout
         const kubeconfig = pulumi
-            .all([args.servers[0].address, retrieveKubeconfig])
+            .all([args.servers[kubeconfigServerIndex].address, retrieveKubeconfig])
             .apply(([address, config]) => {
                 return config.replace('127.0.0.1', address)
             })
