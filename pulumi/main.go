@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/liamawhite/homelab/pulumi/pkg/gatewayapi"
+	"github.com/liamawhite/homelab/pulumi/pkg/istio"
 	"github.com/liamawhite/homelab/pulumi/pkg/kubevip"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -24,6 +26,22 @@ func main() {
 			VIP:     cfg.VIP,
 			Version: cfg.KubeVip.Version,
 		}, pulumi.Provider(provider))
+		if err != nil {
+			return err
+		}
+
+		// 4. Deploy Gateway API (dependency for Istio)
+		gateway, err := gatewayapi.NewGatewayAPI(ctx, "gateway-api", &gatewayapi.GatewayAPIArgs{
+			Version: cfg.GatewayAPI.Version,
+		}, pulumi.Provider(provider))
+		if err != nil {
+			return err
+		}
+
+		// 5. Deploy Istio (depends on Gateway API)
+		_, err = istio.NewIstio(ctx, "istio", &istio.IstioArgs{
+			Version: cfg.Istio.Version,
+		}, pulumi.Provider(provider), pulumi.DependsOn([]pulumi.Resource{gateway}))
 		if err != nil {
 			return err
 		}

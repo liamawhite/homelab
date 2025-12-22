@@ -34,7 +34,24 @@ func NewKubeVip(ctx *pulumi.Context, name string, args *KubeVipArgs, opts ...pul
 	}
 
 	// Child resources should have this component as their parent
-	resourceOpts := append(opts, pulumi.Parent(kubeVip))
+	//
+	// IMPORTANT: This option protects kube-vip during provider replacements.
+	//
+	// Why provider replacements happen:
+	// After kube-vip is deployed, the kubeconfig is typically updated to use the VIP
+	// (192.168.1.50) instead of a specific node IP (e.g., 192.168.1.51). This changes
+	// the kubeconfig content, which causes Pulumi to see the Kubernetes provider as
+	// "changed". When the provider changes, all resources using that provider get new
+	// URNs and Pulumi wants to replace them.
+	//
+	// DeleteBeforeReplace(false): When Pulumi needs to replace a resource, it will create
+	// the new resource first, then delete the old one. This ensures zero downtime during
+	// replacements. Without this, Pulumi would delete first, then create, causing a service
+	// outage.
+	resourceOpts := append(opts,
+		pulumi.Parent(kubeVip),
+		pulumi.DeleteBeforeReplace(false),
+	)
 
 	// Use kube-system namespace
 	namespace := pulumi.String("kube-system")
