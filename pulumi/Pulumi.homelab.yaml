@@ -1,3 +1,7 @@
 config:
   homelab:kubevip:
     version: "v1.0.3"
+  homelab:gatewayapi:
+    version: "1.2.0"
+  homelab:istio:
+    version: "1.28.2"

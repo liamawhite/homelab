@@ -25,13 +25,16 @@ func ExtractKubeconfig(ctx context.Context, sshClient *ssh.Client, nodeAddr stri
 		return "", fmt.Errorf("failed to parse kubeconfig: %w", err)
 	}
 
-	// Replace 127.0.0.1 with actual node address
+	// Replace 127.0.0.1 with k8s.homelab (VIP hostname)
+	// This ensures the kubeconfig always points to the VIP via hostname,
+	// preventing Pulumi provider replacements when switching from node IP to VIP.
+	// The hostname k8s.homelab should be configured in /etc/hosts to point to 192.168.1.50
 	if clusters, ok := config["clusters"].([]interface{}); ok {
 		for _, cluster := range clusters {
 			if clusterMap, ok := cluster.(map[string]interface{}); ok {
 				if clusterData, ok := clusterMap["cluster"].(map[string]interface{}); ok {
 					if server, ok := clusterData["server"].(string); ok {
-						clusterData["server"] = strings.Replace(server, "127.0.0.1", nodeAddr, 1)
+						clusterData["server"] = strings.Replace(server, "127.0.0.1", "k8s.homelab", 1)
 					}
 				}
 			}
