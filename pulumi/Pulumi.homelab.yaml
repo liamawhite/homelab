@@ -1,0 +1,3 @@
+config:
+  homelab:kubevip:
+    version: "v1.0.3"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/liamawhite/homelab/cli/pkg/config"
+	"github.com/liamawhite/homelab/pkg/config"
 	"github.com/liamawhite/homelab/cli/pkg/k3s"
 	"github.com/liamawhite/homelab/cli/pkg/ssh"
 	"github.com/spf13/cobra"
