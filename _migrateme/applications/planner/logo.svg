@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#4F46E5" />
+
+  <!-- Calendar grid -->
+  <g transform="translate(256, 256)">
+    <!-- Top bar -->
+    <rect x="-100" y="-120" width="200" height="30" rx="8" fill="#FFFFFF" opacity="0.9"/>
+
+    <!-- Main calendar body -->
+    <rect x="-100" y="-80" width="200" height="180" rx="8" fill="#FFFFFF"/>
+
+    <!-- Calendar header dots (binding) -->
+    <circle cx="-60" cy="-110" r="8" fill="#FFFFFF"/>
+    <circle cx="0" cy="-110" r="8" fill="#FFFFFF"/>
+    <circle cx="60" cy="-110" r="8" fill="#FFFFFF"/>
+
+    <!-- Grid lines -->
+    <line x1="-100" y1="-40" x2="100" y2="-40" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="-100" y1="0" x2="100" y2="0" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="-100" y1="40" x2="100" y2="40" stroke="#E5E7EB" stroke-width="2"/>
+
+    <line x1="-60" y1="-80" x2="-60" y2="100" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="-20" y1="-80" x2="-20" y2="100" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="20" y1="-80" x2="20" y2="100" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="60" y1="-80" x2="60" y2="100" stroke="#E5E7EB" stroke-width="2"/>
+
+    <!-- Highlighted day (current date marker) -->
+    <circle cx="40" cy="20" r="18" fill="#4F46E5"/>
+    <text x="40" y="28" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF" text-anchor="middle">15</text>
+
+    <!-- Checkmark -->
+    <g transform="translate(-40, 60)">
+      <circle cx="0" cy="0" r="16" fill="#10B981"/>
+      <path d="M -6 0 L -2 4 L 6 -6" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>

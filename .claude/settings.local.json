@@ -1,17 +1,22 @@
 {
-    "permissions": {
-        "allow": [
-            "Bash(tar:*)",
-            "WebFetch(domain:istio.io)",
-            "WebFetch(domain:coredns.io)",
-            "Bash(kubectl --kubeconfig=kubeconfig get:*)",
-            "Bash(kubectl --kubeconfig=kubeconfig logs:*)",
-            "Bash(yarn check)",
-            "Bash(yarn format)",
-            "Bash(yarn deploy)",
-            "WebFetch(domain:tailscale.com)",
-            "Bash(npx tsc:*)"
-        ],
-        "deny": []
-    }
+  "permissions": {
+    "allow": [
+      "Bash(tar:*)",
+      "WebFetch(domain:istio.io)",
+      "WebFetch(domain:coredns.io)",
+      "Bash(kubectl --kubeconfig=kubeconfig get:*)",
+      "Bash(kubectl --kubeconfig=kubeconfig logs:*)",
+      "Bash(yarn check)",
+      "Bash(yarn format)",
+      "Bash(yarn deploy)",
+      "WebFetch(domain:tailscale.com)",
+      "Bash(npx tsc:*)",
+      "Bash(go mod tidy:*)",
+      "WebFetch(domain:kube-vip.io)",
+      "WebSearch",
+      "Bash(go build:*)",
+      "Bash(./homelab:*)"
+    ],
+    "deny": []
+  }
 }

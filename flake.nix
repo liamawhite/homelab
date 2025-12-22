@@ -19,7 +19,6 @@
               yq
               kubernetes-helm
               k9s
-              nodejs_24
               go
               docker
               gnumake
