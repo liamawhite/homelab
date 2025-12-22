@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/liamawhite/homelab/cli/pkg/config"
+	"github.com/liamawhite/homelab/pkg/config"
 	"github.com/liamawhite/homelab/cli/pkg/k3s"
 	"github.com/liamawhite/homelab/cli/pkg/ssh"
 	"github.com/spf13/cobra"
@@ -34,9 +34,9 @@ func init() {
 func runKubeconfig(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
-	// Load configuration (handles node-name, infra.yaml, env vars, etc.)
+	// Load configuration (skip K3s validation - we're just extracting kubeconfig)
 	slog.Info("Loading configuration")
-	cfg, err := config.Load(cmd)
+	cfg, err := config.LoadWithOptions(cmd, true)
 	if err != nil {
 		return err
 	}

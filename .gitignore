@@ -1,5 +1,6 @@
 kubeconfig
 ca.pem
+cluster-token
 
 bin
 homelab

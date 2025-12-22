@@ -17,6 +17,7 @@ type InfraConfig struct {
 	Cluster ClusterConfig `yaml:"cluster" mapstructure:"cluster"`
 	SSH     SSHConfig     `yaml:"ssh" mapstructure:"ssh"`
 	Nodes   []NodeConfig  `yaml:"nodes" mapstructure:"nodes"`
+	KubeVip KubeVipConfig `yaml:"kubevip,omitempty" mapstructure:"kubevip"` // Added for Pulumi
 }
 
 type ClusterConfig struct {
@@ -37,6 +38,11 @@ type NodeConfig struct {
 	SSH     *SSHConfig        `yaml:"ssh,omitempty" mapstructure:"ssh"`
 }
 
+// KubeVipConfig holds kube-vip specific configuration
+type KubeVipConfig struct {
+	Version string `yaml:"version,omitempty" mapstructure:"version"` // kube-vip image version (default: "v1.0.3")
+}
+
 type Config struct {
 	Node             string
 	SSHUser          string
@@ -50,11 +56,21 @@ type Config struct {
 	// New fields for config file support
 	ConfigFile  string
 	InfraConfig *InfraConfig
+
+	// Skip K3s-specific validation (for commands like clustertoken, kubeconfig)
+	SkipK3sValidation bool
 }
 
 // Load loads configuration with precedence: CLI flags > infra.yaml > env vars > defaults
 func Load(cmd *cobra.Command) (*Config, error) {
-	cfg := &Config{}
+	return LoadWithOptions(cmd, false)
+}
+
+// LoadWithOptions loads configuration with optional K3s validation skip
+func LoadWithOptions(cmd *cobra.Command, skipK3sValidation bool) (*Config, error) {
+	cfg := &Config{
+		SkipK3sValidation: skipK3sValidation,
+	}
 
 	// Initialize viper for environment variables
 	viper.SetEnvPrefix("HOMELAB")
@@ -89,6 +105,11 @@ func Load(cmd *cobra.Command) (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+// LoadFromFile loads InfraConfig directly from a file path (for Pulumi)
+func LoadFromFile(path string) (*InfraConfig, error) {
+	return loadInfraYAML(path)
 }
 
 // findConfigFile searches for infra.yaml in common locations
@@ -136,6 +157,11 @@ func loadInfraYAML(path string) (*InfraConfig, error) {
 func applyDefaults(cfg *InfraConfig) {
 	if cfg.SSH.Port == 0 {
 		cfg.SSH.Port = 22
+	}
+
+	// KubeVip defaults
+	if cfg.KubeVip.Version == "" {
+		cfg.KubeVip.Version = "v1.0.3" // Latest stable
 	}
 
 	// SANs default to empty - K3s includes localhost, 127.0.0.1, hostname, and node IPs by default
@@ -278,16 +304,19 @@ func validateConfig(cfg *Config) error {
 		cfg.SSHPassword = string(password)
 	}
 
-	if !cfg.ClusterInit && cfg.ServerURL == "" {
-		return fmt.Errorf("server URL required for joining nodes (use --server)")
-	}
+	// K3s-specific validation (skip for commands like clustertoken, kubeconfig)
+	if !cfg.SkipK3sValidation {
+		if !cfg.ClusterInit && cfg.ServerURL == "" {
+			return fmt.Errorf("server URL required for joining nodes (use --server)")
+		}
 
-	if !cfg.ClusterInit && cfg.Token == "" {
-		return fmt.Errorf("cluster token required for joining nodes (use --token)")
-	}
+		if !cfg.ClusterInit && cfg.Token == "" {
+			return fmt.Errorf("cluster token required for joining nodes (use --token)")
+		}
 
-	if cfg.ClusterInit && (cfg.ServerURL != "" || cfg.Token != "") {
-		return fmt.Errorf("--cluster-init cannot be used with --server or --token")
+		if cfg.ClusterInit && (cfg.ServerURL != "" || cfg.Token != "") {
+			return fmt.Errorf("--cluster-init cannot be used with --server or --token")
+		}
 	}
 
 	return nil

@@ -3,7 +3,12 @@
     "allow": [
       "WebFetch(domain:kube-vip.io)",
       "Bash(cat:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(go mod tidy:*)",
+      "Bash(pulumi preview:*)",
+      "Bash(kubectl --kubeconfig=/Users/liam/github.com/liamawhite/homelab/main/kubeconfig get pods:*)",
+      "Bash(kubectl:*)",
+      "Bash(ping:*)"
     ]
   }
 }

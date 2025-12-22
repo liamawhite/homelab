@@ -10,7 +10,6 @@
       "Bash(yarn format)",
       "Bash(yarn deploy)",
       "WebFetch(domain:tailscale.com)",
-      "Bash(npx tsc:*)",
       "Bash(go mod tidy:*)",
       "WebFetch(domain:kube-vip.io)",
       "WebSearch",
