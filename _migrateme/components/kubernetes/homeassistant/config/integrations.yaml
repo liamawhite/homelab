@@ -1,0 +1,28 @@
+# Integration configurations extracted from UI
+# Note: Sensitive data like tokens are not included
+# This is for reference only - actual config may need manual setup
+
+sun:
+  - title: Sun
+    options: {}
+go2rtc:
+  - title: go2rtc
+    options: {}
+backup:
+  - title: Backup
+    options: {}
+met:
+  - title: Home
+    options: {}
+google_translate:
+  - title: Google Translate text-to-speech
+    options: {}
+radio_browser:
+  - title: Radio Browser
+    options: {}
+hue:
+  - title: Hue Bridge ecb5fa9d9371
+    options: {}
+adaptive_lighting:
+  - title: Liam Office
+    options: {}

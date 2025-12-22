@@ -168,6 +168,8 @@ export class CoreDns extends pulumi.ComponentResource {
                         metadata: { labels: { app: 'coredns-external' } },
                         spec: {
                             serviceAccountName: serviceAccount.metadata.name,
+                            // Use node's DNS to avoid loops. Node DNS is configured via DHCP to not point back to CoreDNS.
+                            dnsPolicy: 'Default',
                             containers: [
                                 {
                                     name: 'coredns',
@@ -225,7 +227,7 @@ export class CoreDns extends pulumi.ComponentResource {
                                         },
                                         limits: {
                                             cpu: '100m',
-                                            memory: '64Mi',
+                                            memory: '256Mi',
                                         },
                                     },
                                     volumeMounts: [

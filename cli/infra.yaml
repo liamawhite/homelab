@@ -1,0 +1,29 @@
+cluster:
+  # Virtual IP for the cluster (for future kube-vip installation)
+  vip: 192.168.1.50
+
+  # TLS Subject Alternative Names for K3s API server certificates
+  # K3s already includes: localhost, 127.0.0.1, node hostname, node IPs
+  sans:
+    - 192.168.1.50  # VIP for future kube-vip
+    - k8s.homelab   # Custom DNS name
+
+  # K3s cluster token (shared secret for nodes joining the cluster)
+  # Extract from first node after bootstrapping: homelab kubeconfig --node pi-0 --token
+  token: ""
+
+# SSH configuration defaults
+ssh:
+  user: liam
+  port: 22
+
+# Node inventory
+nodes:
+  - name: pi-0
+    address: 192.168.1.51
+
+  - name: pi-1
+    address: 192.168.1.52
+
+  - name: pi-2
+    address: 192.168.1.53
