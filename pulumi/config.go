@@ -14,6 +14,7 @@ type Config struct {
 	KubeVip    KubeVipConfig
 	GatewayAPI GatewayAPIConfig
 	Istio      IstioConfig
+	Cloudflare CloudflareConfig
 }
 
 // KubeVipConfig represents kube-vip specific configuration
@@ -29,6 +30,19 @@ type GatewayAPIConfig struct {
 // IstioConfig represents Istio specific configuration
 type IstioConfig struct {
 	Version string `json:"version"`
+}
+
+// CloudflareConfig represents Cloudflare specific configuration
+type CloudflareConfig struct {
+	AccountID string       `json:"accountId"`
+	APIToken  string       `json:"apiToken"`
+	Tunnel    TunnelConfig `json:"tunnel"`
+}
+
+// TunnelConfig represents Cloudflare Tunnel specific configuration
+type TunnelConfig struct {
+	Domain    pulumi.StringOutput `json:"-"` // e.g., "liamwhite.fyi"
+	Subdomain pulumi.StringOutput `json:"-"` // e.g., "*" for wildcard
 }
 
 // LoadConfig loads configuration from infra.yaml and Pulumi config
@@ -90,11 +104,61 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 		istioCfg.Version = "1.28.2"
 	}
 
+	// Get Cloudflare config from Pulumi config
+	type cfConfigInput struct {
+		AccountID string `json:"accountId"`
+		APIToken  string `json:"apiToken"`
+	}
+
+	var cfInput cfConfigInput
+	if err := pulumiCfg.TryObject("cloudflare", &cfInput); err != nil {
+		return nil, fmt.Errorf("cloudflare configuration is required: %w", err)
+	}
+
+	// Validate Cloudflare credentials are provided
+	if cfInput.AccountID == "" {
+		return nil, fmt.Errorf("cloudflare account ID is required in Pulumi config (homelab:cloudflare.accountId)")
+	}
+	if cfInput.APIToken == "" {
+		return nil, fmt.Errorf("cloudflare API token is required in Pulumi config (homelab:cloudflare.apiToken)")
+	}
+
+	// Get tunnel config from the cloudflare object
+	type tunnelInput struct {
+		Domain    string `json:"domain"`
+		Subdomain string `json:"subdomain"`
+	}
+	var tunnel tunnelInput
+	if err := pulumiCfg.TryObject("cloudflare:tunnel", &tunnel); err != nil {
+		// Use defaults
+		tunnel = tunnelInput{
+			Domain:    "liamwhite.fyi",
+			Subdomain: "*",
+		}
+	}
+	if tunnel.Domain == "" {
+		tunnel.Domain = "liamwhite.fyi"
+	}
+	if tunnel.Subdomain == "" {
+		tunnel.Subdomain = "*"
+	}
+
+	// Convert to CloudflareConfig
+	cloudflareCfg := CloudflareConfig{
+		AccountID: cfInput.AccountID,
+		APIToken:  cfInput.APIToken,
+		Tunnel: TunnelConfig{
+			Domain:    pulumi.String(tunnel.Domain).ToStringOutput(),
+			Subdomain: pulumi.String(tunnel.Subdomain).ToStringOutput(),
+		},
+	}
+
 	// 3. Build final config
 	return &Config{
 		VIP:        infraCfg.Cluster.VIP,
 		KubeVip:    kubeVipCfg,
 		GatewayAPI: gatewayAPICfg,
 		Istio:      istioCfg,
+		Cloudflare: cloudflareCfg,
 	}, nil
 }
