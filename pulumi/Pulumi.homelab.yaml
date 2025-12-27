@@ -5,3 +5,12 @@ config:
     version: "1.2.0"
   homelab:istio:
     version: "1.28.2"
+  homelab:cloudflare:
+    accountId: 08363ed67668e0e4fa957a9903af6003
+    apiToken:
+      secure: AAABABx3ngSaLhzeWUAIfYkqnByyM927P1FG3XX278kxGhwjwXEV6npZFlYZmCZRoVvGs/uufcXcmzP0lfw7k8cDe1rK5GVV
+    tunnel:
+      domain:
+        secure: AAABAD0e816lWvAmYU4p+rW6COYN5Z9IrPWokzIZjWSbUC7xifUr416Dr0r2
+      subdomain:
+        secure: AAABAHf2dOVVLn2V5i258YaCu7sHhXtYGjvmz9Dp+89R

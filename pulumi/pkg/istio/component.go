@@ -146,6 +146,12 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 		return nil, err
 	}
 
+	// 5. Deploy Istio Ingress Gateway
+	_, err = DeployIngressGateway(ctx, namespace.Metadata.Name().Elem(), args.Version, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
 	// Register outputs
 	if err := ctx.RegisterResourceOutputs(istio, pulumi.Map{
 		"namespace": istio.Namespace,

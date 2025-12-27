@@ -8,7 +8,14 @@
       "Bash(pulumi preview:*)",
       "Bash(kubectl --kubeconfig=/Users/liam/github.com/liamawhite/homelab/main/kubeconfig get pods:*)",
       "Bash(kubectl:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(git log:*)",
+      "Bash(find:*)",
+      "Bash(go list:*)",
+      "WebFetch(domain:www.pulumi.com)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(go doc:*)",
+      "Bash(go build:*)"
     ]
   }
 }
