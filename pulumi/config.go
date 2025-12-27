@@ -13,6 +13,7 @@ type Config struct {
 	VIP        string
 	KubeVip    KubeVipConfig
 	Istio      IstioConfig
+	Longhorn   LonghornConfig
 	Cloudflare CloudflareConfig
 }
 
@@ -23,6 +24,11 @@ type KubeVipConfig struct {
 
 // IstioConfig represents Istio specific configuration
 type IstioConfig struct {
+	Version string `json:"version"`
+}
+
+// LonghornConfig represents Longhorn specific configuration
+type LonghornConfig struct {
 	Version string `json:"version"`
 }
 
@@ -56,31 +62,30 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	pulumiCfg := config.New(ctx, "homelab")
 	var kubeVipCfg KubeVipConfig
 	var istioCfg IstioConfig
+	var longhornCfg LonghornConfig
 
-	// Try to get kube-vip object from Pulumi config
+	// Get kube-vip config from Pulumi config
 	if err := pulumiCfg.TryObject("kubevip", &kubeVipCfg); err != nil {
-		// Use defaults from infra.yaml if Pulumi config not present
-		kubeVipCfg = KubeVipConfig{
-			Version: infraCfg.KubeVip.Version,
-		}
+		return nil, fmt.Errorf("kube-vip configuration is required in Pulumi config (homelab:kubevip.version): %w", err)
 	}
-
-	// Apply defaults if fields are empty (Pulumi config takes precedence)
 	if kubeVipCfg.Version == "" {
-		kubeVipCfg.Version = infraCfg.KubeVip.Version
+		return nil, fmt.Errorf("kube-vip version is required (set in Pulumi config homelab:kubevip.version)")
 	}
 
-	// Try to get Istio object from Pulumi config (with defaults)
+	// Get Istio config from Pulumi config
 	if err := pulumiCfg.TryObject("istio", &istioCfg); err != nil {
-		// Use defaults if Pulumi config not present
-		istioCfg = IstioConfig{
-			Version: "1.28.2",
-		}
+		return nil, fmt.Errorf("istio configuration is required in Pulumi config (homelab:istio.version): %w", err)
+	}
+	if istioCfg.Version == "" {
+		return nil, fmt.Errorf("istio version is required (set in Pulumi config homelab:istio.version)")
 	}
 
-	// Apply defaults if fields are empty
-	if istioCfg.Version == "" {
-		istioCfg.Version = "1.28.2"
+	// Get Longhorn config from Pulumi config
+	if err := pulumiCfg.TryObject("longhorn", &longhornCfg); err != nil {
+		return nil, fmt.Errorf("longhorn configuration is required in Pulumi config (homelab:longhorn.version): %w", err)
+	}
+	if longhornCfg.Version == "" {
+		return nil, fmt.Errorf("longhorn version is required (set in Pulumi config homelab:longhorn.version)")
 	}
 
 	// Get Cloudflare config from Pulumi config
@@ -123,6 +128,7 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 		VIP:        infraCfg.Cluster.VIP,
 		KubeVip:    kubeVipCfg,
 		Istio:      istioCfg,
+		Longhorn:   longhornCfg,
 		Cloudflare: cloudflareCfg,
 	}, nil
 }

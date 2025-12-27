@@ -17,7 +17,6 @@ type InfraConfig struct {
 	Cluster ClusterConfig `yaml:"cluster" mapstructure:"cluster"`
 	SSH     SSHConfig     `yaml:"ssh" mapstructure:"ssh"`
 	Nodes   []NodeConfig  `yaml:"nodes" mapstructure:"nodes"`
-	KubeVip KubeVipConfig `yaml:"kubevip,omitempty" mapstructure:"kubevip"` // Added for Pulumi
 }
 
 type ClusterConfig struct {
@@ -36,11 +35,6 @@ type NodeConfig struct {
 	Address string            `yaml:"address" mapstructure:"address"`
 	Labels  map[string]string `yaml:"labels,omitempty" mapstructure:"labels"`
 	SSH     *SSHConfig        `yaml:"ssh,omitempty" mapstructure:"ssh"`
-}
-
-// KubeVipConfig holds kube-vip specific configuration
-type KubeVipConfig struct {
-	Version string `yaml:"version,omitempty" mapstructure:"version"` // kube-vip image version (default: "v1.0.3")
 }
 
 type Config struct {
@@ -157,11 +151,6 @@ func loadInfraYAML(path string) (*InfraConfig, error) {
 func applyDefaults(cfg *InfraConfig) {
 	if cfg.SSH.Port == 0 {
 		cfg.SSH.Port = 22
-	}
-
-	// KubeVip defaults
-	if cfg.KubeVip.Version == "" {
-		cfg.KubeVip.Version = "v1.0.3" // Latest stable
 	}
 
 	// SANs default to empty - K3s includes localhost, 127.0.0.1, hostname, and node IPs by default
