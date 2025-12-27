@@ -3,6 +3,8 @@ config:
     version: "v1.0.3"
   homelab:istio:
     version: "1.28.2"
+  homelab:longhorn:
+    version: "v1.9.1"
   homelab:cloudflare:
     accountId: 08363ed67668e0e4fa957a9903af6003
     apiToken:

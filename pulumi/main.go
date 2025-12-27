@@ -4,6 +4,7 @@ import (
 	cftunnel "github.com/liamawhite/homelab/pulumi/pkg/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pulumi/pkg/istio"
 	"github.com/liamawhite/homelab/pulumi/pkg/kubevip"
+	"github.com/liamawhite/homelab/pulumi/pkg/longhorn"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -40,7 +41,17 @@ func main() {
 			return err
 		}
 
-		// 5. Create Cloudflare Tunnel
+		// 5. Deploy Longhorn storage system
+		_, err = longhorn.NewLonghorn(ctx, "longhorn", &longhorn.LonghornArgs{
+			Version: cfg.Longhorn.Version,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{istioMesh}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// 6. Create Cloudflare Tunnel
 		_, err = cftunnel.NewTunnel(ctx, "gateway-tunnel", &cftunnel.TunnelArgs{
 			Domain:              cfg.Cloudflare.Tunnel.Domain,
 			Subdomain:           "*",
