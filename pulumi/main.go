@@ -2,7 +2,6 @@ package main
 
 import (
 	cftunnel "github.com/liamawhite/homelab/pulumi/pkg/cloudflare/tunnel"
-	"github.com/liamawhite/homelab/pulumi/pkg/gateway"
 	"github.com/liamawhite/homelab/pulumi/pkg/istio"
 	"github.com/liamawhite/homelab/pulumi/pkg/kubevip"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -31,35 +30,23 @@ func main() {
 			return err
 		}
 
-		// 5. Deploy Istio
+		// 4. Deploy Istio (includes ingress gateway, main gateway, and health check)
 		istioMesh, err := istio.NewIstio(ctx, "istio", &istio.IstioArgs{
-			Version: cfg.Istio.Version,
+			Version:         cfg.Istio.Version,
+			GatewayDomain:   cfg.Cloudflare.Tunnel.Domain,
+			HealthSubdomain: pulumi.String("health"),
 		}, pulumi.Provider(providers.Kubernetes))
 		if err != nil {
 			return err
 		}
 
-		// 6. Create main Istio Gateway (depends on Istio)
-		mainGateway, err := gateway.NewGateway(ctx, "main-gateway", &gateway.GatewayArgs{
-			Namespace: istioMesh.Namespace,
-		}, pulumi.Provider(providers.Kubernetes))
-		if err != nil {
-			return err
-		}
-
-		// 7. Create health check endpoint
-		err = gateway.NewHealthCheck(ctx, istioMesh.Namespace, "main-gateway", "health.liamwhite.fyi", pulumi.Provider(providers.Kubernetes), pulumi.DependsOn([]pulumi.Resource{mainGateway}))
-		if err != nil {
-			return err
-		}
-
-		// 8. Create Cloudflare Tunnel (depends on Istio ingress gateway)
+		// 5. Create Cloudflare Tunnel
 		_, err = cftunnel.NewTunnel(ctx, "gateway-tunnel", &cftunnel.TunnelArgs{
 			Domain:              cfg.Cloudflare.Tunnel.Domain,
-			Subdomain:           cfg.Cloudflare.Tunnel.Subdomain,
+			Subdomain:           "*",
 			TunnelName:          "homelab-gateway",
 			GatewayNamespace:    istioMesh.Namespace,
-			GatewayService:      pulumi.String("istio-ingressgateway"),
+			GatewayService:      istioMesh.GatewayService,
 			CloudflareAccountID: pulumi.String(cfg.Cloudflare.AccountID),
 			CloudflareProvider:  providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes), pulumi.Providers(providers.Cloudflare))
