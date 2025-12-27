@@ -12,18 +12,12 @@ import (
 type Config struct {
 	VIP        string
 	KubeVip    KubeVipConfig
-	GatewayAPI GatewayAPIConfig
 	Istio      IstioConfig
 	Cloudflare CloudflareConfig
 }
 
 // KubeVipConfig represents kube-vip specific configuration
 type KubeVipConfig struct {
-	Version string `json:"version"`
-}
-
-// GatewayAPIConfig represents Gateway API specific configuration
-type GatewayAPIConfig struct {
 	Version string `json:"version"`
 }
 
@@ -41,8 +35,7 @@ type CloudflareConfig struct {
 
 // TunnelConfig represents Cloudflare Tunnel specific configuration
 type TunnelConfig struct {
-	Domain    pulumi.StringOutput `json:"-"` // e.g., "liamwhite.fyi"
-	Subdomain pulumi.StringOutput `json:"-"` // e.g., "*" for wildcard
+	Domain pulumi.StringOutput `json:"-"`
 }
 
 // LoadConfig loads configuration from infra.yaml and Pulumi config
@@ -62,7 +55,6 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	// 2. Get Pulumi-specific overrides
 	pulumiCfg := config.New(ctx, "homelab")
 	var kubeVipCfg KubeVipConfig
-	var gatewayAPICfg GatewayAPIConfig
 	var istioCfg IstioConfig
 
 	// Try to get kube-vip object from Pulumi config
@@ -76,19 +68,6 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	// Apply defaults if fields are empty (Pulumi config takes precedence)
 	if kubeVipCfg.Version == "" {
 		kubeVipCfg.Version = infraCfg.KubeVip.Version
-	}
-
-	// Try to get Gateway API object from Pulumi config (with defaults)
-	if err := pulumiCfg.TryObject("gatewayapi", &gatewayAPICfg); err != nil {
-		// Use defaults if Pulumi config not present
-		gatewayAPICfg = GatewayAPIConfig{
-			Version: "1.2.0",
-		}
-	}
-
-	// Apply defaults if fields are empty
-	if gatewayAPICfg.Version == "" {
-		gatewayAPICfg.Version = "1.2.0"
 	}
 
 	// Try to get Istio object from Pulumi config (with defaults)
@@ -105,9 +84,13 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	}
 
 	// Get Cloudflare config from Pulumi config
+	type tunnelInput struct {
+		Domain string `json:"domain"`
+	}
 	type cfConfigInput struct {
-		AccountID string `json:"accountId"`
-		APIToken  string `json:"apiToken"`
+		AccountID string      `json:"accountId"`
+		APIToken  string      `json:"apiToken"`
+		Tunnel    tunnelInput `json:"tunnel"`
 	}
 
 	var cfInput cfConfigInput
@@ -122,25 +105,8 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	if cfInput.APIToken == "" {
 		return nil, fmt.Errorf("cloudflare API token is required in Pulumi config (homelab:cloudflare.apiToken)")
 	}
-
-	// Get tunnel config from the cloudflare object
-	type tunnelInput struct {
-		Domain    string `json:"domain"`
-		Subdomain string `json:"subdomain"`
-	}
-	var tunnel tunnelInput
-	if err := pulumiCfg.TryObject("cloudflare:tunnel", &tunnel); err != nil {
-		// Use defaults
-		tunnel = tunnelInput{
-			Domain:    "liamwhite.fyi",
-			Subdomain: "*",
-		}
-	}
-	if tunnel.Domain == "" {
-		tunnel.Domain = "liamwhite.fyi"
-	}
-	if tunnel.Subdomain == "" {
-		tunnel.Subdomain = "*"
+	if cfInput.Tunnel.Domain == "" {
+		return nil, fmt.Errorf("cloudflare tunnel domain is required in Pulumi config (homelab:cloudflare.tunnel.domain)")
 	}
 
 	// Convert to CloudflareConfig
@@ -148,8 +114,7 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 		AccountID: cfInput.AccountID,
 		APIToken:  cfInput.APIToken,
 		Tunnel: TunnelConfig{
-			Domain:    pulumi.String(tunnel.Domain).ToStringOutput(),
-			Subdomain: pulumi.String(tunnel.Subdomain).ToStringOutput(),
+			Domain: pulumi.String(cfInput.Tunnel.Domain).ToStringOutput(),
 		},
 	}
 
@@ -157,7 +122,6 @@ func LoadConfig(ctx *pulumi.Context) (*Config, error) {
 	return &Config{
 		VIP:        infraCfg.Cluster.VIP,
 		KubeVip:    kubeVipCfg,
-		GatewayAPI: gatewayAPICfg,
 		Istio:      istioCfg,
 		Cloudflare: cloudflareCfg,
 	}, nil

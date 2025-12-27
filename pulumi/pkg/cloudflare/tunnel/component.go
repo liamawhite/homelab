@@ -27,7 +27,7 @@ type Tunnel struct {
 // TunnelArgs contains the configuration for Cloudflare Tunnel
 type TunnelArgs struct {
 	Domain              pulumi.StringInput
-	Subdomain           pulumi.StringInput
+	Subdomain           string
 	TunnelName          string
 	GatewayNamespace    pulumi.StringInput
 	GatewayService      pulumi.StringInput
@@ -119,7 +119,7 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 
 	dnsRecord, err := cloudflare.NewRecord(ctx, fmt.Sprintf("%s-dns", name), &cloudflare.RecordArgs{
 		ZoneId:  zoneID,
-		Name:    args.Subdomain,
+		Name:    pulumi.Sprintf("%s.%s", args.Subdomain, args.Domain),
 		Type:    pulumi.String("CNAME"),
 		Content: cfTunnel.Cname,
 		Proxied: pulumi.Bool(true),
