@@ -33,5 +33,5 @@ func init() {
 	rootCmd.AddCommand(bootstrapCmd)
 	rootCmd.AddCommand(k3sCmd)
 	rootCmd.AddCommand(kubeconfigCmd)
-	rootCmd.AddCommand(clustertokenCmd)
+	rootCmd.AddCommand(nodeCmd)
 }

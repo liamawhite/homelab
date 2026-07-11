@@ -29,15 +29,14 @@ Example:
 
 func init() {
 	bootstrapCmd.Flags().String("node", "", "Node name from infra.yaml (required)")
-	bootstrapCmd.Flags().String("ssh-user", "", "SSH username (optional if defined in infra.yaml)")
 }
 
 func runBootstrap(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
-	// Load configuration
+	// Load configuration (skip K3s validation - bootstrap doesn't touch K3s)
 	slog.Info("Loading configuration")
-	cfg, err := config.Load(cmd)
+	cfg, err := config.LoadWithOptions(cmd, true)
 	if err != nil {
 		return err
 	}

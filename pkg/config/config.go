@@ -8,14 +8,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
 )
 
 // InfraConfig represents the complete infra.yaml structure
 type InfraConfig struct {
 	Cluster ClusterConfig `yaml:"cluster" mapstructure:"cluster"`
-	SSH     SSHConfig     `yaml:"ssh" mapstructure:"ssh"`
 	Nodes   []NodeConfig  `yaml:"nodes" mapstructure:"nodes"`
 }
 
@@ -26,15 +24,16 @@ type ClusterConfig struct {
 }
 
 type SSHConfig struct {
-	User string `yaml:"user" mapstructure:"user"`
-	Port int    `yaml:"port" mapstructure:"port"`
+	User     string `yaml:"user" mapstructure:"user"`
+	Port     int    `yaml:"port" mapstructure:"port"`
+	Password string `yaml:"password" mapstructure:"password"`
 }
 
 type NodeConfig struct {
 	Name    string            `yaml:"name" mapstructure:"name"`
 	Address string            `yaml:"address" mapstructure:"address"`
 	Labels  map[string]string `yaml:"labels,omitempty" mapstructure:"labels"`
-	SSH     *SSHConfig        `yaml:"ssh,omitempty" mapstructure:"ssh"`
+	SSH     SSHConfig         `yaml:"ssh" mapstructure:"ssh"`
 }
 
 type Config struct {
@@ -51,7 +50,7 @@ type Config struct {
 	ConfigFile  string
 	InfraConfig *InfraConfig
 
-	// Skip K3s-specific validation (for commands like clustertoken, kubeconfig)
+	// Skip K3s-specific validation (for commands like kubeconfig)
 	SkipK3sValidation bool
 }
 
@@ -106,6 +105,20 @@ func LoadFromFile(path string) (*InfraConfig, error) {
 	return loadInfraYAML(path)
 }
 
+// LoadInfra loads just the infra.yaml configuration, for commands that
+// operate across all nodes rather than targeting one selected node.
+func LoadInfra(cmd *cobra.Command) (*InfraConfig, error) {
+	configFile, _ := cmd.Flags().GetString("config")
+	if configFile == "" {
+		configFile = findConfigFile()
+	}
+	if configFile == "" {
+		return nil, fmt.Errorf("no infra.yaml config file found")
+	}
+
+	return loadInfraYAML(configFile)
+}
+
 // findConfigFile searches for infra.yaml in common locations
 func findConfigFile() string {
 	candidates := []string{
@@ -149,8 +162,10 @@ func loadInfraYAML(path string) (*InfraConfig, error) {
 
 // applyDefaults sets default values for optional fields
 func applyDefaults(cfg *InfraConfig) {
-	if cfg.SSH.Port == 0 {
-		cfg.SSH.Port = 22
+	for i := range cfg.Nodes {
+		if cfg.Nodes[i].SSH.Port == 0 {
+			cfg.Nodes[i].SSH.Port = 22
+		}
 	}
 
 	// SANs default to empty - K3s includes localhost, 127.0.0.1, hostname, and node IPs by default
@@ -163,13 +178,20 @@ func validateInfraConfig(cfg *InfraConfig) error {
 		return fmt.Errorf("at least one node must be defined in infra.yaml")
 	}
 
-	// Check for unique node names
+	// Check for unique node names and required SSH credentials
 	names := make(map[string]bool)
 	for _, node := range cfg.Nodes {
 		if names[node.Name] {
 			return fmt.Errorf("duplicate node name: %s", node.Name)
 		}
 		names[node.Name] = true
+
+		if node.SSH.User == "" {
+			return fmt.Errorf("node '%s': ssh.user is required", node.Name)
+		}
+		if node.SSH.Password == "" {
+			return fmt.Errorf("node '%s': ssh.password is required", node.Name)
+		}
 	}
 
 	// Validate VIP if provided
@@ -189,7 +211,7 @@ func applyConfigWithPrecedence(cmd *cobra.Command, cfg *Config, infraCfg *InfraC
 	nodeName, _ := cmd.Flags().GetString("node")
 
 	if infraCfg != nil && nodeName != "" {
-		selectedNode = findNodeByName(infraCfg, nodeName)
+		selectedNode = FindNodeByName(infraCfg, nodeName)
 		if selectedNode == nil {
 			return fmt.Errorf("node '%s' not found in config file", nodeName)
 		}
@@ -202,19 +224,11 @@ func applyConfigWithPrecedence(cmd *cobra.Command, cfg *Config, infraCfg *InfraC
 		cfg.Node = env
 	}
 
-	// SSH User
-	if flag, _ := cmd.Flags().GetString("ssh-user"); flag != "" {
-		cfg.SSHUser = flag
-	} else if selectedNode != nil && selectedNode.SSH != nil && selectedNode.SSH.User != "" {
+	// SSH User/Password come solely from the selected node's infra.yaml entry
+	if selectedNode != nil {
 		cfg.SSHUser = selectedNode.SSH.User
-	} else if infraCfg != nil && infraCfg.SSH.User != "" {
-		cfg.SSHUser = infraCfg.SSH.User
-	} else if env := viper.GetString("ssh_user"); env != "" {
-		cfg.SSHUser = env
+		cfg.SSHPassword = selectedNode.SSH.Password
 	}
-
-	// SSH Password (environment variable only)
-	cfg.SSHPassword = viper.GetString("ssh_password")
 
 	// SANs
 	if sansFlag, err := cmd.Flags().GetStringSlice("sans"); err == nil && len(sansFlag) > 0 {
@@ -255,11 +269,76 @@ func applyConfigWithPrecedence(cmd *cobra.Command, cfg *Config, infraCfg *InfraC
 	return nil
 }
 
-// Helper functions
-func findNodeByName(cfg *InfraConfig, name string) *NodeConfig {
+// FindNodeByName returns the node with the given name, or nil if absent.
+func FindNodeByName(cfg *InfraConfig, name string) *NodeConfig {
 	for i := range cfg.Nodes {
 		if cfg.Nodes[i].Name == name {
 			return &cfg.Nodes[i]
+		}
+	}
+	return nil
+}
+
+// FindNodeByAddress returns the node with the given address, or nil if
+// absent.
+func FindNodeByAddress(cfg *InfraConfig, address string) *NodeConfig {
+	for i := range cfg.Nodes {
+		if cfg.Nodes[i].Address == address {
+			return &cfg.Nodes[i]
+		}
+	}
+	return nil
+}
+
+// SetClusterToken writes token into path's cluster.token field, editing the
+// parsed node tree rather than a plain struct so comments are preserved.
+// Blank lines and indentation aren't preserved (yaml.v3 reformats to its
+// own default indent when re-encoding a node tree).
+func SetClusterToken(path, token string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	var doc yaml.Node
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		return fmt.Errorf("failed to parse config file: %w", err)
+	}
+	if len(doc.Content) == 0 {
+		return fmt.Errorf("empty config file: %s", path)
+	}
+
+	cluster := mappingValue(doc.Content[0], "cluster")
+	if cluster == nil {
+		return fmt.Errorf("no top-level 'cluster' key in %s", path)
+	}
+	tokenNode := mappingValue(cluster, "token")
+	if tokenNode == nil {
+		return fmt.Errorf("no 'cluster.token' key in %s", path)
+	}
+
+	tokenNode.SetString(token)
+
+	out, err := yaml.Marshal(&doc)
+	if err != nil {
+		return fmt.Errorf("failed to marshal config file: %w", err)
+	}
+	if err := os.WriteFile(path, out, 0600); err != nil {
+		return fmt.Errorf("failed to write %s: %w", path, err)
+	}
+
+	return nil
+}
+
+// mappingValue returns the value node for key within mapping node m, or
+// nil if m isn't a mapping or doesn't contain key.
+func mappingValue(m *yaml.Node, key string) *yaml.Node {
+	if m.Kind != yaml.MappingNode {
+		return nil
+	}
+	for i := 0; i+1 < len(m.Content); i += 2 {
+		if m.Content[i].Value == key {
+			return m.Content[i+1]
 		}
 	}
 	return nil
@@ -270,37 +349,16 @@ func validateConfig(cfg *Config) error {
 		return fmt.Errorf("node is required (use --node with node name from infra.yaml)")
 	}
 
-	if cfg.SSHUser == "" {
-		return fmt.Errorf("SSH user is required (use --ssh-user or define in infra.yaml)")
+	if cfg.SSHUser == "" || cfg.SSHPassword == "" {
+		return fmt.Errorf("node ssh credentials are required (define ssh.user/ssh.password in infra.yaml)")
 	}
 
-	// Prompt for password if not provided
-	if cfg.SSHPassword == "" {
-		fmt.Fprintf(os.Stderr, "SSH password for %s@%s: ", cfg.SSHUser, cfg.Node)
-
-		// Open /dev/tty to read password from terminal
-		tty, err := os.Open("/dev/tty")
-		if err != nil {
-			return fmt.Errorf("failed to open terminal: %w", err)
-		}
-		defer tty.Close()
-
-		password, err := term.ReadPassword(int(tty.Fd()))
-		fmt.Fprintln(os.Stderr) // New line after password input
-		if err != nil {
-			return fmt.Errorf("failed to read password: %w", err)
-		}
-		cfg.SSHPassword = string(password)
-	}
-
-	// K3s-specific validation (skip for commands like clustertoken, kubeconfig)
+	// K3s-specific validation (skip for commands like kubeconfig).
+	// Note: an empty Token when joining is NOT an error here - the k3s
+	// command fetches it automatically from the join server if unset.
 	if !cfg.SkipK3sValidation {
 		if !cfg.ClusterInit && cfg.ServerURL == "" {
 			return fmt.Errorf("server URL required for joining nodes (use --server)")
-		}
-
-		if !cfg.ClusterInit && cfg.Token == "" {
-			return fmt.Errorf("cluster token required for joining nodes (use --token)")
 		}
 
 		if cfg.ClusterInit && (cfg.ServerURL != "" || cfg.Token != "") {
