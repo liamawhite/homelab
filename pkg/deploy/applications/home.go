@@ -1,14 +1,14 @@
-// Package applications holds actual app deployments that route through the
-// shared Istio Gateway (pkg/components/istio/gateway), as opposed to
-// pkg/components which holds reusable infrastructure primitives.
+// Package applications holds actual app deployments, each fronted by its
+// own Istio ambient waypoint (pkg/components/istio/waypoint) rather than a
+// shared ingress Gateway, as opposed to pkg/components which holds reusable
+// infrastructure primitives.
 package applications
 
 import (
 	"fmt"
 
-	domain "github.com/liamawhite/homelab/pkg/components/cloudflare/domain"
+	accessjwt "github.com/liamawhite/homelab/pkg/components/cloudflare/accessjwt"
 	tunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
-	route "github.com/liamawhite/homelab/pkg/components/istio/route"
 	waypoint "github.com/liamawhite/homelab/pkg/components/istio/waypoint"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
@@ -34,7 +34,7 @@ const (
 )
 
 // Home represents a minimal "homelab.<domain>" health-check app: a fixed
-// 200 response, routed through the shared Gateway.
+// 200 response, reachable via its own waypoint-fronted Service.
 type Home struct {
 	pulumi.ResourceState
 
@@ -66,16 +66,14 @@ type HomeArgs struct {
 	// single demo app.
 	Namespace pulumi.StringInput
 
-	// Domains are the public hostnames this app is reachable at - the
-	// Domain resource(s) pkg/deploy/domains.go registered for this app
-	// (keyed by the Subdomain constant below), passed straight through to
-	// the Route.
-	Domains []*domain.Domain
-
-	// GatewayName/GatewayNamespace identify the shared Gateway to attach
-	// to (pkg/components/istio/gateway.Gateway.Name / .Namespace).
-	GatewayName      pulumi.StringInput
-	GatewayNamespace pulumi.StringInput
+	// CloudflareTeamDomain is the Zero Trust team domain (the <team-name>
+	// in https://<team-name>.cloudflareaccess.com), used as the JWT
+	// issuer/JWKS source for validating Access-issued tokens.
+	CloudflareTeamDomain pulumi.StringInput
+	// CloudflareAccessAUD is the Access application's audience tag
+	// (pkg/components/cloudflare/auth.Access.AUD), checked as the JWT's
+	// aud claim.
+	CloudflareAccessAUD pulumi.StringInput
 }
 
 // NewHome deploys the home health-check app and its route.
@@ -185,15 +183,14 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 		return nil, err
 	}
 
-	// 5. Route its registered domain(s) to it via the shared Gateway
-	_, err = route.NewRoute(ctx, name, &route.RouteArgs{
-		Namespace:          args.Namespace,
-		Domains:            args.Domains,
-		GatewayName:        args.GatewayName,
-		GatewayNamespace:   args.GatewayNamespace,
-		BackendServiceName: service.Metadata.Name().Elem(),
-		BackendServicePort: 80,
-	}, append(localOpts, pulumi.DependsOn([]pulumi.Resource{service}))...)
+	// 5. Require a valid Cloudflare Access JWT for anything reaching this
+	// Service through its waypoint.
+	_, err = accessjwt.NewAccessJWT(ctx, name, &accessjwt.AccessJWTArgs{
+		Namespace:            args.Namespace,
+		ServiceName:          service.Metadata.Name().Elem(),
+		CloudflareTeamDomain: args.CloudflareTeamDomain,
+		CloudflareAccessAUD:  args.CloudflareAccessAUD,
+	}, append(localOpts, pulumi.DependsOn([]pulumi.Resource{service, wp}))...)
 	if err != nil {
 		return nil, err
 	}
