@@ -5,8 +5,8 @@ import (
 	"log/slog"
 
 	"github.com/liamawhite/homelab/pkg/config"
-	"github.com/liamawhite/homelab/cli/pkg/raspberry"
-	"github.com/liamawhite/homelab/cli/pkg/ssh"
+	"github.com/liamawhite/homelab/pkg/raspberry"
+	"github.com/liamawhite/homelab/pkg/ssh"
 	"github.com/spf13/cobra"
 )
 

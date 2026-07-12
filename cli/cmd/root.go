@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 
+	pulumicmd "github.com/liamawhite/homelab/cli/cmd/pulumi"
 	"github.com/spf13/cobra"
 )
 
@@ -34,4 +35,6 @@ func init() {
 	rootCmd.AddCommand(k3sCmd)
 	rootCmd.AddCommand(kubeconfigCmd)
 	rootCmd.AddCommand(nodeCmd)
+	rootCmd.AddCommand(pulumicmd.UpCmd)
+	rootCmd.AddCommand(pulumicmd.PreviewCmd)
 }

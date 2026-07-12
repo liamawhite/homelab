@@ -4,17 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
-	"strings"
 
-	"github.com/liamawhite/homelab/cli/pkg/k3s"
-	"github.com/liamawhite/homelab/cli/pkg/ssh"
 	"github.com/liamawhite/homelab/pkg/config"
+	"github.com/liamawhite/homelab/pkg/k3s"
+	"github.com/liamawhite/homelab/pkg/kubeconfig"
+	"github.com/liamawhite/homelab/pkg/ssh"
 	"github.com/spf13/cobra"
 )
-
-const homelabContextName = "homelab"
 
 var kubeconfigCmd = &cobra.Command{
 	Use:   "kubeconfig",
@@ -92,7 +88,7 @@ func runKubeconfig(cmd *cobra.Command, args []string) error {
 
 	// Extract kubeconfig
 	slog.Info("Extracting kubeconfig")
-	kubeconfig, err := k3s.ExtractKubeconfig(ctx, client, infraCfg.Cluster.VIP)
+	extracted, err := k3s.ExtractKubeconfig(ctx, client, infraCfg.Cluster.VIP)
 	if err != nil {
 		slog.Error("Failed to extract kubeconfig", "error", err)
 		return err
@@ -100,41 +96,26 @@ func runKubeconfig(cmd *cobra.Command, args []string) error {
 
 	switch output {
 	case "-":
-		fmt.Print(kubeconfig)
+		fmt.Print(extracted)
 	case "":
-		target, err := defaultKubeconfigPath()
+		target, err := kubeconfig.DefaultPath()
 		if err != nil {
 			return fmt.Errorf("failed to determine default kubeconfig path: %w", err)
 		}
 
-		slog.Info("Merging kubeconfig", "path", target, "context", homelabContextName)
-		if err := k3s.MergeKubeconfig(kubeconfig, target, homelabContextName); err != nil {
+		slog.Info("Merging kubeconfig", "path", target, "context", kubeconfig.ContextName)
+		if err := k3s.MergeKubeconfig(extracted, target, kubeconfig.ContextName); err != nil {
 			slog.Error("Failed to merge kubeconfig", "error", err)
 			return err
 		}
 
-		fmt.Printf("Merged into %s and switched to context %q\n", target, homelabContextName)
+		fmt.Printf("Merged into %s and switched to context %q\n", target, kubeconfig.ContextName)
 	default:
-		if err := k3s.WriteKubeconfig(kubeconfig, output); err != nil {
+		if err := k3s.WriteKubeconfig(extracted, output); err != nil {
 			slog.Error("Failed to write kubeconfig", "error", err)
 			return err
 		}
 	}
 
 	return nil
-}
-
-// defaultKubeconfigPath resolves where kubectl would look for its
-// kubeconfig: $KUBECONFIG (its first entry, if it lists several), else
-// ~/.kube/config.
-func defaultKubeconfigPath() (string, error) {
-	if kc := os.Getenv("KUBECONFIG"); kc != "" {
-		return strings.Split(kc, string(os.PathListSeparator))[0], nil
-	}
-
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(home, ".kube", "config"), nil
 }

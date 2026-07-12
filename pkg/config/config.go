@@ -13,14 +13,39 @@ import (
 
 // InfraConfig represents the complete infra.yaml structure
 type InfraConfig struct {
-	Cluster ClusterConfig `yaml:"cluster" mapstructure:"cluster"`
-	Nodes   []NodeConfig  `yaml:"nodes" mapstructure:"nodes"`
+	Cluster    ClusterConfig    `yaml:"cluster" mapstructure:"cluster"`
+	Nodes      []NodeConfig     `yaml:"nodes" mapstructure:"nodes"`
+	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
 }
 
 type ClusterConfig struct {
 	VIP   string   `yaml:"vip" mapstructure:"vip"`
 	SANs  []string `yaml:"sans" mapstructure:"sans"`
 	Token string   `yaml:"token" mapstructure:"token"`
+}
+
+// CloudflareConfig holds credentials for the Cloudflare provider (DNS,
+// Tunnel, Access) and the domain the tunnel routes traffic for.
+type CloudflareConfig struct {
+	AccountID string       `yaml:"accountId" mapstructure:"accountId"`
+	APIToken  string       `yaml:"apiToken" mapstructure:"apiToken"`
+	Tunnel    TunnelConfig `yaml:"tunnel" mapstructure:"tunnel"`
+	Access    AccessConfig `yaml:"access" mapstructure:"access"`
+}
+
+type TunnelConfig struct {
+	Domain string `yaml:"domain" mapstructure:"domain"`
+}
+
+// AccessConfig configures the Cloudflare Access application that gates
+// everything routed through the tunnel.
+type AccessConfig struct {
+	AllowedEmails []string `yaml:"allowedEmails" mapstructure:"allowedEmails"`
+	// TeamDomain is the Cloudflare Zero Trust team domain (the <team-name>
+	// in https://<team-name>.cloudflareaccess.com), used as the JWT
+	// issuer/JWKS source for validating Access-issued tokens at the shared
+	// Gateway.
+	TeamDomain string `yaml:"teamDomain" mapstructure:"teamDomain"`
 }
 
 type SSHConfig struct {

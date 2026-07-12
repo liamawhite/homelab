@@ -12,11 +12,10 @@ The project uses Nix for development environment management, Go for CLI/infrastr
 - `go run cli/main.go k3s --node <name> --server <url>` - Join node to cluster (cluster token is fetched automatically from the join server and saved to infra.yaml if not already set)
 - `go run cli/main.go kubeconfig [--node <name>]` - Extract kubeconfig (connects via the cluster VIP if --node omitted)
 - `go run cli/main.go node status` - Show health/status for each node
+- `go run cli/main.go preview` - Preview Pulumi infrastructure changes (kube-vip, Istio control plane + shared ingress Gateway)
+- `go run cli/main.go up` - Deploy Pulumi infrastructure (kube-vip, Istio control plane + shared ingress Gateway)
 
-**Pulumi Go Commands:**
-- `cd pulumi && pulumi preview` - Preview infrastructure changes
-- `cd pulumi && pulumi up` - Deploy kube-vip and core components
-- `cd pulumi && pulumi destroy` - Destroy Pulumi-managed resources
+There is no `pulumi/` project directory and no raw `pulumi` CLI workflow - `up`/`preview` define the project, backend, and program entirely in Go and run fully inline via the Automation API (see below). There's no `destroy` command yet; since there's no on-disk Pulumi.yaml anymore, doing it via the raw `pulumi` CLI would need a throwaway project file pointed at `.pulumi-state/` - add a `homelab destroy` command (mirroring `cli/cmd/pulumi/up.go`) if/when that's needed.
 
 **TypeScript Development Commands:**
 - `nix develop` - Enter the development shell with all required tools
@@ -36,51 +35,73 @@ All commands should be run within the Nix development shell (`nix develop`) whic
 ## Project Architecture
 
 This is a hybrid Infrastructure as Code project that deploys a complete homelab on Raspberry Pi hardware using:
-- **Go CLI** (`cli/`) - Bootstraps infrastructure (Raspberry Pi provisioning, K3s installation)
-- **Pulumi Go** (`pulumi/`) - Deploys core Kubernetes components (kube-vip for control plane HA)
+- **Go CLI** (`cli/`) - Bootstraps infrastructure (Raspberry Pi provisioning, K3s installation) and deploys Pulumi-managed components (kube-vip for control plane HA), fully inline via the Automation API
 - **Pulumi TypeScript** (root/`project/`) - Legacy deployment for applications (being gradually migrated to Go)
 
-### Go CLI and Infrastructure (`cli/`, `pulumi/`, `pkg/`)
+### Go CLI and Infrastructure (`cli/`, `pkg/`)
 
-The Go-based tooling handles infrastructure bootstrapping and core Kubernetes components:
+`cli/` only holds the Cobra command wiring. `pkg/` splits three ways:
+- **`pkg/*`** (root) - cross-cutting utilities: `config`, `kubeconfig`, `versions`, `k3s`, `ssh`, `probe`, `raspberry`, and the orchestrator `deploy`.
+- **`pkg/crds/*`** - generated CRD types + the raw manifest + `InstallCRDs` helpers, one subdirectory per upstream CRD source (`istio`, `gatewayapi`). These don't register as Pulumi `ComponentResource`s - `InstallCRDs` just applies an embedded manifest and returns a `*yamlv2.ConfigGroup` directly - so they aren't "components" in the same sense as the next bucket.
+- **`pkg/components/*`** - actual `ComponentResource`-registering code that deploys real workloads (`kubevip`, `longhorn`, `cloudflare/{tunnel,auth}`, `istio` + `istio/gateway` + `istio/route`).
+
+**Namespace convention**: components never create their own namespace. Every namespace is created once, centrally, by `pkg/deploy/namespaces.go`; components that need one take a `Namespace pulumi.StringInput` arg instead. This exists because `pkg/crds/istio.InstallCRDs` and `pkg/components/istio.NewIstio` used to each create their own `istio-system` `Namespace` object - two Pulumi resources owning one physical namespace, which conflicts the moment both are wired in. Follow this pattern for any new component that needs a namespace: add/uncomment its entry in `namespaces.go`, thread the name through as an arg, and pass `pulumi.DependsOn` on the actual namespace resource at the call site (Helm chart resources don't always reliably propagate implicit Output-based dependencies).
 
 1. **CLI Tool** (`cli/`):
    - `cmd/bootstrap.go` - Raspberry Pi provisioning (SSH keys, system updates)
    - `cmd/k3s.go` - K3s installation (cluster init or join; auto-fetches and saves the cluster token to infra.yaml if unset)
    - `cmd/kubeconfig.go` - Kubeconfig extraction (merges into your default kubeconfig by default; connects via the VIP if --node omitted)
    - `cmd/node.go`, `cmd/node_status.go` - Per-node health status (ping/SSH/bootstrap/k3s/API checks)
-   - `pkg/k3s/` - K3s installer implementation
-   - `pkg/ssh/` - SSH client for remote operations
+   - `cmd/pulumi/` - The `up`/`preview` commands (still top-level: `homelab up`, `homelab preview`), in their own subpackage:
+     - `pulumi.go` - Shared setup: resolves a reachable cluster endpoint, extracts a kubeconfig from it, and builds a fully inline Automation API stack from `pkg/deploy.Program` - project name, Go runtime, and the `.pulumi-state/` backend URL are all defined in Go here, no Pulumi.yaml involved
+     - `up.go`, `preview.go` - Run `pulumi up`/`pulumi preview` in-process via the Automation API
 
-2. **Pulumi Go** (`pulumi/`):
-   - `main.go` - Entry point, orchestrates deployment
-   - `config.go` - Configuration loading (merges `infra.yaml` + Pulumi config)
-   - `provider.go` - Kubernetes provider from `kubeconfig`
-   - `pkg/kubevip/` - Kube-vip component for control plane HA
-     - `component.go` - ComponentResource implementation
-     - `rbac.go` - ServiceAccount, ClusterRole, ClusterRoleBinding
-     - `daemonset.go` - DaemonSet with kube-vip configuration
+2. **Root `pkg/` utilities**:
+   - `config/config.go` - Shared `infra.yaml` loader (VIP, nodes, SSH, cluster token, Cloudflare account/token/tunnel domain/Access allowed emails); precedence: CLI flags > infra.yaml > env vars > defaults
+   - `kubeconfig/kubeconfig.go` - Kubeconfig path resolution (`$KUBECONFIG`, else `~/.kube/config`) and the `homelab` context name, used by the CLI's `kubeconfig` command
+   - `versions/versions.go` - Pinned component versions (kube-vip, Istio, GatewayAPI, Longhorn) - plain Go constants, no Pulumi config involved. `pkg/crds/*/gen-crds.sh` scripts read their target version from here at generation time (`make sync`), so bumping a version and regenerating always stay in sync.
+   - `k3s/` - K3s installer, kubeconfig extraction, and `resolve.go`'s `ResolveClusterEndpoint` - tries the cluster VIP first, then each node directly, returning the first that accepts an SSH connection (errors if none do). This matters because the VIP only exists once kube-vip is deployed, so the very first `up` has to reach a node directly.
+   - `ssh/` - SSH client for remote operations
+   - `raspberry/` - Raspberry Pi bootstrap/provisioning checks
+   - `probe/` - Network reachability/neighbor-table probing used by `node status`
+   - `deploy/` - The Pulumi program itself, as a library:
+     - `deploy.go` - `Program(kubeconfig, infraCfg)` returns a `pulumi.RunFunc`: creates namespaces → installs CRDs → kube-vip → Istio control plane → shared Gateway → Cloudflare Access
+     - `namespaces.go` - centralized namespace creation (see convention above)
+     - `crds.go` - calls `pkg/crds/{gatewayapi,istio}.InstallCRDs`
+     - `providers.go` - builds the Kubernetes provider from the resolved kubeconfig and the Cloudflare provider from `infra.yaml`'s API token
 
-3. **Shared Config** (`pkg/config/`):
-   - `config.go` - Shared configuration structure used by both CLI and Pulumi
-   - Loads from `infra.yaml` at repository root
-   - Handles precedence: CLI flags > infra.yaml > env vars > defaults
+3. **`pkg/crds/`** - generated types + CRD installation, one dir per source:
+   - `istio/` - `crds/` (generated from the Istio `base` Helm chart via `crd2pulumi`), `istio-crds.yaml` (the extracted manifest), `gen-crds.sh`, `doc.go` (`//go:generate`), `install.go` (`InstallCRDs`, embeds `istio-crds.yaml`)
+   - `gatewayapi/` - same shape, for the Kubernetes Gateway API standard-channel manifest (downloaded directly from GitHub releases, no Helm chart)
 
-4. **Configuration Files**:
-   - `infra.yaml` - Main configuration (VIP, nodes, SSH settings, cluster token, kube-vip version)
-   - `kubeconfig` - Generated by CLI via `--output-kubeconfig`, used by Pulumi (gitignored)
+4. **`pkg/components/`** - actual deployable components:
+   - `kubevip/` - Kube-vip component for control plane HA (`component.go`, `rbac.go`, `daemonset.go`) - targets the pre-existing `kube-system` namespace, doesn't need the namespace-arg convention
+   - `istio/` - `component.go` (`NewIstio`: istiod + CNI + ztunnel Helm charts only - ambient mesh control plane)
+     - `gateway/` - `NewGateway`: the single shared Kubernetes Gateway API `Gateway`, open to `HTTPRoute`s from any namespace. References istiod's auto-created `GatewayClass` named `istio` by name rather than owning one (avoids the same ownership-conflict class the namespace convention above fixes)
+     - `route/` - `NewRoute`: reusable `HTTPRoute` attached to the shared Gateway, for future app deployments to call - not wired into `deploy.Program` yet (nothing to route to)
+   - `longhorn/`, `cloudflare/{tunnel,auth}/` - not currently wired into `deploy.Program` (kube-vip + Istio control plane + shared Gateway + Cloudflare Access only, for now) - kept for when they're reintroduced. Wiring `longhorn` or `cloudflare/tunnel` in requires un-commenting their spec entries in `pkg/deploy/namespaces.go` in the same change
+
+5. **State** (`.pulumi-state/`):
+   - Git-crypt'd local file backend (see `.gitattributes`) - `cli/cmd/pulumi/pulumi.go` points the Automation API workspace's backend at `file://<absolute path to .pulumi-state>`, computed relative to the CLI's working directory (repo root)
+   - Secrets provider is a blank passphrase (`PULUMI_CONFIG_PASSPHRASE=""`) - protection at rest comes from git-crypt, not a second passphrase to manage
+
+6. **Configuration Files**:
+   - `infra.yaml` - Main configuration (VIP, nodes, SSH settings, cluster token; Cloudflare account ID/API token/tunnel domain/Access allowed emails)
 
 **Workflow**:
 ```bash
 # 1. Bootstrap first node
 go run cli/main.go bootstrap --node pi-0
 go run cli/main.go k3s --node pi-0 --cluster-init
-go run cli/main.go kubeconfig --node pi-0 --output ./kubeconfig
 
-# 2. Deploy kube-vip via Pulumi
-cd pulumi && pulumi up
+# 2. Deploy kube-vip via Pulumi (connects directly to pi-0 - the VIP doesn't
+# exist yet)
+go run cli/main.go up
 
-# 3. Join additional nodes via VIP (cluster token fetched and saved automatically)
+# 3. Merge kubeconfig into your default kubeconfig for kubectl/k9s (now via the VIP)
+go run cli/main.go kubeconfig
+
+# 4. Join additional nodes via VIP (cluster token fetched and saved automatically)
 go run cli/main.go bootstrap --node pi-1
 go run cli/main.go k3s --node pi-1 --server https://192.168.1.50:6443
 ```
@@ -124,7 +145,7 @@ go run cli/main.go k3s --node pi-1 --server https://192.168.1.50:6443
 ### Generated Files
 
 **Go Infrastructure:**
-- `kubeconfig` - Generated by CLI at repo root for kubectl/k9s access (gitignored)
+- Kubeconfig - Merged by the CLI into your default kubeconfig (`$KUBECONFIG`, else `~/.kube/config`) under the `homelab` context, for kubectl/k9s/Pulumi access
 - `ca.pem` - Root CA certificate for the PKI (gitignored)
 
 **TypeScript Infrastructure:**

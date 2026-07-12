@@ -11,11 +11,11 @@ import (
 	"sync"
 	"text/tabwriter"
 
-	"github.com/liamawhite/homelab/cli/pkg/k3s"
-	"github.com/liamawhite/homelab/cli/pkg/probe"
-	"github.com/liamawhite/homelab/cli/pkg/raspberry"
-	"github.com/liamawhite/homelab/cli/pkg/ssh"
 	"github.com/liamawhite/homelab/pkg/config"
+	"github.com/liamawhite/homelab/pkg/k3s"
+	"github.com/liamawhite/homelab/pkg/probe"
+	"github.com/liamawhite/homelab/pkg/raspberry"
+	"github.com/liamawhite/homelab/pkg/ssh"
 	"github.com/spf13/cobra"
 )
 

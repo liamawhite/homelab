@@ -1,1 +1,2 @@
 infra.yaml filter=git-crypt diff=git-crypt
+.pulumi-state/** filter=git-crypt diff=git-crypt

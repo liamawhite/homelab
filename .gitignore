@@ -1,8 +1,8 @@
-kubeconfig
-ca.pem
-cluster-token
+/kubeconfig
+/ca.pem
+/cluster-token
 
-bin
-homelab
+/bin
+/homelab
 
 
