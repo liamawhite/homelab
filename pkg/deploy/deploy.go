@@ -6,6 +6,7 @@
 package deploy
 
 import (
+	"github.com/liamawhite/homelab/pkg/components/cilium"
 	cfauth "github.com/liamawhite/homelab/pkg/components/cloudflare/auth"
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pkg/components/istio"
@@ -23,6 +24,15 @@ import (
 func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFunc {
 	return func(ctx *pulumi.Context) error {
 		providers, err := NewProviders(ctx, kubeconfig, infraCfg)
+		if err != nil {
+			return err
+		}
+
+		// Cilium establishes the base pod network - everything below
+		// depends on it, so it has to be the first real workload created.
+		_, err = cilium.NewCilium(ctx, "cilium", &cilium.CiliumArgs{
+			Version: versions.Cilium,
+		}, pulumi.Provider(providers.Kubernetes))
 		if err != nil {
 			return err
 		}

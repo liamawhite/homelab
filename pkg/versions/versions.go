@@ -7,4 +7,5 @@ const (
 	GatewayAPI = "v1.6.0"
 	Istio      = "1.30.2"
 	Longhorn   = "v1.9.1"
+	Cilium     = "1.19.5"
 )
