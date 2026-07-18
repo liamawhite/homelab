@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/liamawhite/homelab/pkg/components/dns"
+	"github.com/liamawhite/homelab/pkg/components/istio"
+	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
@@ -201,6 +204,28 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 				Metadata: &metav1.ObjectMetaArgs{
 					Labels: pulumi.StringMap{
 						"app": pulumi.String("cloudflared"),
+						// cloudflared resolves Cloudflare edge hostnames to
+						// establish the tunnel - needs DNS access under
+						// Cilium's default-deny egress baseline.
+						dns.AccessLabelKey: pulumi.String(dns.AccessLabelValue),
+						// cloudflared also needs to actually reach the
+						// Cloudflare Tunnel edge itself (see
+						// allow-egress-cloudflare-tunnel below).
+						AccessLabelKey: pulumi.String(AccessLabelValue),
+						// Opts out of ztunnel's ambient capture, same as
+						// istiod/ztunnel/istio-cni (pkg/components/istio) -
+						// confirmed live: with the cloudflare namespace's
+						// ambient label capturing all of this pod's traffic,
+						// kubelet's plain-HTTP liveness probe to port 2000
+						// was being silently intercepted by ztunnel (which
+						// expects HBONE, not plain HTTP) and timing out,
+						// causing an endless restart loop despite the tunnel
+						// itself being healthy. Safe to opt out: nothing
+						// calls into cloudflared over the pod network except
+						// kubelet, and waypoint routing/mTLS enforcement for
+						// its calls out to an app's Service is done on that
+						// Service's (destination) side, not the source's.
+						istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeNone),
 					},
 				},
 				Spec: &corev1.PodSpecArgs{
@@ -225,6 +250,16 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 								},
 								InitialDelaySeconds: pulumi.Int(10),
 								PeriodSeconds:       pulumi.Int(10),
+								// Default (1s) is too tight on this
+								// hardware - confirmed live, cloudflared
+								// establishing its ~4 concurrent QUIC
+								// connections at startup can starve its own
+								// metrics server past 1s under this
+								// container's 100m CPU limit on a
+								// Raspberry Pi's weaker cores, causing
+								// kubelet to kill and restart an otherwise
+								// healthy process.
+								TimeoutSeconds: pulumi.Int(5),
 							},
 							Resources: &corev1.ResourceRequirementsArgs{
 								Limits: pulumi.StringMap{
@@ -247,6 +282,47 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 	}
 
 	tunnel.Deployment = deployment
+
+	// 8. Only pods carrying AccessLabelKey/AccessLabelValue can reach the
+	// Cloudflare Tunnel edge - egress access is opt-in per workload, not
+	// blanket, same as every other network policy in this repo. Cloudflare
+	// edge IPs aren't expressible as a fixed CIDR, hence ToEntities "world"
+	// restricted by port, same reasoning as pkg/components/dns's
+	// allow-egress-coredns-upstream. Port 7844 (UDP+TCP) is the tunnel
+	// protocol itself (QUIC, falling back to h2mux); port 443 is needed for
+	// cloudflared's own control-plane calls (e.g. api.cloudflare.com).
+	// Requires the Cilium CiliumClusterwideNetworkPolicy CRD to already
+	// exist - callers must pass pulumi.DependsOn on the Cilium installation
+	// (see pkg/components/cilium.NewCilium).
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-cloudflare-tunnel", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-egress-cloudflare-tunnel"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					AccessLabelKey: pulumi.String(AccessLabelValue),
+				},
+			},
+			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+					ToEntities: pulumi.StringArray{pulumi.String("world")},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("7844"), Protocol: pulumi.String("UDP")},
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("7844"), Protocol: pulumi.String("TCP")},
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("443"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, resourceOpts...)
+	if err != nil {
+		return nil, err
+	}
 
 	// Register outputs
 	if err := ctx.RegisterResourceOutputs(tunnel, pulumi.Map{

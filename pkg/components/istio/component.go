@@ -3,6 +3,9 @@ package istio
 import (
 	"fmt"
 
+	"github.com/liamawhite/homelab/pkg/components/apiserver"
+	"github.com/liamawhite/homelab/pkg/components/dns"
+	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	securityv1 "github.com/liamawhite/homelab/pkg/crds/istio/crds/kubernetes/security/v1"
 	helmv4 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/helm/v4"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
@@ -59,6 +62,12 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 		RepositoryOpts: repositoryOpts,
 		Values: pulumi.Map{
 			"profile": pulumi.String("ambient"),
+			// istiod watches the K8s API directly (Namespaces, CRDs,
+			// Secrets, leader-election leases, etc.) - needs apiserver
+			// access under Cilium's default-deny egress baseline.
+			"podLabels": pulumi.StringMap{
+				apiserver.AccessLabelKey: pulumi.String(apiserver.AccessLabelValue),
+			},
 			"pilot": pulumi.Map{
 				"resources": pulumi.Map{
 					"limits": pulumi.Map{
@@ -91,6 +100,18 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 			"global": pulumi.Map{
 				"platform": pulumi.String("k3s"),
 			},
+			// istio-cni pushes config/status via istiod's XDS and watches
+			// Pods directly for ambient redirection - needs istiod and
+			// apiserver access under Cilium's default-deny egress
+			// baseline, plus DNS to resolve istiod's hostname
+			// (istiod.istio-system.svc) in the first place - the istiod
+			// grant alone only covers the connection once that hostname
+			// is already resolved.
+			"podLabels": pulumi.StringMap{
+				AccessLabelKey:           pulumi.String(AccessLabelValue),
+				apiserver.AccessLabelKey: pulumi.String(apiserver.AccessLabelValue),
+				dns.AccessLabelKey:       pulumi.String(dns.AccessLabelValue),
+			},
 			// K3s-specific CNI paths
 			// https://github.com/k3s-io/k3s/issues/11076
 			"cni": pulumi.Map{
@@ -120,6 +141,16 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 		Version:        pulumi.String(args.Version),
 		RepositoryOpts: repositoryOpts,
 		Values: pulumi.Map{
+			// ztunnel is an istiod XDS consumer (per this component's own
+			// doc comment above) - needs istiod access under Cilium's
+			// default-deny egress baseline, plus DNS to resolve istiod's
+			// hostname (istiod.istio-system.svc) in the first place - the
+			// istiod grant alone only covers the connection once that
+			// hostname is already resolved.
+			"podLabels": pulumi.StringMap{
+				AccessLabelKey:     pulumi.String(AccessLabelValue),
+				dns.AccessLabelKey: pulumi.String(dns.AccessLabelValue),
+			},
 			"resources": pulumi.Map{
 				"limits": pulumi.Map{
 					"cpu":    pulumi.String("200m"),
@@ -180,6 +211,83 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 					Group: pulumi.String("gateway.networking.k8s.io"),
 					Kind:  pulumi.String("GatewayClass"),
 					Name:  pulumi.String("istio-waypoint"),
+				},
+			},
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// 6. Only pods carrying AccessLabelKey/AccessLabelValue can reach
+	// istiod's XDS ports - istiod access is opt-in per workload, not
+	// blanket, so every consumer (ztunnel, istio-cni, waypoints, gateways)
+	// is explicit about depending on it. Requires the Cilium
+	// CiliumClusterwideNetworkPolicy CRD to already exist - callers must
+	// pass pulumi.DependsOn on the Cilium installation (see
+	// pkg/components/cilium.NewCilium).
+	istiodMatchLabels := pulumi.StringMap{
+		k8sNamespaceLabel: args.Namespace,
+		"app":             pulumi.String("istiod"),
+	}
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-istiod", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-egress-istiod"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					AccessLabelKey: pulumi.String(AccessLabelValue),
+				},
+			},
+			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+					ToEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArgs{MatchLabels: istiodMatchLabels},
+					},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("15012"), Protocol: pulumi.String("TCP")},
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("15010"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// istiod also needs an INGRESS allow to match - the egress policy above
+	// only lets a labeled client's traffic leave; "default-deny" blocks all
+	// ingress cluster-wide too, so without this istiod's pod silently drops
+	// the connection before it ever reaches the process (no server-side log
+	// entry at all - confirmed live, this exact gap left ztunnel/istio-cni
+	// stuck retrying a TCP connect indefinitely). Mirrors allow-ingress-dns.
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-ingress-istiod", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-ingress-istiod"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: istiodMatchLabels,
+			},
+			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+					FromEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArgs{},
+					},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("15012"), Protocol: pulumi.String("TCP")},
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("15010"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
 				},
 			},
 		},

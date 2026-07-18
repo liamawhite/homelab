@@ -6,9 +6,11 @@
 package deploy
 
 import (
+	"github.com/liamawhite/homelab/pkg/components/apiserver"
 	"github.com/liamawhite/homelab/pkg/components/cilium"
 	cfauth "github.com/liamawhite/homelab/pkg/components/cloudflare/auth"
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
+	"github.com/liamawhite/homelab/pkg/components/dns"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
 	infraconfig "github.com/liamawhite/homelab/pkg/config"
@@ -20,7 +22,10 @@ import (
 // Program returns the Pulumi program that deploys kube-vip, the Istio
 // control plane, and every app - each fronted by its own ambient waypoint
 // rather than a shared ingress Gateway - against the cluster reachable via
-// kubeconfig.
+// kubeconfig. The total time this program is allowed to run is bounded by
+// the caller's context deadline (see cli/cmd/pulumi's "--timeout" flag),
+// not by anything set here - see that flag's doc comment for why a
+// per-resource timeout isn't the right tool for that.
 func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFunc {
 	return func(ctx *pulumi.Context) error {
 		providers, err := NewProviders(ctx, kubeconfig, infraCfg)
@@ -30,9 +35,34 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 
 		// Cilium establishes the base pod network - everything below
 		// depends on it, so it has to be the first real workload created.
-		_, err = cilium.NewCilium(ctx, "cilium", &cilium.CiliumArgs{
+		ciliumComp, err := cilium.NewCilium(ctx, "cilium", &cilium.CiliumArgs{
 			Version: versions.Cilium,
 		}, pulumi.Provider(providers.Kubernetes))
+		if err != nil {
+			return err
+		}
+
+		// DNS and the API server both have to keep working under Cilium's
+		// default-deny baseline, so both depend directly on Cilium
+		// (specifically, the CiliumClusterwideNetworkPolicy CRD its Helm
+		// chart installs). apiserver has to come first: DNS's own
+		// ClusterDNS component patches CoreDNS's Deployment to grant it
+		// apiserver access (its "kubernetes" plugin watches the K8s API
+		// directly) and waits for that rollout to succeed, which can't
+		// happen until the apiserver-access CiliumClusterwideNetworkPolicy
+		// already exists.
+		apiserverComp, err := apiserver.NewClusterAPIServer(ctx, "cluster-apiserver",
+			pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{ciliumComp}),
+		)
+		if err != nil {
+			return err
+		}
+
+		_, err = dns.NewClusterDNS(ctx, "cluster-dns",
+			pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{ciliumComp, apiserverComp}),
+		)
 		if err != nil {
 			return err
 		}
@@ -64,7 +94,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			Version:   versions.Istio,
 			Namespace: istioSystemNS.Metadata.Name().Elem(),
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Istio, crds.GatewayAPI, istioSystemNS}),
+			pulumi.DependsOn([]pulumi.Resource{crds.Istio, crds.GatewayAPI, istioSystemNS, ciliumComp}),
 		)
 		if err != nil {
 			return err
@@ -111,7 +141,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			CloudflareAccountID: pulumi.String(infraCfg.Cloudflare.AccountID),
 			CloudflareProvider:  providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{cloudflareNS, home}),
+			pulumi.DependsOn([]pulumi.Resource{cloudflareNS, home, ciliumComp}),
 		)
 		if err != nil {
 			return err

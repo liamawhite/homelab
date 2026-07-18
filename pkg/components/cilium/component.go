@@ -19,7 +19,11 @@
 package cilium
 
 import (
+	"fmt"
+
+	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	helmv4 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/helm/v4"
+	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -81,10 +85,53 @@ func NewCilium(ctx *pulumi.Context, name string, args *CiliumArgs, opts ...pulum
 			"socketLB": pulumi.Map{
 				"hostNamespaceOnly": pulumi.Bool(true),
 			},
-			// Documented safe default when chaining with another CNI's
-			// ambient/service-mesh redirection; not separately verified
-			// against this cluster's own kube-proxy setup post-migration.
-			"kubeProxyReplacement": pulumi.Bool(false),
+			// K3s's embedded kube-proxy turns out not to actually run once a
+			// custom CNI is configured (--flannel-backend: none) - confirmed
+			// live: no KUBE-SERVICES iptables DNAT rules exist at all, so
+			// every ClusterIP (including CoreDNS's) was completely
+			// unreachable. Cilium has to replace kube-proxy itself, not
+			// just coexist with it - there's no working kube-proxy to
+			// coexist with. socketLB.hostNamespaceOnly + cni.exclusive:
+			// false above are exactly the two settings Cilium's own Istio
+			// integration docs call out as required to keep this
+			// compatible with istio-cni's traffic interception.
+			"kubeProxyReplacement": pulumi.Bool(true),
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Mesh-wide network policy baseline - every cluster this component sets
+	// up as the CNI comes with this, same reasoning as
+	// pkg/components/istio bundling its own AuthorizationPolicy/
+	// PeerAuthentication baseline rather than leaving callers to remember
+	// to wire security up separately.
+	//
+	// default-deny: every pod-networked endpoint denied on both ingress
+	// and egress by default, EXCEPT ingress from the kubelet on the pod's
+	// own node - without that exception, every pod's liveness/readiness
+	// probes break the moment ingress defaults to deny, since those
+	// originate from the node itself (Cilium's "host" entity), not from
+	// another pod. No egress exceptions at all yet, including DNS - this
+	// is a deliberate clean-slate baseline; per-workload/per-namespace
+	// egress allow policies (DNS, istiod, kube-apiserver, cloudflared,
+	// etc.) still need to be designed and added on top of this.
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-default-deny", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("default-deny"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{},
+			EnableDefaultDeny: &ciliumv2.CiliumClusterwideNetworkPolicySpecEnableDefaultDenyArgs{
+				Ingress: pulumi.Bool(true),
+				Egress:  pulumi.Bool(true),
+			},
+			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+					FromEntities: pulumi.StringArray{pulumi.String("host"), pulumi.String("remote-node")},
+				},
+			},
 		},
 	}, localOpts...)
 	if err != nil {

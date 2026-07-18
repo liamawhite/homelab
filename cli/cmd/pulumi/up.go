@@ -1,6 +1,7 @@
 package pulumi
 
 import (
+	"context"
 	"os"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optup"
@@ -26,11 +27,14 @@ Example:
 }
 
 func runUp(cmd *cobra.Command, args []string) error {
-	ctx, stack, err := prepareStack(cmd)
+	ctx, timeout, stack, err := prepareStack(cmd)
 	if err != nil {
 		return err
 	}
 
-	_, err = stack.Up(ctx, optup.ProgressStreams(os.Stdout))
+	upCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	_, err = stack.Up(upCtx, optup.ProgressStreams(os.Stdout))
 	return err
 }

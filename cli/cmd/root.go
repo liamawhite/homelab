@@ -30,6 +30,7 @@ func Execute() {
 func init() {
 	// Global persistent flags
 	rootCmd.PersistentFlags().String("config", "", "Path to infra.yaml config file (auto-detected if not specified)")
+	rootCmd.PersistentFlags().String("timeout", "2m", "Total time budget for the up/preview/refresh/cancel operation itself (Go duration format, e.g. 90s, 2m, 5m) - a stuck resource (e.g. a Deployment rollout wait) aborts the whole operation once this elapses, rather than each resource getting its own allowance")
 
 	rootCmd.AddCommand(bootstrapCmd)
 	rootCmd.AddCommand(k3sCmd)
@@ -37,4 +38,6 @@ func init() {
 	rootCmd.AddCommand(nodeCmd)
 	rootCmd.AddCommand(pulumicmd.UpCmd)
 	rootCmd.AddCommand(pulumicmd.PreviewCmd)
+	rootCmd.AddCommand(pulumicmd.RefreshCmd)
+	rootCmd.AddCommand(pulumicmd.CancelCmd)
 }

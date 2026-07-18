@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"path/filepath"
+	"time"
 
 	"github.com/liamawhite/homelab/pkg/config"
 	"github.com/liamawhite/homelab/pkg/deploy"
@@ -32,38 +33,51 @@ const (
 
 // prepareStack resolves a reachable cluster endpoint, extracts a kubeconfig
 // from it, and returns an Automation API stack wired up to deploy against
-// that cluster.
-func prepareStack(cmd *cobra.Command) (context.Context, auto.Stack, error) {
+// that cluster, plus the total time budget (from "--timeout") callers should
+// give the actual stack operation (Up/Preview/Refresh) - NOT applied to the
+// setup work above, only to the operation itself, since resolving the
+// cluster/kubeconfig is a different class of failure than a stuck
+// Kubernetes resource.
+func prepareStack(cmd *cobra.Command) (context.Context, time.Duration, auto.Stack, error) {
 	ctx := context.Background()
 
 	slog.Info("Loading configuration")
 	infraCfg, err := config.LoadInfra(cmd)
 	if err != nil {
-		return nil, auto.Stack{}, err
+		return nil, 0, auto.Stack{}, err
+	}
+
+	timeoutStr, err := cmd.Flags().GetString("timeout")
+	if err != nil {
+		return nil, 0, auto.Stack{}, fmt.Errorf("failed to read --timeout flag: %w", err)
+	}
+	timeout, err := time.ParseDuration(timeoutStr)
+	if err != nil {
+		return nil, 0, auto.Stack{}, fmt.Errorf("invalid --timeout %q: %w", timeoutStr, err)
 	}
 
 	slog.Info("Resolving a reachable cluster endpoint")
 	address, sshUser, sshPassword, err := k3s.ResolveClusterEndpoint(ctx, infraCfg)
 	if err != nil {
-		return nil, auto.Stack{}, err
+		return nil, 0, auto.Stack{}, err
 	}
 	slog.Info("Found reachable cluster endpoint", "address", address)
 
 	client := ssh.NewClientWithPassword(address, sshUser, sshPassword)
 	if err := client.Connect(ctx); err != nil {
-		return nil, auto.Stack{}, err
+		return nil, 0, auto.Stack{}, err
 	}
 	defer client.Close()
 
 	slog.Info("Extracting kubeconfig")
 	kubeconfig, err := k3s.ExtractKubeconfig(ctx, client, address)
 	if err != nil {
-		return nil, auto.Stack{}, err
+		return nil, 0, auto.Stack{}, err
 	}
 
 	backendDir, err := filepath.Abs(stateDir)
 	if err != nil {
-		return nil, auto.Stack{}, fmt.Errorf("failed to resolve state directory: %w", err)
+		return nil, 0, auto.Stack{}, fmt.Errorf("failed to resolve state directory: %w", err)
 	}
 
 	project := workspace.Project{
@@ -83,8 +97,8 @@ func prepareStack(cmd *cobra.Command) (context.Context, auto.Stack, error) {
 			"PULUMI_K8S_ENABLE_PATCH_FORCE": "true",
 		}))
 	if err != nil {
-		return nil, auto.Stack{}, fmt.Errorf("failed to create pulumi stack: %w", err)
+		return nil, 0, auto.Stack{}, fmt.Errorf("failed to create pulumi stack: %w", err)
 	}
 
-	return ctx, stack, nil
+	return ctx, timeout, stack, nil
 }

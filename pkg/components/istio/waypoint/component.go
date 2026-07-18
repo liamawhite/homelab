@@ -7,6 +7,8 @@
 package waypoint
 
 import (
+	"github.com/liamawhite/homelab/pkg/components/dns"
+	"github.com/liamawhite/homelab/pkg/components/istio"
 	gatewayv1 "github.com/liamawhite/homelab/pkg/crds/gatewayapi/crds/kubernetes/gateway/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -63,6 +65,18 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 					Name:     pulumi.String("mesh"),
 					Port:     pulumi.Int(15008),
 					Protocol: pulumi.String("HBONE"),
+				},
+			},
+			// The waypoint proxy istiod provisions from this Gateway is an
+			// XDS client - needs istiod access under Cilium's default-deny
+			// egress baseline, plus DNS to resolve istiod's hostname
+			// (istiod.istio-system.svc) in the first place - the istiod
+			// grant alone only covers the connection once that hostname
+			// is already resolved.
+			Infrastructure: &gatewayv1.GatewaySpecInfrastructureArgs{
+				Labels: pulumi.StringMap{
+					istio.AccessLabelKey: pulumi.String(istio.AccessLabelValue),
+					dns.AccessLabelKey:   pulumi.String(dns.AccessLabelValue),
 				},
 			},
 		},

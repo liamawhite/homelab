@@ -3,6 +3,7 @@ package deploy
 import (
 	"fmt"
 
+	"github.com/liamawhite/homelab/pkg/components/istio"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -70,16 +71,16 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		// deletes to everything inside it) rather than a safe rename. Remove
 		// this alias once applied successfully once.
 		{name: IstioSystemNamespace, labels: pulumi.StringMap{
-			"istio.io/dataplane-mode": pulumi.String("ambient"),
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}, aliases: []pulumi.Alias{
 			{Name: pulumi.String("istio-crds-namespace")},
 		}},
 		// Uncomment when pkg/components/longhorn is wired into Program():
 		// {name: LonghornSystemNamespace, labels: pulumi.StringMap{
-		// 	"istio.io/dataplane-mode": pulumi.String("ambient"),
+		// 	istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		// }},
 		{name: CloudflareNamespace, labels: pulumi.StringMap{
-			"istio.io/dataplane-mode": pulumi.String("ambient"),
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}
 

@@ -1,6 +1,7 @@
 package pulumi
 
 import (
+	"context"
 	"os"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optpreview"
@@ -27,11 +28,14 @@ Example:
 }
 
 func runPreview(cmd *cobra.Command, args []string) error {
-	ctx, stack, err := prepareStack(cmd)
+	ctx, timeout, stack, err := prepareStack(cmd)
 	if err != nil {
 		return err
 	}
 
-	_, err = stack.Preview(ctx, optpreview.ProgressStreams(os.Stdout))
+	previewCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	_, err = stack.Preview(previewCtx, optpreview.ProgressStreams(os.Stdout))
 	return err
 }
