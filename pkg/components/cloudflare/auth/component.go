@@ -20,6 +20,12 @@ type Access struct {
 	// JWT's audience claim wherever Access-issued tokens get re-verified
 	// (e.g. the shared Gateway's RequestAuthentication).
 	AUD pulumi.StringOutput
+	// TeamDomain echoes AccessArgs.TeamDomain - exposed so callers building
+	// an accessjwt.AccessJWTArgs from this Access don't need their own
+	// separate reference to the raw config value.
+	TeamDomain pulumi.StringOutput
+	// AllowedEmails echoes AccessArgs.AllowedEmails, for the same reason.
+	AllowedEmails pulumi.StringArrayOutput
 }
 
 // AccessArgs contains the configuration for an Access application.
@@ -34,6 +40,13 @@ type AccessArgs struct {
 	// SessionDuration is how often a user is forced to re-authenticate,
 	// e.g. "24h" or "2h45m".
 	SessionDuration pulumi.StringInput
+	// TeamDomain is the Zero Trust team domain (the <team-name> in
+	// https://<team-name>.cloudflareaccess.com) - not used to create the
+	// Access application itself, only echoed back on Access so callers
+	// validating Access-issued JWTs elsewhere (e.g.
+	// pkg/components/cloudflare/accessjwt) have a single object to depend
+	// on instead of threading this value through separately.
+	TeamDomain string
 }
 
 // NewAccess creates a new Cloudflare Access application and an allow policy
@@ -60,6 +73,8 @@ func NewAccess(ctx *pulumi.Context, name string, args *AccessArgs, opts ...pulum
 	}
 	access.ApplicationID = app.ID().ToStringOutput()
 	access.AUD = app.Aud
+	access.TeamDomain = pulumi.String(args.TeamDomain).ToStringOutput()
+	access.AllowedEmails = pulumi.ToStringArray(args.AllowedEmails).ToStringArrayOutput()
 
 	// 2. Create the allow policy restricting the application to AllowedEmails
 	_, err = cloudflare.NewZeroTrustAccessPolicy(ctx, fmt.Sprintf("%s-policy", name), &cloudflare.ZeroTrustAccessPolicyArgs{
@@ -82,6 +97,8 @@ func NewAccess(ctx *pulumi.Context, name string, args *AccessArgs, opts ...pulum
 	if err := ctx.RegisterResourceOutputs(access, pulumi.Map{
 		"applicationId": access.ApplicationID,
 		"aud":           access.AUD,
+		"teamDomain":    access.TeamDomain,
+		"allowedEmails": access.AllowedEmails,
 	}); err != nil {
 		return nil, err
 	}

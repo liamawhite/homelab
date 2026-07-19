@@ -66,24 +66,10 @@ type HomeArgs struct {
 	// does not create it.
 	Namespace pulumi.StringInput
 
-	// CloudflareTeamDomain is the Zero Trust team domain (the <team-name>
-	// in https://<team-name>.cloudflareaccess.com), used as the JWT
-	// issuer/JWKS source for validating Access-issued tokens.
-	CloudflareTeamDomain pulumi.StringInput
-	// CloudflareAccessAUD is the Access application's audience tag
-	// (pkg/components/cloudflare/auth.Access.AUD), checked as the JWT's
-	// aud claim.
-	CloudflareAccessAUD pulumi.StringInput
-	// CloudflareTunnelNamespace is where pkg/components/cloudflare/tunnel's
-	// cloudflared runs (pkg/deploy.CloudflareNamespace) - passed through to
-	// accessjwt.NewAccessJWT so it can restrict its AuthorizationPolicy to
-	// cloudflared's own identity, not just its JWT claims.
-	CloudflareTunnelNamespace pulumi.StringInput
-	// CloudflareAllowedEmails is the same allowlist passed to
-	// pkg/components/cloudflare/auth.NewAccess, threaded through to
-	// accessjwt.NewAccessJWT so it can independently re-check the JWT's
-	// email claim against it.
-	CloudflareAllowedEmails pulumi.StringArrayInput
+	// Cloudflare is the shared Cloudflare configuration gating this app's
+	// Service - passed straight through to accessjwt.NewAccessJWT, see
+	// accessjwt.Config for what it bundles and why.
+	Cloudflare *accessjwt.Config
 }
 
 // NewHome deploys the home health-check app and its route.
@@ -214,12 +200,9 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 	// 5. Require a valid Cloudflare Access JWT for anything reaching this
 	// Service through its waypoint.
 	_, err = accessjwt.NewAccessJWT(ctx, name, &accessjwt.AccessJWTArgs{
-		Namespace:                 args.Namespace,
-		ServiceName:               service.Metadata.Name().Elem(),
-		CloudflareTeamDomain:      args.CloudflareTeamDomain,
-		CloudflareAccessAUD:       args.CloudflareAccessAUD,
-		CloudflareTunnelNamespace: args.CloudflareTunnelNamespace,
-		CloudflareAllowedEmails:   args.CloudflareAllowedEmails,
+		Namespace:   args.Namespace,
+		ServiceName: service.Metadata.Name().Elem(),
+		Cloudflare:  args.Cloudflare,
 	}, append(localOpts, pulumi.DependsOn([]pulumi.Resource{service, wp}))...)
 	if err != nil {
 		return nil, err

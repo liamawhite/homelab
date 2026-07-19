@@ -8,6 +8,7 @@ package deploy
 import (
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
 	"github.com/liamawhite/homelab/pkg/components/cilium"
+	accessjwt "github.com/liamawhite/homelab/pkg/components/cloudflare/accessjwt"
 	cfauth "github.com/liamawhite/homelab/pkg/components/cloudflare/auth"
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pkg/components/dns"
@@ -109,17 +110,18 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			Domain:          pulumi.Sprintf("*.%s", infraCfg.Cloudflare.Tunnel.Domain),
 			AllowedEmails:   infraCfg.Cloudflare.Access.AllowedEmails,
 			SessionDuration: pulumi.String("24h"),
+			TeamDomain:      infraCfg.Cloudflare.Access.TeamDomain,
 		}, pulumi.Provider(providers.Cloudflare))
 		if err != nil {
 			return err
 		}
 
 		home, err := applications.NewHome(ctx, "home", &applications.HomeArgs{
-			Namespace:                 homeNS.Metadata.Name().Elem(),
-			CloudflareTeamDomain:      pulumi.String(infraCfg.Cloudflare.Access.TeamDomain),
-			CloudflareAccessAUD:       access.AUD,
-			CloudflareTunnelNamespace: cloudflareNS.Metadata.Name().Elem(),
-			CloudflareAllowedEmails:   pulumi.ToStringArray(infraCfg.Cloudflare.Access.AllowedEmails),
+			Namespace: homeNS.Metadata.Name().Elem(),
+			Cloudflare: &accessjwt.Config{
+				Access:          access,
+				TunnelNamespace: cloudflareNS.Metadata.Name().Elem(),
+			},
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, homeNS}),
 		)
