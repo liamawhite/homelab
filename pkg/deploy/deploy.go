@@ -73,6 +73,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 		istioSystemNS := namespaces.Get(IstioSystemNamespace)
 		cloudflareNS := namespaces.Get(CloudflareNamespace)
+		homeNS := namespaces.Get(HomeNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -114,11 +115,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 
 		home, err := applications.NewHome(ctx, "home", &applications.HomeArgs{
-			Namespace:            pulumi.String("default"),
+			Namespace:            homeNS.Metadata.Name().Elem(),
 			CloudflareTeamDomain: pulumi.String(infraCfg.Cloudflare.Access.TeamDomain),
 			CloudflareAccessAUD:  access.AUD,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp}),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, homeNS}),
 		)
 		if err != nil {
 			return err

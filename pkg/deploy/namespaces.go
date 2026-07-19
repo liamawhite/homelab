@@ -20,6 +20,7 @@ const (
 	IstioSystemNamespace    = "istio-system"
 	LonghornSystemNamespace = "longhorn-system"
 	CloudflareNamespace     = "cloudflare"
+	HomeNamespace           = "home"
 )
 
 // namespaceSpec describes one namespace createNamespaces should create.
@@ -80,6 +81,15 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		// 	istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		// }},
 		{name: CloudflareNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		// Ambient-enrolled like every other namespace here. Was briefly
+		// given its own liveness probe (unlike the "default" namespace it
+		// used to live in) to test whether any ambient-enrolled workload
+		// with an HTTP probe hits the same kubelet-probe-vs-ztunnel
+		// conflict cloudflared did - confirmed it does, see
+		// pkg/deploy/applications/home.go and issue #6.
+		{name: HomeNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}

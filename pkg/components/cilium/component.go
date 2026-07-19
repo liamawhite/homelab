@@ -85,17 +85,32 @@ func NewCilium(ctx *pulumi.Context, name string, args *CiliumArgs, opts ...pulum
 			"socketLB": pulumi.Map{
 				"hostNamespaceOnly": pulumi.Bool(true),
 			},
-			// K3s's embedded kube-proxy turns out not to actually run once a
-			// custom CNI is configured (--flannel-backend: none) - confirmed
-			// live: no KUBE-SERVICES iptables DNAT rules exist at all, so
-			// every ClusterIP (including CoreDNS's) was completely
-			// unreachable. Cilium has to replace kube-proxy itself, not
-			// just coexist with it - there's no working kube-proxy to
-			// coexist with. socketLB.hostNamespaceOnly + cni.exclusive:
+			// K3s embeds its own kube-proxy and keeps running it regardless
+			// of CNI choice unless told otherwise - live nftables evidence
+			// (non-zero KUBE-SERVICES/KUBE-PROXY-FIREWALL/KUBE-PROXY-CANARY
+			// counters) showed both it and Cilium's kubeProxyReplacement
+			// programming Service routing at the same time. pkg/k3s's install
+			// command now passes --disable-kube-proxy so Cilium is the only
+			// thing doing this. socketLB.hostNamespaceOnly + cni.exclusive:
 			// false above are exactly the two settings Cilium's own Istio
-			// integration docs call out as required to keep this
-			// compatible with istio-cni's traffic interception.
+			// integration docs call out as required to keep this compatible
+			// with istio-cni's traffic interception.
 			"kubeProxyReplacement": pulumi.Bool(true),
+			// Pinned explicitly, even though this cluster already reports
+			// "Host: Legacy" in cilium-dbg status without it - confirmed via
+			// live testing that neither VXLAN tunnel mode nor native routing
+			// mode ever actually enables eBPF host routing here (likely a
+			// Raspberry Pi kernel/eBPF feature gap, not something either
+			// routing mode controls). Setting this explicitly guards against
+			// silently drifting onto eBPF host routing on a future kernel or
+			// Cilium upgrade, which would bypass istio-cni's iptables-based
+			// kubelet-probe SNAT exclusion rule the same way it does upstream
+			// - see issue #6. Doesn't fix that issue's actual root cause
+			// (confirmed live, no effect either way today), it just keeps us
+			// pinned to the one behavior we've verified.
+			"bpf": pulumi.Map{
+				"hostLegacyRouting": pulumi.Bool(true),
+			},
 		},
 	}, localOpts...)
 	if err != nil {

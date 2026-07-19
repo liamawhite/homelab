@@ -60,10 +60,10 @@ func (h *Home) TunnelRoute() tunnel.TunnelRoute {
 
 // HomeArgs contains the configuration for Home.
 type HomeArgs struct {
-	// Namespace is the namespace this app's backend runs in. Uses the
-	// pre-existing "default" namespace for now (not created by us - no
-	// conflict risk) rather than adding a new managed namespace for a
-	// single demo app.
+	// Namespace is the namespace this app's backend runs in - created
+	// centrally by pkg/deploy/namespaces.go (HomeNamespace) and passed in
+	// here, ambient-enrolled like istio-system/cloudflare. This component
+	// does not create it.
 	Namespace pulumi.StringInput
 
 	// CloudflareTeamDomain is the Zero Trust team domain (the <team-name>
@@ -126,6 +126,20 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 							Ports: corev1.ContainerPortArray{
 								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(echoPort)},
 							},
+							// No LivenessProbe: an HTTP probe here hits the
+							// same kubelet-probe-vs-ztunnel conflict as
+							// cloudflared (see issue #6) - confirmed live
+							// this app crash-loops identically to
+							// cloudflared once ambient-enrolled with one,
+							// proving that issue is generic to any ambient
+							// pod with an HTTP probe, not cloudflared-
+							// specific. Left off for the same reason it's
+							// off there. Confirmed unrelated to kube-proxy
+							// or Cilium's routing settings - every
+							// combination of --disable-kube-proxy,
+							// bpf.hostLegacyRouting, kubeProxyReplacement,
+							// and native vs. VXLAN-tunnel routing tried
+							// produces the identical failure - see issue #6.
 							Resources: &corev1.ResourceRequirementsArgs{
 								Limits: pulumi.StringMap{
 									"cpu":    pulumi.String("50m"),
@@ -163,7 +177,6 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 			tunnel.WaypointAccessLabelKey: pulumi.String(tunnel.WaypointAccessLabelValue),
 		},
 		TargetLabels: labels,
-		TargetPort:   echoPort,
 	}, localOpts...)
 	if err != nil {
 		return nil, err

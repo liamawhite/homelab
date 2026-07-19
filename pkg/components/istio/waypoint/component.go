@@ -47,19 +47,29 @@ type WaypointArgs struct {
 	// tunnel. Left to the caller since not every waypoint needs it.
 	Labels pulumi.StringMap
 	// TargetLabels are the pod labels (e.g. {"app": "home"}) of the app
-	// backend this waypoint fronts, in the same Namespace. If set (along
-	// with TargetPort), this component creates the waypoint-to-app
-	// CiliumClusterwideNetworkPolicy pair - egress from this specific
-	// waypoint to that specific app, and the app's matching ingress
-	// counterpart (default-deny blocks both directions independently) -
-	// scoped to this one app, not reusable across others, unlike the
-	// cloudflared-to-waypoint policies in
+	// backend this waypoint fronts, in the same Namespace. If set, this
+	// component creates the waypoint-to-app CiliumClusterwideNetworkPolicy
+	// pair - egress from this specific waypoint to that specific app, and
+	// the app's matching ingress counterpart (default-deny blocks both
+	// directions independently) - scoped to this one app, not reusable
+	// across others, unlike the cloudflared-to-waypoint policies in
 	// pkg/components/cloudflare/tunnel. Left empty for a waypoint with no
 	// backend to wire up yet.
 	TargetLabels pulumi.StringMap
-	// TargetPort is the app backend's port, required if TargetLabels is set.
-	TargetPort int
 }
+
+// ztunnelInboundPort is ztunnel's fixed HBONE listener port on every
+// ambient-enrolled pod - NOT the app's own container port. A waypoint's
+// connect_originate dials the app pod's real IP but always on this port
+// (ztunnel terminates HBONE/mTLS here and only then forwards plaintext to
+// the app's real port over loopback inside that pod's own netns - Cilium
+// never sees that final hop as a separate flow). The egress/ingress CCNPs
+// below have to allow this port, not the app's TargetPort - confirmed live
+// via Hubble showing Cilium DROPPING waypoint->app SYNs on the app's real
+// port with a policy verdict, while cloudflared->waypoint traffic (which
+// already correctly targets this same port) went through fine - see issue
+// investigation in cloudflare/tunnel's matching allow-ingress policy.
+const ztunnelInboundPort = 15008
 
 // NewWaypoint creates a single Istio ambient waypoint proxy. Traffic is
 // routed through it by labeling the target (a Service, Pod, or Namespace)
@@ -136,7 +146,7 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 			cilium.K8sNamespaceLabel: args.Namespace,
 			GatewayNameLabel:         pulumi.String(name),
 		}
-		targetPort := fmt.Sprintf("%d", args.TargetPort)
+		hbonePort := fmt.Sprintf("%d", ztunnelInboundPort)
 
 		_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-to-app", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
 			Metadata: &metav1.ObjectMetaArgs{
@@ -156,7 +166,7 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 						ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
 							&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
 								Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
-									&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String(targetPort), Protocol: pulumi.String("TCP")},
+									&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String(hbonePort), Protocol: pulumi.String("TCP")},
 								},
 							},
 						},
@@ -186,7 +196,7 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 						ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArray{
 							&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArgs{
 								Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
-									&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String(targetPort), Protocol: pulumi.String("TCP")},
+									&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String(hbonePort), Protocol: pulumi.String("TCP")},
 								},
 							},
 						},

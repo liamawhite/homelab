@@ -51,8 +51,11 @@ func (i *Installer) GetClusterToken(ctx context.Context) (string, error) {
 
 // buildInstallCommand builds the K3s install command based on configuration
 func (i *Installer) buildInstallCommand(clusterInit bool, serverURL, token string) string {
-	// Base command
-	cmd := "curl -sfL https://get.k3s.io | sh -s - server --disable=traefik --disable=servicelb"
+	// Base command. --disable-kube-proxy: Cilium's kubeProxyReplacement
+	// already handles all Service routing (pkg/components/cilium), so K3s's
+	// own embedded kube-proxy would otherwise run alongside it unused - two
+	// mechanisms programming the same nftables rules for no reason.
+	cmd := "curl -sfL https://get.k3s.io | sh -s - server --disable=traefik --disable=servicelb --disable-kube-proxy"
 
 	// Add TLS SANs
 	for _, san := range i.sans {
