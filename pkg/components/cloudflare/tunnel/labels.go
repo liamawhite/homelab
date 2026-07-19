@@ -24,3 +24,11 @@ const (
 	WaypointAccessLabelKey   = "network.homelab.io/cloudflare-tunnel-waypoint"
 	WaypointAccessLabelValue = "true"
 )
+
+// ServiceAccountName is the name this component gives cloudflared's
+// ServiceAccount (see NewTunnel) - exported so callers can build cloudflared's
+// SPIFFE identity (spiffe://cluster.local/ns/<namespace>/sa/<this>) for their
+// own AuthorizationPolicy source-principal checks (e.g.
+// pkg/components/cloudflare/accessjwt) without hardcoding this name a second
+// time.
+const ServiceAccountName = "cloudflared"

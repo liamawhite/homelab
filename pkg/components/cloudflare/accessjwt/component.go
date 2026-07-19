@@ -10,6 +10,7 @@ package accessjwt
 import (
 	"fmt"
 
+	tunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	securityv1 "github.com/liamawhite/homelab/pkg/crds/istio/crds/kubernetes/security/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -37,6 +38,25 @@ type AccessJWTArgs struct {
 	// (pkg/components/cloudflare/auth.Access.AUD), checked as the JWT's
 	// aud claim.
 	CloudflareAccessAUD pulumi.StringInput
+	// CloudflareTunnelNamespace is the namespace pkg/components/cloudflare/
+	// tunnel's cloudflared runs in (pkg/deploy.CloudflareNamespace) - used
+	// to build cloudflared's SPIFFE identity for the source-principal
+	// check below. Not imported directly from pkg/deploy: that package
+	// already depends on this one (via pkg/deploy/applications), so
+	// importing back would cycle - the caller threads the value through
+	// instead.
+	CloudflareTunnelNamespace pulumi.StringInput
+	// CloudflareAllowedEmails is the same allowlist already enforced by
+	// pkg/components/cloudflare/auth.NewAccess's Access application at
+	// Cloudflare's edge - checked again here, independently, against the
+	// JWT's own email claim. Without this, the origin only verifies "some
+	// user Cloudflare Access let through" (right issuer/audience), not
+	// which one - so a still-unexpired JWT for a user later removed from
+	// this list would keep working if it were ever replayed directly at
+	// the origin rather than through a fresh Access login. Duplicating the
+	// allowlist here means it must be updated in both places, but closes
+	// that gap independently of Cloudflare's own edge decision.
+	CloudflareAllowedEmails pulumi.StringArrayInput
 }
 
 // NewAccessJWT creates JWT validation for a single Service: a
@@ -111,6 +131,27 @@ func NewAccessJWT(ctx *pulumi.Context, name string, args *AccessJWTArgs, opts ..
 	// checks, a valid JWT for any issuer/audience the RequestAuthentication
 	// accepts would be enough, rather than specifically this Cloudflare
 	// Access app's.
+	//
+	// Also checks the JWT's email claim against the exact same
+	// CloudflareAllowedEmails list pkg/components/cloudflare/auth.NewAccess
+	// already enforces at Cloudflare's edge - deliberately duplicated
+	// rather than trusted transitively, since a still-unexpired JWT for a
+	// user later removed from that list would otherwise keep validating
+	// here if it were ever replayed directly at the origin instead of
+	// through a fresh Access login (this policy only verifies the token's
+	// signature/issuer/audience, not whether Cloudflare would still issue
+	// one to this specific user today).
+	//
+	// Also requires the caller's mTLS identity to be cloudflared itself
+	// (From.Source.Principals) - belt-and-suspenders alongside the
+	// pkg/components/cloudflare/tunnel egress/pkg/components/istio/waypoint
+	// ingress CiliumClusterwideNetworkPolicy pair that already restricts
+	// this at L3/L4 by pod label. Without this, any mesh workload that
+	// could reach this waypoint (e.g. if that Cilium policy were ever
+	// loosened or misconfigured) and presented a valid Cloudflare Access
+	// JWT would pass - the claims checks above authenticate the token, not
+	// who's presenting it. This closes that gap at the Istio/L7 layer
+	// independently of Cilium.
 	_, err = securityv1.NewAuthorizationPolicy(ctx, fmt.Sprintf("%s-allow", name), &securityv1.AuthorizationPolicyArgs{
 		Metadata: &metav1.ObjectMetaArgs{
 			Name:      pulumi.String(fmt.Sprintf("%s-allow", name)),
@@ -123,6 +164,15 @@ func NewAccessJWT(ctx *pulumi.Context, name string, args *AccessJWTArgs, opts ..
 			},
 			Rules: securityv1.AuthorizationPolicySpecRulesArray{
 				&securityv1.AuthorizationPolicySpecRulesArgs{
+					From: securityv1.AuthorizationPolicySpecRulesFromArray{
+						&securityv1.AuthorizationPolicySpecRulesFromArgs{
+							Source: &securityv1.AuthorizationPolicySpecRulesFromSourceArgs{
+								Principals: pulumi.StringArray{
+									pulumi.Sprintf("cluster.local/ns/%s/sa/%s", args.CloudflareTunnelNamespace, tunnel.ServiceAccountName),
+								},
+							},
+						},
+					},
 					When: securityv1.AuthorizationPolicySpecRulesWhenArray{
 						&securityv1.AuthorizationPolicySpecRulesWhenArgs{
 							Key:    pulumi.String("request.auth.claims[iss]"),
@@ -131,6 +181,10 @@ func NewAccessJWT(ctx *pulumi.Context, name string, args *AccessJWTArgs, opts ..
 						&securityv1.AuthorizationPolicySpecRulesWhenArgs{
 							Key:    pulumi.String("request.auth.claims[aud]"),
 							Values: pulumi.StringArray{args.CloudflareAccessAUD},
+						},
+						&securityv1.AuthorizationPolicySpecRulesWhenArgs{
+							Key:    pulumi.String("request.auth.claims[email]"),
+							Values: args.CloudflareAllowedEmails,
 						},
 					},
 				},

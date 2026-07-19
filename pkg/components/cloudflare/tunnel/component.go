@@ -172,7 +172,7 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 	// rather than running as its namespace's shared "default" account.
 	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
 		Metadata: &metav1.ObjectMetaArgs{
-			Name:      pulumi.String("cloudflared"),
+			Name:      pulumi.String(ServiceAccountName),
 			Namespace: args.Namespace.ToStringPtrOutput(),
 		},
 	}, resourceOpts...)

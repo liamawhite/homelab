@@ -5,4 +5,9 @@
 /bin
 /homelab
 
+# Pulumi writes a fresh backup + history snapshot on every deploy; only the
+# current stack state (.pulumi-state/.pulumi/stacks) matters for recovery.
+/.pulumi-state/.pulumi/backups/
+/.pulumi-state/.pulumi/history/
+
 

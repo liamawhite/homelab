@@ -115,9 +115,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 
 		home, err := applications.NewHome(ctx, "home", &applications.HomeArgs{
-			Namespace:            homeNS.Metadata.Name().Elem(),
-			CloudflareTeamDomain: pulumi.String(infraCfg.Cloudflare.Access.TeamDomain),
-			CloudflareAccessAUD:  access.AUD,
+			Namespace:                 homeNS.Metadata.Name().Elem(),
+			CloudflareTeamDomain:      pulumi.String(infraCfg.Cloudflare.Access.TeamDomain),
+			CloudflareAccessAUD:       access.AUD,
+			CloudflareTunnelNamespace: cloudflareNS.Metadata.Name().Elem(),
+			CloudflareAllowedEmails:   pulumi.ToStringArray(infraCfg.Cloudflare.Access.AllowedEmails),
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, homeNS}),
 		)
