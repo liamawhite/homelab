@@ -126,20 +126,14 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 							Ports: corev1.ContainerPortArray{
 								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(echoPort)},
 							},
-							// No LivenessProbe: an HTTP probe here hits the
-							// same kubelet-probe-vs-ztunnel conflict as
-							// cloudflared (see issue #6) - confirmed live
-							// this app crash-loops identically to
-							// cloudflared once ambient-enrolled with one,
-							// proving that issue is generic to any ambient
-							// pod with an HTTP probe, not cloudflared-
-							// specific. Left off for the same reason it's
-							// off there. Confirmed unrelated to kube-proxy
-							// or Cilium's routing settings - every
-							// combination of --disable-kube-proxy,
-							// bpf.hostLegacyRouting, kubeProxyReplacement,
-							// and native vs. VXLAN-tunnel routing tried
-							// produces the identical failure - see issue #6.
+							LivenessProbe: &corev1.ProbeArgs{
+								HttpGet: &corev1.HTTPGetActionArgs{
+									Path: pulumi.String("/"),
+									Port: pulumi.Int(echoPort),
+								},
+								InitialDelaySeconds: pulumi.Int(5),
+								PeriodSeconds:       pulumi.Int(10),
+							},
 							Resources: &corev1.ResourceRequirementsArgs{
 								Limits: pulumi.StringMap{
 									"cpu":    pulumi.String("50m"),

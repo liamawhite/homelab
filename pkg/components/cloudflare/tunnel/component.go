@@ -221,8 +221,7 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 						// ingress policy only accepting traffic from the
 						// waypoint's own identity means a non-ambient
 						// source's direct, un-tunneled connection just
-						// gets dropped). See the missing LivenessProbe
-						// below for the other half of this trade-off.
+						// gets dropped).
 					},
 				},
 				Spec: &corev1.PodSpecArgs{
@@ -240,32 +239,14 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 								pulumi.String("--token"),
 								tunnelToken,
 							},
-							// No LivenessProbe: kubelet's own HTTP GET
-							// probe against this pod's IP is exactly the
-							// kind of traffic ztunnel's ambient capture
-							// intercepts, and it doesn't handle plain HTTP
-							// - the connection just hangs until the probe
-							// times out, killing an otherwise-healthy
-							// process (confirmed live: CPU usage stayed
-							// ~2m/100m the whole time - a false positive,
-							// not real unresponsiveness). This is a
-							// documented Istio+Cilium ambient
-							// incompatibility (istio/istio#49277, #57911)
-							// with no working fix found for this cluster:
-							// patching istio-cni's HOST_PROBE_SNAT_IP is a
-							// security regression (defeats the point of
-							// the default link-local SNAT address, which
-							// exists to prevent IP spoofing on pods), and
-							// Cilium's bpf.hostLegacyRouting (confirmed
-							// active via cilium-dbg status) had no effect,
-							// likely because this cluster's VXLAN tunnel
-							// mode already forces legacy host routing
-							// regardless of that setting. Traded away in
-							// favor of staying ambient-enrolled (see the
-							// Labels comment above) - Kubernetes still
-							// restarts this container on a real crash
-							// (non-zero exit) regardless of whether a
-							// liveness probe is configured.
+							LivenessProbe: &corev1.ProbeArgs{
+								HttpGet: &corev1.HTTPGetActionArgs{
+									Path: pulumi.String("/ready"),
+									Port: pulumi.Int(2000),
+								},
+								InitialDelaySeconds: pulumi.Int(5),
+								PeriodSeconds:       pulumi.Int(10),
+							},
 							Resources: &corev1.ResourceRequirementsArgs{
 								Limits: pulumi.StringMap{
 									"cpu":    pulumi.String("100m"),

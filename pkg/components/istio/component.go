@@ -343,6 +343,85 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 		return nil, err
 	}
 
+	// Ambient mode's fix for a problem it otherwise has with kubelet
+	// liveness/readiness probes: kubelet lives in the node's host network
+	// namespace, not inside any pod, so its probe traffic would normally
+	// get captured by ztunnel's per-node redirect the exact same way any
+	// other inbound connection to an ambient-enrolled pod does - and
+	// ztunnel, expecting an HBONE/mTLS handshake from a fellow mesh
+	// workload, has no idea what to do with a plain HTTP GET from
+	// kubelet, so the probe hangs until kubelet's own client-side timeout
+	// fires. istio-cni's fix: SNAT kubelet's probe traffic to a fixed,
+	// non-routable link-local sentinel address (169.254.7.127, or its
+	// IPv6 equivalent fd16:9254:7127:1337:ffff:ffff:ffff:ffff) before it
+	// hits the redirect rules, then exclude that exact source from
+	// capture - so recognized probe traffic skips ztunnel and reaches the
+	// container directly. This is supposed to be invisible, zero-config
+	// plumbing.
+	//
+	// It doesn't work on this cluster. Cilium (with kubeProxyReplacement
+	// enabled) has its own eBPF datapath doing packet classification and
+	// redirection, chained alongside istio-cni's iptables rules on the
+	// same interfaces (see cni.exclusive/socketLB.hostNamespaceOnly in
+	// pkg/components/cilium) - and once SNAT'd, Cilium's own identity
+	// resolution no longer recognizes this traffic as coming from "host"
+	// (the entity our default-deny baseline already explicitly allows,
+	// see pkg/components/cilium's default-deny FromEntities). Confirmed
+	// live with a Hubble trace while testing pkg/deploy/applications/
+	// home.go's LivenessProbe:
+	//
+	//   169.254.7.127:xxxxx (world) <> home/home-...:5678 ... DENIED
+	//   169.254.7.127:xxxxx (world) <> home/home-...:5678 Policy denied DROPPED
+	//
+	// - the SNAT'd probe is reclassified as "world" (an unrecognized,
+	// untrusted external source) instead of "host", so it falls straight
+	// into the default-deny baseline and gets dropped. This is the
+	// documented istio/istio#49277 and #57911 upstream incompatibility -
+	// see issue #6 for the full investigation, including several other
+	// Cilium settings tried (bpf.hostLegacyRouting, native vs. VXLAN-
+	// tunnel routing, disabling kube-proxy, kubeProxyReplacement itself)
+	// that all turned out to be irrelevant to this specific mechanism.
+	//
+	// The fix here: explicitly allow ingress from that exact sentinel
+	// address, cluster-wide, on any port - the same trust default-deny
+	// already extends to the "host"/"remote-node" entities, just spelled
+	// out by CIDR instead of by identity since Cilium won't resolve the
+	// identity correctly post-SNAT. This is NOT the same as the
+	// previously-rejected fix of repointing istio-cni's
+	// HOST_PROBE_SNAT_IP at the node's real IP (a maintainer flagged that
+	// as a security regression, since a real routable host IP can be
+	// spoofed by a malicious pod to impersonate trusted host traffic).
+	// 169.254.7.127 is link-local and non-routable off-node, and Cilium's
+	// own anti-spoofing enforcement prevents a pod from forging an
+	// arbitrary source IP on its own egress - only istio-cni's kernel-
+	// level SNAT rule (matched via `-m owner --socket-exists`, i.e. only
+	// for connections actually owned by the node's own kubelet process)
+	// ever produces packets from this address. Trusting it is exactly as
+	// safe as trusting the "host" entity default-deny already does.
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-ingress-ambient-probe-snat", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-ingress-ambient-probe-snat"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			// Empty selector: matches every endpoint cluster-wide, same as
+			// pkg/components/cilium's default-deny baseline - any
+			// ambient-enrolled pod with a kubelet probe can hit this, not
+			// just istiod's.
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{},
+			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+					FromCIDR: pulumi.StringArray{
+						pulumi.String("169.254.7.127/32"),
+						pulumi.String("fd16:9254:7127:1337:ffff:ffff:ffff:ffff/128"),
+					},
+				},
+			},
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
 	// Register outputs
 	if err := ctx.RegisterResourceOutputs(istio, pulumi.Map{
 		"namespace": istio.Namespace,
