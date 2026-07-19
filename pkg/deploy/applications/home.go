@@ -150,9 +150,20 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 	// are per-service, not shared across a namespace, so each app's
 	// AuthorizationPolicy/RequestAuthentication can be scoped and evolved
 	// independently rather than funneling through one shared enforcement
-	// point.
+	// point. Opts into pkg/components/cloudflare/tunnel's waypoint-access
+	// policy since Home is reachable through the Cloudflare Tunnel (see
+	// TunnelRoute below). TargetLabels/TargetPort has the waypoint
+	// component wire up its own network policy to this app's backend.
+	// (JWKS fetching for NewAccessJWT below is istiod's job, not this
+	// waypoint's - see pkg/components/cloudflare/accessjwt's own egress
+	// policy, which targets istiod directly.)
 	wp, err := waypoint.NewWaypoint(ctx, fmt.Sprintf("%s-waypoint", name), &waypoint.WaypointArgs{
 		Namespace: args.Namespace,
+		Labels: pulumi.StringMap{
+			tunnel.WaypointAccessLabelKey: pulumi.String(tunnel.WaypointAccessLabelValue),
+		},
+		TargetLabels: labels,
+		TargetPort:   echoPort,
 	}, localOpts...)
 	if err != nil {
 		return nil, err

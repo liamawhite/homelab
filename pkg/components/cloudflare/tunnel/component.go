@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/liamawhite/homelab/pkg/components/dns"
-	"github.com/liamawhite/homelab/pkg/components/istio"
 	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
@@ -212,20 +211,18 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 						// Cloudflare Tunnel edge itself (see
 						// allow-egress-cloudflare-tunnel below).
 						AccessLabelKey: pulumi.String(AccessLabelValue),
-						// Opts out of ztunnel's ambient capture, same as
-						// istiod/ztunnel/istio-cni (pkg/components/istio) -
-						// confirmed live: with the cloudflare namespace's
-						// ambient label capturing all of this pod's traffic,
-						// kubelet's plain-HTTP liveness probe to port 2000
-						// was being silently intercepted by ztunnel (which
-						// expects HBONE, not plain HTTP) and timing out,
-						// causing an endless restart loop despite the tunnel
-						// itself being healthy. Safe to opt out: nothing
-						// calls into cloudflared over the pod network except
-						// kubelet, and waypoint routing/mTLS enforcement for
-						// its calls out to an app's Service is done on that
-						// Service's (destination) side, not the source's.
-						istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeNone),
+						// Stays ambient-enrolled (unlike
+						// istiod/ztunnel/istio-cni) - ztunnel has to
+						// capture this pod's own egress for it to reach an
+						// app's waypoint at all (confirmed live: opting
+						// out via istio.io/dataplane-mode: none breaks
+						// cloudflared's connection to the home app's
+						// waypoint - default-deny plus the waypoint's own
+						// ingress policy only accepting traffic from the
+						// waypoint's own identity means a non-ambient
+						// source's direct, un-tunneled connection just
+						// gets dropped). See the missing LivenessProbe
+						// below for the other half of this trade-off.
 					},
 				},
 				Spec: &corev1.PodSpecArgs{
@@ -243,24 +240,32 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 								pulumi.String("--token"),
 								tunnelToken,
 							},
-							LivenessProbe: &corev1.ProbeArgs{
-								HttpGet: &corev1.HTTPGetActionArgs{
-									Path: pulumi.String("/ready"),
-									Port: pulumi.Int(2000),
-								},
-								InitialDelaySeconds: pulumi.Int(10),
-								PeriodSeconds:       pulumi.Int(10),
-								// Default (1s) is too tight on this
-								// hardware - confirmed live, cloudflared
-								// establishing its ~4 concurrent QUIC
-								// connections at startup can starve its own
-								// metrics server past 1s under this
-								// container's 100m CPU limit on a
-								// Raspberry Pi's weaker cores, causing
-								// kubelet to kill and restart an otherwise
-								// healthy process.
-								TimeoutSeconds: pulumi.Int(5),
-							},
+							// No LivenessProbe: kubelet's own HTTP GET
+							// probe against this pod's IP is exactly the
+							// kind of traffic ztunnel's ambient capture
+							// intercepts, and it doesn't handle plain HTTP
+							// - the connection just hangs until the probe
+							// times out, killing an otherwise-healthy
+							// process (confirmed live: CPU usage stayed
+							// ~2m/100m the whole time - a false positive,
+							// not real unresponsiveness). This is a
+							// documented Istio+Cilium ambient
+							// incompatibility (istio/istio#49277, #57911)
+							// with no working fix found for this cluster:
+							// patching istio-cni's HOST_PROBE_SNAT_IP is a
+							// security regression (defeats the point of
+							// the default link-local SNAT address, which
+							// exists to prevent IP spoofing on pods), and
+							// Cilium's bpf.hostLegacyRouting (confirmed
+							// active via cilium-dbg status) had no effect,
+							// likely because this cluster's VXLAN tunnel
+							// mode already forces legacy host routing
+							// regardless of that setting. Traded away in
+							// favor of staying ambient-enrolled (see the
+							// Labels comment above) - Kubernetes still
+							// restarts this container on a real crash
+							// (non-zero exit) regardless of whether a
+							// liveness probe is configured.
 							Resources: &corev1.ResourceRequirementsArgs{
 								Limits: pulumi.StringMap{
 									"cpu":    pulumi.String("100m"),
@@ -313,6 +318,88 @@ func NewTunnel(ctx *pulumi.Context, name string, args *TunnelArgs, opts ...pulum
 								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("7844"), Protocol: pulumi.String("UDP")},
 								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("7844"), Protocol: pulumi.String("TCP")},
 								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("443"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, resourceOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// 9. Only pods carrying AccessLabelKey/AccessLabelValue (i.e.
+	// cloudflared) can reach waypoints that opt in via
+	// WaypointAccessLabelKey/Value - needed for cloudflared to actually
+	// deliver a tunneled HTTP request to an app's Service once ambient
+	// routes it through that Service's waypoint (see
+	// pkg/components/istio/waypoint), on the waypoint's HBONE mesh
+	// listener (port 15008). This is the generic, reusable half of that
+	// path; the waypoint-to-app leg is specific to each app's own pods and
+	// lives with that app instead (see pkg/deploy/applications/home.go).
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-waypoints", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-egress-cloudflare-tunnel-waypoints"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					AccessLabelKey: pulumi.String(AccessLabelValue),
+				},
+			},
+			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+					ToEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArgs{
+							MatchLabels: pulumi.StringMap{
+								WaypointAccessLabelKey: pulumi.String(WaypointAccessLabelValue),
+							},
+						},
+					},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("15008"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, resourceOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// 10. Ingress counterpart to #9 - default-deny blocks ingress
+	// independently of egress, so a waypoint that opted in via
+	// WaypointAccessLabelKey also needs to actually accept the connection
+	// (same lesson as istiod's own missing ingress policy, see
+	// pkg/components/istio).
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-ingress-waypoints", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-ingress-cloudflare-tunnel-waypoints"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					WaypointAccessLabelKey: pulumi.String(WaypointAccessLabelValue),
+				},
+			},
+			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+					FromEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArgs{
+							MatchLabels: pulumi.StringMap{
+								AccessLabelKey: pulumi.String(AccessLabelValue),
+							},
+						},
+					},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("15008"), Protocol: pulumi.String("TCP")},
 							},
 						},
 					},

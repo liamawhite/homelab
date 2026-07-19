@@ -118,7 +118,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			CloudflareTeamDomain: pulumi.String(infraCfg.Cloudflare.Access.TeamDomain),
 			CloudflareAccessAUD:  access.AUD,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh}),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp}),
 		)
 		if err != nil {
 			return err

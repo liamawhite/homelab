@@ -7,12 +7,25 @@
 package waypoint
 
 import (
+	"fmt"
+	"maps"
+
+	"github.com/liamawhite/homelab/pkg/components/cilium"
 	"github.com/liamawhite/homelab/pkg/components/dns"
 	"github.com/liamawhite/homelab/pkg/components/istio"
+	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	gatewayv1 "github.com/liamawhite/homelab/pkg/crds/gatewayapi/crds/kubernetes/gateway/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
+
+// mergeLabels returns a new pulumi.StringMap containing base plus every
+// entry of extra (extra wins on key collision).
+func mergeLabels(base, extra pulumi.StringMap) pulumi.StringMap {
+	merged := maps.Clone(base)
+	maps.Copy(merged, extra)
+	return merged
+}
 
 // Waypoint represents a single Istio ambient waypoint proxy.
 type Waypoint struct {
@@ -27,6 +40,25 @@ type WaypointArgs struct {
 	// Namespace is where the waypoint proxy itself runs - not created/owned
 	// by this component, same convention as everywhere else in this repo.
 	Namespace pulumi.StringInput
+	// Labels are merged into the waypoint proxy's own pod labels, in
+	// addition to the istiod/DNS access this component always adds -
+	// e.g. a label opting into pkg/components/cloudflare/tunnel's
+	// waypoint-access policy, for apps actually exposed through that
+	// tunnel. Left to the caller since not every waypoint needs it.
+	Labels pulumi.StringMap
+	// TargetLabels are the pod labels (e.g. {"app": "home"}) of the app
+	// backend this waypoint fronts, in the same Namespace. If set (along
+	// with TargetPort), this component creates the waypoint-to-app
+	// CiliumClusterwideNetworkPolicy pair - egress from this specific
+	// waypoint to that specific app, and the app's matching ingress
+	// counterpart (default-deny blocks both directions independently) -
+	// scoped to this one app, not reusable across others, unlike the
+	// cloudflared-to-waypoint policies in
+	// pkg/components/cloudflare/tunnel. Left empty for a waypoint with no
+	// backend to wire up yet.
+	TargetLabels pulumi.StringMap
+	// TargetPort is the app backend's port, required if TargetLabels is set.
+	TargetPort int
 }
 
 // NewWaypoint creates a single Istio ambient waypoint proxy. Traffic is
@@ -43,6 +75,14 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 	}
 
 	localOpts := append(opts, pulumi.Parent(wp))
+
+	// Base labels every waypoint needs (istiod/DNS access), plus whatever
+	// the caller asked for on top.
+	infraLabels := pulumi.StringMap{
+		istio.AccessLabelKey: pulumi.String(istio.AccessLabelValue),
+		dns.AccessLabelKey:   pulumi.String(dns.AccessLabelValue),
+	}
+	maps.Copy(infraLabels, args.Labels)
 
 	// istiod auto-creates the "istio-waypoint" GatewayClass (controllerName
 	// istio.io/waypoint-controller) - referenced by name here rather than
@@ -74,15 +114,89 @@ func NewWaypoint(ctx *pulumi.Context, name string, args *WaypointArgs, opts ...p
 			// grant alone only covers the connection once that hostname
 			// is already resolved.
 			Infrastructure: &gatewayv1.GatewaySpecInfrastructureArgs{
-				Labels: pulumi.StringMap{
-					istio.AccessLabelKey: pulumi.String(istio.AccessLabelValue),
-					dns.AccessLabelKey:   pulumi.String(dns.AccessLabelValue),
-				},
+				Labels: infraLabels,
 			},
 		},
 	}, localOpts...)
 	if err != nil {
 		return nil, err
+	}
+
+	if args.TargetLabels != nil {
+		// Egress first, then its ingress counterpart - default-deny
+		// blocks both directions independently (confirmed live with
+		// istiod's own missing ingress policy, see pkg/components/istio).
+		// Scoped to this specific waypoint's istiod-assigned gateway-name
+		// identity and this specific app's own pod labels, not a shared
+		// opt-in label - unlike pkg/components/cloudflare/tunnel's
+		// cloudflared-to-waypoint policies, which are reusable across
+		// every app's waypoint, this leg is a 1:1 relationship intrinsic
+		// to this one waypoint/app pair.
+		gatewayNameMatch := pulumi.StringMap{
+			cilium.K8sNamespaceLabel: args.Namespace,
+			GatewayNameLabel:         pulumi.String(name),
+		}
+		targetPort := fmt.Sprintf("%d", args.TargetPort)
+
+		_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-to-app", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+			Metadata: &metav1.ObjectMetaArgs{
+				Name: pulumi.String(fmt.Sprintf("allow-egress-%s-to-app", name)),
+			},
+			Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+				EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+					MatchLabels: gatewayNameMatch,
+				},
+				Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+					&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+						ToEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArray{
+							&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArgs{
+								MatchLabels: mergeLabels(pulumi.StringMap{cilium.K8sNamespaceLabel: args.Namespace}, args.TargetLabels),
+							},
+						},
+						ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+							&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+								Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+									&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String(targetPort), Protocol: pulumi.String("TCP")},
+								},
+							},
+						},
+					},
+				},
+			},
+		}, localOpts...)
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-ingress-from-waypoint", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+			Metadata: &metav1.ObjectMetaArgs{
+				Name: pulumi.String(fmt.Sprintf("allow-ingress-%s-from-waypoint", name)),
+			},
+			Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+				EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+					MatchLabels: mergeLabels(pulumi.StringMap{cilium.K8sNamespaceLabel: args.Namespace}, args.TargetLabels),
+				},
+				Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+					&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+						FromEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArray{
+							&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressFromEndpointsArgs{
+								MatchLabels: gatewayNameMatch,
+							},
+						},
+						ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArray{
+							&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArgs{
+								Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
+									&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String(targetPort), Protocol: pulumi.String("TCP")},
+								},
+							},
+						},
+					},
+				},
+			},
+		}, localOpts...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	wp.Name = pulumi.String(name).ToStringOutput()

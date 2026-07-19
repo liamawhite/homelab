@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
+	"github.com/liamawhite/homelab/pkg/components/cilium"
 	"github.com/liamawhite/homelab/pkg/components/dns"
 	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	securityv1 "github.com/liamawhite/homelab/pkg/crds/istio/crds/kubernetes/security/v1"
@@ -64,9 +65,17 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 			"profile": pulumi.String("ambient"),
 			// istiod watches the K8s API directly (Namespaces, CRDs,
 			// Secrets, leader-election leases, etc.) - needs apiserver
-			// access under Cilium's default-deny egress baseline.
+			// access under Cilium's default-deny egress baseline. It also
+			// fetches JWKS for any RequestAuthentication with a remote
+			// jwksUri itself, at config-push time (see
+			// pkg/components/cloudflare/accessjwt's own egress policy) -
+			// needs DNS to resolve that JWKS host's name in the first
+			// place, confirmed live: istiod had apiserver access and its
+			// own JWKS-fetch egress grant, but no DNS access at all, so
+			// it could never resolve the hostname to attempt the fetch.
 			"podLabels": pulumi.StringMap{
 				apiserver.AccessLabelKey: pulumi.String(apiserver.AccessLabelValue),
+				dns.AccessLabelKey:       pulumi.String(dns.AccessLabelValue),
 			},
 			"pilot": pulumi.Map{
 				"resources": pulumi.Map{
@@ -227,8 +236,8 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 	// pass pulumi.DependsOn on the Cilium installation (see
 	// pkg/components/cilium.NewCilium).
 	istiodMatchLabels := pulumi.StringMap{
-		k8sNamespaceLabel: args.Namespace,
-		"app":             pulumi.String("istiod"),
+		cilium.K8sNamespaceLabel: args.Namespace,
+		"app":                    pulumi.String("istiod"),
 	}
 	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-istiod", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
 		Metadata: &metav1.ObjectMetaArgs{
@@ -285,6 +294,44 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
 								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("15012"), Protocol: pulumi.String("TCP")},
 								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("15010"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
+	// istiod fetches JWKS for any RequestAuthentication with a remote
+	// jwksUri itself, at config-push time, embedding the keys statically
+	// into what it pushes to the enforcing waypoint rather than that
+	// waypoint fetching them live (confirmed live: the waypoint's own
+	// Envoy had no remote JWKS cluster at all, and istiod's own logs
+	// showed the actual fetch attempts/failures). A property of istiod
+	// itself, not anything specific to Cloudflare Access
+	// (pkg/components/cloudflare/accessjwt) or any other JWT issuer, so
+	// it's a fixed baseline policy here rather than something each
+	// RequestAuthentication caller creates. JWKS hosts aren't a fixed
+	// CIDR, hence ToEntities "world" restricted by port, same reasoning
+	// as allow-egress-coredns-upstream (pkg/components/dns).
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-jwks", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-egress-jwks"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: istiodMatchLabels,
+			},
+			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+					ToEntities: pulumi.StringArray{pulumi.String("world")},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("443"), Protocol: pulumi.String("TCP")},
 							},
 						},
 					},

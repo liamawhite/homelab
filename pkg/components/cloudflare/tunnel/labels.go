@@ -10,3 +10,17 @@ const (
 	AccessLabelKey   = "network.homelab.io/cloudflare-tunnel"
 	AccessLabelValue = "true"
 )
+
+// WaypointAccessLabelKey and WaypointAccessLabelValue mark a waypoint proxy
+// (pkg/components/istio/waypoint) as reachable from cloudflared - the
+// destination-side counterpart to AccessLabelKey/AccessLabelValue above
+// (which gates cloudflared's own egress to the *Cloudflare* edge, not to
+// in-cluster destinations). Any app whose Service is routed through the
+// Cloudflare Tunnel adds this to its own waypoint (via
+// waypoint.WaypointArgs.Labels) to opt in - reusable across apps, unlike
+// the waypoint-to-app leg, which is specific to each app's own pods and so
+// isn't a shared label (see pkg/deploy/applications/home.go).
+const (
+	WaypointAccessLabelKey   = "network.homelab.io/cloudflare-tunnel-waypoint"
+	WaypointAccessLabelValue = "true"
+)

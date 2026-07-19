@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
+	"github.com/liamawhite/homelab/pkg/components/cilium"
 	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
@@ -56,8 +57,8 @@ func NewClusterDNS(ctx *pulumi.Context, name string, opts ...pulumi.ResourceOpti
 					ToEndpoints: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArray{
 						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToEndpointsArgs{
 							MatchLabels: pulumi.StringMap{
-								k8sNamespaceLabel: pulumi.String("kube-system"),
-								"k8s-app":         pulumi.String("kube-dns"),
+								cilium.K8sNamespaceLabel: pulumi.String("kube-system"),
+								"k8s-app":                pulumi.String("kube-dns"),
 							},
 						},
 					},
@@ -84,8 +85,8 @@ func NewClusterDNS(ctx *pulumi.Context, name string, opts ...pulumi.ResourceOpti
 		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
 			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
 				MatchLabels: pulumi.StringMap{
-					k8sNamespaceLabel: pulumi.String("kube-system"),
-					"k8s-app":         pulumi.String("kube-dns"),
+					cilium.K8sNamespaceLabel: pulumi.String("kube-system"),
+					"k8s-app":                pulumi.String("kube-dns"),
 				},
 			},
 			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
@@ -123,8 +124,8 @@ func NewClusterDNS(ctx *pulumi.Context, name string, opts ...pulumi.ResourceOpti
 		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
 			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
 				MatchLabels: pulumi.StringMap{
-					k8sNamespaceLabel: pulumi.String("kube-system"),
-					"k8s-app":         pulumi.String("kube-dns"),
+					cilium.K8sNamespaceLabel: pulumi.String("kube-system"),
+					"k8s-app":                pulumi.String("kube-dns"),
 				},
 			},
 			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
