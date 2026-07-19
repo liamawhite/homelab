@@ -55,6 +55,15 @@ func NewProviders(ctx *pulumi.Context, kubeconfig string, infraCfg *infraconfig.
 	if infraCfg.Cloudflare.Tunnel.Domain == "" {
 		return nil, fmt.Errorf("cloudflare tunnel domain is required in infra.yaml")
 	}
+	if infraCfg.Tailscale.OAuthClientID == "" {
+		return nil, fmt.Errorf("tailscale OAuth client ID is required in infra.yaml")
+	}
+	if infraCfg.Tailscale.OAuthClientSecret == "" {
+		return nil, fmt.Errorf("tailscale OAuth client secret is required in infra.yaml")
+	}
+	if infraCfg.Tailscale.MagicDNSSuffix == "" {
+		return nil, fmt.Errorf("tailscale MagicDNS suffix is required in infra.yaml")
+	}
 
 	// Create Kubernetes provider from the resolved kubeconfig
 	k8sProvider, err := NewKubernetesProvider(ctx, kubeconfig)

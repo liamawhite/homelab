@@ -8,4 +8,5 @@ const (
 	Istio      = "1.30.2"
 	Longhorn   = "v1.9.1"
 	Cilium     = "1.19.5"
+	Tailscale  = "1.98.9"
 )

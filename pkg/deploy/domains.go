@@ -46,7 +46,7 @@ func (d *Domains) Get(name string) *cfdomain.Domain {
 // here when wiring in a new app that needs a public hostname.
 func createDomains(ctx *pulumi.Context, baseDomain pulumi.StringInput, tunnelTarget pulumi.StringInput, accountID pulumi.StringInput, provider *cloudflare.Provider, opts ...pulumi.ResourceOption) (*Domains, error) {
 	specs := []domainSpec{
-		{name: "home", subdomain: applications.Subdomain},
+		{name: "public", subdomain: applications.PublicSubdomain},
 	}
 
 	zoneID := pulumi.All(baseDomain, accountID).ApplyT(func(inputs []interface{}) (string, error) {

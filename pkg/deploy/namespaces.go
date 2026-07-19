@@ -20,7 +20,8 @@ const (
 	IstioSystemNamespace    = "istio-system"
 	LonghornSystemNamespace = "longhorn-system"
 	CloudflareNamespace     = "cloudflare"
-	HomeNamespace           = "home"
+	TailscaleNamespace      = "tailscale"
+	HealthNamespace         = "health"
 )
 
 // namespaceSpec describes one namespace createNamespaces should create.
@@ -83,13 +84,23 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		{name: CloudflareNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
-		// Ambient-enrolled like every other namespace here. Was briefly
-		// given its own liveness probe (unlike the "default" namespace it
-		// used to live in) to test whether any ambient-enrolled workload
-		// with an HTTP probe hits the same kubelet-probe-vs-ztunnel
-		// conflict cloudflared did - confirmed it does, see
-		// pkg/deploy/applications/home.go and issue #6.
-		{name: HomeNamespace, labels: pulumi.StringMap{
+		// The tailscale-operator's own namespace - its dynamically created
+		// per-Ingress proxy pods land here too, and need ztunnel capture to
+		// reach an app's waypoint (see pkg/components/tailscale).
+		{name: TailscaleNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		// Shared by both "public" and "private" (pkg/deploy/applications) -
+		// a deliberate one-namespace-for-two-apps exception to the rest of
+		// this file's per-app convention, since they're explicitly the same
+		// health-check demo split by exposure mechanism, not unrelated
+		// apps. Ambient-enrolled like every other namespace here. Was
+		// briefly given its own liveness probe (unlike the "default"
+		// namespace it used to live in) to test whether any
+		// ambient-enrolled workload with an HTTP probe hits the same
+		// kubelet-probe-vs-ztunnel conflict cloudflared did - confirmed it
+		// does, see pkg/deploy/applications/public.go and issue #6.
+		{name: HealthNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}

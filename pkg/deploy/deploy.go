@@ -14,6 +14,8 @@ import (
 	"github.com/liamawhite/homelab/pkg/components/dns"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
+	"github.com/liamawhite/homelab/pkg/components/tailscale"
+	tsingress "github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
 	infraconfig "github.com/liamawhite/homelab/pkg/config"
 	"github.com/liamawhite/homelab/pkg/deploy/applications"
 	"github.com/liamawhite/homelab/pkg/versions"
@@ -74,7 +76,8 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 		istioSystemNS := namespaces.Get(IstioSystemNamespace)
 		cloudflareNS := namespaces.Get(CloudflareNamespace)
-		homeNS := namespaces.Get(HomeNamespace)
+		tailscaleNS := namespaces.Get(TailscaleNamespace)
+		healthNS := namespaces.Get(HealthNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -102,8 +105,8 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		// Gate everything behind Cloudflare Access. Created before Home
-		// since Home's AccessJWT policy needs this application's AUD to
+		// Gate everything behind Cloudflare Access. Created before Public
+		// since Public's AccessJWT policy needs this application's AUD to
 		// validate Access-issued JWTs against.
 		access, err := cfauth.NewAccess(ctx, "homelab-access", &cfauth.AccessArgs{
 			AccountID:       pulumi.String(infraCfg.Cloudflare.AccountID),
@@ -116,14 +119,38 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		home, err := applications.NewHome(ctx, "home", &applications.HomeArgs{
-			Namespace: homeNS.Metadata.Name().Elem(),
+		// Puts every Tailscale-fronted app's Service on the tailnet - see
+		// pkg/components/tailscale/ingress for the per-app half of this.
+		tsOperator, err := tailscale.NewOperator(ctx, "tailscale-operator", &tailscale.OperatorArgs{
+			Namespace:         tailscaleNS.Metadata.Name().Elem(),
+			Version:           versions.Tailscale,
+			OAuthClientID:     pulumi.String(infraCfg.Tailscale.OAuthClientID),
+			OAuthClientSecret: pulumi.String(infraCfg.Tailscale.OAuthClientSecret),
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{ciliumComp, tailscaleNS}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Resolved once and shared by every Cloudflare DNS/Ruleset resource
+		// below (pkg/components/tailscale/ingress.NewIngress and
+		// createTailscaleRedirects) - createDomains has its own separate,
+		// pre-existing lookup.
+		zoneID := lookupZoneID(ctx,
+			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			pulumi.String(infraCfg.Cloudflare.AccountID),
+			providers.Cloudflare,
+		)
+
+		public, err := applications.NewPublic(ctx, "public", &applications.PublicArgs{
+			Namespace: healthNS.Metadata.Name().Elem(),
 			Cloudflare: &accessjwt.Config{
 				Access:          access,
 				TunnelNamespace: cloudflareNS.Metadata.Name().Elem(),
 			},
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, homeNS}),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, healthNS}),
 		)
 		if err != nil {
 			return err
@@ -142,11 +169,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			// record). Leave it alone even though "gateway" no longer
 			// describes anything else in this repo.
 			TunnelName:          "homelab-gateway",
-			Routes:              []cftunnel.TunnelRoute{home.TunnelRoute()},
+			Routes:              []cftunnel.TunnelRoute{public.TunnelRoute()},
 			CloudflareAccountID: pulumi.String(infraCfg.Cloudflare.AccountID),
 			CloudflareProvider:  providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{cloudflareNS, home, ciliumComp}),
+			pulumi.DependsOn([]pulumi.Resource{cloudflareNS, public, ciliumComp}),
 		)
 		if err != nil {
 			return err
@@ -160,6 +187,36 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			pulumi.String(infraCfg.Cloudflare.AccountID),
 			providers.Cloudflare,
 			pulumi.DependsOn([]pulumi.Resource{tunnel}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Tailscale-only counterpart to Public - fully independent of
+		// tunnel/public, no ordering relationship between them.
+		private, err := applications.NewPrivate(ctx, "private", &applications.PrivateArgs{
+			Namespace:                  healthNS.Metadata.Name().Elem(),
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, healthNS, tsOperator}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Cloudflare-side redirect bookmarks for every Tailscale-fronted
+		// app - see pkg/deploy/redirects.go for why this has to be
+		// collected centrally rather than each app creating its own.
+		_, err = createTailscaleRedirects(ctx,
+			zoneID,
+			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			providers.Cloudflare,
+			[]tsingress.RedirectRoute{private.TailscaleRedirect()},
+			pulumi.DependsOn([]pulumi.Resource{private}),
 		)
 		if err != nil {
 			return err

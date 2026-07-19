@@ -16,6 +16,7 @@ type InfraConfig struct {
 	Cluster    ClusterConfig    `yaml:"cluster" mapstructure:"cluster"`
 	Nodes      []NodeConfig     `yaml:"nodes" mapstructure:"nodes"`
 	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
+	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
 }
 
 type ClusterConfig struct {
@@ -46,6 +47,23 @@ type AccessConfig struct {
 	// issuer/JWKS source for validating Access-issued tokens at the shared
 	// Gateway.
 	TeamDomain string `yaml:"teamDomain" mapstructure:"teamDomain"`
+}
+
+// TailscaleConfig holds the OAuth credentials the Tailscale Kubernetes
+// Operator uses to register itself and create per-Ingress proxy devices,
+// plus the tailnet's own MagicDNS suffix (used to build redirect targets).
+// The OAuth client needs "auth_keys" and "devices:core" scopes, and the
+// tailnet's ACL policy must already define tag:k8s-operator/tag:k8s in
+// tagOwners - manual admin-console prerequisites, not managed by this repo.
+type TailscaleConfig struct {
+	OAuthClientID     string `yaml:"oauthClientId" mapstructure:"oauthClientId"`
+	OAuthClientSecret string `yaml:"oauthClientSecret" mapstructure:"oauthClientSecret"`
+	// MagicDNSSuffix is your tailnet's real DNS suffix, appended after a
+	// device/service hostname (Tailscale admin console > DNS settings) -
+	// normally "<random-name>.ts.net". Only used to build the target URL
+	// for pkg/deploy/redirects.go's Cloudflare redirect rules - never
+	// exposed as a hostname on the Cloudflare zone itself.
+	MagicDNSSuffix string `yaml:"magicDnsSuffix" mapstructure:"magicDnsSuffix"`
 }
 
 type SSHConfig struct {
