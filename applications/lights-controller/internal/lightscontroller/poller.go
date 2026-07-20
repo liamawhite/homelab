@@ -119,6 +119,23 @@ func (p *Poller) upsert(ctx context.Context, logger logr.Logger, l lighthue.Ligh
 			light.Labels = map[string]string{}
 		}
 		light.Labels[bridgeIDLabel] = l.BridgeID
+
+		// Seed Spec from the just-fetched live state exactly once, at
+		// creation. CreateOrUpdate's Get populates CreationTimestamp
+		// before invoking this closure on an existing object, so a zero
+		// CreationTimestamp reliably means "this call is creating a new
+		// object" - never "updating an existing one." After this the
+		// poller must never touch Spec again - see Reconciler for what
+		// happens to it from here.
+		if light.CreationTimestamp.IsZero() {
+			light.Spec = lightsv1alpha1.LightSpec{
+				Name:       l.Name,
+				On:         l.On,
+				Brightness: int32(l.Brightness),
+				Color:      l.Color,
+				ColorTempK: int32(l.ColorTempK),
+			}
+		}
 		return nil
 	})
 	if err != nil {

@@ -16,7 +16,7 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.name
-      name: Name
+      name: Display Name
       type: string
     - jsonPath: .status.ip
       name: IP

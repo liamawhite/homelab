@@ -31,12 +31,8 @@ type LightPatch struct {
 	Kind pulumi.StringPtrOutput `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaPatchPtrOutput `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   pulumi.StringMapOutput    `pulumi:"spec"`
-	Status LightStatusPatchPtrOutput `pulumi:"status"`
+	Spec     LightSpecPatchPtrOutput         `pulumi:"spec"`
+	Status   LightStatusPatchPtrOutput       `pulumi:"status"`
 }
 
 // NewLightPatch registers a new resource with the given unique name, arguments, and options.
@@ -87,11 +83,7 @@ type lightPatchArgs struct {
 	Kind *string `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec map[string]string `pulumi:"spec"`
+	Spec     *LightSpecPatch         `pulumi:"spec"`
 }
 
 // The set of arguments for constructing a LightPatch resource.
@@ -102,11 +94,7 @@ type LightPatchArgs struct {
 	Kind pulumi.StringPtrInput
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaPatchPtrInput
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec pulumi.StringMapInput
+	Spec     LightSpecPatchPtrInput
 }
 
 func (LightPatchArgs) ElementType() reflect.Type {
@@ -211,12 +199,8 @@ func (o LightPatchOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
 	return o.ApplyT(func(v *LightPatch) metav1.ObjectMetaPatchPtrOutput { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
 }
 
-// LightSpec is deliberately empty in this phase: the controller only
-// reports observed state (see LightStatus), it doesn't accept desired
-// state yet. Future control fields (desired on/brightness/color) land
-// here without requiring an API version bump.
-func (o LightPatchOutput) Spec() pulumi.StringMapOutput {
-	return o.ApplyT(func(v *LightPatch) pulumi.StringMapOutput { return v.Spec }).(pulumi.StringMapOutput)
+func (o LightPatchOutput) Spec() LightSpecPatchPtrOutput {
+	return o.ApplyT(func(v *LightPatch) LightSpecPatchPtrOutput { return v.Spec }).(LightSpecPatchPtrOutput)
 }
 
 func (o LightPatchOutput) Status() LightStatusPatchPtrOutput {

@@ -962,12 +962,8 @@ type LightType struct {
 	Kind *string `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   map[string]string `pulumi:"spec"`
-	Status *LightStatus      `pulumi:"status"`
+	Spec     *LightSpec         `pulumi:"spec"`
+	Status   *LightStatus       `pulumi:"status"`
 }
 
 // LightTypeInput is an input type that accepts LightTypeArgs and LightTypeOutput values.
@@ -992,12 +988,8 @@ type LightTypeArgs struct {
 	Kind pulumi.StringPtrInput `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaPtrInput `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   pulumi.StringMapInput `pulumi:"spec"`
-	Status LightStatusPtrInput   `pulumi:"status"`
+	Spec     LightSpecPtrInput         `pulumi:"spec"`
+	Status   LightStatusPtrInput       `pulumi:"status"`
 }
 
 func (LightTypeArgs) ElementType() reflect.Type {
@@ -1070,12 +1062,8 @@ func (o LightTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
 	return o.ApplyT(func(v LightType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
 }
 
-// LightSpec is deliberately empty in this phase: the controller only
-// reports observed state (see LightStatus), it doesn't accept desired
-// state yet. Future control fields (desired on/brightness/color) land
-// here without requiring an API version bump.
-func (o LightTypeOutput) Spec() pulumi.StringMapOutput {
-	return o.ApplyT(func(v LightType) map[string]string { return v.Spec }).(pulumi.StringMapOutput)
+func (o LightTypeOutput) Spec() LightSpecPtrOutput {
+	return o.ApplyT(func(v LightType) *LightSpec { return v.Spec }).(LightSpecPtrOutput)
 }
 
 func (o LightTypeOutput) Status() LightStatusPtrOutput {
@@ -1195,12 +1183,8 @@ type LightPatchType struct {
 	Kind *string `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   map[string]string `pulumi:"spec"`
-	Status *LightStatusPatch `pulumi:"status"`
+	Spec     *LightSpecPatch         `pulumi:"spec"`
+	Status   *LightStatusPatch       `pulumi:"status"`
 }
 
 // LightPatchTypeInput is an input type that accepts LightPatchTypeArgs and LightPatchTypeOutput values.
@@ -1225,12 +1209,8 @@ type LightPatchTypeArgs struct {
 	Kind pulumi.StringPtrInput `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaPatchPtrInput `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   pulumi.StringMapInput    `pulumi:"spec"`
-	Status LightStatusPatchPtrInput `pulumi:"status"`
+	Spec     LightSpecPatchPtrInput         `pulumi:"spec"`
+	Status   LightStatusPatchPtrInput       `pulumi:"status"`
 }
 
 func (LightPatchTypeArgs) ElementType() reflect.Type {
@@ -1278,16 +1258,556 @@ func (o LightPatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
 	return o.ApplyT(func(v LightPatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
 }
 
-// LightSpec is deliberately empty in this phase: the controller only
-// reports observed state (see LightStatus), it doesn't accept desired
-// state yet. Future control fields (desired on/brightness/color) land
-// here without requiring an API version bump.
-func (o LightPatchTypeOutput) Spec() pulumi.StringMapOutput {
-	return o.ApplyT(func(v LightPatchType) map[string]string { return v.Spec }).(pulumi.StringMapOutput)
+func (o LightPatchTypeOutput) Spec() LightSpecPatchPtrOutput {
+	return o.ApplyT(func(v LightPatchType) *LightSpecPatch { return v.Spec }).(LightSpecPatchPtrOutput)
 }
 
 func (o LightPatchTypeOutput) Status() LightStatusPatchPtrOutput {
 	return o.ApplyT(func(v LightPatchType) *LightStatusPatch { return v.Status }).(LightStatusPatchPtrOutput)
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpec struct {
+	// Brightness is the desired percentage (0-100), or -1 if the light
+	// doesn't support dimming - same sentinel convention as
+	// LightStatus.Brightness.
+	Brightness *int `pulumi:"brightness"`
+	// Color is the desired approximate "#rrggbb" swatch, or "" if the
+	// light doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+	// light doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// Name is the desired human-readable Hue name. NOTE: actually renaming
+	// a Hue light requires a PUT to the owning *device* resource, not this
+	// light resource (a light's own metadata.name is deprecated/read-only
+	// in the Hue API) - the device's RID isn't plumbed through today, so
+	// enacting a Name change is deferred along with the rest of enactment.
+	Name *string `pulumi:"name"`
+	// On is the desired on/off state.
+	On *bool `pulumi:"on"`
+}
+
+// LightSpecInput is an input type that accepts LightSpecArgs and LightSpecOutput values.
+// You can construct a concrete instance of `LightSpecInput` via:
+//
+//	LightSpecArgs{...}
+type LightSpecInput interface {
+	pulumi.Input
+
+	ToLightSpecOutput() LightSpecOutput
+	ToLightSpecOutputWithContext(context.Context) LightSpecOutput
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpecArgs struct {
+	// Brightness is the desired percentage (0-100), or -1 if the light
+	// doesn't support dimming - same sentinel convention as
+	// LightStatus.Brightness.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// Color is the desired approximate "#rrggbb" swatch, or "" if the
+	// light doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+	// light doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// Name is the desired human-readable Hue name. NOTE: actually renaming
+	// a Hue light requires a PUT to the owning *device* resource, not this
+	// light resource (a light's own metadata.name is deprecated/read-only
+	// in the Hue API) - the device's RID isn't plumbed through today, so
+	// enacting a Name change is deferred along with the rest of enactment.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// On is the desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+}
+
+func (LightSpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*LightSpec)(nil)).Elem()
+}
+
+func (i LightSpecArgs) ToLightSpecOutput() LightSpecOutput {
+	return i.ToLightSpecOutputWithContext(context.Background())
+}
+
+func (i LightSpecArgs) ToLightSpecOutputWithContext(ctx context.Context) LightSpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecOutput)
+}
+
+func (i LightSpecArgs) ToLightSpecPtrOutput() LightSpecPtrOutput {
+	return i.ToLightSpecPtrOutputWithContext(context.Background())
+}
+
+func (i LightSpecArgs) ToLightSpecPtrOutputWithContext(ctx context.Context) LightSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecOutput).ToLightSpecPtrOutputWithContext(ctx)
+}
+
+// LightSpecPtrInput is an input type that accepts LightSpecArgs, LightSpecPtr and LightSpecPtrOutput values.
+// You can construct a concrete instance of `LightSpecPtrInput` via:
+//
+//	        LightSpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type LightSpecPtrInput interface {
+	pulumi.Input
+
+	ToLightSpecPtrOutput() LightSpecPtrOutput
+	ToLightSpecPtrOutputWithContext(context.Context) LightSpecPtrOutput
+}
+
+type lightSpecPtrType LightSpecArgs
+
+func LightSpecPtr(v *LightSpecArgs) LightSpecPtrInput {
+	return (*lightSpecPtrType)(v)
+}
+
+func (*lightSpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**LightSpec)(nil)).Elem()
+}
+
+func (i *lightSpecPtrType) ToLightSpecPtrOutput() LightSpecPtrOutput {
+	return i.ToLightSpecPtrOutputWithContext(context.Background())
+}
+
+func (i *lightSpecPtrType) ToLightSpecPtrOutputWithContext(ctx context.Context) LightSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecPtrOutput)
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpecOutput struct{ *pulumi.OutputState }
+
+func (LightSpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*LightSpec)(nil)).Elem()
+}
+
+func (o LightSpecOutput) ToLightSpecOutput() LightSpecOutput {
+	return o
+}
+
+func (o LightSpecOutput) ToLightSpecOutputWithContext(ctx context.Context) LightSpecOutput {
+	return o
+}
+
+func (o LightSpecOutput) ToLightSpecPtrOutput() LightSpecPtrOutput {
+	return o.ToLightSpecPtrOutputWithContext(context.Background())
+}
+
+func (o LightSpecOutput) ToLightSpecPtrOutputWithContext(ctx context.Context) LightSpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v LightSpec) *LightSpec {
+		return &v
+	}).(LightSpecPtrOutput)
+}
+
+// Brightness is the desired percentage (0-100), or -1 if the light
+// doesn't support dimming - same sentinel convention as
+// LightStatus.Brightness.
+func (o LightSpecOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v LightSpec) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// Color is the desired approximate "#rrggbb" swatch, or "" if the
+// light doesn't support color.
+func (o LightSpecOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightSpec) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+// light doesn't support color temperature.
+func (o LightSpecOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v LightSpec) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// Name is the desired human-readable Hue name. NOTE: actually renaming
+// a Hue light requires a PUT to the owning *device* resource, not this
+// light resource (a light's own metadata.name is deprecated/read-only
+// in the Hue API) - the device's RID isn't plumbed through today, so
+// enacting a Name change is deferred along with the rest of enactment.
+func (o LightSpecOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightSpec) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// On is the desired on/off state.
+func (o LightSpecOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v LightSpec) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+type LightSpecPtrOutput struct{ *pulumi.OutputState }
+
+func (LightSpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**LightSpec)(nil)).Elem()
+}
+
+func (o LightSpecPtrOutput) ToLightSpecPtrOutput() LightSpecPtrOutput {
+	return o
+}
+
+func (o LightSpecPtrOutput) ToLightSpecPtrOutputWithContext(ctx context.Context) LightSpecPtrOutput {
+	return o
+}
+
+func (o LightSpecPtrOutput) Elem() LightSpecOutput {
+	return o.ApplyT(func(v *LightSpec) LightSpec {
+		if v != nil {
+			return *v
+		}
+		var ret LightSpec
+		return ret
+	}).(LightSpecOutput)
+}
+
+// Brightness is the desired percentage (0-100), or -1 if the light
+// doesn't support dimming - same sentinel convention as
+// LightStatus.Brightness.
+func (o LightSpecPtrOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Brightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// Color is the desired approximate "#rrggbb" swatch, or "" if the
+// light doesn't support color.
+func (o LightSpecPtrOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Color
+	}).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+// light doesn't support color temperature.
+func (o LightSpecPtrOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// Name is the desired human-readable Hue name. NOTE: actually renaming
+// a Hue light requires a PUT to the owning *device* resource, not this
+// light resource (a light's own metadata.name is deprecated/read-only
+// in the Hue API) - the device's RID isn't plumbed through today, so
+// enacting a Name change is deferred along with the rest of enactment.
+func (o LightSpecPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// On is the desired on/off state.
+func (o LightSpecPtrOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.On
+	}).(pulumi.BoolPtrOutput)
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpecPatch struct {
+	// Brightness is the desired percentage (0-100), or -1 if the light
+	// doesn't support dimming - same sentinel convention as
+	// LightStatus.Brightness.
+	Brightness *int `pulumi:"brightness"`
+	// Color is the desired approximate "#rrggbb" swatch, or "" if the
+	// light doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+	// light doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// Name is the desired human-readable Hue name. NOTE: actually renaming
+	// a Hue light requires a PUT to the owning *device* resource, not this
+	// light resource (a light's own metadata.name is deprecated/read-only
+	// in the Hue API) - the device's RID isn't plumbed through today, so
+	// enacting a Name change is deferred along with the rest of enactment.
+	Name *string `pulumi:"name"`
+	// On is the desired on/off state.
+	On *bool `pulumi:"on"`
+}
+
+// LightSpecPatchInput is an input type that accepts LightSpecPatchArgs and LightSpecPatchOutput values.
+// You can construct a concrete instance of `LightSpecPatchInput` via:
+//
+//	LightSpecPatchArgs{...}
+type LightSpecPatchInput interface {
+	pulumi.Input
+
+	ToLightSpecPatchOutput() LightSpecPatchOutput
+	ToLightSpecPatchOutputWithContext(context.Context) LightSpecPatchOutput
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpecPatchArgs struct {
+	// Brightness is the desired percentage (0-100), or -1 if the light
+	// doesn't support dimming - same sentinel convention as
+	// LightStatus.Brightness.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// Color is the desired approximate "#rrggbb" swatch, or "" if the
+	// light doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+	// light doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// Name is the desired human-readable Hue name. NOTE: actually renaming
+	// a Hue light requires a PUT to the owning *device* resource, not this
+	// light resource (a light's own metadata.name is deprecated/read-only
+	// in the Hue API) - the device's RID isn't plumbed through today, so
+	// enacting a Name change is deferred along with the rest of enactment.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// On is the desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+}
+
+func (LightSpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*LightSpecPatch)(nil)).Elem()
+}
+
+func (i LightSpecPatchArgs) ToLightSpecPatchOutput() LightSpecPatchOutput {
+	return i.ToLightSpecPatchOutputWithContext(context.Background())
+}
+
+func (i LightSpecPatchArgs) ToLightSpecPatchOutputWithContext(ctx context.Context) LightSpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecPatchOutput)
+}
+
+func (i LightSpecPatchArgs) ToLightSpecPatchPtrOutput() LightSpecPatchPtrOutput {
+	return i.ToLightSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i LightSpecPatchArgs) ToLightSpecPatchPtrOutputWithContext(ctx context.Context) LightSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecPatchOutput).ToLightSpecPatchPtrOutputWithContext(ctx)
+}
+
+// LightSpecPatchPtrInput is an input type that accepts LightSpecPatchArgs, LightSpecPatchPtr and LightSpecPatchPtrOutput values.
+// You can construct a concrete instance of `LightSpecPatchPtrInput` via:
+//
+//	        LightSpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type LightSpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToLightSpecPatchPtrOutput() LightSpecPatchPtrOutput
+	ToLightSpecPatchPtrOutputWithContext(context.Context) LightSpecPatchPtrOutput
+}
+
+type lightSpecPatchPtrType LightSpecPatchArgs
+
+func LightSpecPatchPtr(v *LightSpecPatchArgs) LightSpecPatchPtrInput {
+	return (*lightSpecPatchPtrType)(v)
+}
+
+func (*lightSpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**LightSpecPatch)(nil)).Elem()
+}
+
+func (i *lightSpecPatchPtrType) ToLightSpecPatchPtrOutput() LightSpecPatchPtrOutput {
+	return i.ToLightSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *lightSpecPatchPtrType) ToLightSpecPatchPtrOutputWithContext(ctx context.Context) LightSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(LightSpecPatchPtrOutput)
+}
+
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpecPatchOutput struct{ *pulumi.OutputState }
+
+func (LightSpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*LightSpecPatch)(nil)).Elem()
+}
+
+func (o LightSpecPatchOutput) ToLightSpecPatchOutput() LightSpecPatchOutput {
+	return o
+}
+
+func (o LightSpecPatchOutput) ToLightSpecPatchOutputWithContext(ctx context.Context) LightSpecPatchOutput {
+	return o
+}
+
+func (o LightSpecPatchOutput) ToLightSpecPatchPtrOutput() LightSpecPatchPtrOutput {
+	return o.ToLightSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o LightSpecPatchOutput) ToLightSpecPatchPtrOutputWithContext(ctx context.Context) LightSpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v LightSpecPatch) *LightSpecPatch {
+		return &v
+	}).(LightSpecPatchPtrOutput)
+}
+
+// Brightness is the desired percentage (0-100), or -1 if the light
+// doesn't support dimming - same sentinel convention as
+// LightStatus.Brightness.
+func (o LightSpecPatchOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// Color is the desired approximate "#rrggbb" swatch, or "" if the
+// light doesn't support color.
+func (o LightSpecPatchOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+// light doesn't support color temperature.
+func (o LightSpecPatchOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// Name is the desired human-readable Hue name. NOTE: actually renaming
+// a Hue light requires a PUT to the owning *device* resource, not this
+// light resource (a light's own metadata.name is deprecated/read-only
+// in the Hue API) - the device's RID isn't plumbed through today, so
+// enacting a Name change is deferred along with the rest of enactment.
+func (o LightSpecPatchOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// On is the desired on/off state.
+func (o LightSpecPatchOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+type LightSpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (LightSpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**LightSpecPatch)(nil)).Elem()
+}
+
+func (o LightSpecPatchPtrOutput) ToLightSpecPatchPtrOutput() LightSpecPatchPtrOutput {
+	return o
+}
+
+func (o LightSpecPatchPtrOutput) ToLightSpecPatchPtrOutputWithContext(ctx context.Context) LightSpecPatchPtrOutput {
+	return o
+}
+
+func (o LightSpecPatchPtrOutput) Elem() LightSpecPatchOutput {
+	return o.ApplyT(func(v *LightSpecPatch) LightSpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret LightSpecPatch
+		return ret
+	}).(LightSpecPatchOutput)
+}
+
+// Brightness is the desired percentage (0-100), or -1 if the light
+// doesn't support dimming - same sentinel convention as
+// LightStatus.Brightness.
+func (o LightSpecPatchPtrOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Brightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// Color is the desired approximate "#rrggbb" swatch, or "" if the
+// light doesn't support color.
+func (o LightSpecPatchPtrOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Color
+	}).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+// light doesn't support color temperature.
+func (o LightSpecPatchPtrOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// Name is the desired human-readable Hue name. NOTE: actually renaming
+// a Hue light requires a PUT to the owning *device* resource, not this
+// light resource (a light's own metadata.name is deprecated/read-only
+// in the Hue API) - the device's RID isn't plumbed through today, so
+// enacting a Name change is deferred along with the rest of enactment.
+func (o LightSpecPatchPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// On is the desired on/off state.
+func (o LightSpecPatchPtrOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.On
+	}).(pulumi.BoolPtrOutput)
 }
 
 // LightStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Light,
@@ -2057,6 +2577,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*LightTypeArrayInput)(nil)).Elem(), LightTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightListTypeInput)(nil)).Elem(), LightListTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightPatchTypeInput)(nil)).Elem(), LightPatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LightSpecInput)(nil)).Elem(), LightSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LightSpecPtrInput)(nil)).Elem(), LightSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LightSpecPatchInput)(nil)).Elem(), LightSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*LightSpecPatchPtrInput)(nil)).Elem(), LightSpecPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusInput)(nil)).Elem(), LightStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPtrInput)(nil)).Elem(), LightStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPatchInput)(nil)).Elem(), LightStatusPatchArgs{})
@@ -2073,6 +2597,10 @@ func init() {
 	pulumi.RegisterOutputType(LightTypeArrayOutput{})
 	pulumi.RegisterOutputType(LightListTypeOutput{})
 	pulumi.RegisterOutputType(LightPatchTypeOutput{})
+	pulumi.RegisterOutputType(LightSpecOutput{})
+	pulumi.RegisterOutputType(LightSpecPtrOutput{})
+	pulumi.RegisterOutputType(LightSpecPatchOutput{})
+	pulumi.RegisterOutputType(LightSpecPatchPtrOutput{})
 	pulumi.RegisterOutputType(LightStatusOutput{})
 	pulumi.RegisterOutputType(LightStatusPtrOutput{})
 	pulumi.RegisterOutputType(LightStatusPatchOutput{})

@@ -20,6 +20,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
@@ -29,11 +30,15 @@ func main() {
 		bridgesFile      string
 		pollInterval     time.Duration
 		healthProbeAddr  string
+		resyncPeriod     time.Duration
+		dryRun           bool
 		leaderElectionID = "lights-controller-leader"
 	)
 	flag.StringVar(&bridgesFile, "bridges-file", "/etc/lights-controller/bridges.json", "Path to the mounted bridges Secret (JSON array of {id, appKey})")
 	flag.DurationVar(&pollInterval, "poll-interval", 60*time.Second, "How often to poll bridges and sync Light status")
 	flag.StringVar(&healthProbeAddr, "health-probe-bind-address", ":8081", "Address the health/readiness endpoints bind to")
+	flag.DurationVar(&resyncPeriod, "resync-period", time.Minute, "How often the manager's cache does a full relist, forcing a re-reconcile of every Light in addition to reconciling immediately on every spec edit")
+	flag.BoolVar(&dryRun, "dry-run", true, "If true (default), the Light reconciler only logs spec/status drift instead of enacting it against the bridge - enactment isn't implemented yet either way")
 	flag.Parse()
 
 	// ctrl.Log.WithName(...) alone never attaches a real logging backend -
@@ -64,6 +69,9 @@ func main() {
 		LeaderElection:          true,
 		LeaderElectionID:        leaderElectionID,
 		LeaderElectionNamespace: os.Getenv("POD_NAMESPACE"),
+		Cache: cache.Options{
+			SyncPeriod: &resyncPeriod,
+		},
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to create manager: %v\n", err)
@@ -89,7 +97,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.Info("starting lights-controller", "bridges", len(bridgeConfigs), "pollInterval", pollInterval)
+	if err := ctrl.NewControllerManagedBy(mgr).
+		For(&lightsv1alpha1.Light{}).
+		Complete(&lightscontroller.Reconciler{Client: mgr.GetClient(), DryRun: dryRun}); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to register light reconciler: %v\n", err)
+		os.Exit(1)
+	}
+
+	logger.Info("starting lights-controller", "bridges", len(bridgeConfigs), "pollInterval", pollInterval, "resyncPeriod", resyncPeriod, "dryRun", dryRun)
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		fmt.Fprintf(os.Stderr, "manager exited with error: %v\n", err)
 		os.Exit(1)

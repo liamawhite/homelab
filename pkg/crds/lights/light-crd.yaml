@@ -16,7 +16,7 @@ spec:
   versions:
   - additionalPrinterColumns:
     - jsonPath: .status.name
-      name: Name
+      name: Display Name
       type: string
     - jsonPath: .status.on
       name: "On"
@@ -62,10 +62,45 @@ spec:
             type: object
           spec:
             description: |-
-              LightSpec is deliberately empty in this phase: the controller only
-              reports observed state (see LightStatus), it doesn't accept desired
-              state yet. Future control fields (desired on/brightness/color) land
-              here without requiring an API version bump.
+              LightSpec is the desired/controllable subset of light state. It is
+              seeded exactly once - from the live light state observed at the moment
+              its Light CR is first created (see Poller.upsert in
+              internal/lightscontroller/poller.go) - after which the poller never
+              touches it again. Any later difference between Spec and Status
+              therefore reflects either a user edit (kubectl edit/apply) or a change
+              made directly at the bridge/app. Reconciling that difference back onto
+              the physical bridge is future work (see internal/lightscontroller.
+              Reconciler); today the controller only reports (dry-run) the drift.
+            properties:
+              brightness:
+                description: |-
+                  Brightness is the desired percentage (0-100), or -1 if the light
+                  doesn't support dimming - same sentinel convention as
+                  LightStatus.Brightness.
+                format: int32
+                type: integer
+              color:
+                description: |-
+                  Color is the desired approximate "#rrggbb" swatch, or "" if the
+                  light doesn't support color.
+                type: string
+              colorTempK:
+                description: |-
+                  ColorTempK is the desired color temperature in Kelvin, or 0 if the
+                  light doesn't support color temperature.
+                format: int32
+                type: integer
+              name:
+                description: |-
+                  Name is the desired human-readable Hue name. NOTE: actually renaming
+                  a Hue light requires a PUT to the owning *device* resource, not this
+                  light resource (a light's own metadata.name is deprecated/read-only
+                  in the Hue API) - the device's RID isn't plumbed through today, so
+                  enacting a Name change is deferred along with the rest of enactment.
+                type: string
+              "on":
+                description: On is the desired on/off state.
+                type: boolean
             type: object
           status:
             description: |-

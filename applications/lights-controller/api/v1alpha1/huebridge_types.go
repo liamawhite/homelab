@@ -42,7 +42,7 @@ type HueBridgeStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
-// +kubebuilder:printcolumn:name="Name",type="string",JSONPath=".status.name"
+// +kubebuilder:printcolumn:name="Display Name",type="string",JSONPath=".status.name"
 // +kubebuilder:printcolumn:name="IP",type="string",JSONPath=".status.ip"
 // +kubebuilder:printcolumn:name="Reachable",type="boolean",JSONPath=".status.reachable"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"

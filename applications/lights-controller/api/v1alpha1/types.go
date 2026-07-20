@@ -15,11 +15,35 @@ import (
 
 // +kubebuilder:object:generate=true
 
-// LightSpec is deliberately empty in this phase: the controller only
-// reports observed state (see LightStatus), it doesn't accept desired
-// state yet. Future control fields (desired on/brightness/color) land
-// here without requiring an API version bump.
-type LightSpec struct{}
+// LightSpec is the desired/controllable subset of light state. It is
+// seeded exactly once - from the live light state observed at the moment
+// its Light CR is first created (see Poller.upsert in
+// internal/lightscontroller/poller.go) - after which the poller never
+// touches it again. Any later difference between Spec and Status
+// therefore reflects either a user edit (kubectl edit/apply) or a change
+// made directly at the bridge/app. Reconciling that difference back onto
+// the physical bridge is future work (see internal/lightscontroller.
+// Reconciler); today the controller only reports (dry-run) the drift.
+type LightSpec struct {
+	// Name is the desired human-readable Hue name. NOTE: actually renaming
+	// a Hue light requires a PUT to the owning *device* resource, not this
+	// light resource (a light's own metadata.name is deprecated/read-only
+	// in the Hue API) - the device's RID isn't plumbed through today, so
+	// enacting a Name change is deferred along with the rest of enactment.
+	Name string `json:"name,omitempty"`
+	// On is the desired on/off state.
+	On bool `json:"on,omitempty"`
+	// Brightness is the desired percentage (0-100), or -1 if the light
+	// doesn't support dimming - same sentinel convention as
+	// LightStatus.Brightness.
+	Brightness int32 `json:"brightness,omitempty"`
+	// Color is the desired approximate "#rrggbb" swatch, or "" if the
+	// light doesn't support color.
+	Color string `json:"color,omitempty"`
+	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
+	// light doesn't support color temperature.
+	ColorTempK int32 `json:"colorTempK,omitempty"`
+}
 
 // +kubebuilder:object:generate=true
 
@@ -64,7 +88,7 @@ type LightStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
-// +kubebuilder:printcolumn:name="Name",type="string",JSONPath=".status.name"
+// +kubebuilder:printcolumn:name="Display Name",type="string",JSONPath=".status.name"
 // +kubebuilder:printcolumn:name="On",type="boolean",JSONPath=".status.on"
 // +kubebuilder:printcolumn:name="Brightness",type="integer",JSONPath=".status.brightness"
 // +kubebuilder:printcolumn:name="Bridge",type="string",JSONPath=".status.bridgeId"

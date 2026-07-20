@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/pulumi/pulumi/sdk/v3/go/auto/optrefresh"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optup"
 	"github.com/spf13/cobra"
 )
@@ -26,14 +27,29 @@ Example:
 	RunE: runUp,
 }
 
+func init() {
+	UpCmd.Flags().Bool("refresh", false, "Reconcile Pulumi's state against the cluster's actual live state before diffing/applying - use when a resource may have drifted or been deleted outside Pulumi (e.g. manually, or by an interrupted prior operation), since a plain up only diffs against last-recorded state, not live state")
+}
+
 func runUp(cmd *cobra.Command, args []string) error {
 	ctx, timeout, stack, err := prepareStack(cmd)
 	if err != nil {
 		return err
 	}
 
+	refresh, err := cmd.Flags().GetBool("refresh")
+	if err != nil {
+		return err
+	}
+
 	upCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+
+	if refresh {
+		if _, err := stack.Refresh(upCtx, optrefresh.ProgressStreams(os.Stdout)); err != nil {
+			return err
+		}
+	}
 
 	_, err = stack.Up(upCtx, optup.ProgressStreams(os.Stdout))
 	return err

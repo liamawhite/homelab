@@ -25,12 +25,8 @@ type Light struct {
 	Kind pulumi.StringOutput `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaOutput `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec   pulumi.StringMapOutput `pulumi:"spec"`
-	Status LightStatusPtrOutput   `pulumi:"status"`
+	Spec     LightSpecOutput         `pulumi:"spec"`
+	Status   LightStatusPtrOutput    `pulumi:"status"`
 }
 
 // NewLight registers a new resource with the given unique name, arguments, and options.
@@ -81,11 +77,7 @@ type lightArgs struct {
 	Kind *string `pulumi:"kind"`
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec map[string]string `pulumi:"spec"`
+	Spec     *LightSpec         `pulumi:"spec"`
 }
 
 // The set of arguments for constructing a Light resource.
@@ -96,11 +88,7 @@ type LightArgs struct {
 	Kind pulumi.StringPtrInput
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	Metadata metav1.ObjectMetaPtrInput
-	// LightSpec is deliberately empty in this phase: the controller only
-	// reports observed state (see LightStatus), it doesn't accept desired
-	// state yet. Future control fields (desired on/brightness/color) land
-	// here without requiring an API version bump.
-	Spec pulumi.StringMapInput
+	Spec     LightSpecPtrInput
 }
 
 func (LightArgs) ElementType() reflect.Type {
@@ -205,12 +193,8 @@ func (o LightOutput) Metadata() metav1.ObjectMetaOutput {
 	return o.ApplyT(func(v *Light) metav1.ObjectMetaOutput { return v.Metadata }).(metav1.ObjectMetaOutput)
 }
 
-// LightSpec is deliberately empty in this phase: the controller only
-// reports observed state (see LightStatus), it doesn't accept desired
-// state yet. Future control fields (desired on/brightness/color) land
-// here without requiring an API version bump.
-func (o LightOutput) Spec() pulumi.StringMapOutput {
-	return o.ApplyT(func(v *Light) pulumi.StringMapOutput { return v.Spec }).(pulumi.StringMapOutput)
+func (o LightOutput) Spec() LightSpecOutput {
+	return o.ApplyT(func(v *Light) LightSpecOutput { return v.Spec }).(LightSpecOutput)
 }
 
 func (o LightOutput) Status() LightStatusPtrOutput {
