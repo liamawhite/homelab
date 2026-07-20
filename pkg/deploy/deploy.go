@@ -15,6 +15,7 @@ import (
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
+	tsacl "github.com/liamawhite/homelab/pkg/components/tailscale/acl"
 	tsingress "github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
 	infraconfig "github.com/liamawhite/homelab/pkg/config"
 	"github.com/liamawhite/homelab/pkg/deploy/applications"
@@ -119,6 +120,15 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
+		// The tailnet's ACL policy - must exist before the operator/proxies
+		// can register themselves under tag:k8s-operator/tag:k8s.
+		tsAcl, err := tsacl.NewAcl(ctx, "tailscale-acl", &tsacl.AclArgs{
+			Provider: providers.Tailscale,
+		})
+		if err != nil {
+			return err
+		}
+
 		// Puts every Tailscale-fronted app's Service on the tailnet - see
 		// pkg/components/tailscale/ingress for the per-app half of this.
 		tsOperator, err := tailscale.NewOperator(ctx, "tailscale-operator", &tailscale.OperatorArgs{
@@ -127,7 +137,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			OAuthClientID:     pulumi.String(infraCfg.Tailscale.OAuthClientID),
 			OAuthClientSecret: pulumi.String(infraCfg.Tailscale.OAuthClientSecret),
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{ciliumComp, tailscaleNS}),
+			pulumi.DependsOn([]pulumi.Resource{ciliumComp, tailscaleNS, tsAcl}),
 		)
 		if err != nil {
 			return err

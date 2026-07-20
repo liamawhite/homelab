@@ -52,9 +52,10 @@ type AccessConfig struct {
 // TailscaleConfig holds the OAuth credentials the Tailscale Kubernetes
 // Operator uses to register itself and create per-Ingress proxy devices,
 // plus the tailnet's own MagicDNS suffix (used to build redirect targets).
-// The OAuth client needs "auth_keys" and "devices:core" scopes, and the
-// tailnet's ACL policy must already define tag:k8s-operator/tag:k8s in
-// tagOwners - manual admin-console prerequisites, not managed by this repo.
+// The OAuth client needs "auth_keys" and "devices:core" scopes; the
+// tailnet's ACL policy (tagOwners for tag:k8s-operator/tag:k8s) is managed
+// by this repo too - see pkg/components/tailscale/acl - not a manual
+// admin-console step anymore.
 type TailscaleConfig struct {
 	OAuthClientID     string `yaml:"oauthClientId" mapstructure:"oauthClientId"`
 	OAuthClientSecret string `yaml:"oauthClientSecret" mapstructure:"oauthClientSecret"`
@@ -64,6 +65,23 @@ type TailscaleConfig struct {
 	// for pkg/deploy/redirects.go's Cloudflare redirect rules - never
 	// exposed as a hostname on the Cloudflare zone itself.
 	MagicDNSSuffix string `yaml:"magicDnsSuffix" mapstructure:"magicDnsSuffix"`
+	// Admin holds a separate, least-privilege OAuth credential (scope
+	// policy_file only) used solely to manage the tailnet's ACL policy -
+	// deliberately distinct from OAuthClientID/Secret above (which the
+	// in-cluster operator uses and only needs auth_keys/devices:core for),
+	// mirroring the legacy _migrateme/project/vpn.ts's tailscale.admin vs
+	// tailscale.operator split. Keeping this credential separate means the
+	// operator's own OAuth client - which lives in-cluster as a k8s Secret,
+	// readable by anything with pod-exec access in its namespace - never
+	// gains tailnet-wide policy-write power.
+	Admin AdminConfig `yaml:"admin" mapstructure:"admin"`
+}
+
+// AdminConfig holds the OAuth credential used only to manage the tailnet's
+// ACL policy (see TailscaleConfig.Admin).
+type AdminConfig struct {
+	OAuthClientID     string `yaml:"oauthClientId" mapstructure:"oauthClientId"`
+	OAuthClientSecret string `yaml:"oauthClientSecret" mapstructure:"oauthClientSecret"`
 }
 
 type SSHConfig struct {

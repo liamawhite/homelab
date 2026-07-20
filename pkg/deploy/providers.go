@@ -6,6 +6,7 @@ import (
 	infraconfig "github.com/liamawhite/homelab/pkg/config"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	"github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes"
+	tstailscale "github.com/pulumi/pulumi-tailscale/sdk/go/tailscale"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -37,10 +38,33 @@ func NewCloudflareProvider(ctx *pulumi.Context, apiToken string) (*cloudflare.Pr
 	return provider, nil
 }
 
+// NewTailscaleProvider creates a Tailscale admin-API provider from a
+// dedicated OAuth credential (see infra.yaml's tailscale.admin) - separate
+// from the credential pkg/components/tailscale's operator uses, since this
+// one needs the policy_file scope to manage the tailnet ACL
+// (pkg/components/tailscale/acl), a materially different privilege level.
+func NewTailscaleProvider(ctx *pulumi.Context, oauthClientID, oauthClientSecret string) (*tstailscale.Provider, error) {
+	provider, err := tstailscale.NewProvider(ctx, "tailscale", &tstailscale.ProviderArgs{
+		OauthClientId:     pulumi.String(oauthClientID),
+		OauthClientSecret: pulumi.String(oauthClientSecret),
+		// Explicitly request only what this credential needs, even though
+		// the OAuth client's own admin-console permission grant is what
+		// actually gates this - defense in depth, same reasoning as
+		// scoping the operator's own OAuth client narrowly.
+		Scopes: pulumi.StringArray{pulumi.String("policy_file")},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return provider, nil
+}
+
 // Providers holds all infrastructure providers
 type Providers struct {
 	Kubernetes *kubernetes.Provider
 	Cloudflare *cloudflare.Provider
+	Tailscale  *tstailscale.Provider
 }
 
 // NewProviders validates the infra.yaml fields providers need and creates
@@ -64,6 +88,12 @@ func NewProviders(ctx *pulumi.Context, kubeconfig string, infraCfg *infraconfig.
 	if infraCfg.Tailscale.MagicDNSSuffix == "" {
 		return nil, fmt.Errorf("tailscale MagicDNS suffix is required in infra.yaml")
 	}
+	if infraCfg.Tailscale.Admin.OAuthClientID == "" {
+		return nil, fmt.Errorf("tailscale admin OAuth client ID is required in infra.yaml")
+	}
+	if infraCfg.Tailscale.Admin.OAuthClientSecret == "" {
+		return nil, fmt.Errorf("tailscale admin OAuth client secret is required in infra.yaml")
+	}
 
 	// Create Kubernetes provider from the resolved kubeconfig
 	k8sProvider, err := NewKubernetesProvider(ctx, kubeconfig)
@@ -76,8 +106,14 @@ func NewProviders(ctx *pulumi.Context, kubeconfig string, infraCfg *infraconfig.
 		return nil, err
 	}
 
+	tsProvider, err := NewTailscaleProvider(ctx, infraCfg.Tailscale.Admin.OAuthClientID, infraCfg.Tailscale.Admin.OAuthClientSecret)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Providers{
 		Kubernetes: k8sProvider,
 		Cloudflare: cfProvider,
+		Tailscale:  tsProvider,
 	}, nil
 }

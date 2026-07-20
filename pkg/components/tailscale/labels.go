@@ -47,3 +47,14 @@ const IngressClassName = "tailscale"
 // pkg/components/cloudflare/tunnel.ServiceAccountName is used - not a
 // namespace-prefix wildcard.
 const ProxiesServiceAccountName = "proxies"
+
+// OperatorTag and ProxyTag are the tailnet ACL tags the tailscale-operator
+// chart assigns by its own default (operatorConfig.defaultTags /
+// proxyConfig.defaultTags - now set explicitly to these values in
+// component.go rather than left to the chart's implicit default, so they
+// can't silently drift from what pkg/components/tailscale/acl declares as
+// tagOwners for them).
+const (
+	OperatorTag = "tag:k8s-operator"
+	ProxyTag    = "tag:k8s"
+)

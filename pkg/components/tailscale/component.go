@@ -86,6 +86,11 @@ func NewOperator(ctx *pulumi.Context, name string, args *OperatorArgs, opts ...p
 					apiserver.AccessLabelKey: pulumi.String(apiserver.AccessLabelValue),
 					AccessLabelKey:           pulumi.String(AccessLabelValue),
 				},
+				// Matches the chart's own default - set explicitly (not
+				// left implicit) so it can't silently drift from what
+				// pkg/components/tailscale/acl declares as tagOwners for
+				// this tag.
+				"defaultTags": pulumi.StringArray{pulumi.String(OperatorTag)},
 				"resources": pulumi.Map{
 					"limits": pulumi.Map{
 						"cpu":    pulumi.String("100m"),
@@ -104,6 +109,11 @@ func NewOperator(ctx *pulumi.Context, name string, args *OperatorArgs, opts ...p
 				// AccessLabelKey/dns.AccessLabelKey under Cilium's
 				// default-deny baseline.
 				"defaultProxyClass": pulumi.String(DefaultProxyClassName),
+				// Matches the chart's own default - set explicitly for the
+				// same reason as operatorConfig.defaultTags above. Unlike
+				// that field (a string array), the chart's values.yaml
+				// takes a single string here.
+				"defaultTags": pulumi.String(ProxyTag),
 			},
 		},
 	}, resourceOpts...)
