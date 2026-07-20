@@ -12,8 +12,10 @@ import (
 	cfauth "github.com/liamawhite/homelab/pkg/components/cloudflare/auth"
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pkg/components/dns"
+	"github.com/liamawhite/homelab/pkg/components/hubcontroller"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
+	"github.com/liamawhite/homelab/pkg/components/lightscontroller"
 	"github.com/liamawhite/homelab/pkg/components/longhorn"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	tsacl "github.com/liamawhite/homelab/pkg/components/tailscale/acl"
@@ -81,6 +83,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		cloudflareNS := namespaces.Get(CloudflareNamespace)
 		tailscaleNS := namespaces.Get(TailscaleNamespace)
 		healthNS := namespaces.Get(HealthNamespace)
+		lightsNS := namespaces.Get(LightsNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -234,6 +237,59 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			CloudflareProvider:         providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, longhornNS, tsOperator}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Shared image for both lights-controller and hub-controller below
+		// - see pkg/deploy/image.go for why this is built once rather than
+		// inside each component.
+		lightsImage, err := buildLightsControllerImage(ctx, "lights-controller-image",
+			infraCfg.GHCR.Username, infraCfg.GHCR.Token,
+			pulumi.Provider(providers.Kubernetes),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Discovers Hue bridges via SSDP and publishes their IPs as
+		// HueBridge custom resources - runs HostNetwork: true since SSDP
+		// can't work from a normal pod under this cluster's CNI (confirmed
+		// live via `cilium monitor --type drop`: SSDP's M-SEARCH needs an
+		// IGMP multicast group-join first, and Cilium's eBPF datapath
+		// drops IGMP outright, "CT: Unknown L4 protocol", below the level
+		// any CiliumClusterwideNetworkPolicy rule can act on). See
+		// pkg/components/hubcontroller's package doc comment for the full
+		// reasoning, including why this is split into its own component
+		// rather than just making lights-controller itself hostNetwork.
+		_, err = hubcontroller.NewHubController(ctx, "hub-controller", &hubcontroller.HubControllerArgs{
+			Namespace:    lightsNS.Metadata.Name().Elem(),
+			Bridges:      infraCfg.Lights.Hue.Bridges,
+			PollInterval: pulumi.String("60s"),
+			Image:        lightsImage.Ref,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, lightsImage}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Syncs live Hue light status into Light custom resources - fully
+		// independent of every app above; needs the API server (to manage
+		// Light CRs, read HueBridge status, and its leader-election
+		// Lease) and the Hue bridge(s) on the LAN (see
+		// pkg/components/lightscontroller/network.go). No DependsOn on
+		// hub-controller: they only interact at runtime via the
+		// Kubernetes API (a missing/unreachable HueBridge is handled
+		// gracefully), not at deploy time.
+		_, err = lightscontroller.NewLightsController(ctx, "lights-controller", &lightscontroller.LightsControllerArgs{
+			Namespace:    lightsNS.Metadata.Name().Elem(),
+			Bridges:      infraCfg.Lights.Hue.Bridges,
+			PollInterval: pulumi.String("60s"),
+			Image:        lightsImage.Ref,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp, lightsImage}),
 		)
 		if err != nil {
 			return err

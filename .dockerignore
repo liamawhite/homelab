@@ -1,0 +1,9 @@
+# applications/lights-controller/Dockerfile builds with the repo root as
+# its context (needed for its go.mod's local "replace" directive to see
+# the root module's source) - these aren't needed for that build and would
+# otherwise bloat the context upload.
+_migrateme/
+.git/
+.pulumi-state/
+cli/
+bin/

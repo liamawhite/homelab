@@ -22,6 +22,7 @@ const (
 	CloudflareNamespace     = "cloudflare"
 	TailscaleNamespace      = "tailscale"
 	HealthNamespace         = "health"
+	LightsNamespace         = "lights"
 )
 
 // namespaceSpec describes one namespace createNamespaces should create.
@@ -93,6 +94,9 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		// kubelet-probe-vs-ztunnel conflict cloudflared did - confirmed it
 		// does, see pkg/deploy/applications/public.go and issue #6.
 		{name: HealthNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		{name: LightsNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}

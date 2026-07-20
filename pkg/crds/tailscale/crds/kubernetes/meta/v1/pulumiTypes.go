@@ -21,8 +21,6 @@ type DeleteOptions struct {
 	DryRun []string `pulumi:"dryRun"`
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
 	GracePeriodSeconds *int `pulumi:"gracePeriodSeconds"`
-	// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-	IgnoreStoreReadErrorWithClusterBreakingPotential *bool `pulumi:"ignoreStoreReadErrorWithClusterBreakingPotential"`
 	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind *string `pulumi:"kind"`
 	// Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the "orphan" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
@@ -52,8 +50,6 @@ type DeleteOptionsArgs struct {
 	DryRun pulumi.StringArrayInput `pulumi:"dryRun"`
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
 	GracePeriodSeconds pulumi.IntPtrInput `pulumi:"gracePeriodSeconds"`
-	// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-	IgnoreStoreReadErrorWithClusterBreakingPotential pulumi.BoolPtrInput `pulumi:"ignoreStoreReadErrorWithClusterBreakingPotential"`
 	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind pulumi.StringPtrInput `pulumi:"kind"`
 	// Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the "orphan" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
@@ -106,11 +102,6 @@ func (o DeleteOptionsOutput) GracePeriodSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DeleteOptions) *int { return v.GracePeriodSeconds }).(pulumi.IntPtrOutput)
 }
 
-// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-func (o DeleteOptionsOutput) IgnoreStoreReadErrorWithClusterBreakingPotential() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeleteOptions) *bool { return v.IgnoreStoreReadErrorWithClusterBreakingPotential }).(pulumi.BoolPtrOutput)
-}
-
 // Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 func (o DeleteOptionsOutput) Kind() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeleteOptions) *string { return v.Kind }).(pulumi.StringPtrOutput)
@@ -139,8 +130,6 @@ type DeleteOptionsPatch struct {
 	DryRun []string `pulumi:"dryRun"`
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
 	GracePeriodSeconds *int `pulumi:"gracePeriodSeconds"`
-	// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-	IgnoreStoreReadErrorWithClusterBreakingPotential *bool `pulumi:"ignoreStoreReadErrorWithClusterBreakingPotential"`
 	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind *string `pulumi:"kind"`
 	// Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the "orphan" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
@@ -170,8 +159,6 @@ type DeleteOptionsPatchArgs struct {
 	DryRun pulumi.StringArrayInput `pulumi:"dryRun"`
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately.
 	GracePeriodSeconds pulumi.IntPtrInput `pulumi:"gracePeriodSeconds"`
-	// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-	IgnoreStoreReadErrorWithClusterBreakingPotential pulumi.BoolPtrInput `pulumi:"ignoreStoreReadErrorWithClusterBreakingPotential"`
 	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	Kind pulumi.StringPtrInput `pulumi:"kind"`
 	// Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the "orphan" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both.
@@ -224,11 +211,6 @@ func (o DeleteOptionsPatchOutput) GracePeriodSeconds() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v DeleteOptionsPatch) *int { return v.GracePeriodSeconds }).(pulumi.IntPtrOutput)
 }
 
-// if set to true, it will trigger an unsafe deletion of the resource in case the normal deletion flow fails with a corrupt object error. A resource is considered corrupt if it can not be retrieved from the underlying storage successfully because of a) its data can not be transformed e.g. decryption failure, or b) it fails to decode into an object. NOTE: unsafe deletion ignores finalizer constraints, skips precondition checks, and removes the object from the storage. WARNING: This may potentially break the cluster if the workload associated with the resource being unsafe-deleted relies on normal deletion flow. Use only if you REALLY know what you are doing. The default value is false, and the user must opt in to enable it
-func (o DeleteOptionsPatchOutput) IgnoreStoreReadErrorWithClusterBreakingPotential() pulumi.BoolPtrOutput {
-	return o.ApplyT(func(v DeleteOptionsPatch) *bool { return v.IgnoreStoreReadErrorWithClusterBreakingPotential }).(pulumi.BoolPtrOutput)
-}
-
 // Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 func (o DeleteOptionsPatchOutput) Kind() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeleteOptionsPatch) *string { return v.Kind }).(pulumi.StringPtrOutput)
@@ -249,122 +231,6 @@ func (o DeleteOptionsPatchOutput) PropagationPolicy() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v DeleteOptionsPatch) *string { return v.PropagationPolicy }).(pulumi.StringPtrOutput)
 }
 
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1 struct {
-}
-
-// FieldsV1Input is an input type that accepts FieldsV1Args and FieldsV1Output values.
-// You can construct a concrete instance of `FieldsV1Input` via:
-//
-//	FieldsV1Args{...}
-type FieldsV1Input interface {
-	pulumi.Input
-
-	ToFieldsV1Output() FieldsV1Output
-	ToFieldsV1OutputWithContext(context.Context) FieldsV1Output
-}
-
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1Args struct {
-}
-
-func (FieldsV1Args) ElementType() reflect.Type {
-	return reflect.TypeOf((*FieldsV1)(nil)).Elem()
-}
-
-func (i FieldsV1Args) ToFieldsV1Output() FieldsV1Output {
-	return i.ToFieldsV1OutputWithContext(context.Background())
-}
-
-func (i FieldsV1Args) ToFieldsV1OutputWithContext(ctx context.Context) FieldsV1Output {
-	return pulumi.ToOutputWithContext(ctx, i).(FieldsV1Output)
-}
-
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1Output struct{ *pulumi.OutputState }
-
-func (FieldsV1Output) ElementType() reflect.Type {
-	return reflect.TypeOf((*FieldsV1)(nil)).Elem()
-}
-
-func (o FieldsV1Output) ToFieldsV1Output() FieldsV1Output {
-	return o
-}
-
-func (o FieldsV1Output) ToFieldsV1OutputWithContext(ctx context.Context) FieldsV1Output {
-	return o
-}
-
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1Patch struct {
-}
-
-// FieldsV1PatchInput is an input type that accepts FieldsV1PatchArgs and FieldsV1PatchOutput values.
-// You can construct a concrete instance of `FieldsV1PatchInput` via:
-//
-//	FieldsV1PatchArgs{...}
-type FieldsV1PatchInput interface {
-	pulumi.Input
-
-	ToFieldsV1PatchOutput() FieldsV1PatchOutput
-	ToFieldsV1PatchOutputWithContext(context.Context) FieldsV1PatchOutput
-}
-
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1PatchArgs struct {
-}
-
-func (FieldsV1PatchArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*FieldsV1Patch)(nil)).Elem()
-}
-
-func (i FieldsV1PatchArgs) ToFieldsV1PatchOutput() FieldsV1PatchOutput {
-	return i.ToFieldsV1PatchOutputWithContext(context.Background())
-}
-
-func (i FieldsV1PatchArgs) ToFieldsV1PatchOutputWithContext(ctx context.Context) FieldsV1PatchOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(FieldsV1PatchOutput)
-}
-
-// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
-//
-// Each key is either a '.' representing the field itself, and will always map to an empty set, or a string representing a sub-field or item. The string will follow one of these four formats: 'f:<name>', where <name> is the name of a field in a struct, or key in a map 'v:<value>', where <value> is the exact json formatted value of a list item 'i:<index>', where <index> is position of a item in a list 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values If a key maps to an empty Fields value, the field that key represents is part of the set.
-//
-// The exact format is defined in sigs.k8s.io/structured-merge-diff
-type FieldsV1PatchOutput struct{ *pulumi.OutputState }
-
-func (FieldsV1PatchOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*FieldsV1Patch)(nil)).Elem()
-}
-
-func (o FieldsV1PatchOutput) ToFieldsV1PatchOutput() FieldsV1PatchOutput {
-	return o
-}
-
-func (o FieldsV1PatchOutput) ToFieldsV1PatchOutputWithContext(ctx context.Context) FieldsV1PatchOutput {
-	return o
-}
-
 // ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
 type ListMeta struct {
 	// continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message.
@@ -375,10 +241,6 @@ type ListMeta struct {
 	ResourceVersion *string `pulumi:"resourceVersion"`
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink *string `pulumi:"selfLink"`
-	// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-	//
-	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-	ShardInfo *ShardInfo `pulumi:"shardInfo"`
 }
 
 // ListMetaInput is an input type that accepts ListMetaArgs and ListMetaOutput values.
@@ -402,10 +264,6 @@ type ListMetaArgs struct {
 	ResourceVersion pulumi.StringPtrInput `pulumi:"resourceVersion"`
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink pulumi.StringPtrInput `pulumi:"selfLink"`
-	// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-	//
-	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-	ShardInfo ShardInfoPtrInput `pulumi:"shardInfo"`
 }
 
 func (ListMetaArgs) ElementType() reflect.Type {
@@ -506,13 +364,6 @@ func (o ListMetaOutput) SelfLink() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v ListMeta) *string { return v.SelfLink }).(pulumi.StringPtrOutput)
 }
 
-// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-//
-// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-func (o ListMetaOutput) ShardInfo() ShardInfoPtrOutput {
-	return o.ApplyT(func(v ListMeta) *ShardInfo { return v.ShardInfo }).(ShardInfoPtrOutput)
-}
-
 type ListMetaPtrOutput struct{ *pulumi.OutputState }
 
 func (ListMetaPtrOutput) ElementType() reflect.Type {
@@ -577,18 +428,6 @@ func (o ListMetaPtrOutput) SelfLink() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-//
-// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-func (o ListMetaPtrOutput) ShardInfo() ShardInfoPtrOutput {
-	return o.ApplyT(func(v *ListMeta) *ShardInfo {
-		if v == nil {
-			return nil
-		}
-		return v.ShardInfo
-	}).(ShardInfoPtrOutput)
-}
-
 // ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
 type ListMetaPatch struct {
 	// continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message.
@@ -599,10 +438,6 @@ type ListMetaPatch struct {
 	ResourceVersion *string `pulumi:"resourceVersion"`
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink *string `pulumi:"selfLink"`
-	// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-	//
-	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-	ShardInfo *ShardInfoPatch `pulumi:"shardInfo"`
 }
 
 // ListMetaPatchInput is an input type that accepts ListMetaPatchArgs and ListMetaPatchOutput values.
@@ -626,10 +461,6 @@ type ListMetaPatchArgs struct {
 	ResourceVersion pulumi.StringPtrInput `pulumi:"resourceVersion"`
 	// Deprecated: selfLink is a legacy read-only field that is no longer populated by the system.
 	SelfLink pulumi.StringPtrInput `pulumi:"selfLink"`
-	// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-	//
-	// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-	ShardInfo ShardInfoPatchPtrInput `pulumi:"shardInfo"`
 }
 
 func (ListMetaPatchArgs) ElementType() reflect.Type {
@@ -730,13 +561,6 @@ func (o ListMetaPatchOutput) SelfLink() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v ListMetaPatch) *string { return v.SelfLink }).(pulumi.StringPtrOutput)
 }
 
-// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-//
-// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-func (o ListMetaPatchOutput) ShardInfo() ShardInfoPatchPtrOutput {
-	return o.ApplyT(func(v ListMetaPatch) *ShardInfoPatch { return v.ShardInfo }).(ShardInfoPatchPtrOutput)
-}
-
 type ListMetaPatchPtrOutput struct{ *pulumi.OutputState }
 
 func (ListMetaPatchPtrOutput) ElementType() reflect.Type {
@@ -799,18 +623,6 @@ func (o ListMetaPatchPtrOutput) SelfLink() pulumi.StringPtrOutput {
 		}
 		return v.SelfLink
 	}).(pulumi.StringPtrOutput)
-}
-
-// shardInfo is set when the list is a filtered subset of the full collection, as selected by a shard selector on the request. It echoes back the selector so clients can verify which shard they received and merge sharded responses. Clients should not cache sharded list responses as a full representation of the collection.
-//
-// This is an alpha field and requires enabling the ShardedListAndWatch feature gate.
-func (o ListMetaPatchPtrOutput) ShardInfo() ShardInfoPatchPtrOutput {
-	return o.ApplyT(func(v *ListMetaPatch) *ShardInfoPatch {
-		if v == nil {
-			return nil
-		}
-		return v.ShardInfo
-	}).(ShardInfoPatchPtrOutput)
 }
 
 // ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource that the fieldset applies to.
@@ -2335,98 +2147,6 @@ func (o OwnerReferencePatchArrayOutput) Index(i pulumi.IntInput) OwnerReferenceP
 	}).(OwnerReferencePatchOutput)
 }
 
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type Patch struct {
-}
-
-// PatchInput is an input type that accepts PatchArgs and PatchOutput values.
-// You can construct a concrete instance of `PatchInput` via:
-//
-//	PatchArgs{...}
-type PatchInput interface {
-	pulumi.Input
-
-	ToPatchOutput() PatchOutput
-	ToPatchOutputWithContext(context.Context) PatchOutput
-}
-
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type PatchArgs struct {
-}
-
-func (PatchArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*Patch)(nil)).Elem()
-}
-
-func (i PatchArgs) ToPatchOutput() PatchOutput {
-	return i.ToPatchOutputWithContext(context.Background())
-}
-
-func (i PatchArgs) ToPatchOutputWithContext(ctx context.Context) PatchOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PatchOutput)
-}
-
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type PatchOutput struct{ *pulumi.OutputState }
-
-func (PatchOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*Patch)(nil)).Elem()
-}
-
-func (o PatchOutput) ToPatchOutput() PatchOutput {
-	return o
-}
-
-func (o PatchOutput) ToPatchOutputWithContext(ctx context.Context) PatchOutput {
-	return o
-}
-
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type PatchPatch struct {
-}
-
-// PatchPatchInput is an input type that accepts PatchPatchArgs and PatchPatchOutput values.
-// You can construct a concrete instance of `PatchPatchInput` via:
-//
-//	PatchPatchArgs{...}
-type PatchPatchInput interface {
-	pulumi.Input
-
-	ToPatchPatchOutput() PatchPatchOutput
-	ToPatchPatchOutputWithContext(context.Context) PatchPatchOutput
-}
-
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type PatchPatchArgs struct {
-}
-
-func (PatchPatchArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*PatchPatch)(nil)).Elem()
-}
-
-func (i PatchPatchArgs) ToPatchPatchOutput() PatchPatchOutput {
-	return i.ToPatchPatchOutputWithContext(context.Background())
-}
-
-func (i PatchPatchArgs) ToPatchPatchOutputWithContext(ctx context.Context) PatchPatchOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(PatchPatchOutput)
-}
-
-// Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-type PatchPatchOutput struct{ *pulumi.OutputState }
-
-func (PatchPatchOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*PatchPatch)(nil)).Elem()
-}
-
-func (o PatchPatchOutput) ToPatchPatchOutput() PatchPatchOutput {
-	return o
-}
-
-func (o PatchPatchOutput) ToPatchPatchOutputWithContext(ctx context.Context) PatchPatchOutput {
-	return o
-}
-
 // Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.
 type Preconditions struct {
 	// Specifies the target ResourceVersion
@@ -2742,286 +2462,6 @@ func (o PreconditionsPatchPtrOutput) Uid() pulumi.StringPtrOutput {
 			return nil
 		}
 		return v.Uid
-	}).(pulumi.StringPtrOutput)
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfo struct {
-	// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-	Selector string `pulumi:"selector"`
-}
-
-// ShardInfoInput is an input type that accepts ShardInfoArgs and ShardInfoOutput values.
-// You can construct a concrete instance of `ShardInfoInput` via:
-//
-//	ShardInfoArgs{...}
-type ShardInfoInput interface {
-	pulumi.Input
-
-	ToShardInfoOutput() ShardInfoOutput
-	ToShardInfoOutputWithContext(context.Context) ShardInfoOutput
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfoArgs struct {
-	// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-	Selector pulumi.StringInput `pulumi:"selector"`
-}
-
-func (ShardInfoArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*ShardInfo)(nil)).Elem()
-}
-
-func (i ShardInfoArgs) ToShardInfoOutput() ShardInfoOutput {
-	return i.ToShardInfoOutputWithContext(context.Background())
-}
-
-func (i ShardInfoArgs) ToShardInfoOutputWithContext(ctx context.Context) ShardInfoOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoOutput)
-}
-
-func (i ShardInfoArgs) ToShardInfoPtrOutput() ShardInfoPtrOutput {
-	return i.ToShardInfoPtrOutputWithContext(context.Background())
-}
-
-func (i ShardInfoArgs) ToShardInfoPtrOutputWithContext(ctx context.Context) ShardInfoPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoOutput).ToShardInfoPtrOutputWithContext(ctx)
-}
-
-// ShardInfoPtrInput is an input type that accepts ShardInfoArgs, ShardInfoPtr and ShardInfoPtrOutput values.
-// You can construct a concrete instance of `ShardInfoPtrInput` via:
-//
-//	        ShardInfoArgs{...}
-//
-//	or:
-//
-//	        nil
-type ShardInfoPtrInput interface {
-	pulumi.Input
-
-	ToShardInfoPtrOutput() ShardInfoPtrOutput
-	ToShardInfoPtrOutputWithContext(context.Context) ShardInfoPtrOutput
-}
-
-type shardInfoPtrType ShardInfoArgs
-
-func ShardInfoPtr(v *ShardInfoArgs) ShardInfoPtrInput {
-	return (*shardInfoPtrType)(v)
-}
-
-func (*shardInfoPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**ShardInfo)(nil)).Elem()
-}
-
-func (i *shardInfoPtrType) ToShardInfoPtrOutput() ShardInfoPtrOutput {
-	return i.ToShardInfoPtrOutputWithContext(context.Background())
-}
-
-func (i *shardInfoPtrType) ToShardInfoPtrOutputWithContext(ctx context.Context) ShardInfoPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoPtrOutput)
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfoOutput struct{ *pulumi.OutputState }
-
-func (ShardInfoOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*ShardInfo)(nil)).Elem()
-}
-
-func (o ShardInfoOutput) ToShardInfoOutput() ShardInfoOutput {
-	return o
-}
-
-func (o ShardInfoOutput) ToShardInfoOutputWithContext(ctx context.Context) ShardInfoOutput {
-	return o
-}
-
-func (o ShardInfoOutput) ToShardInfoPtrOutput() ShardInfoPtrOutput {
-	return o.ToShardInfoPtrOutputWithContext(context.Background())
-}
-
-func (o ShardInfoOutput) ToShardInfoPtrOutputWithContext(ctx context.Context) ShardInfoPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v ShardInfo) *ShardInfo {
-		return &v
-	}).(ShardInfoPtrOutput)
-}
-
-// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-func (o ShardInfoOutput) Selector() pulumi.StringOutput {
-	return o.ApplyT(func(v ShardInfo) string { return v.Selector }).(pulumi.StringOutput)
-}
-
-type ShardInfoPtrOutput struct{ *pulumi.OutputState }
-
-func (ShardInfoPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**ShardInfo)(nil)).Elem()
-}
-
-func (o ShardInfoPtrOutput) ToShardInfoPtrOutput() ShardInfoPtrOutput {
-	return o
-}
-
-func (o ShardInfoPtrOutput) ToShardInfoPtrOutputWithContext(ctx context.Context) ShardInfoPtrOutput {
-	return o
-}
-
-func (o ShardInfoPtrOutput) Elem() ShardInfoOutput {
-	return o.ApplyT(func(v *ShardInfo) ShardInfo {
-		if v != nil {
-			return *v
-		}
-		var ret ShardInfo
-		return ret
-	}).(ShardInfoOutput)
-}
-
-// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-func (o ShardInfoPtrOutput) Selector() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *ShardInfo) *string {
-		if v == nil {
-			return nil
-		}
-		return &v.Selector
-	}).(pulumi.StringPtrOutput)
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfoPatch struct {
-	// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-	Selector *string `pulumi:"selector"`
-}
-
-// ShardInfoPatchInput is an input type that accepts ShardInfoPatchArgs and ShardInfoPatchOutput values.
-// You can construct a concrete instance of `ShardInfoPatchInput` via:
-//
-//	ShardInfoPatchArgs{...}
-type ShardInfoPatchInput interface {
-	pulumi.Input
-
-	ToShardInfoPatchOutput() ShardInfoPatchOutput
-	ToShardInfoPatchOutputWithContext(context.Context) ShardInfoPatchOutput
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfoPatchArgs struct {
-	// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-	Selector pulumi.StringPtrInput `pulumi:"selector"`
-}
-
-func (ShardInfoPatchArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*ShardInfoPatch)(nil)).Elem()
-}
-
-func (i ShardInfoPatchArgs) ToShardInfoPatchOutput() ShardInfoPatchOutput {
-	return i.ToShardInfoPatchOutputWithContext(context.Background())
-}
-
-func (i ShardInfoPatchArgs) ToShardInfoPatchOutputWithContext(ctx context.Context) ShardInfoPatchOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoPatchOutput)
-}
-
-func (i ShardInfoPatchArgs) ToShardInfoPatchPtrOutput() ShardInfoPatchPtrOutput {
-	return i.ToShardInfoPatchPtrOutputWithContext(context.Background())
-}
-
-func (i ShardInfoPatchArgs) ToShardInfoPatchPtrOutputWithContext(ctx context.Context) ShardInfoPatchPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoPatchOutput).ToShardInfoPatchPtrOutputWithContext(ctx)
-}
-
-// ShardInfoPatchPtrInput is an input type that accepts ShardInfoPatchArgs, ShardInfoPatchPtr and ShardInfoPatchPtrOutput values.
-// You can construct a concrete instance of `ShardInfoPatchPtrInput` via:
-//
-//	        ShardInfoPatchArgs{...}
-//
-//	or:
-//
-//	        nil
-type ShardInfoPatchPtrInput interface {
-	pulumi.Input
-
-	ToShardInfoPatchPtrOutput() ShardInfoPatchPtrOutput
-	ToShardInfoPatchPtrOutputWithContext(context.Context) ShardInfoPatchPtrOutput
-}
-
-type shardInfoPatchPtrType ShardInfoPatchArgs
-
-func ShardInfoPatchPtr(v *ShardInfoPatchArgs) ShardInfoPatchPtrInput {
-	return (*shardInfoPatchPtrType)(v)
-}
-
-func (*shardInfoPatchPtrType) ElementType() reflect.Type {
-	return reflect.TypeOf((**ShardInfoPatch)(nil)).Elem()
-}
-
-func (i *shardInfoPatchPtrType) ToShardInfoPatchPtrOutput() ShardInfoPatchPtrOutput {
-	return i.ToShardInfoPatchPtrOutputWithContext(context.Background())
-}
-
-func (i *shardInfoPatchPtrType) ToShardInfoPatchPtrOutputWithContext(ctx context.Context) ShardInfoPatchPtrOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(ShardInfoPatchPtrOutput)
-}
-
-// ShardInfo describes the shard selector that was applied to produce a list response. Its presence on a list response indicates the list is a filtered subset.
-type ShardInfoPatchOutput struct{ *pulumi.OutputState }
-
-func (ShardInfoPatchOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*ShardInfoPatch)(nil)).Elem()
-}
-
-func (o ShardInfoPatchOutput) ToShardInfoPatchOutput() ShardInfoPatchOutput {
-	return o
-}
-
-func (o ShardInfoPatchOutput) ToShardInfoPatchOutputWithContext(ctx context.Context) ShardInfoPatchOutput {
-	return o
-}
-
-func (o ShardInfoPatchOutput) ToShardInfoPatchPtrOutput() ShardInfoPatchPtrOutput {
-	return o.ToShardInfoPatchPtrOutputWithContext(context.Background())
-}
-
-func (o ShardInfoPatchOutput) ToShardInfoPatchPtrOutputWithContext(ctx context.Context) ShardInfoPatchPtrOutput {
-	return o.ApplyTWithContext(ctx, func(_ context.Context, v ShardInfoPatch) *ShardInfoPatch {
-		return &v
-	}).(ShardInfoPatchPtrOutput)
-}
-
-// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-func (o ShardInfoPatchOutput) Selector() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v ShardInfoPatch) *string { return v.Selector }).(pulumi.StringPtrOutput)
-}
-
-type ShardInfoPatchPtrOutput struct{ *pulumi.OutputState }
-
-func (ShardInfoPatchPtrOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((**ShardInfoPatch)(nil)).Elem()
-}
-
-func (o ShardInfoPatchPtrOutput) ToShardInfoPatchPtrOutput() ShardInfoPatchPtrOutput {
-	return o
-}
-
-func (o ShardInfoPatchPtrOutput) ToShardInfoPatchPtrOutputWithContext(ctx context.Context) ShardInfoPatchPtrOutput {
-	return o
-}
-
-func (o ShardInfoPatchPtrOutput) Elem() ShardInfoPatchOutput {
-	return o.ApplyT(func(v *ShardInfoPatch) ShardInfoPatch {
-		if v != nil {
-			return *v
-		}
-		var ret ShardInfoPatch
-		return ret
-	}).(ShardInfoPatchOutput)
-}
-
-// selector is the shard selector string from the request, echoed back so clients can verify which shard they received and merge responses from multiple shards.
-func (o ShardInfoPatchPtrOutput) Selector() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *ShardInfoPatch) *string {
-		if v == nil {
-			return nil
-		}
-		return v.Selector
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -3993,103 +3433,9 @@ func (o StatusPatchOutput) Status() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v StatusPatch) *string { return v.Status }).(pulumi.StringPtrOutput)
 }
 
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type Time struct {
-}
-
-// TimeInput is an input type that accepts TimeArgs and TimeOutput values.
-// You can construct a concrete instance of `TimeInput` via:
-//
-//	TimeArgs{...}
-type TimeInput interface {
-	pulumi.Input
-
-	ToTimeOutput() TimeOutput
-	ToTimeOutputWithContext(context.Context) TimeOutput
-}
-
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type TimeArgs struct {
-}
-
-func (TimeArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*Time)(nil)).Elem()
-}
-
-func (i TimeArgs) ToTimeOutput() TimeOutput {
-	return i.ToTimeOutputWithContext(context.Background())
-}
-
-func (i TimeArgs) ToTimeOutputWithContext(ctx context.Context) TimeOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(TimeOutput)
-}
-
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type TimeOutput struct{ *pulumi.OutputState }
-
-func (TimeOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*Time)(nil)).Elem()
-}
-
-func (o TimeOutput) ToTimeOutput() TimeOutput {
-	return o
-}
-
-func (o TimeOutput) ToTimeOutputWithContext(ctx context.Context) TimeOutput {
-	return o
-}
-
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type TimePatch struct {
-}
-
-// TimePatchInput is an input type that accepts TimePatchArgs and TimePatchOutput values.
-// You can construct a concrete instance of `TimePatchInput` via:
-//
-//	TimePatchArgs{...}
-type TimePatchInput interface {
-	pulumi.Input
-
-	ToTimePatchOutput() TimePatchOutput
-	ToTimePatchOutputWithContext(context.Context) TimePatchOutput
-}
-
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type TimePatchArgs struct {
-}
-
-func (TimePatchArgs) ElementType() reflect.Type {
-	return reflect.TypeOf((*TimePatch)(nil)).Elem()
-}
-
-func (i TimePatchArgs) ToTimePatchOutput() TimePatchOutput {
-	return i.ToTimePatchOutputWithContext(context.Background())
-}
-
-func (i TimePatchArgs) ToTimePatchOutputWithContext(ctx context.Context) TimePatchOutput {
-	return pulumi.ToOutputWithContext(ctx, i).(TimePatchOutput)
-}
-
-// Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-type TimePatchOutput struct{ *pulumi.OutputState }
-
-func (TimePatchOutput) ElementType() reflect.Type {
-	return reflect.TypeOf((*TimePatch)(nil)).Elem()
-}
-
-func (o TimePatchOutput) ToTimePatchOutput() TimePatchOutput {
-	return o
-}
-
-func (o TimePatchOutput) ToTimePatchOutputWithContext(ctx context.Context) TimePatchOutput {
-	return o
-}
-
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DeleteOptionsInput)(nil)).Elem(), DeleteOptionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DeleteOptionsPatchInput)(nil)).Elem(), DeleteOptionsPatchArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*FieldsV1Input)(nil)).Elem(), FieldsV1Args{})
-	pulumi.RegisterInputType(reflect.TypeOf((*FieldsV1PatchInput)(nil)).Elem(), FieldsV1PatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ListMetaInput)(nil)).Elem(), ListMetaArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ListMetaPtrInput)(nil)).Elem(), ListMetaArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ListMetaPatchInput)(nil)).Elem(), ListMetaPatchArgs{})
@@ -4106,16 +3452,10 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*OwnerReferenceArrayInput)(nil)).Elem(), OwnerReferenceArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OwnerReferencePatchInput)(nil)).Elem(), OwnerReferencePatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*OwnerReferencePatchArrayInput)(nil)).Elem(), OwnerReferencePatchArray{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PatchInput)(nil)).Elem(), PatchArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*PatchPatchInput)(nil)).Elem(), PatchPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PreconditionsInput)(nil)).Elem(), PreconditionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PreconditionsPtrInput)(nil)).Elem(), PreconditionsArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PreconditionsPatchInput)(nil)).Elem(), PreconditionsPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*PreconditionsPatchPtrInput)(nil)).Elem(), PreconditionsPatchArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*ShardInfoInput)(nil)).Elem(), ShardInfoArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*ShardInfoPtrInput)(nil)).Elem(), ShardInfoArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*ShardInfoPatchInput)(nil)).Elem(), ShardInfoPatchArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*ShardInfoPatchPtrInput)(nil)).Elem(), ShardInfoPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusInput)(nil)).Elem(), StatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusCauseInput)(nil)).Elem(), StatusCauseArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusCauseArrayInput)(nil)).Elem(), StatusCauseArray{})
@@ -4126,12 +3466,8 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusDetailsPatchInput)(nil)).Elem(), StatusDetailsPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusDetailsPatchPtrInput)(nil)).Elem(), StatusDetailsPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*StatusPatchInput)(nil)).Elem(), StatusPatchArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*TimeInput)(nil)).Elem(), TimeArgs{})
-	pulumi.RegisterInputType(reflect.TypeOf((*TimePatchInput)(nil)).Elem(), TimePatchArgs{})
 	pulumi.RegisterOutputType(DeleteOptionsOutput{})
 	pulumi.RegisterOutputType(DeleteOptionsPatchOutput{})
-	pulumi.RegisterOutputType(FieldsV1Output{})
-	pulumi.RegisterOutputType(FieldsV1PatchOutput{})
 	pulumi.RegisterOutputType(ListMetaOutput{})
 	pulumi.RegisterOutputType(ListMetaPtrOutput{})
 	pulumi.RegisterOutputType(ListMetaPatchOutput{})
@@ -4148,16 +3484,10 @@ func init() {
 	pulumi.RegisterOutputType(OwnerReferenceArrayOutput{})
 	pulumi.RegisterOutputType(OwnerReferencePatchOutput{})
 	pulumi.RegisterOutputType(OwnerReferencePatchArrayOutput{})
-	pulumi.RegisterOutputType(PatchOutput{})
-	pulumi.RegisterOutputType(PatchPatchOutput{})
 	pulumi.RegisterOutputType(PreconditionsOutput{})
 	pulumi.RegisterOutputType(PreconditionsPtrOutput{})
 	pulumi.RegisterOutputType(PreconditionsPatchOutput{})
 	pulumi.RegisterOutputType(PreconditionsPatchPtrOutput{})
-	pulumi.RegisterOutputType(ShardInfoOutput{})
-	pulumi.RegisterOutputType(ShardInfoPtrOutput{})
-	pulumi.RegisterOutputType(ShardInfoPatchOutput{})
-	pulumi.RegisterOutputType(ShardInfoPatchPtrOutput{})
 	pulumi.RegisterOutputType(StatusOutput{})
 	pulumi.RegisterOutputType(StatusCauseOutput{})
 	pulumi.RegisterOutputType(StatusCauseArrayOutput{})
@@ -4168,6 +3498,4 @@ func init() {
 	pulumi.RegisterOutputType(StatusDetailsPatchOutput{})
 	pulumi.RegisterOutputType(StatusDetailsPatchPtrOutput{})
 	pulumi.RegisterOutputType(StatusPatchOutput{})
-	pulumi.RegisterOutputType(TimeOutput{})
-	pulumi.RegisterOutputType(TimePatchOutput{})
 }

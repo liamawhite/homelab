@@ -18,6 +18,16 @@ type InfraConfig struct {
 	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
 	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
 	Lights     LightsConfig     `yaml:"lights" mapstructure:"lights"`
+	GHCR       GHCRConfig       `yaml:"ghcr" mapstructure:"ghcr"`
+}
+
+// GHCRConfig holds credentials for pushing images to GitHub Container
+// Registry (ghcr.io) - Token needs the write:packages scope. Used by
+// pkg/components/lightscontroller's dockerbuild.Image resource to build
+// and push the lights-controller's image as part of `homelab up`.
+type GHCRConfig struct {
+	Username string `yaml:"username" mapstructure:"username"`
+	Token    string `yaml:"token" mapstructure:"token"`
 }
 
 // LightsConfig holds credentials for smart-light integrations, saved by

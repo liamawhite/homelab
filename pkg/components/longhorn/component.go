@@ -128,6 +128,12 @@ func NewLonghorn(
 
 	longhorn.Namespace = args.Namespace.ToStringOutput()
 
+	// Network policy - see network.go. Applied before the chart so
+	// Longhorn's pods never even briefly come up without it.
+	if err := newNetworkPolicy(ctx, fmt.Sprintf("%s-network", name), args.Namespace, localOpts...); err != nil {
+		return nil, err
+	}
+
 	// 1. Deploy Longhorn Helm chart with default values
 	chart, err := helmv4.NewChart(ctx, fmt.Sprintf("%s-chart", name), &helmv4.ChartArgs{
 		Namespace: args.Namespace,

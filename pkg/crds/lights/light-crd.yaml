@@ -1,0 +1,136 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: lights.lights.homelab.internal
+spec:
+  group: lights.homelab.internal
+  names:
+    kind: Light
+    listKind: LightList
+    plural: lights
+    singular: light
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.name
+      name: Name
+      type: string
+    - jsonPath: .status.on
+      name: "On"
+      type: boolean
+    - jsonPath: .status.brightness
+      name: Brightness
+      type: integer
+    - jsonPath: .status.bridgeId
+      name: Bridge
+      type: string
+    - jsonPath: .status.reachable
+      name: Reachable
+      priority: 1
+      type: boolean
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Light represents a single Hue light's live, observed state. Cluster
+          scoped (like Node/PersistentVolume) since it represents a physical
+          device, not a namespace-scoped app resource. Named after the light's own
+          Hue UUID (stable, unique, valid as a Kubernetes object name).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              LightSpec is deliberately empty in this phase: the controller only
+              reports observed state (see LightStatus), it doesn't accept desired
+              state yet. Future control fields (desired on/brightness/color) land
+              here without requiring an API version bump.
+            type: object
+          status:
+            description: |-
+              LightStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Light,
+              plus Reachable/LastSynced which that type has no notion of.
+            properties:
+              bridgeId:
+                description: |-
+                  BridgeID is the Hue bridge id (see pkg/config.HueBridgeConfig) this
+                  light belongs to.
+                type: string
+              brightness:
+                description: |-
+                  Brightness is a percentage (0-100), or -1 if the light doesn't
+                  support dimming - same sentinel convention as hue.Light.Brightness,
+                  deliberately not a pointer so DeepCopyInto stays a trivial value copy.
+                format: int32
+                type: integer
+              color:
+                description: |-
+                  Color is an approximate "#rrggbb" swatch, or "" if the light doesn't
+                  support color.
+                type: string
+              colorTempK:
+                description: |-
+                  ColorTempK is the color temperature in Kelvin, or 0 if the light
+                  doesn't support color temperature - same sentinel convention as
+                  hue.Light.ColorTempK.
+                format: int32
+                type: integer
+              fixtureType:
+                description: FixtureType is the light's archetype, e.g. "recessed
+                  ceiling".
+                type: string
+              lastSynced:
+                description: |-
+                  LastSynced is when this status was last successfully updated from
+                  the bridge.
+                format: date-time
+                type: string
+              model:
+                description: Model is the owning device's model ID, e.g. "LCA005".
+                type: string
+              name:
+                description: |-
+                  Name is the light's human-readable Hue name (e.g. "Kitchen Sink") -
+                  metadata.name is the Hue UUID instead (stable, valid as a k8s
+                  object name), so this is the only place the friendly name appears.
+                type: string
+              "on":
+                description: On is the light's last-observed on/off state.
+                type: boolean
+              product:
+                description: Product is the owning device's product name, e.g. "Hue
+                  color lamp".
+                type: string
+              reachable:
+                description: |-
+                  Reachable is false when the owning bridge failed to respond on the
+                  most recent poll - the rest of this status is then stale, left as
+                  of the last successful sync rather than cleared.
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
