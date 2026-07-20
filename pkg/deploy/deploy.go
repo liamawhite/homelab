@@ -14,6 +14,7 @@ import (
 	"github.com/liamawhite/homelab/pkg/components/dns"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
+	"github.com/liamawhite/homelab/pkg/components/longhorn"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	tsacl "github.com/liamawhite/homelab/pkg/components/tailscale/acl"
 	tsingress "github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
@@ -76,6 +77,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 		istioSystemNS := namespaces.Get(IstioSystemNamespace)
+		longhornNS := namespaces.Get(LonghornSystemNamespace)
 		cloudflareNS := namespaces.Get(CloudflareNamespace)
 		tailscaleNS := namespaces.Get(TailscaleNamespace)
 		healthNS := namespaces.Get(HealthNamespace)
@@ -218,6 +220,25 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
+		// Longhorn provides the cluster's distributed block storage backend,
+		// including a Tailscale-exposed UI (same exposure pattern as
+		// Private) - fully independent of every app above, just placed here
+		// since it needs both tsOperator and zoneID.
+		storage, err := longhorn.NewLonghorn(ctx, "longhorn", &longhorn.LonghornArgs{
+			Version:                    versions.Longhorn,
+			Namespace:                  longhornNS.Metadata.Name().Elem(),
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, longhornNS, tsOperator}),
+		)
+		if err != nil {
+			return err
+		}
+
 		// Cloudflare-side redirect bookmarks for every Tailscale-fronted
 		// app - see pkg/deploy/redirects.go for why this has to be
 		// collected centrally rather than each app creating its own.
@@ -225,8 +246,8 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			zoneID,
 			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
 			providers.Cloudflare,
-			[]tsingress.RedirectRoute{private.TailscaleRedirect()},
-			pulumi.DependsOn([]pulumi.Resource{private}),
+			[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect()},
+			pulumi.DependsOn([]pulumi.Resource{private, storage}),
 		)
 		if err != nil {
 			return err

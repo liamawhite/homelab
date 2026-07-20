@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
+	lightscmd "github.com/liamawhite/homelab/cli/cmd/lights"
 	pulumicmd "github.com/liamawhite/homelab/cli/cmd/pulumi"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +23,7 @@ func Execute() {
 	}))
 	slog.SetDefault(logger)
 
-	if err := rootCmd.Execute(); err != nil {
+	if err := rootCmd.ExecuteContext(context.Background()); err != nil {
 		slog.Error("Command failed", "error", err)
 		os.Exit(1)
 	}
@@ -35,6 +37,7 @@ func init() {
 	rootCmd.AddCommand(bootstrapCmd)
 	rootCmd.AddCommand(k3sCmd)
 	rootCmd.AddCommand(kubeconfigCmd)
+	rootCmd.AddCommand(lightscmd.Cmd)
 	rootCmd.AddCommand(nodeCmd)
 	rootCmd.AddCommand(pulumicmd.UpCmd)
 	rootCmd.AddCommand(pulumicmd.PreviewCmd)

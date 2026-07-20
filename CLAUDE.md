@@ -79,7 +79,8 @@ This is a hybrid Infrastructure as Code project that deploys a complete homelab 
    - `istio/` - `component.go` (`NewIstio`: istiod + CNI + ztunnel Helm charts only - ambient mesh control plane)
      - `gateway/` - `NewGateway`: the single shared Kubernetes Gateway API `Gateway`, open to `HTTPRoute`s from any namespace. References istiod's auto-created `GatewayClass` named `istio` by name rather than owning one (avoids the same ownership-conflict class the namespace convention above fixes)
      - `route/` - `NewRoute`: reusable `HTTPRoute` attached to the shared Gateway, for future app deployments to call - not wired into `deploy.Program` yet (nothing to route to)
-   - `longhorn/`, `cloudflare/{tunnel,auth}/` - not currently wired into `deploy.Program` (kube-vip + Istio control plane + shared Gateway + Cloudflare Access only, for now) - kept for when they're reintroduced. Wiring `longhorn` or `cloudflare/tunnel` in requires un-commenting their spec entries in `pkg/deploy/namespaces.go` in the same change
+   - `longhorn/` - `NewLonghorn`: Helm-deployed distributed block storage, exports the default StorageClass, and exposes its UI over Tailscale (`storage.<tailnet>`) the same way `pkg/deploy/applications/private.go` exposes an app - wired into `deploy.Program`
+   - `cloudflare/{tunnel,auth}/` - wired into `deploy.Program`
 
 5. **State** (`.pulumi-state/`):
    - Git-crypt'd local file backend (see `.gitattributes`) - `cli/cmd/pulumi/pulumi.go` points the Automation API workspace's backend at `file://<absolute path to .pulumi-state>`, computed relative to the CLI's working directory (repo root)

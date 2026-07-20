@@ -17,6 +17,26 @@ type InfraConfig struct {
 	Nodes      []NodeConfig     `yaml:"nodes" mapstructure:"nodes"`
 	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
 	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
+	Lights     LightsConfig     `yaml:"lights" mapstructure:"lights"`
+}
+
+// LightsConfig holds credentials for smart-light integrations, saved by
+// commands like `homelab lights pair` rather than hand-edited.
+type LightsConfig struct {
+	Hue HueConfig `yaml:"hue" mapstructure:"hue"`
+}
+
+type HueConfig struct {
+	Bridges []HueBridgeConfig `yaml:"bridges" mapstructure:"bridges"`
+}
+
+// HueBridgeConfig is one paired Hue bridge: its stable bridge ID (from
+// /api/config) and the application key issued for it via the link-button
+// pairing flow. Deliberately no IP - bridge IPs are re-resolved via
+// discovery rather than cached, since they aren't guaranteed stable.
+type HueBridgeConfig struct {
+	ID     string `yaml:"id" mapstructure:"id"`
+	AppKey string `yaml:"appKey" mapstructure:"appKey"`
 }
 
 type ClusterConfig struct {
@@ -169,15 +189,28 @@ func LoadFromFile(path string) (*InfraConfig, error) {
 // LoadInfra loads just the infra.yaml configuration, for commands that
 // operate across all nodes rather than targeting one selected node.
 func LoadInfra(cmd *cobra.Command) (*InfraConfig, error) {
+	configFile, err := ResolveConfigPath(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	return loadInfraYAML(configFile)
+}
+
+// ResolveConfigPath returns the infra.yaml path to use: the --config flag
+// if set, otherwise the first of findConfigFile's candidate locations that
+// exists. Returns an error if neither yields a path - for commands (like
+// LoadInfra's callers, or lights pair) that need to write to a specific
+// file, not just read whatever optional config happens to be present.
+func ResolveConfigPath(cmd *cobra.Command) (string, error) {
 	configFile, _ := cmd.Flags().GetString("config")
 	if configFile == "" {
 		configFile = findConfigFile()
 	}
 	if configFile == "" {
-		return nil, fmt.Errorf("no infra.yaml config file found")
+		return "", fmt.Errorf("no infra.yaml config file found")
 	}
-
-	return loadInfraYAML(configFile)
+	return configFile, nil
 }
 
 // findConfigFile searches for infra.yaml in common locations
@@ -380,14 +413,62 @@ func SetClusterToken(path, token string) error {
 
 	tokenNode.SetString(token)
 
-	out, err := yaml.Marshal(&doc)
+	return writeConfigDoc(path, &doc)
+}
+
+// SaveHueBridge upserts a paired Hue bridge's application key into path's
+// lights.hue.bridges list, keyed by bridge ID - editing the parsed node
+// tree (like SetClusterToken) rather than a plain struct so the rest of
+// the file's comments/formatting survive. Creates the lights/hue/bridges
+// structure if it doesn't already exist.
+func SaveHueBridge(path, bridgeID, appKey string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	var doc yaml.Node
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		return fmt.Errorf("failed to parse config file: %w", err)
+	}
+	if len(doc.Content) == 0 {
+		return fmt.Errorf("empty config file: %s", path)
+	}
+	root := doc.Content[0]
+
+	hueNode := ensureMapping(ensureMapping(root, "lights"), "hue")
+	bridges := ensureSequence(hueNode, "bridges")
+
+	for _, item := range bridges.Content {
+		idNode := mappingValue(item, "id")
+		if idNode == nil || idNode.Value != bridgeID {
+			continue
+		}
+		if keyNode := mappingValue(item, "appKey"); keyNode != nil {
+			keyNode.SetString(appKey)
+		} else {
+			appendMapEntry(item, "appKey", stringNode(appKey))
+		}
+		return writeConfigDoc(path, &doc)
+	}
+
+	entry := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}
+	appendMapEntry(entry, "id", stringNode(bridgeID))
+	appendMapEntry(entry, "appKey", stringNode(appKey))
+	bridges.Content = append(bridges.Content, entry)
+
+	return writeConfigDoc(path, &doc)
+}
+
+// writeConfigDoc marshals doc back to path.
+func writeConfigDoc(path string, doc *yaml.Node) error {
+	out, err := yaml.Marshal(doc)
 	if err != nil {
 		return fmt.Errorf("failed to marshal config file: %w", err)
 	}
 	if err := os.WriteFile(path, out, 0600); err != nil {
 		return fmt.Errorf("failed to write %s: %w", path, err)
 	}
-
 	return nil
 }
 
@@ -403,6 +484,38 @@ func mappingValue(m *yaml.Node, key string) *yaml.Node {
 		}
 	}
 	return nil
+}
+
+// appendMapEntry appends a key: value entry to mapping node m.
+func appendMapEntry(m *yaml.Node, key string, value *yaml.Node) {
+	m.Content = append(m.Content, stringNode(key), value)
+}
+
+// ensureMapping returns parent's existing mapping child named key, or
+// creates, appends, and returns an empty one.
+func ensureMapping(parent *yaml.Node, key string) *yaml.Node {
+	if child := mappingValue(parent, key); child != nil {
+		return child
+	}
+	child := &yaml.Node{Kind: yaml.MappingNode, Tag: "!!map"}
+	appendMapEntry(parent, key, child)
+	return child
+}
+
+// ensureSequence returns parent's existing sequence child named key, or
+// creates, appends, and returns an empty one.
+func ensureSequence(parent *yaml.Node, key string) *yaml.Node {
+	if child := mappingValue(parent, key); child != nil {
+		return child
+	}
+	child := &yaml.Node{Kind: yaml.SequenceNode, Tag: "!!seq"}
+	appendMapEntry(parent, key, child)
+	return child
+}
+
+// stringNode builds a scalar string yaml.Node for use as a map value.
+func stringNode(s string) *yaml.Node {
+	return &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: s}
 }
 
 func validateConfig(cfg *Config) error {

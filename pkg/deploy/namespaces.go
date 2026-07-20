@@ -54,14 +54,7 @@ func (n *Namespaces) Get(name string) *corev1.Namespace {
 }
 
 // createNamespaces creates every Kubernetes namespace any pkg/deploy
-// component needs, up front, as the sole owner of each. Only namespaces
-// actually consumed by Program()'s current call graph are listed here today
-// (istio-system). LonghornSystemNamespace and CloudflareNamespace are
-// defined above and documented here so that when pkg/components/longhorn
-// and pkg/components/cloudflare/tunnel are eventually wired into Program(),
-// their spec entries below are simply un-commented rather than invented
-// fresh. Un-commenting must happen together with wiring in that component -
-// otherwise its Namespace arg references a namespace nothing created.
+// component needs, up front, as the sole owner of each.
 func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Namespaces, error) {
 	specs := []namespaceSpec{
 		// TEMPORARY: adopting the physical istio-system namespace previously
@@ -77,10 +70,9 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		}, aliases: []pulumi.Alias{
 			{Name: pulumi.String("istio-crds-namespace")},
 		}},
-		// Uncomment when pkg/components/longhorn is wired into Program():
-		// {name: LonghornSystemNamespace, labels: pulumi.StringMap{
-		// 	istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
-		// }},
+		{name: LonghornSystemNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
 		{name: CloudflareNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
