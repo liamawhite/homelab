@@ -12,11 +12,13 @@ import (
 	cfauth "github.com/liamawhite/homelab/pkg/components/cloudflare/auth"
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pkg/components/dns"
+	"github.com/liamawhite/homelab/pkg/components/grafana"
 	"github.com/liamawhite/homelab/pkg/components/hubcontroller"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
 	"github.com/liamawhite/homelab/pkg/components/lightscontroller"
 	"github.com/liamawhite/homelab/pkg/components/longhorn"
+	"github.com/liamawhite/homelab/pkg/components/prometheus"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	tsacl "github.com/liamawhite/homelab/pkg/components/tailscale/acl"
 	tsingress "github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
@@ -84,6 +86,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		tailscaleNS := namespaces.Get(TailscaleNamespace)
 		healthNS := namespaces.Get(HealthNamespace)
 		lightsNS := namespaces.Get(LightsNamespace)
+		monitoringNS := namespaces.Get(MonitoringNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -242,6 +245,59 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
+		// Metrics-collection plane: prometheus-operator, the Prometheus CR,
+		// and its exporters (node-exporter, kube-state-metrics, cadvisor's
+		// ServiceMonitor) - hand-rolled Go resources rather than a Helm
+		// chart (see pkg/components/prometheus's package doc comment for
+		// why). Depends on storage.DefaultStorageClass for its PVC, so has
+		// to come after Longhorn.
+		monitoring, err := prometheus.NewPrometheus(ctx, "monitoring", &prometheus.PrometheusArgs{
+			Namespace:               monitoringNS.Metadata.Name().Elem(),
+			OperatorVersion:         versions.PrometheusOperator,
+			Version:                 versions.Prometheus,
+			NodeExporterVersion:     versions.NodeExporter,
+			KubeStateMetricsVersion: versions.KubeStateMetrics,
+			AlertmanagerVersion:     versions.Alertmanager,
+			KubeRBACProxyVersion:    versions.KubeRBACProxy,
+			StorageClassName:        storage.DefaultStorageClass,
+			// Data retention strategy: a size cap alongside the time-based
+			// one, so Prometheus proactively compacts away old blocks the
+			// moment either limit is hit rather than risking a disk-full
+			// crash if ingestion ever grows faster than expected - see
+			// instance.go's doc comment for the full reasoning.
+			StorageSize:                "20Gi",
+			Retention:                  "14d",
+			RetentionSize:              "18GB",
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.Prometheus, crds.GatewayAPI, crds.Istio, mesh, ciliumComp, apiserverComp, monitoringNS, storage, tsOperator}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Tailscale-exposed Grafana UI, wired to the Prometheus Service
+		// above - same exposure pattern as Longhorn's UI and Private.
+		graf, err := grafana.NewGrafana(ctx, "grafana", &grafana.GrafanaArgs{
+			Version:                    versions.Grafana,
+			Namespace:                  monitoringNS.Metadata.Name().Elem(),
+			PrometheusServiceName:      pulumi.String(prometheus.ServiceName),
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, monitoringNS, tsOperator, monitoring}),
+		)
+		if err != nil {
+			return err
+		}
+
 		// Shared image for both lights-controller and hub-controller below
 		// - see pkg/deploy/image.go for why this is built once rather than
 		// inside each component.
@@ -287,7 +343,10 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			Namespace:    lightsNS.Metadata.Name().Elem(),
 			Bridges:      infraCfg.Lights.Hue.Bridges,
 			PollInterval: pulumi.String("60s"),
-			Image:        lightsImage.Ref,
+			// Deliberately true regardless of the binary's own default -
+			// see LightsControllerArgs.DryRun's doc comment.
+			DryRun: pulumi.Bool(true),
+			Image:  lightsImage.Ref,
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp, lightsImage}),
 		)
@@ -302,8 +361,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			zoneID,
 			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
 			providers.Cloudflare,
-			[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect()},
-			pulumi.DependsOn([]pulumi.Resource{private, storage}),
+			append(
+				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect()},
+				monitoring.TailscaleRedirects()...,
+			),
+			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring}),
 		)
 		if err != nil {
 			return err

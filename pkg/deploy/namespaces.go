@@ -23,6 +23,7 @@ const (
 	TailscaleNamespace      = "tailscale"
 	HealthNamespace         = "health"
 	LightsNamespace         = "lights"
+	MonitoringNamespace     = "monitoring"
 )
 
 // namespaceSpec describes one namespace createNamespaces should create.
@@ -97,6 +98,9 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 		{name: LightsNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		{name: MonitoringNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}
