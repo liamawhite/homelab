@@ -39,6 +39,12 @@ type LightsControllerArgs struct {
 	Bridges []config.HueBridgeConfig
 	// PollInterval is how often the controller polls bridges, e.g. "60s".
 	PollInterval pulumi.StringInput
+	// DryRun controls whether the Light reconciler enacts spec changes
+	// against the bridge (false) or only logs drift (true). Passed
+	// explicitly rather than left to the binary's own default so flipping
+	// a live deployment into real-enactment mode is a deliberate,
+	// reviewable change here rather than a side effect of a new image.
+	DryRun pulumi.BoolInput
 	// Image is the shared lights-controller/hub-controller image
 	// (built once in pkg/deploy/image.go and passed to both components).
 	Image pulumi.StringInput
@@ -253,6 +259,7 @@ func NewLightsController(ctx *pulumi.Context, name string, args *LightsControlle
 							Args: pulumi.StringArray{
 								pulumi.Sprintf("--bridges-file=%s/bridges.json", mountPath),
 								pulumi.Sprintf("--poll-interval=%s", args.PollInterval),
+								pulumi.Sprintf("--dry-run=%v", args.DryRun),
 							},
 							Env: corev1.EnvVarArray{
 								&corev1.EnvVarArgs{

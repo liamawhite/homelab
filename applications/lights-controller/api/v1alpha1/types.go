@@ -21,15 +21,14 @@ import (
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpec struct {
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
 	// light resource (a light's own metadata.name is deprecated/read-only
-	// in the Hue API) - the device's RID isn't plumbed through today, so
-	// enacting a Name change is deferred along with the rest of enactment.
+	// in the Hue API) - see Status.DeviceID and Reconciler.
 	Name string `json:"name,omitempty"`
 	// On is the desired on/off state.
 	On bool `json:"on,omitempty"`
@@ -83,6 +82,18 @@ type LightStatus struct {
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
 	LastSynced metav1.Time `json:"lastSynced,omitempty"`
+	// DeviceID is the RID of the device owning this light - needed to
+	// enact Name changes, which the light resource's own PUT doesn't
+	// support (see Reconciler).
+	DeviceID string `json:"deviceId,omitempty"`
+	// LastEnactAttempt is when the controller last attempted to push Spec
+	// to the bridge (success or failure) - also the debounce clock:
+	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	LastEnactAttempt metav1.Time `json:"lastEnactAttempt,omitempty"`
+	// EnactError is the most recent enactment failure, or "" if the last
+	// attempt succeeded (or none has been made, or nothing currently
+	// differs between Spec and Status).
+	EnactError string `json:"enactError,omitempty"`
 }
 
 // +kubebuilder:object:root=true

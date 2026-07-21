@@ -23,6 +23,14 @@ import (
 // without listing every Light in the cluster.
 const bridgeIDLabel = "lights.homelab.internal/bridge-id"
 
+// LightRef identifies a single light on a single bridge - used by Trigger
+// to ask Poller for an out-of-band refresh of just that light, without
+// waiting for the next regular tick.
+type LightRef struct {
+	BridgeID string
+	LightID  string
+}
+
 // Poller is a manager.Runnable that periodically syncs every paired
 // bridge's lights into Light custom resources: creating/updating one per
 // light, marking a bridge's lights unreachable (never deleting them) if
@@ -34,6 +42,11 @@ type Poller struct {
 	Client       client.Client
 	Bridges      []bridges.Config
 	PollInterval time.Duration
+	// Trigger, if non-nil, lets Reconciler ask for an out-of-band refresh
+	// of one light sooner than the next regular tick - e.g. right after
+	// successfully enacting a spec change, so Status converges within
+	// seconds instead of waiting up to PollInterval.
+	Trigger <-chan LightRef
 }
 
 var (
@@ -61,6 +74,8 @@ func (p *Poller) Start(ctx context.Context) error {
 			return nil
 		case <-ticker.C:
 			p.sync(ctx, logger)
+		case ref := <-p.Trigger:
+			p.syncOne(ctx, logger, ref.BridgeID, ref.LightID)
 		}
 	}
 }
@@ -107,6 +122,34 @@ func (p *Poller) syncBridge(ctx context.Context, logger logr.Logger, b bridges.C
 	p.gc(ctx, logger, b.ID, seen)
 }
 
+// syncOne refreshes a single light's status, given its bridge and light
+// ID - used for Trigger-driven out-of-band refreshes. Deliberately not a
+// call into syncBridge (which fetches every light + every device on the
+// bridge, and runs GC): none of that is wanted for "just recheck the one
+// light we just changed."
+func (p *Poller) syncOne(ctx context.Context, logger logr.Logger, bridgeID, lightID string) {
+	var hueBridge lightsv1alpha1.HueBridge
+	if err := p.Client.Get(ctx, client.ObjectKey{Name: bridges.ResourceName(bridgeID)}, &hueBridge); err != nil {
+		return // nothing trustworthy to refresh from right now; the regular ticker will catch it later
+	}
+	if !hueBridge.Status.Reachable || hueBridge.Status.IP == "" {
+		return
+	}
+
+	b, ok := bridges.FindByID(p.Bridges, bridgeID)
+	if !ok {
+		logger.Error(nil, "triggered sync for unknown bridge", "bridge", bridgeID)
+		return
+	}
+
+	light, err := lighthue.FetchLight(ctx, hueBridge.Status.IP, b.AppKey, lightID)
+	if err != nil {
+		logger.Error(err, "failed to fetch light for triggered sync", "light", lightID)
+		return
+	}
+	p.upsert(ctx, logger, light)
+}
+
 // upsert ensures a Light CR named after l.ID exists and carries l's
 // current status. Object creation/labeling and the status subresource are
 // deliberately two separate client calls - controller-runtime's
@@ -146,6 +189,7 @@ func (p *Poller) upsert(ctx context.Context, logger logr.Logger, l lighthue.Ligh
 	light.Status = lightsv1alpha1.LightStatus{
 		Name:        l.Name,
 		BridgeID:    l.BridgeID,
+		DeviceID:    l.DeviceID,
 		On:          l.On,
 		Brightness:  int32(l.Brightness),
 		Color:       l.Color,

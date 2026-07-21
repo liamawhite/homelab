@@ -33,6 +33,17 @@ func ResourceName(bridgeID string) string {
 	return strings.ToLower(bridgeID)
 }
 
+// FindByID returns the paired bridge config matching id, or false if none
+// matched.
+func FindByID(cfgs []Config, id string) (Config, bool) {
+	for _, c := range cfgs {
+		if c.ID == id {
+			return c, true
+		}
+	}
+	return Config{}, false
+}
+
 // Load reads and parses the bridges file mounted from the "hue-bridges"
 // Secret (see pkg/components/lightscontroller/component.go).
 func Load(path string) ([]Config, error) {

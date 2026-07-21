@@ -1,10 +1,12 @@
 package hue
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -16,6 +18,7 @@ type Light struct {
 	ID          string
 	Name        string
 	BridgeID    string
+	DeviceID    string // RID of the owning device resource - needed to rename the light (see RenameDevice)
 	On          bool
 	Brightness  float64 // percentage 0-100; -1 if the light doesn't support dimming
 	Color       string  // approximate "#rrggbb" swatch; "" if the light doesn't support color
@@ -102,35 +105,190 @@ func FetchLights(ctx context.Context, ip, bridgeID, appKey string) ([]Light, err
 
 	lights := make([]Light, 0, len(parsed.Data))
 	for _, r := range parsed.Data {
-		brightness := -1.0
-		if r.Dimming != nil {
-			brightness = r.Dimming.Brightness
-		}
-
-		var color string
-		if r.Color != nil {
-			color = xyToHex(r.Color.XY.X, r.Color.XY.Y)
-		}
-
-		var colorTempK int
-		if r.ColorTemperature != nil && r.ColorTemperature.MirekValid {
-			colorTempK = mirekToKelvin(r.ColorTemperature.Mirek)
-		}
-
 		device := devices[r.Owner.RID]
-
-		lights = append(lights, Light{
-			ID:          r.ID,
-			Name:        r.Metadata.Name,
-			BridgeID:    bridgeID,
-			On:          r.On.On,
-			Brightness:  brightness,
-			Color:       color,
-			ColorTempK:  colorTempK,
-			FixtureType: strings.ReplaceAll(r.Metadata.Archetype, "_", " "),
-			Product:     device.Product,
-			Model:       device.Model,
-		})
+		lights = append(lights, parseLightResource(r, bridgeID, device))
 	}
 	return lights, nil
+}
+
+// parseLightResource maps one CLIP v2 light resource to a Light, shared by
+// FetchLights (which enriches every light with device info in one batch)
+// and FetchLight (which doesn't - see its doc comment).
+func parseLightResource(r lightResource, bridgeID string, device DeviceInfo) Light {
+	brightness := -1.0
+	if r.Dimming != nil {
+		brightness = r.Dimming.Brightness
+	}
+
+	var color string
+	if r.Color != nil {
+		color = xyToHex(r.Color.XY.X, r.Color.XY.Y)
+	}
+
+	var colorTempK int
+	if r.ColorTemperature != nil && r.ColorTemperature.MirekValid {
+		colorTempK = mirekToKelvin(r.ColorTemperature.Mirek)
+	}
+
+	return Light{
+		ID:          r.ID,
+		Name:        r.Metadata.Name,
+		BridgeID:    bridgeID,
+		DeviceID:    r.Owner.RID,
+		On:          r.On.On,
+		Brightness:  brightness,
+		Color:       color,
+		ColorTempK:  colorTempK,
+		FixtureType: strings.ReplaceAll(r.Metadata.Archetype, "_", " "),
+		Product:     device.Product,
+		Model:       device.Model,
+	}
+}
+
+// FetchLight returns the current live state of a single light by ID,
+// without the Product/Model device enrichment FetchLights does - used by
+// lightscontroller's Reconciler to poll for confirmation shortly after
+// enacting a change, where a per-light device lookup isn't needed.
+func FetchLight(ctx context.Context, ip, appKey, lightID string) (Light, error) {
+	url := fmt.Sprintf("https://%s/clip/v2/resource/light/%s", ip, lightID)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return Light{}, fmt.Errorf("failed to build request for %s: %w", url, err)
+	}
+	req.Header.Set("hue-application-key", appKey)
+
+	resp, err := hueClient.Do(req)
+	if err != nil {
+		return Light{}, fmt.Errorf("failed to reach %s: %w", url, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return Light{}, fmt.Errorf("%s returned status %d", url, resp.StatusCode)
+	}
+
+	var parsed lightsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
+		return Light{}, fmt.Errorf("failed to decode response from %s: %w", url, err)
+	}
+	if len(parsed.Data) == 0 {
+		return Light{}, fmt.Errorf("light %s not found on bridge %s", lightID, ip)
+	}
+	return parseLightResource(parsed.Data[0], "", DeviceInfo{}), nil
+}
+
+// UpdateLightState is the subset of a light's state that can be enacted
+// via the light resource's own PUT endpoint (renaming is not part of this
+// - see RenameDevice).
+type UpdateLightState struct {
+	On         bool
+	Brightness float64 // -1 = light doesn't support dimming, omitted from the PUT
+	Color      string  // ""  = light doesn't support color, omitted from the PUT
+	ColorTempK int     // 0   = light doesn't support color temp, omitted from the PUT
+}
+
+type lightPutOn struct {
+	On bool `json:"on"`
+}
+
+type lightPutDimming struct {
+	Brightness float64 `json:"brightness"`
+}
+
+type lightPutXY struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
+type lightPutColor struct {
+	XY lightPutXY `json:"xy"`
+}
+
+type lightPutColorTemperature struct {
+	Mirek int `json:"mirek"`
+}
+
+type lightPutBody struct {
+	On               lightPutOn                `json:"on"`
+	Dimming          *lightPutDimming          `json:"dimming,omitempty"`
+	Color            *lightPutColor            `json:"color,omitempty"`
+	ColorTemperature *lightPutColorTemperature `json:"color_temperature,omitempty"`
+}
+
+// UpdateLight pushes desired's on/brightness/color/colorTempK to the light
+// at lightID via the CLIP v2 API's own PUT endpoint for light resources.
+func UpdateLight(ctx context.Context, ip, appKey, lightID string, desired UpdateLightState) error {
+	body := lightPutBody{On: lightPutOn{On: desired.On}}
+
+	if desired.Brightness != -1 {
+		body.Dimming = &lightPutDimming{Brightness: desired.Brightness}
+	}
+	if desired.Color != "" {
+		x, y, err := hexToXY(desired.Color)
+		if err != nil {
+			return fmt.Errorf("failed to convert color %q: %w", desired.Color, err)
+		}
+		body.Color = &lightPutColor{XY: lightPutXY{X: x, Y: y}}
+	}
+	if desired.ColorTempK != 0 {
+		body.ColorTemperature = &lightPutColorTemperature{Mirek: kelvinToMirek(desired.ColorTempK)}
+	}
+
+	payload, err := json.Marshal(body)
+	if err != nil {
+		return fmt.Errorf("failed to marshal light update: %w", err)
+	}
+
+	url := fmt.Sprintf("https://%s/clip/v2/resource/light/%s", ip, lightID)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to build request for %s: %w", url, err)
+	}
+	req.Header.Set("hue-application-key", appKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := hueClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to reach %s: %w", url, err)
+	}
+	return checkAPIErrors(resp, url)
+}
+
+// apiError is one entry in the CLIP v2 API's "errors" array.
+type apiError struct {
+	Description string `json:"description"`
+}
+
+// apiErrorResponse is the envelope every CLIP v2 API response - success or
+// failure - is wrapped in.
+type apiErrorResponse struct {
+	Errors []apiError `json:"errors"`
+}
+
+// checkAPIErrors reads and closes resp.Body, returning an error if the
+// CLIP v2 API signaled a failure - either a non-200 HTTP status, or a
+// non-empty "errors" array in an otherwise-200 response (the CLIP v2 API
+// returns HTTP 200 even for validation failures, e.g. an out-of-range
+// brightness, signaling them only via that array).
+func checkAPIErrors(resp *http.Response, url string) error {
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response from %s: %w", url, err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("%s returned status %d: %s", url, resp.StatusCode, body)
+	}
+	var parsed apiErrorResponse
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return fmt.Errorf("failed to decode response from %s: %w", url, err)
+	}
+	if len(parsed.Errors) > 0 {
+		msgs := make([]string, len(parsed.Errors))
+		for i, e := range parsed.Errors {
+			msgs[i] = e.Description
+		}
+		return fmt.Errorf("%s returned errors: %s", url, strings.Join(msgs, "; "))
+	}
+	return nil
 }

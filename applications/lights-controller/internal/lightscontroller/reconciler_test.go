@@ -3,8 +3,10 @@ package lightscontroller
 import (
 	"slices"
 	"testing"
+	"time"
 
 	lightsv1alpha1 "github.com/liamawhite/lights-controller/api/v1alpha1"
+	"github.com/liamawhite/lights-controller/internal/bridges"
 )
 
 func TestDiffLight(t *testing.T) {
@@ -72,5 +74,45 @@ func TestDiffLight(t *testing.T) {
 				t.Errorf("diffLight() fields = %v, want %v", gotFields, tc.want)
 			}
 		})
+	}
+}
+
+func TestHasField(t *testing.T) {
+	diffs := []fieldDiff{{Field: "on"}, {Field: "color"}}
+	if !hasField(diffs, "on") {
+		t.Error("hasField(diffs, \"on\") = false, want true")
+	}
+	if hasField(diffs, "brightness") {
+		t.Error("hasField(diffs, \"brightness\") = true, want false")
+	}
+	if hasField(nil, "on") {
+		t.Error("hasField(nil, \"on\") = true, want false")
+	}
+}
+
+func TestRemainingCooldown(t *testing.T) {
+	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	cooldown := 30 * time.Second
+
+	if got := remainingCooldown(time.Time{}, cooldown, now); got != 0 {
+		t.Errorf("remainingCooldown with zero lastAttempt = %v, want 0", got)
+	}
+	if got := remainingCooldown(now.Add(-10*time.Second), cooldown, now); got != 20*time.Second {
+		t.Errorf("remainingCooldown 10s into a 30s cooldown = %v, want 20s", got)
+	}
+	if got := remainingCooldown(now.Add(-45*time.Second), cooldown, now); got > 0 {
+		t.Errorf("remainingCooldown after cooldown elapsed = %v, want <= 0", got)
+	}
+}
+
+func TestBridgesFindByID(t *testing.T) {
+	cfgs := []bridges.Config{{ID: "abc", AppKey: "key1"}, {ID: "def", AppKey: "key2"}}
+
+	got, ok := bridges.FindByID(cfgs, "def")
+	if !ok || got.AppKey != "key2" {
+		t.Errorf("FindByID(cfgs, \"def\") = %+v, %v, want key2, true", got, ok)
+	}
+	if _, ok := bridges.FindByID(cfgs, "missing"); ok {
+		t.Error("FindByID(cfgs, \"missing\") = true, want false")
 	}
 }

@@ -1,6 +1,7 @@
 package hue
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -63,4 +64,38 @@ func fetchDevices(ctx context.Context, ip, appKey string) (map[string]DeviceInfo
 		devices[d.ID] = DeviceInfo{Name: d.Metadata.Name, Product: d.ProductData.ProductName, Model: d.ProductData.ModelID}
 	}
 	return devices, nil
+}
+
+type devicePutMetadata struct {
+	Name string `json:"name"`
+}
+
+type devicePutBody struct {
+	Metadata devicePutMetadata `json:"metadata"`
+}
+
+// RenameDevice sets deviceID's display name - the only way to rename a
+// Hue light, since the light resource's own PUT doesn't accept a metadata
+// field (its GET response's metadata.name is documented "deprecated, use
+// metadata on device level"). deviceID is the owning device's RID (see
+// Light.DeviceID), not the light's own ID.
+func RenameDevice(ctx context.Context, ip, appKey, deviceID, name string) error {
+	payload, err := json.Marshal(devicePutBody{Metadata: devicePutMetadata{Name: name}})
+	if err != nil {
+		return fmt.Errorf("failed to marshal device rename: %w", err)
+	}
+
+	url := fmt.Sprintf("https://%s/clip/v2/resource/device/%s", ip, deviceID)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, url, bytes.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("failed to build request for %s: %w", url, err)
+	}
+	req.Header.Set("hue-application-key", appKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := hueClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to reach %s: %w", url, err)
+	}
+	return checkAPIErrors(resp, url)
 }

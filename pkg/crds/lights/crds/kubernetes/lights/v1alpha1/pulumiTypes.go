@@ -1272,9 +1272,9 @@ func (o LightPatchTypeOutput) Status() LightStatusPatchPtrOutput {
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpec struct {
 	// Brightness is the desired percentage (0-100), or -1 if the light
 	// doesn't support dimming - same sentinel convention as
@@ -1289,8 +1289,7 @@ type LightSpec struct {
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
 	// light resource (a light's own metadata.name is deprecated/read-only
-	// in the Hue API) - the device's RID isn't plumbed through today, so
-	// enacting a Name change is deferred along with the rest of enactment.
+	// in the Hue API) - see Status.DeviceID and Reconciler.
 	Name *string `pulumi:"name"`
 	// On is the desired on/off state.
 	On *bool `pulumi:"on"`
@@ -1313,9 +1312,9 @@ type LightSpecInput interface {
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpecArgs struct {
 	// Brightness is the desired percentage (0-100), or -1 if the light
 	// doesn't support dimming - same sentinel convention as
@@ -1330,8 +1329,7 @@ type LightSpecArgs struct {
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
 	// light resource (a light's own metadata.name is deprecated/read-only
-	// in the Hue API) - the device's RID isn't plumbed through today, so
-	// enacting a Name change is deferred along with the rest of enactment.
+	// in the Hue API) - see Status.DeviceID and Reconciler.
 	Name pulumi.StringPtrInput `pulumi:"name"`
 	// On is the desired on/off state.
 	On pulumi.BoolPtrInput `pulumi:"on"`
@@ -1396,9 +1394,9 @@ func (i *lightSpecPtrType) ToLightSpecPtrOutputWithContext(ctx context.Context) 
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpecOutput struct{ *pulumi.OutputState }
 
 func (LightSpecOutput) ElementType() reflect.Type {
@@ -1445,8 +1443,7 @@ func (o LightSpecOutput) ColorTempK() pulumi.IntPtrOutput {
 // Name is the desired human-readable Hue name. NOTE: actually renaming
 // a Hue light requires a PUT to the owning *device* resource, not this
 // light resource (a light's own metadata.name is deprecated/read-only
-// in the Hue API) - the device's RID isn't plumbed through today, so
-// enacting a Name change is deferred along with the rest of enactment.
+// in the Hue API) - see Status.DeviceID and Reconciler.
 func (o LightSpecOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightSpec) *string { return v.Name }).(pulumi.StringPtrOutput)
 }
@@ -1517,8 +1514,7 @@ func (o LightSpecPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 // Name is the desired human-readable Hue name. NOTE: actually renaming
 // a Hue light requires a PUT to the owning *device* resource, not this
 // light resource (a light's own metadata.name is deprecated/read-only
-// in the Hue API) - the device's RID isn't plumbed through today, so
-// enacting a Name change is deferred along with the rest of enactment.
+// in the Hue API) - see Status.DeviceID and Reconciler.
 func (o LightSpecPtrOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightSpec) *string {
 		if v == nil {
@@ -1544,9 +1540,9 @@ func (o LightSpecPtrOutput) On() pulumi.BoolPtrOutput {
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpecPatch struct {
 	// Brightness is the desired percentage (0-100), or -1 if the light
 	// doesn't support dimming - same sentinel convention as
@@ -1561,8 +1557,7 @@ type LightSpecPatch struct {
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
 	// light resource (a light's own metadata.name is deprecated/read-only
-	// in the Hue API) - the device's RID isn't plumbed through today, so
-	// enacting a Name change is deferred along with the rest of enactment.
+	// in the Hue API) - see Status.DeviceID and Reconciler.
 	Name *string `pulumi:"name"`
 	// On is the desired on/off state.
 	On *bool `pulumi:"on"`
@@ -1585,9 +1580,9 @@ type LightSpecPatchInput interface {
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpecPatchArgs struct {
 	// Brightness is the desired percentage (0-100), or -1 if the light
 	// doesn't support dimming - same sentinel convention as
@@ -1602,8 +1597,7 @@ type LightSpecPatchArgs struct {
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
 	// light resource (a light's own metadata.name is deprecated/read-only
-	// in the Hue API) - the device's RID isn't plumbed through today, so
-	// enacting a Name change is deferred along with the rest of enactment.
+	// in the Hue API) - see Status.DeviceID and Reconciler.
 	Name pulumi.StringPtrInput `pulumi:"name"`
 	// On is the desired on/off state.
 	On pulumi.BoolPtrInput `pulumi:"on"`
@@ -1668,9 +1662,9 @@ func (i *lightSpecPatchPtrType) ToLightSpecPatchPtrOutputWithContext(ctx context
 // internal/lightscontroller/poller.go) - after which the poller never
 // touches it again. Any later difference between Spec and Status
 // therefore reflects either a user edit (kubectl edit/apply) or a change
-// made directly at the bridge/app. Reconciling that difference back onto
-// the physical bridge is future work (see internal/lightscontroller.
-// Reconciler); today the controller only reports (dry-run) the drift.
+// made directly at the bridge/app. internal/lightscontroller.Reconciler
+// enacts that difference back onto the physical bridge (unless run with
+// --dry-run, which only logs it).
 type LightSpecPatchOutput struct{ *pulumi.OutputState }
 
 func (LightSpecPatchOutput) ElementType() reflect.Type {
@@ -1717,8 +1711,7 @@ func (o LightSpecPatchOutput) ColorTempK() pulumi.IntPtrOutput {
 // Name is the desired human-readable Hue name. NOTE: actually renaming
 // a Hue light requires a PUT to the owning *device* resource, not this
 // light resource (a light's own metadata.name is deprecated/read-only
-// in the Hue API) - the device's RID isn't plumbed through today, so
-// enacting a Name change is deferred along with the rest of enactment.
+// in the Hue API) - see Status.DeviceID and Reconciler.
 func (o LightSpecPatchOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightSpecPatch) *string { return v.Name }).(pulumi.StringPtrOutput)
 }
@@ -1789,8 +1782,7 @@ func (o LightSpecPatchPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 // Name is the desired human-readable Hue name. NOTE: actually renaming
 // a Hue light requires a PUT to the owning *device* resource, not this
 // light resource (a light's own metadata.name is deprecated/read-only
-// in the Hue API) - the device's RID isn't plumbed through today, so
-// enacting a Name change is deferred along with the rest of enactment.
+// in the Hue API) - see Status.DeviceID and Reconciler.
 func (o LightSpecPatchPtrOutput) Name() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightSpecPatch) *string {
 		if v == nil {
@@ -1827,8 +1819,20 @@ type LightStatus struct {
 	// doesn't support color temperature - same sentinel convention as
 	// hue.Light.ColorTempK.
 	ColorTempK *int `pulumi:"colorTempK"`
+	// DeviceID is the RID of the device owning this light - needed to
+	// enact Name changes, which the light resource's own PUT doesn't
+	// support (see Reconciler).
+	DeviceId *string `pulumi:"deviceId"`
+	// EnactError is the most recent enactment failure, or "" if the last
+	// attempt succeeded (or none has been made, or nothing currently
+	// differs between Spec and Status).
+	EnactError *string `pulumi:"enactError"`
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType *string `pulumi:"fixtureType"`
+	// LastEnactAttempt is when the controller last attempted to push Spec
+	// to the bridge (success or failure) - also the debounce clock:
+	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	LastEnactAttempt *string `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
 	LastSynced *string `pulumi:"lastSynced"`
@@ -1876,8 +1880,20 @@ type LightStatusArgs struct {
 	// doesn't support color temperature - same sentinel convention as
 	// hue.Light.ColorTempK.
 	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// DeviceID is the RID of the device owning this light - needed to
+	// enact Name changes, which the light resource's own PUT doesn't
+	// support (see Reconciler).
+	DeviceId pulumi.StringPtrInput `pulumi:"deviceId"`
+	// EnactError is the most recent enactment failure, or "" if the last
+	// attempt succeeded (or none has been made, or nothing currently
+	// differs between Spec and Status).
+	EnactError pulumi.StringPtrInput `pulumi:"enactError"`
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType pulumi.StringPtrInput `pulumi:"fixtureType"`
+	// LastEnactAttempt is when the controller last attempted to push Spec
+	// to the bridge (success or failure) - also the debounce clock:
+	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	LastEnactAttempt pulumi.StringPtrInput `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
@@ -2002,9 +2018,30 @@ func (o LightStatusOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v LightStatus) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
 }
 
+// DeviceID is the RID of the device owning this light - needed to
+// enact Name changes, which the light resource's own PUT doesn't
+// support (see Reconciler).
+func (o LightStatusOutput) DeviceId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatus) *string { return v.DeviceId }).(pulumi.StringPtrOutput)
+}
+
+// EnactError is the most recent enactment failure, or "" if the last
+// attempt succeeded (or none has been made, or nothing currently
+// differs between Spec and Status).
+func (o LightStatusOutput) EnactError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatus) *string { return v.EnactError }).(pulumi.StringPtrOutput)
+}
+
 // FixtureType is the light's archetype, e.g. "recessed ceiling".
 func (o LightStatusOutput) FixtureType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightStatus) *string { return v.FixtureType }).(pulumi.StringPtrOutput)
+}
+
+// LastEnactAttempt is when the controller last attempted to push Spec
+// to the bridge (success or failure) - also the debounce clock:
+// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+func (o LightStatusOutput) LastEnactAttempt() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatus) *string { return v.LastEnactAttempt }).(pulumi.StringPtrOutput)
 }
 
 // LastSynced is when this status was last successfully updated from
@@ -2112,6 +2149,30 @@ func (o LightStatusPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+// DeviceID is the RID of the device owning this light - needed to
+// enact Name changes, which the light resource's own PUT doesn't
+// support (see Reconciler).
+func (o LightStatusPtrOutput) DeviceId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.DeviceId
+	}).(pulumi.StringPtrOutput)
+}
+
+// EnactError is the most recent enactment failure, or "" if the last
+// attempt succeeded (or none has been made, or nothing currently
+// differs between Spec and Status).
+func (o LightStatusPtrOutput) EnactError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.EnactError
+	}).(pulumi.StringPtrOutput)
+}
+
 // FixtureType is the light's archetype, e.g. "recessed ceiling".
 func (o LightStatusPtrOutput) FixtureType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightStatus) *string {
@@ -2119,6 +2180,18 @@ func (o LightStatusPtrOutput) FixtureType() pulumi.StringPtrOutput {
 			return nil
 		}
 		return v.FixtureType
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastEnactAttempt is when the controller last attempted to push Spec
+// to the bridge (success or failure) - also the debounce clock:
+// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+func (o LightStatusPtrOutput) LastEnactAttempt() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEnactAttempt
 	}).(pulumi.StringPtrOutput)
 }
 
@@ -2204,8 +2277,20 @@ type LightStatusPatch struct {
 	// doesn't support color temperature - same sentinel convention as
 	// hue.Light.ColorTempK.
 	ColorTempK *int `pulumi:"colorTempK"`
+	// DeviceID is the RID of the device owning this light - needed to
+	// enact Name changes, which the light resource's own PUT doesn't
+	// support (see Reconciler).
+	DeviceId *string `pulumi:"deviceId"`
+	// EnactError is the most recent enactment failure, or "" if the last
+	// attempt succeeded (or none has been made, or nothing currently
+	// differs between Spec and Status).
+	EnactError *string `pulumi:"enactError"`
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType *string `pulumi:"fixtureType"`
+	// LastEnactAttempt is when the controller last attempted to push Spec
+	// to the bridge (success or failure) - also the debounce clock:
+	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	LastEnactAttempt *string `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
 	LastSynced *string `pulumi:"lastSynced"`
@@ -2253,8 +2338,20 @@ type LightStatusPatchArgs struct {
 	// doesn't support color temperature - same sentinel convention as
 	// hue.Light.ColorTempK.
 	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// DeviceID is the RID of the device owning this light - needed to
+	// enact Name changes, which the light resource's own PUT doesn't
+	// support (see Reconciler).
+	DeviceId pulumi.StringPtrInput `pulumi:"deviceId"`
+	// EnactError is the most recent enactment failure, or "" if the last
+	// attempt succeeded (or none has been made, or nothing currently
+	// differs between Spec and Status).
+	EnactError pulumi.StringPtrInput `pulumi:"enactError"`
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType pulumi.StringPtrInput `pulumi:"fixtureType"`
+	// LastEnactAttempt is when the controller last attempted to push Spec
+	// to the bridge (success or failure) - also the debounce clock:
+	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	LastEnactAttempt pulumi.StringPtrInput `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
@@ -2379,9 +2476,30 @@ func (o LightStatusPatchOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v LightStatusPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
 }
 
+// DeviceID is the RID of the device owning this light - needed to
+// enact Name changes, which the light resource's own PUT doesn't
+// support (see Reconciler).
+func (o LightStatusPatchOutput) DeviceId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatusPatch) *string { return v.DeviceId }).(pulumi.StringPtrOutput)
+}
+
+// EnactError is the most recent enactment failure, or "" if the last
+// attempt succeeded (or none has been made, or nothing currently
+// differs between Spec and Status).
+func (o LightStatusPatchOutput) EnactError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatusPatch) *string { return v.EnactError }).(pulumi.StringPtrOutput)
+}
+
 // FixtureType is the light's archetype, e.g. "recessed ceiling".
 func (o LightStatusPatchOutput) FixtureType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightStatusPatch) *string { return v.FixtureType }).(pulumi.StringPtrOutput)
+}
+
+// LastEnactAttempt is when the controller last attempted to push Spec
+// to the bridge (success or failure) - also the debounce clock:
+// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+func (o LightStatusPatchOutput) LastEnactAttempt() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v LightStatusPatch) *string { return v.LastEnactAttempt }).(pulumi.StringPtrOutput)
 }
 
 // LastSynced is when this status was last successfully updated from
@@ -2489,6 +2607,30 @@ func (o LightStatusPatchPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 	}).(pulumi.IntPtrOutput)
 }
 
+// DeviceID is the RID of the device owning this light - needed to
+// enact Name changes, which the light resource's own PUT doesn't
+// support (see Reconciler).
+func (o LightStatusPatchPtrOutput) DeviceId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.DeviceId
+	}).(pulumi.StringPtrOutput)
+}
+
+// EnactError is the most recent enactment failure, or "" if the last
+// attempt succeeded (or none has been made, or nothing currently
+// differs between Spec and Status).
+func (o LightStatusPatchPtrOutput) EnactError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.EnactError
+	}).(pulumi.StringPtrOutput)
+}
+
 // FixtureType is the light's archetype, e.g. "recessed ceiling".
 func (o LightStatusPatchPtrOutput) FixtureType() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightStatusPatch) *string {
@@ -2496,6 +2638,18 @@ func (o LightStatusPatchPtrOutput) FixtureType() pulumi.StringPtrOutput {
 			return nil
 		}
 		return v.FixtureType
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastEnactAttempt is when the controller last attempted to push Spec
+// to the bridge (success or failure) - also the debounce clock:
+// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+func (o LightStatusPatchPtrOutput) LastEnactAttempt() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *LightStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEnactAttempt
 	}).(pulumi.StringPtrOutput)
 }
 
