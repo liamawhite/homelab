@@ -1,12 +1,3 @@
-// Package applications groups the Pulumi deploy-time wiring for
-// applications/lights-controller's two binaries: building the one shared
-// image they both run from, and deploying hub-controller and
-// lights-controller against it. The controllers' own component
-// implementations stay in pkg/components/{hubcontroller,lightscontroller}
-// (same convention as every other component in this repo); this file only
-// groups the Hue-specific orchestration that pkg/deploy/deploy.go would
-// otherwise have spread inline across itself alongside every unrelated
-// component.
 package applications
 
 import (
@@ -27,13 +18,71 @@ import (
 
 const lightsControllerImageName = "ghcr.io/liamawhite/lights-controller"
 
-// defaultGroups are the Group CRs InstallLights seeds with an empty
-// membership list - just the named rooms/areas known to exist today.
-// Which Lights actually belong to each is left for kubectl edit
-// afterward (see createDefaultGroups' IgnoreChanges), the same "declare
-// the identity, let something else own the mutable content" split
-// Switch.Spec.Bindings already relies on.
-var defaultGroups = []string{"living-space", "main-bedroom", "front-office", "external-office"}
+// defaultGroups are the Group CRs NewLights seeds - the named rooms/areas
+// known to exist today, with each one's exact Light membership declared
+// here as the single source of truth (same "declared in code, not
+// hand-edited live" convention as infra.yaml's lights.hue.bridges for
+// HueBridge). Groups with no known membership yet are left with an empty
+// Lights list.
+var defaultGroups = []struct {
+	Name   string
+	Lights []string
+}{
+	{
+		Name: "living-space",
+		Lights: []string{
+			"c535e296-856a-4f5b-8d9f-bf0bc51ded05", // Kitchen Dryer
+			"a9a33139-495b-4a68-a9b0-c2d377cbda10", // Kitchen Island
+			"ba3b815d-96e0-4f49-9527-4c88c9961edc", // Kitchen Island
+			"d289f279-7ce4-45a6-bd69-0ad2d8a46786", // Kitchen Microwave
+			"0064ad7e-0d1f-478c-a380-330c0e3d5866", // Kitchen Sink
+			"af886699-c462-4d60-9ac7-57ea1d46ff91", // Kitchen Sink
+			"0fa8827c-6085-4d1e-8e19-295ca11be3a4", // Living Room 1
+			"6b1df6d3-d138-42f9-b7e9-d48b5e499500", // Living Room Bedroom
+			"00dafbef-8d78-4d58-8651-2f919325d663", // Living Room Hallway
+			"bfcfcd15-b673-4a2d-9055-7b929ee2837a", // Living Room TV
+			"1082961a-79da-488a-92c5-cd2a4173ca2f", // TV Center
+			"c4699e76-6f49-489d-b723-3b0c8986489e", // TV Left
+			"4700b1c0-1b13-4f09-82a1-2739b0eadd1c", // TV Right
+		},
+	},
+	{
+		Name: "main-bedroom",
+		Lights: []string{
+			"523d3d33-e24d-4f6f-99d9-204ca10b1f37", // Main Bedroom Ceiling
+			"e4c3b4dd-88d6-46ba-894a-be18f020d7e9", // Main Bedroom (Tia)
+			"fe7b9822-3b69-4f76-ad7b-cbbbce16df57", // Main Bedroom (Liam)
+		},
+	},
+	{
+		Name: "front-office",
+		Lights: []string{
+			"8f69d609-4faf-4f5b-ae89-eb7f316042ba", // Liam Office Ceiling
+		},
+	},
+	{
+		Name: "external-office",
+		Lights: []string{
+			"0af7838d-8570-44f1-a744-7ef5030334ae", // Pendant Light
+			"9fa61050-79bc-4b1e-aa5a-81b85f45458b", // Ceiling Main
+			"442d9f3a-c33e-4be2-ab35-d764afadb0a9", // Ceiling Top
+			"74090b6f-1035-46b0-a5d7-91dc8e04f892", // Monitor Left
+			"b2c9cdfc-9f9b-4729-985c-7d2c9c15dc54", // Monitor Right
+		},
+	},
+	{
+		Name: "external-front",
+		Lights: []string{
+			"a5bfd741-d400-4ee6-8d7f-466209ec8ee2", // Door Lantern
+		},
+	},
+	{
+		Name: "back-bedroom",
+		Lights: []string{
+			"5ed5f32b-cdce-4937-bce4-0d430ed6406e", // Baby Ceiling
+		},
+	},
+}
 
 // BuildLightsControllerImage builds and pushes the ONE shared image
 // containing both applications/lights-controller/cmd/lights-controller
@@ -133,7 +182,7 @@ func BuildLightsControllerImage(ctx *pulumi.Context, name, ghcrUsername, ghcrTok
 	}, opts...)
 }
 
-// LightsArgs is what InstallLights needs to build the shared image and
+// LightsArgs is what NewLights needs to build the shared image and
 // deploy both hub-controller and lights-controller against it.
 type LightsArgs struct {
 	// Namespace is created centrally by pkg/deploy/namespaces.go and
@@ -154,14 +203,20 @@ type LightsArgs struct {
 	DryRun pulumi.BoolInput
 }
 
-// Lights groups the two Hue-related deployments and the one shared image
-// they both run.
+// Lights groups the Hue-specific deploy-time wiring: building the one
+// shared image applications/lights-controller's two binaries both run
+// from, and deploying hub-controller and lights-controller against it.
+// The controllers' own component implementations stay in
+// pkg/components/{hubcontroller,lightscontroller} (same convention as
+// every other component in this repo) - this just groups the orchestration
+// pkg/deploy/deploy.go would otherwise have spread inline across itself
+// alongside every unrelated component.
 type Lights struct {
 	HubController    *hubcontroller.HubController
 	LightsController *lightscontroller.LightsController
 }
 
-// InstallLights builds the shared lights-controller/hub-controller image
+// NewLights builds the shared lights-controller/hub-controller image
 // once, then deploys both components against it. hub-controller has no
 // DependsOn on lights-controller or vice versa: they only interact at
 // runtime via the Kubernetes API (a missing/unreachable HueBridge is
@@ -175,7 +230,7 @@ type Lights struct {
 // (parent name + these child names), so renaming them here would delete
 // and recreate every real Deployment/RBAC object/HueBridge CR underneath
 // for no reason.
-func InstallLights(ctx *pulumi.Context, args *LightsArgs, opts ...pulumi.ResourceOption) (*Lights, error) {
+func NewLights(ctx *pulumi.Context, args *LightsArgs, opts ...pulumi.ResourceOption) (*Lights, error) {
 	image, err := BuildLightsControllerImage(ctx, "lights-controller-image", args.GHCRUsername, args.GHCRToken, opts...)
 	if err != nil {
 		return nil, err
@@ -210,23 +265,22 @@ func InstallLights(ctx *pulumi.Context, args *LightsArgs, opts ...pulumi.Resourc
 	return &Lights{HubController: hub, LightsController: lc}, nil
 }
 
-// createDefaultGroups seeds each of defaultGroups with an empty Lights
-// list if it doesn't already exist. IgnoreChanges("spec") means this only
-// ever sets Spec on first creation - populating a group's actual Light
-// names is left to kubectl edit, and is never reverted by a later `up`.
+// createDefaultGroups creates (or updates) each of defaultGroups with its
+// declared Lights list - Pulumi is authoritative for Spec here, the same
+// way it already is for HueBridge, so a later `up` corrects any out-of-band
+// edit back to what's declared above rather than ignoring it.
 func createDefaultGroups(ctx *pulumi.Context, opts ...pulumi.ResourceOption) error {
-	for _, name := range defaultGroups {
-		groupOpts := append([]pulumi.ResourceOption{pulumi.IgnoreChanges([]string{"spec"})}, opts...)
-		_, err := lightsv1alpha1.NewGroup(ctx, fmt.Sprintf("group-%s", name), &lightsv1alpha1.GroupArgs{
+	for _, group := range defaultGroups {
+		_, err := lightsv1alpha1.NewGroup(ctx, fmt.Sprintf("group-%s", group.Name), &lightsv1alpha1.GroupArgs{
 			Metadata: &metav1.ObjectMetaArgs{
-				Name: pulumi.String(name),
+				Name: pulumi.String(group.Name),
 			},
 			Spec: &lightsv1alpha1.GroupSpecArgs{
-				Lights: pulumi.StringArray{},
+				Lights: pulumi.ToStringArray(group.Lights),
 			},
-		}, groupOpts...)
+		}, opts...)
 		if err != nil {
-			return fmt.Errorf("failed to create group %q: %w", name, err)
+			return fmt.Errorf("failed to create group %q: %w", group.Name, err)
 		}
 	}
 	return nil

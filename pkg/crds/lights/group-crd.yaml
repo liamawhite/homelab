@@ -15,6 +15,9 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .status.lightCount
+      name: Lights
+      type: integer
     - jsonPath: .status.missingLights
       name: Missing
       type: string
@@ -68,6 +71,15 @@ spec:
                 description: LastSynced is when this status was last recomputed.
                 format: date-time
                 type: string
+              lightCount:
+                description: |-
+                  LightCount is len(Spec.Lights) - kept in Status (rather than only
+                  computed client-side) purely so kubectl can print it as a column:
+                  a CRD printer column's JSONPath can only select an existing field,
+                  not derive one (e.g. no len()), so there's nowhere else to source
+                  this from.
+                format: int32
+                type: integer
               missingLights:
                 description: |-
                   MissingLights are entries in Spec.Lights that don't currently match

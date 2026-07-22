@@ -6,7 +6,6 @@
 package deploy
 
 import (
-	lightsapp "github.com/liamawhite/homelab/applications"
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
 	"github.com/liamawhite/homelab/pkg/components/cilium"
 	accessjwt "github.com/liamawhite/homelab/pkg/components/cloudflare/accessjwt"
@@ -298,11 +297,12 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 
 		// Builds the shared lights-controller/hub-controller image and
-		// deploys both against it (see applications/lights.go for the full
-		// reasoning, including hub-controller's HostNetwork: true and why
-		// there's no DependsOn between the two components - they only
-		// interact at runtime via the Kubernetes API, not at deploy time).
-		_, err = lightsapp.InstallLights(ctx, &lightsapp.LightsArgs{
+		// deploys both against it (see pkg/deploy/applications/lights.go
+		// for the full reasoning, including hub-controller's
+		// HostNetwork: true and why there's no DependsOn between the two
+		// components - they only interact at runtime via the Kubernetes
+		// API, not at deploy time).
+		_, err = applications.NewLights(ctx, &applications.LightsArgs{
 			Namespace:       lightsNS.Metadata.Name().Elem(),
 			Bridges:         infraCfg.Lights.Hue.Bridges,
 			GHCRUsername:    infraCfg.GHCR.Username,
@@ -311,9 +311,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			// Now a drift safety net behind the real-time eventstream path,
 			// not the primary sync mechanism.
 			LightsPollInterval: pulumi.String("30s"),
-			// Enactment enabled - the reconciler pushes Light.Spec changes
-			// to the physical bridge instead of only logging drift.
-			DryRun: pulumi.Bool(false),
+			// Dry-run: the reconciler only logs Light.Spec drift instead of
+			// pushing it to the physical bridge. Scoped entirely to
+			// lightscontroller.Reconciler - doesn't affect hub-controller,
+			// Switch, or Group at all.
+			DryRun: pulumi.Bool(true),
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp}),
 		)

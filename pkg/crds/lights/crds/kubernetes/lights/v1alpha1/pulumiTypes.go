@@ -620,6 +620,12 @@ func (o GroupSpecPatchPtrOutput) Lights() pulumi.StringArrayOutput {
 type GroupStatus struct {
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
+	// LightCount is len(Spec.Lights) - kept in Status (rather than only
+	// computed client-side) purely so kubectl can print it as a column:
+	// a CRD printer column's JSONPath can only select an existing field,
+	// not derive one (e.g. no len()), so there's nowhere else to source
+	// this from.
+	LightCount *int `pulumi:"lightCount"`
 	// MissingLights are entries in Spec.Lights that don't currently match
 	// any Light CR name.
 	MissingLights []string `pulumi:"missingLights"`
@@ -641,6 +647,12 @@ type GroupStatusInput interface {
 type GroupStatusArgs struct {
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// LightCount is len(Spec.Lights) - kept in Status (rather than only
+	// computed client-side) purely so kubectl can print it as a column:
+	// a CRD printer column's JSONPath can only select an existing field,
+	// not derive one (e.g. no len()), so there's nowhere else to source
+	// this from.
+	LightCount pulumi.IntPtrInput `pulumi:"lightCount"`
 	// MissingLights are entries in Spec.Lights that don't currently match
 	// any Light CR name.
 	MissingLights pulumi.StringArrayInput `pulumi:"missingLights"`
@@ -730,6 +742,15 @@ func (o GroupStatusOutput) LastSynced() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
 }
 
+// LightCount is len(Spec.Lights) - kept in Status (rather than only
+// computed client-side) purely so kubectl can print it as a column:
+// a CRD printer column's JSONPath can only select an existing field,
+// not derive one (e.g. no len()), so there's nowhere else to source
+// this from.
+func (o GroupStatusOutput) LightCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v GroupStatus) *int { return v.LightCount }).(pulumi.IntPtrOutput)
+}
+
 // MissingLights are entries in Spec.Lights that don't currently match
 // any Light CR name.
 func (o GroupStatusOutput) MissingLights() pulumi.StringArrayOutput {
@@ -770,6 +791,20 @@ func (o GroupStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
+// LightCount is len(Spec.Lights) - kept in Status (rather than only
+// computed client-side) purely so kubectl can print it as a column:
+// a CRD printer column's JSONPath can only select an existing field,
+// not derive one (e.g. no len()), so there's nowhere else to source
+// this from.
+func (o GroupStatusPtrOutput) LightCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *GroupStatus) *int {
+		if v == nil {
+			return nil
+		}
+		return v.LightCount
+	}).(pulumi.IntPtrOutput)
+}
+
 // MissingLights are entries in Spec.Lights that don't currently match
 // any Light CR name.
 func (o GroupStatusPtrOutput) MissingLights() pulumi.StringArrayOutput {
@@ -786,6 +821,12 @@ func (o GroupStatusPtrOutput) MissingLights() pulumi.StringArrayOutput {
 type GroupStatusPatch struct {
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
+	// LightCount is len(Spec.Lights) - kept in Status (rather than only
+	// computed client-side) purely so kubectl can print it as a column:
+	// a CRD printer column's JSONPath can only select an existing field,
+	// not derive one (e.g. no len()), so there's nowhere else to source
+	// this from.
+	LightCount *int `pulumi:"lightCount"`
 	// MissingLights are entries in Spec.Lights that don't currently match
 	// any Light CR name.
 	MissingLights []string `pulumi:"missingLights"`
@@ -807,6 +848,12 @@ type GroupStatusPatchInput interface {
 type GroupStatusPatchArgs struct {
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// LightCount is len(Spec.Lights) - kept in Status (rather than only
+	// computed client-side) purely so kubectl can print it as a column:
+	// a CRD printer column's JSONPath can only select an existing field,
+	// not derive one (e.g. no len()), so there's nowhere else to source
+	// this from.
+	LightCount pulumi.IntPtrInput `pulumi:"lightCount"`
 	// MissingLights are entries in Spec.Lights that don't currently match
 	// any Light CR name.
 	MissingLights pulumi.StringArrayInput `pulumi:"missingLights"`
@@ -896,6 +943,15 @@ func (o GroupStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
 }
 
+// LightCount is len(Spec.Lights) - kept in Status (rather than only
+// computed client-side) purely so kubectl can print it as a column:
+// a CRD printer column's JSONPath can only select an existing field,
+// not derive one (e.g. no len()), so there's nowhere else to source
+// this from.
+func (o GroupStatusPatchOutput) LightCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v GroupStatusPatch) *int { return v.LightCount }).(pulumi.IntPtrOutput)
+}
+
 // MissingLights are entries in Spec.Lights that don't currently match
 // any Light CR name.
 func (o GroupStatusPatchOutput) MissingLights() pulumi.StringArrayOutput {
@@ -934,6 +990,20 @@ func (o GroupStatusPatchPtrOutput) LastSynced() pulumi.StringPtrOutput {
 		}
 		return v.LastSynced
 	}).(pulumi.StringPtrOutput)
+}
+
+// LightCount is len(Spec.Lights) - kept in Status (rather than only
+// computed client-side) purely so kubectl can print it as a column:
+// a CRD printer column's JSONPath can only select an existing field,
+// not derive one (e.g. no len()), so there's nowhere else to source
+// this from.
+func (o GroupStatusPatchPtrOutput) LightCount() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *GroupStatusPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.LightCount
+	}).(pulumi.IntPtrOutput)
 }
 
 // MissingLights are entries in Spec.Lights that don't currently match

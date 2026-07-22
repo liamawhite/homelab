@@ -1,6 +1,5 @@
 // Package groupcontroller implements the Reconciler that keeps a Group's
-// Status.MissingLights in sync with which of its Spec.Lights currently
-// resolve to a real Light CR.
+// Status.MissingLights/LightCount in sync with Spec.Lights.
 package groupcontroller
 
 import (
@@ -53,11 +52,13 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	}
 
 	missing := missingLights(group.Spec.Lights, existing)
-	if slices.Equal(group.Status.MissingLights, missing) {
+	count := int32(len(group.Spec.Lights))
+	if slices.Equal(group.Status.MissingLights, missing) && group.Status.LightCount == count {
 		return ctrl.Result{}, nil
 	}
 
 	group.Status.MissingLights = missing
+	group.Status.LightCount = count
 	group.Status.LastSynced = metav1.Now()
 	if err := r.Client.Status().Update(ctx, &group); err != nil {
 		logger.Error(err, "failed to update group status", "group", group.Name)

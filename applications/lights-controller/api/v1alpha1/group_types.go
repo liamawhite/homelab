@@ -20,6 +20,12 @@ type GroupStatus struct {
 	// MissingLights are entries in Spec.Lights that don't currently match
 	// any Light CR name.
 	MissingLights []string `json:"missingLights,omitempty"`
+	// LightCount is len(Spec.Lights) - kept in Status (rather than only
+	// computed client-side) purely so kubectl can print it as a column:
+	// a CRD printer column's JSONPath can only select an existing field,
+	// not derive one (e.g. no len()), so there's nowhere else to source
+	// this from.
+	LightCount int32 `json:"lightCount,omitempty"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced metav1.Time `json:"lastSynced,omitempty"`
 }
@@ -27,6 +33,7 @@ type GroupStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster
+// +kubebuilder:printcolumn:name="Lights",type="integer",JSONPath=".status.lightCount"
 // +kubebuilder:printcolumn:name="Missing",type="string",JSONPath=".status.missingLights"
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
