@@ -46,7 +46,7 @@ type LightsControllerArgs struct {
 	// reviewable change here rather than a side effect of a new image.
 	DryRun pulumi.BoolInput
 	// Image is the shared lights-controller/hub-controller image
-	// (built once in pkg/deploy/image.go and passed to both components).
+	// (built once in applications/lights.go and passed to both components).
 	Image pulumi.StringInput
 }
 
@@ -107,6 +107,19 @@ func NewLightsController(ctx *pulumi.Context, name string, args *LightsControlle
 			&rbacv1.PolicyRuleArgs{
 				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
 				Resources: pulumi.StringArray{pulumi.String("switches/status")},
+				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				Resources: pulumi.StringArray{pulumi.String("groups")},
+				Verbs: pulumi.StringArray{
+					pulumi.String("get"), pulumi.String("list"), pulumi.String("watch"),
+					pulumi.String("create"), pulumi.String("update"), pulumi.String("patch"), pulumi.String("delete"),
+				},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				Resources: pulumi.StringArray{pulumi.String("groups/status")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
 			},
 			// Read-only: hub-controller (pkg/components/hubcontroller) owns
@@ -227,7 +240,7 @@ func NewLightsController(ctx *pulumi.Context, name string, args *LightsControlle
 	// 5. Deployment. Single replica - leader election (see the lease
 	// RBAC above) makes more than one safe later, but nothing needs it
 	// yet. Image is the shared lights-controller/hub-controller image
-	// (see pkg/deploy/image.go) - Command picks which of its two binaries
+	// (see applications/lights.go) - Command picks which of its two binaries
 	// this Deployment actually runs.
 	const volumeName = "hue-bridges"
 	const mountPath = "/etc/lights-controller"

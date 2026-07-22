@@ -55,7 +55,10 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			if err := r.applyToLight(ctx, lightName, binding.Action); err != nil {
 				logger.Error(err, "failed to apply switch action to light",
 					"switch", sw.Name, "light", lightName, "event", sw.Status.LastEvent)
+				continue
 			}
+			logger.Info("applied switch action to light",
+				"switch", sw.Name, "light", lightName, "event", sw.Status.LastEvent)
 		}
 	}
 

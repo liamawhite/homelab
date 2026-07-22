@@ -60,7 +60,9 @@ func (c *EventConsumer) handleEvent(ctx context.Context, logger logr.Logger, ev 
 	light.Status = mergeLightStatus(light.Status, ev, metav1.Now())
 	if err := c.Client.Status().Update(ctx, &light); err != nil {
 		logger.Error(err, "failed to update light status from event", "light", ev.LightID)
+		return
 	}
+	logger.Info("light event received", "light", ev.LightID, "on", ev.On, "brightness", ev.Brightness, "color", ev.Color, "colorTempK", ev.ColorTempK)
 }
 
 // mergeLightStatus computes light's next Status after a (possibly

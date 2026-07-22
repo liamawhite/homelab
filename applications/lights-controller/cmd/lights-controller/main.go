@@ -17,6 +17,7 @@ import (
 	lightsv1alpha1 "github.com/liamawhite/lights-controller/api/v1alpha1"
 	"github.com/liamawhite/lights-controller/internal/bridges"
 	"github.com/liamawhite/lights-controller/internal/eventstream"
+	"github.com/liamawhite/lights-controller/internal/groupcontroller"
 	"github.com/liamawhite/lights-controller/internal/lightscontroller"
 	"github.com/liamawhite/lights-controller/internal/switchcontroller"
 
@@ -138,6 +139,15 @@ func main() {
 		For(&lightsv1alpha1.Switch{}).
 		Complete(&switchcontroller.Reconciler{Client: mgr.GetClient()}); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to register switch reconciler: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Group has no bridge-side state to sync from, so it's just a watch-
+	// driven reconciler - no Poller/EventConsumer.
+	if err := ctrl.NewControllerManagedBy(mgr).
+		For(&lightsv1alpha1.Group{}).
+		Complete(&groupcontroller.Reconciler{Client: mgr.GetClient()}); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to register group reconciler: %v\n", err)
 		os.Exit(1)
 	}
 

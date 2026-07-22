@@ -21,6 +21,12 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
+	case "kubernetes:lights.homelab.internal/v1alpha1:Group":
+		r = &Group{}
+	case "kubernetes:lights.homelab.internal/v1alpha1:GroupList":
+		r = &GroupList{}
+	case "kubernetes:lights.homelab.internal/v1alpha1:GroupPatch":
+		r = &GroupPatch{}
 	case "kubernetes:lights.homelab.internal/v1alpha1:HueBridge":
 		r = &HueBridge{}
 	case "kubernetes:lights.homelab.internal/v1alpha1:HueBridgeList":

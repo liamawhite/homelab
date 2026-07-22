@@ -77,7 +77,7 @@ type HubControllerArgs struct {
 	// round, e.g. "60s".
 	PollInterval pulumi.StringInput
 	// Image is the shared lights-controller/hub-controller image
-	// (built once in pkg/deploy/image.go and passed to both components).
+	// (built once in applications/lights.go and passed to both components).
 	Image pulumi.StringInput
 }
 
@@ -234,7 +234,7 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 	// correct default for a hostNetwork pod regardless). Single replica -
 	// leader election (see the lease RBAC above) makes more than one safe
 	// later, but nothing needs it yet. Image is the shared
-	// lights-controller/hub-controller image (see pkg/deploy/image.go) -
+	// lights-controller/hub-controller image (see applications/lights.go) -
 	// Command picks which of its two binaries this Deployment runs. No
 	// mounted config: which bridges to sync comes from listing HueBridge
 	// CRs directly (step 4 above), not a bridges.json file.

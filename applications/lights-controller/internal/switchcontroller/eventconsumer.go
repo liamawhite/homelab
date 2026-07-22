@@ -65,5 +65,7 @@ func (c *EventConsumer) handleEvent(ctx context.Context, logger logr.Logger, ev 
 	sw.Status.LastEventTime = metav1.NewTime(ev.Time)
 	if err := c.Client.Status().Update(ctx, &sw); err != nil {
 		logger.Error(err, "failed to update switch status from event", "switch", ev.ButtonID, "event", ev.Event)
+		return
 	}
+	logger.Info("switch event received", "switch", ev.ButtonID, "event", ev.Event, "time", ev.Time)
 }

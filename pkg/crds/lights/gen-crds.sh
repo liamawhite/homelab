@@ -32,8 +32,9 @@ trap 'rm -rf "${TMP_DIR}"' EXIT
 mv "${TMP_DIR}/lights.homelab.internal_lights.yaml" "${SCRIPT_DIR}/light-crd.yaml"
 mv "${TMP_DIR}/lights.homelab.internal_huebridges.yaml" "${SCRIPT_DIR}/huebridge-crd.yaml"
 mv "${TMP_DIR}/lights.homelab.internal_switches.yaml" "${SCRIPT_DIR}/switch-crd.yaml"
+mv "${TMP_DIR}/lights.homelab.internal_groups.yaml" "${SCRIPT_DIR}/group-crd.yaml"
 
 echo "Generating Pulumi Go types from CRDs..."
-(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml)
+(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml group-crd.yaml)
 
 echo "Successfully generated Light/HueBridge CRD types!"

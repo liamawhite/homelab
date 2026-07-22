@@ -6,6 +6,7 @@
 package deploy
 
 import (
+	lightsapp "github.com/liamawhite/homelab/applications"
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
 	"github.com/liamawhite/homelab/pkg/components/cilium"
 	accessjwt "github.com/liamawhite/homelab/pkg/components/cloudflare/accessjwt"
@@ -13,10 +14,8 @@ import (
 	cftunnel "github.com/liamawhite/homelab/pkg/components/cloudflare/tunnel"
 	"github.com/liamawhite/homelab/pkg/components/dns"
 	"github.com/liamawhite/homelab/pkg/components/grafana"
-	"github.com/liamawhite/homelab/pkg/components/hubcontroller"
 	"github.com/liamawhite/homelab/pkg/components/istio"
 	"github.com/liamawhite/homelab/pkg/components/kubevip"
-	"github.com/liamawhite/homelab/pkg/components/lightscontroller"
 	"github.com/liamawhite/homelab/pkg/components/longhorn"
 	"github.com/liamawhite/homelab/pkg/components/prometheus"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
@@ -298,59 +297,25 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		// Shared image for both lights-controller and hub-controller below
-		// - see pkg/deploy/image.go for why this is built once rather than
-		// inside each component.
-		lightsImage, err := buildLightsControllerImage(ctx, "lights-controller-image",
-			infraCfg.GHCR.Username, infraCfg.GHCR.Token,
-			pulumi.Provider(providers.Kubernetes),
-		)
-		if err != nil {
-			return err
-		}
-
-		// Discovers Hue bridges via SSDP and publishes their IPs as
-		// HueBridge custom resources - runs HostNetwork: true since SSDP
-		// can't work from a normal pod under this cluster's CNI (confirmed
-		// live via `cilium monitor --type drop`: SSDP's M-SEARCH needs an
-		// IGMP multicast group-join first, and Cilium's eBPF datapath
-		// drops IGMP outright, "CT: Unknown L4 protocol", below the level
-		// any CiliumClusterwideNetworkPolicy rule can act on). See
-		// pkg/components/hubcontroller's package doc comment for the full
-		// reasoning, including why this is split into its own component
-		// rather than just making lights-controller itself hostNetwork.
-		_, err = hubcontroller.NewHubController(ctx, "hub-controller", &hubcontroller.HubControllerArgs{
-			Namespace:    lightsNS.Metadata.Name().Elem(),
-			Bridges:      infraCfg.Lights.Hue.Bridges,
-			PollInterval: pulumi.String("60s"),
-			Image:        lightsImage.Ref,
-		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, lightsImage}),
-		)
-		if err != nil {
-			return err
-		}
-
-		// Syncs live Hue light status into Light custom resources - fully
-		// independent of every app above; needs the API server (to manage
-		// Light CRs, read HueBridge status, and its leader-election
-		// Lease) and the Hue bridge(s) on the LAN (see
-		// pkg/components/lightscontroller/network.go). No DependsOn on
-		// hub-controller: they only interact at runtime via the
-		// Kubernetes API (a missing/unreachable HueBridge is handled
-		// gracefully), not at deploy time.
-		_, err = lightscontroller.NewLightsController(ctx, "lights-controller", &lightscontroller.LightsControllerArgs{
-			Namespace: lightsNS.Metadata.Name().Elem(),
-			Bridges:   infraCfg.Lights.Hue.Bridges,
+		// Builds the shared lights-controller/hub-controller image and
+		// deploys both against it (see applications/lights.go for the full
+		// reasoning, including hub-controller's HostNetwork: true and why
+		// there's no DependsOn between the two components - they only
+		// interact at runtime via the Kubernetes API, not at deploy time).
+		_, err = lightsapp.InstallLights(ctx, &lightsapp.LightsArgs{
+			Namespace:       lightsNS.Metadata.Name().Elem(),
+			Bridges:         infraCfg.Lights.Hue.Bridges,
+			GHCRUsername:    infraCfg.GHCR.Username,
+			GHCRToken:       infraCfg.GHCR.Token,
+			HubPollInterval: pulumi.String("60s"),
 			// Now a drift safety net behind the real-time eventstream path,
 			// not the primary sync mechanism.
-			PollInterval: pulumi.String("30s"),
+			LightsPollInterval: pulumi.String("30s"),
 			// Enactment enabled - the reconciler pushes Light.Spec changes
 			// to the physical bridge instead of only logging drift.
 			DryRun: pulumi.Bool(false),
-			Image:  lightsImage.Ref,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp, lightsImage}),
+			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp}),
 		)
 		if err != nil {
 			return err

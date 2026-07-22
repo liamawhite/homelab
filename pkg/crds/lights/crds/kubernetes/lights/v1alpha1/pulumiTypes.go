@@ -14,6 +14,939 @@ import (
 
 var _ = utilities.GetEnvOrDefault
 
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
+	Spec     *GroupSpec         `pulumi:"spec"`
+	Status   *GroupStatus       `pulumi:"status"`
+}
+
+// GroupTypeInput is an input type that accepts GroupTypeArgs and GroupTypeOutput values.
+// You can construct a concrete instance of `GroupTypeInput` via:
+//
+//	GroupTypeArgs{...}
+type GroupTypeInput interface {
+	pulumi.Input
+
+	ToGroupTypeOutput() GroupTypeOutput
+	ToGroupTypeOutputWithContext(context.Context) GroupTypeOutput
+}
+
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPtrInput `pulumi:"metadata"`
+	Spec     GroupSpecPtrInput         `pulumi:"spec"`
+	Status   GroupStatusPtrInput       `pulumi:"status"`
+}
+
+func (GroupTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupType)(nil)).Elem()
+}
+
+func (i GroupTypeArgs) ToGroupTypeOutput() GroupTypeOutput {
+	return i.ToGroupTypeOutputWithContext(context.Background())
+}
+
+func (i GroupTypeArgs) ToGroupTypeOutputWithContext(ctx context.Context) GroupTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupTypeOutput)
+}
+
+// GroupTypeArrayInput is an input type that accepts GroupTypeArray and GroupTypeArrayOutput values.
+// You can construct a concrete instance of `GroupTypeArrayInput` via:
+//
+//	GroupTypeArray{ GroupTypeArgs{...} }
+type GroupTypeArrayInput interface {
+	pulumi.Input
+
+	ToGroupTypeArrayOutput() GroupTypeArrayOutput
+	ToGroupTypeArrayOutputWithContext(context.Context) GroupTypeArrayOutput
+}
+
+type GroupTypeArray []GroupTypeInput
+
+func (GroupTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GroupType)(nil)).Elem()
+}
+
+func (i GroupTypeArray) ToGroupTypeArrayOutput() GroupTypeArrayOutput {
+	return i.ToGroupTypeArrayOutputWithContext(context.Background())
+}
+
+func (i GroupTypeArray) ToGroupTypeArrayOutputWithContext(ctx context.Context) GroupTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupTypeArrayOutput)
+}
+
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupTypeOutput struct{ *pulumi.OutputState }
+
+func (GroupTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupType)(nil)).Elem()
+}
+
+func (o GroupTypeOutput) ToGroupTypeOutput() GroupTypeOutput {
+	return o
+}
+
+func (o GroupTypeOutput) ToGroupTypeOutputWithContext(ctx context.Context) GroupTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o GroupTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o GroupTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o GroupTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
+	return o.ApplyT(func(v GroupType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
+}
+
+func (o GroupTypeOutput) Spec() GroupSpecPtrOutput {
+	return o.ApplyT(func(v GroupType) *GroupSpec { return v.Spec }).(GroupSpecPtrOutput)
+}
+
+func (o GroupTypeOutput) Status() GroupStatusPtrOutput {
+	return o.ApplyT(func(v GroupType) *GroupStatus { return v.Status }).(GroupStatusPtrOutput)
+}
+
+type GroupTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (GroupTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]GroupType)(nil)).Elem()
+}
+
+func (o GroupTypeArrayOutput) ToGroupTypeArrayOutput() GroupTypeArrayOutput {
+	return o
+}
+
+func (o GroupTypeArrayOutput) ToGroupTypeArrayOutputWithContext(ctx context.Context) GroupTypeArrayOutput {
+	return o
+}
+
+func (o GroupTypeArrayOutput) Index(i pulumi.IntInput) GroupTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) GroupType {
+		return vs[0].([]GroupType)[vs[1].(int)]
+	}).(GroupTypeOutput)
+}
+
+// GroupList is a list of Group
+type GroupListType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// List of groups. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items []GroupType `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata *metav1.ListMeta `pulumi:"metadata"`
+}
+
+// GroupListTypeInput is an input type that accepts GroupListTypeArgs and GroupListTypeOutput values.
+// You can construct a concrete instance of `GroupListTypeInput` via:
+//
+//	GroupListTypeArgs{...}
+type GroupListTypeInput interface {
+	pulumi.Input
+
+	ToGroupListTypeOutput() GroupListTypeOutput
+	ToGroupListTypeOutputWithContext(context.Context) GroupListTypeOutput
+}
+
+// GroupList is a list of Group
+type GroupListTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// List of groups. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items GroupTypeArrayInput `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata metav1.ListMetaPtrInput `pulumi:"metadata"`
+}
+
+func (GroupListTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupListType)(nil)).Elem()
+}
+
+func (i GroupListTypeArgs) ToGroupListTypeOutput() GroupListTypeOutput {
+	return i.ToGroupListTypeOutputWithContext(context.Background())
+}
+
+func (i GroupListTypeArgs) ToGroupListTypeOutputWithContext(ctx context.Context) GroupListTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupListTypeOutput)
+}
+
+// GroupList is a list of Group
+type GroupListTypeOutput struct{ *pulumi.OutputState }
+
+func (GroupListTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupListType)(nil)).Elem()
+}
+
+func (o GroupListTypeOutput) ToGroupListTypeOutput() GroupListTypeOutput {
+	return o
+}
+
+func (o GroupListTypeOutput) ToGroupListTypeOutputWithContext(ctx context.Context) GroupListTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o GroupListTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupListType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// List of groups. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+func (o GroupListTypeOutput) Items() GroupTypeArrayOutput {
+	return o.ApplyT(func(v GroupListType) []GroupType { return v.Items }).(GroupTypeArrayOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o GroupListTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupListType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o GroupListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
+	return o.ApplyT(func(v GroupListType) *metav1.ListMeta { return v.Metadata }).(metav1.ListMetaPtrOutput)
+}
+
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupPatchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
+	Spec     *GroupSpecPatch         `pulumi:"spec"`
+	Status   *GroupStatusPatch       `pulumi:"status"`
+}
+
+// GroupPatchTypeInput is an input type that accepts GroupPatchTypeArgs and GroupPatchTypeOutput values.
+// You can construct a concrete instance of `GroupPatchTypeInput` via:
+//
+//	GroupPatchTypeArgs{...}
+type GroupPatchTypeInput interface {
+	pulumi.Input
+
+	ToGroupPatchTypeOutput() GroupPatchTypeOutput
+	ToGroupPatchTypeOutputWithContext(context.Context) GroupPatchTypeOutput
+}
+
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupPatchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPatchPtrInput `pulumi:"metadata"`
+	Spec     GroupSpecPatchPtrInput         `pulumi:"spec"`
+	Status   GroupStatusPatchPtrInput       `pulumi:"status"`
+}
+
+func (GroupPatchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupPatchType)(nil)).Elem()
+}
+
+func (i GroupPatchTypeArgs) ToGroupPatchTypeOutput() GroupPatchTypeOutput {
+	return i.ToGroupPatchTypeOutputWithContext(context.Background())
+}
+
+func (i GroupPatchTypeArgs) ToGroupPatchTypeOutputWithContext(ctx context.Context) GroupPatchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupPatchTypeOutput)
+}
+
+// Group is a user-named collection of Lights, for other resources (switch
+// bindings, future circadian schedules) to target instead of enumerating
+// individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
+// but metadata.name is user-chosen (e.g. "living-room") rather than a
+// stable Hue UUID - a Group has no Hue-side identity at all.
+type GroupPatchTypeOutput struct{ *pulumi.OutputState }
+
+func (GroupPatchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupPatchType)(nil)).Elem()
+}
+
+func (o GroupPatchTypeOutput) ToGroupPatchTypeOutput() GroupPatchTypeOutput {
+	return o
+}
+
+func (o GroupPatchTypeOutput) ToGroupPatchTypeOutputWithContext(ctx context.Context) GroupPatchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o GroupPatchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupPatchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o GroupPatchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupPatchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o GroupPatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
+	return o.ApplyT(func(v GroupPatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
+}
+
+func (o GroupPatchTypeOutput) Spec() GroupSpecPatchPtrOutput {
+	return o.ApplyT(func(v GroupPatchType) *GroupSpecPatch { return v.Spec }).(GroupSpecPatchPtrOutput)
+}
+
+func (o GroupPatchTypeOutput) Status() GroupStatusPatchPtrOutput {
+	return o.ApplyT(func(v GroupPatchType) *GroupStatusPatch { return v.Status }).(GroupStatusPatchPtrOutput)
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpec struct {
+	// Lights are the names of Light CRs that belong to this group.
+	Lights []string `pulumi:"lights"`
+}
+
+// GroupSpecInput is an input type that accepts GroupSpecArgs and GroupSpecOutput values.
+// You can construct a concrete instance of `GroupSpecInput` via:
+//
+//	GroupSpecArgs{...}
+type GroupSpecInput interface {
+	pulumi.Input
+
+	ToGroupSpecOutput() GroupSpecOutput
+	ToGroupSpecOutputWithContext(context.Context) GroupSpecOutput
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpecArgs struct {
+	// Lights are the names of Light CRs that belong to this group.
+	Lights pulumi.StringArrayInput `pulumi:"lights"`
+}
+
+func (GroupSpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpec)(nil)).Elem()
+}
+
+func (i GroupSpecArgs) ToGroupSpecOutput() GroupSpecOutput {
+	return i.ToGroupSpecOutputWithContext(context.Background())
+}
+
+func (i GroupSpecArgs) ToGroupSpecOutputWithContext(ctx context.Context) GroupSpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecOutput)
+}
+
+func (i GroupSpecArgs) ToGroupSpecPtrOutput() GroupSpecPtrOutput {
+	return i.ToGroupSpecPtrOutputWithContext(context.Background())
+}
+
+func (i GroupSpecArgs) ToGroupSpecPtrOutputWithContext(ctx context.Context) GroupSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecOutput).ToGroupSpecPtrOutputWithContext(ctx)
+}
+
+// GroupSpecPtrInput is an input type that accepts GroupSpecArgs, GroupSpecPtr and GroupSpecPtrOutput values.
+// You can construct a concrete instance of `GroupSpecPtrInput` via:
+//
+//	        GroupSpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupSpecPtrInput interface {
+	pulumi.Input
+
+	ToGroupSpecPtrOutput() GroupSpecPtrOutput
+	ToGroupSpecPtrOutputWithContext(context.Context) GroupSpecPtrOutput
+}
+
+type groupSpecPtrType GroupSpecArgs
+
+func GroupSpecPtr(v *GroupSpecArgs) GroupSpecPtrInput {
+	return (*groupSpecPtrType)(v)
+}
+
+func (*groupSpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpec)(nil)).Elem()
+}
+
+func (i *groupSpecPtrType) ToGroupSpecPtrOutput() GroupSpecPtrOutput {
+	return i.ToGroupSpecPtrOutputWithContext(context.Background())
+}
+
+func (i *groupSpecPtrType) ToGroupSpecPtrOutputWithContext(ctx context.Context) GroupSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecPtrOutput)
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpecOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpec)(nil)).Elem()
+}
+
+func (o GroupSpecOutput) ToGroupSpecOutput() GroupSpecOutput {
+	return o
+}
+
+func (o GroupSpecOutput) ToGroupSpecOutputWithContext(ctx context.Context) GroupSpecOutput {
+	return o
+}
+
+func (o GroupSpecOutput) ToGroupSpecPtrOutput() GroupSpecPtrOutput {
+	return o.ToGroupSpecPtrOutputWithContext(context.Background())
+}
+
+func (o GroupSpecOutput) ToGroupSpecPtrOutputWithContext(ctx context.Context) GroupSpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupSpec) *GroupSpec {
+		return &v
+	}).(GroupSpecPtrOutput)
+}
+
+// Lights are the names of Light CRs that belong to this group.
+func (o GroupSpecOutput) Lights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v GroupSpec) []string { return v.Lights }).(pulumi.StringArrayOutput)
+}
+
+type GroupSpecPtrOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpec)(nil)).Elem()
+}
+
+func (o GroupSpecPtrOutput) ToGroupSpecPtrOutput() GroupSpecPtrOutput {
+	return o
+}
+
+func (o GroupSpecPtrOutput) ToGroupSpecPtrOutputWithContext(ctx context.Context) GroupSpecPtrOutput {
+	return o
+}
+
+func (o GroupSpecPtrOutput) Elem() GroupSpecOutput {
+	return o.ApplyT(func(v *GroupSpec) GroupSpec {
+		if v != nil {
+			return *v
+		}
+		var ret GroupSpec
+		return ret
+	}).(GroupSpecOutput)
+}
+
+// Lights are the names of Light CRs that belong to this group.
+func (o GroupSpecPtrOutput) Lights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *GroupSpec) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Lights
+	}).(pulumi.StringArrayOutput)
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpecPatch struct {
+	// Lights are the names of Light CRs that belong to this group.
+	Lights []string `pulumi:"lights"`
+}
+
+// GroupSpecPatchInput is an input type that accepts GroupSpecPatchArgs and GroupSpecPatchOutput values.
+// You can construct a concrete instance of `GroupSpecPatchInput` via:
+//
+//	GroupSpecPatchArgs{...}
+type GroupSpecPatchInput interface {
+	pulumi.Input
+
+	ToGroupSpecPatchOutput() GroupSpecPatchOutput
+	ToGroupSpecPatchOutputWithContext(context.Context) GroupSpecPatchOutput
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpecPatchArgs struct {
+	// Lights are the names of Light CRs that belong to this group.
+	Lights pulumi.StringArrayInput `pulumi:"lights"`
+}
+
+func (GroupSpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecPatch)(nil)).Elem()
+}
+
+func (i GroupSpecPatchArgs) ToGroupSpecPatchOutput() GroupSpecPatchOutput {
+	return i.ToGroupSpecPatchOutputWithContext(context.Background())
+}
+
+func (i GroupSpecPatchArgs) ToGroupSpecPatchOutputWithContext(ctx context.Context) GroupSpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecPatchOutput)
+}
+
+func (i GroupSpecPatchArgs) ToGroupSpecPatchPtrOutput() GroupSpecPatchPtrOutput {
+	return i.ToGroupSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i GroupSpecPatchArgs) ToGroupSpecPatchPtrOutputWithContext(ctx context.Context) GroupSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecPatchOutput).ToGroupSpecPatchPtrOutputWithContext(ctx)
+}
+
+// GroupSpecPatchPtrInput is an input type that accepts GroupSpecPatchArgs, GroupSpecPatchPtr and GroupSpecPatchPtrOutput values.
+// You can construct a concrete instance of `GroupSpecPatchPtrInput` via:
+//
+//	        GroupSpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupSpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToGroupSpecPatchPtrOutput() GroupSpecPatchPtrOutput
+	ToGroupSpecPatchPtrOutputWithContext(context.Context) GroupSpecPatchPtrOutput
+}
+
+type groupSpecPatchPtrType GroupSpecPatchArgs
+
+func GroupSpecPatchPtr(v *GroupSpecPatchArgs) GroupSpecPatchPtrInput {
+	return (*groupSpecPatchPtrType)(v)
+}
+
+func (*groupSpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecPatch)(nil)).Elem()
+}
+
+func (i *groupSpecPatchPtrType) ToGroupSpecPatchPtrOutput() GroupSpecPatchPtrOutput {
+	return i.ToGroupSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *groupSpecPatchPtrType) ToGroupSpecPatchPtrOutputWithContext(ctx context.Context) GroupSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecPatchPtrOutput)
+}
+
+// GroupSpec is the user-declared list of Lights belonging to this group.
+type GroupSpecPatchOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecPatch)(nil)).Elem()
+}
+
+func (o GroupSpecPatchOutput) ToGroupSpecPatchOutput() GroupSpecPatchOutput {
+	return o
+}
+
+func (o GroupSpecPatchOutput) ToGroupSpecPatchOutputWithContext(ctx context.Context) GroupSpecPatchOutput {
+	return o
+}
+
+func (o GroupSpecPatchOutput) ToGroupSpecPatchPtrOutput() GroupSpecPatchPtrOutput {
+	return o.ToGroupSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o GroupSpecPatchOutput) ToGroupSpecPatchPtrOutputWithContext(ctx context.Context) GroupSpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupSpecPatch) *GroupSpecPatch {
+		return &v
+	}).(GroupSpecPatchPtrOutput)
+}
+
+// Lights are the names of Light CRs that belong to this group.
+func (o GroupSpecPatchOutput) Lights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v GroupSpecPatch) []string { return v.Lights }).(pulumi.StringArrayOutput)
+}
+
+type GroupSpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecPatch)(nil)).Elem()
+}
+
+func (o GroupSpecPatchPtrOutput) ToGroupSpecPatchPtrOutput() GroupSpecPatchPtrOutput {
+	return o
+}
+
+func (o GroupSpecPatchPtrOutput) ToGroupSpecPatchPtrOutputWithContext(ctx context.Context) GroupSpecPatchPtrOutput {
+	return o
+}
+
+func (o GroupSpecPatchPtrOutput) Elem() GroupSpecPatchOutput {
+	return o.ApplyT(func(v *GroupSpecPatch) GroupSpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret GroupSpecPatch
+		return ret
+	}).(GroupSpecPatchOutput)
+}
+
+// Lights are the names of Light CRs that belong to this group.
+func (o GroupSpecPatchPtrOutput) Lights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *GroupSpecPatch) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Lights
+	}).(pulumi.StringArrayOutput)
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatus struct {
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+	// MissingLights are entries in Spec.Lights that don't currently match
+	// any Light CR name.
+	MissingLights []string `pulumi:"missingLights"`
+}
+
+// GroupStatusInput is an input type that accepts GroupStatusArgs and GroupStatusOutput values.
+// You can construct a concrete instance of `GroupStatusInput` via:
+//
+//	GroupStatusArgs{...}
+type GroupStatusInput interface {
+	pulumi.Input
+
+	ToGroupStatusOutput() GroupStatusOutput
+	ToGroupStatusOutputWithContext(context.Context) GroupStatusOutput
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatusArgs struct {
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// MissingLights are entries in Spec.Lights that don't currently match
+	// any Light CR name.
+	MissingLights pulumi.StringArrayInput `pulumi:"missingLights"`
+}
+
+func (GroupStatusArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupStatus)(nil)).Elem()
+}
+
+func (i GroupStatusArgs) ToGroupStatusOutput() GroupStatusOutput {
+	return i.ToGroupStatusOutputWithContext(context.Background())
+}
+
+func (i GroupStatusArgs) ToGroupStatusOutputWithContext(ctx context.Context) GroupStatusOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusOutput)
+}
+
+func (i GroupStatusArgs) ToGroupStatusPtrOutput() GroupStatusPtrOutput {
+	return i.ToGroupStatusPtrOutputWithContext(context.Background())
+}
+
+func (i GroupStatusArgs) ToGroupStatusPtrOutputWithContext(ctx context.Context) GroupStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusOutput).ToGroupStatusPtrOutputWithContext(ctx)
+}
+
+// GroupStatusPtrInput is an input type that accepts GroupStatusArgs, GroupStatusPtr and GroupStatusPtrOutput values.
+// You can construct a concrete instance of `GroupStatusPtrInput` via:
+//
+//	        GroupStatusArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupStatusPtrInput interface {
+	pulumi.Input
+
+	ToGroupStatusPtrOutput() GroupStatusPtrOutput
+	ToGroupStatusPtrOutputWithContext(context.Context) GroupStatusPtrOutput
+}
+
+type groupStatusPtrType GroupStatusArgs
+
+func GroupStatusPtr(v *GroupStatusArgs) GroupStatusPtrInput {
+	return (*groupStatusPtrType)(v)
+}
+
+func (*groupStatusPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupStatus)(nil)).Elem()
+}
+
+func (i *groupStatusPtrType) ToGroupStatusPtrOutput() GroupStatusPtrOutput {
+	return i.ToGroupStatusPtrOutputWithContext(context.Background())
+}
+
+func (i *groupStatusPtrType) ToGroupStatusPtrOutputWithContext(ctx context.Context) GroupStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusPtrOutput)
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatusOutput struct{ *pulumi.OutputState }
+
+func (GroupStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupStatus)(nil)).Elem()
+}
+
+func (o GroupStatusOutput) ToGroupStatusOutput() GroupStatusOutput {
+	return o
+}
+
+func (o GroupStatusOutput) ToGroupStatusOutputWithContext(ctx context.Context) GroupStatusOutput {
+	return o
+}
+
+func (o GroupStatusOutput) ToGroupStatusPtrOutput() GroupStatusPtrOutput {
+	return o.ToGroupStatusPtrOutputWithContext(context.Background())
+}
+
+func (o GroupStatusOutput) ToGroupStatusPtrOutputWithContext(ctx context.Context) GroupStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupStatus) *GroupStatus {
+		return &v
+	}).(GroupStatusPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o GroupStatusOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// MissingLights are entries in Spec.Lights that don't currently match
+// any Light CR name.
+func (o GroupStatusOutput) MissingLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v GroupStatus) []string { return v.MissingLights }).(pulumi.StringArrayOutput)
+}
+
+type GroupStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (GroupStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupStatus)(nil)).Elem()
+}
+
+func (o GroupStatusPtrOutput) ToGroupStatusPtrOutput() GroupStatusPtrOutput {
+	return o
+}
+
+func (o GroupStatusPtrOutput) ToGroupStatusPtrOutputWithContext(ctx context.Context) GroupStatusPtrOutput {
+	return o
+}
+
+func (o GroupStatusPtrOutput) Elem() GroupStatusOutput {
+	return o.ApplyT(func(v *GroupStatus) GroupStatus {
+		if v != nil {
+			return *v
+		}
+		var ret GroupStatus
+		return ret
+	}).(GroupStatusOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o GroupStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// MissingLights are entries in Spec.Lights that don't currently match
+// any Light CR name.
+func (o GroupStatusPtrOutput) MissingLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *GroupStatus) []string {
+		if v == nil {
+			return nil
+		}
+		return v.MissingLights
+	}).(pulumi.StringArrayOutput)
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatusPatch struct {
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+	// MissingLights are entries in Spec.Lights that don't currently match
+	// any Light CR name.
+	MissingLights []string `pulumi:"missingLights"`
+}
+
+// GroupStatusPatchInput is an input type that accepts GroupStatusPatchArgs and GroupStatusPatchOutput values.
+// You can construct a concrete instance of `GroupStatusPatchInput` via:
+//
+//	GroupStatusPatchArgs{...}
+type GroupStatusPatchInput interface {
+	pulumi.Input
+
+	ToGroupStatusPatchOutput() GroupStatusPatchOutput
+	ToGroupStatusPatchOutputWithContext(context.Context) GroupStatusPatchOutput
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatusPatchArgs struct {
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// MissingLights are entries in Spec.Lights that don't currently match
+	// any Light CR name.
+	MissingLights pulumi.StringArrayInput `pulumi:"missingLights"`
+}
+
+func (GroupStatusPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupStatusPatch)(nil)).Elem()
+}
+
+func (i GroupStatusPatchArgs) ToGroupStatusPatchOutput() GroupStatusPatchOutput {
+	return i.ToGroupStatusPatchOutputWithContext(context.Background())
+}
+
+func (i GroupStatusPatchArgs) ToGroupStatusPatchOutputWithContext(ctx context.Context) GroupStatusPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusPatchOutput)
+}
+
+func (i GroupStatusPatchArgs) ToGroupStatusPatchPtrOutput() GroupStatusPatchPtrOutput {
+	return i.ToGroupStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i GroupStatusPatchArgs) ToGroupStatusPatchPtrOutputWithContext(ctx context.Context) GroupStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusPatchOutput).ToGroupStatusPatchPtrOutputWithContext(ctx)
+}
+
+// GroupStatusPatchPtrInput is an input type that accepts GroupStatusPatchArgs, GroupStatusPatchPtr and GroupStatusPatchPtrOutput values.
+// You can construct a concrete instance of `GroupStatusPatchPtrInput` via:
+//
+//	        GroupStatusPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupStatusPatchPtrInput interface {
+	pulumi.Input
+
+	ToGroupStatusPatchPtrOutput() GroupStatusPatchPtrOutput
+	ToGroupStatusPatchPtrOutputWithContext(context.Context) GroupStatusPatchPtrOutput
+}
+
+type groupStatusPatchPtrType GroupStatusPatchArgs
+
+func GroupStatusPatchPtr(v *GroupStatusPatchArgs) GroupStatusPatchPtrInput {
+	return (*groupStatusPatchPtrType)(v)
+}
+
+func (*groupStatusPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupStatusPatch)(nil)).Elem()
+}
+
+func (i *groupStatusPatchPtrType) ToGroupStatusPatchPtrOutput() GroupStatusPatchPtrOutput {
+	return i.ToGroupStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *groupStatusPatchPtrType) ToGroupStatusPatchPtrOutputWithContext(ctx context.Context) GroupStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupStatusPatchPtrOutput)
+}
+
+// GroupStatus reports which of Spec.Lights don't currently resolve to a
+// Light CR - a typo'd or since-deleted reference would otherwise be silent.
+type GroupStatusPatchOutput struct{ *pulumi.OutputState }
+
+func (GroupStatusPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupStatusPatch)(nil)).Elem()
+}
+
+func (o GroupStatusPatchOutput) ToGroupStatusPatchOutput() GroupStatusPatchOutput {
+	return o
+}
+
+func (o GroupStatusPatchOutput) ToGroupStatusPatchOutputWithContext(ctx context.Context) GroupStatusPatchOutput {
+	return o
+}
+
+func (o GroupStatusPatchOutput) ToGroupStatusPatchPtrOutput() GroupStatusPatchPtrOutput {
+	return o.ToGroupStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (o GroupStatusPatchOutput) ToGroupStatusPatchPtrOutputWithContext(ctx context.Context) GroupStatusPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupStatusPatch) *GroupStatusPatch {
+		return &v
+	}).(GroupStatusPatchPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o GroupStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// MissingLights are entries in Spec.Lights that don't currently match
+// any Light CR name.
+func (o GroupStatusPatchOutput) MissingLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v GroupStatusPatch) []string { return v.MissingLights }).(pulumi.StringArrayOutput)
+}
+
+type GroupStatusPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (GroupStatusPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupStatusPatch)(nil)).Elem()
+}
+
+func (o GroupStatusPatchPtrOutput) ToGroupStatusPatchPtrOutput() GroupStatusPatchPtrOutput {
+	return o
+}
+
+func (o GroupStatusPatchPtrOutput) ToGroupStatusPatchPtrOutputWithContext(ctx context.Context) GroupStatusPatchPtrOutput {
+	return o
+}
+
+func (o GroupStatusPatchPtrOutput) Elem() GroupStatusPatchOutput {
+	return o.ApplyT(func(v *GroupStatusPatch) GroupStatusPatch {
+		if v != nil {
+			return *v
+		}
+		var ret GroupStatusPatch
+		return ret
+	}).(GroupStatusPatchOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o GroupStatusPatchPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// MissingLights are entries in Spec.Lights that don't currently match
+// any Light CR name.
+func (o GroupStatusPatchPtrOutput) MissingLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *GroupStatusPatch) []string {
+		if v == nil {
+			return nil
+		}
+		return v.MissingLights
+	}).(pulumi.StringArrayOutput)
+}
+
 // HueBridge represents a single Hue bridge's live-resolved network
 // location, maintained by hub-controller (see
 // applications/lights-controller/cmd/hub-controller) so lights-controller
@@ -4860,6 +5793,18 @@ func (o SwitchStatusPatchPtrOutput) Reachable() pulumi.BoolPtrOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupTypeInput)(nil)).Elem(), GroupTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupTypeArrayInput)(nil)).Elem(), GroupTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupListTypeInput)(nil)).Elem(), GroupListTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupPatchTypeInput)(nil)).Elem(), GroupPatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecInput)(nil)).Elem(), GroupSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPtrInput)(nil)).Elem(), GroupSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPatchInput)(nil)).Elem(), GroupSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPatchPtrInput)(nil)).Elem(), GroupSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupStatusInput)(nil)).Elem(), GroupStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupStatusPtrInput)(nil)).Elem(), GroupStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupStatusPatchInput)(nil)).Elem(), GroupStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupStatusPatchPtrInput)(nil)).Elem(), GroupStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HueBridgeTypeInput)(nil)).Elem(), HueBridgeTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HueBridgeTypeArrayInput)(nil)).Elem(), HueBridgeTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HueBridgeListTypeInput)(nil)).Elem(), HueBridgeListTypeArgs{})
@@ -4900,6 +5845,18 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPtrInput)(nil)).Elem(), SwitchStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchInput)(nil)).Elem(), SwitchStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchPtrInput)(nil)).Elem(), SwitchStatusPatchArgs{})
+	pulumi.RegisterOutputType(GroupTypeOutput{})
+	pulumi.RegisterOutputType(GroupTypeArrayOutput{})
+	pulumi.RegisterOutputType(GroupListTypeOutput{})
+	pulumi.RegisterOutputType(GroupPatchTypeOutput{})
+	pulumi.RegisterOutputType(GroupSpecOutput{})
+	pulumi.RegisterOutputType(GroupSpecPtrOutput{})
+	pulumi.RegisterOutputType(GroupSpecPatchOutput{})
+	pulumi.RegisterOutputType(GroupSpecPatchPtrOutput{})
+	pulumi.RegisterOutputType(GroupStatusOutput{})
+	pulumi.RegisterOutputType(GroupStatusPtrOutput{})
+	pulumi.RegisterOutputType(GroupStatusPatchOutput{})
+	pulumi.RegisterOutputType(GroupStatusPatchPtrOutput{})
 	pulumi.RegisterOutputType(HueBridgeTypeOutput{})
 	pulumi.RegisterOutputType(HueBridgeTypeArrayOutput{})
 	pulumi.RegisterOutputType(HueBridgeListTypeOutput{})
