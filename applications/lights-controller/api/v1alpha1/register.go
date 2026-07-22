@@ -13,16 +13,16 @@ var GroupVersion = schema.GroupVersion{Group: "lights.homelab.internal", Version
 // SchemeBuilder collects this package's types for AddToScheme.
 var SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
-// AddToScheme registers Light/LightList/HueBridge/HueBridgeList with a
-// runtime.Scheme, for controller-runtime's typed client to use. Both
-// lights-controller and hub-controller call this - each only actually
-// reads/writes one of the two kinds, but sharing one scheme is simpler
-// than splitting it, and RBAC (not scheme registration) is what actually
-// enforces which kind each binary may touch.
+// AddToScheme registers Light/LightList/HueBridge/HueBridgeList/Switch/
+// SwitchList with a runtime.Scheme, for controller-runtime's typed client
+// to use. Both lights-controller and hub-controller call this - each only
+// actually reads/writes a subset of these kinds, but sharing one scheme is
+// simpler than splitting it, and RBAC (not scheme registration) is what
+// actually enforces which kind each binary may touch.
 var AddToScheme = SchemeBuilder.AddToScheme
 
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(GroupVersion, &Light{}, &LightList{}, &HueBridge{}, &HueBridgeList{})
+	scheme.AddKnownTypes(GroupVersion, &Light{}, &LightList{}, &HueBridge{}, &HueBridgeList{}, &Switch{}, &SwitchList{})
 	metav1.AddToGroupVersion(scheme, GroupVersion)
 	return nil
 }

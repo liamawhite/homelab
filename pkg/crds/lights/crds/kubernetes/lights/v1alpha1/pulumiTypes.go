@@ -1830,8 +1830,8 @@ type LightStatus struct {
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType *string `pulumi:"fixtureType"`
 	// LastEnactAttempt is when the controller last attempted to push Spec
-	// to the bridge (success or failure) - also the debounce clock:
-	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	// to the bridge (success or failure) - purely informational bookkeeping,
+	// visible via kubectl.
 	LastEnactAttempt *string `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
@@ -1891,8 +1891,8 @@ type LightStatusArgs struct {
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType pulumi.StringPtrInput `pulumi:"fixtureType"`
 	// LastEnactAttempt is when the controller last attempted to push Spec
-	// to the bridge (success or failure) - also the debounce clock:
-	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	// to the bridge (success or failure) - purely informational bookkeeping,
+	// visible via kubectl.
 	LastEnactAttempt pulumi.StringPtrInput `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
@@ -2038,8 +2038,8 @@ func (o LightStatusOutput) FixtureType() pulumi.StringPtrOutput {
 }
 
 // LastEnactAttempt is when the controller last attempted to push Spec
-// to the bridge (success or failure) - also the debounce clock:
-// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+// to the bridge (success or failure) - purely informational bookkeeping,
+// visible via kubectl.
 func (o LightStatusOutput) LastEnactAttempt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightStatus) *string { return v.LastEnactAttempt }).(pulumi.StringPtrOutput)
 }
@@ -2184,8 +2184,8 @@ func (o LightStatusPtrOutput) FixtureType() pulumi.StringPtrOutput {
 }
 
 // LastEnactAttempt is when the controller last attempted to push Spec
-// to the bridge (success or failure) - also the debounce clock:
-// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+// to the bridge (success or failure) - purely informational bookkeeping,
+// visible via kubectl.
 func (o LightStatusPtrOutput) LastEnactAttempt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightStatus) *string {
 		if v == nil {
@@ -2288,8 +2288,8 @@ type LightStatusPatch struct {
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType *string `pulumi:"fixtureType"`
 	// LastEnactAttempt is when the controller last attempted to push Spec
-	// to the bridge (success or failure) - also the debounce clock:
-	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	// to the bridge (success or failure) - purely informational bookkeeping,
+	// visible via kubectl.
 	LastEnactAttempt *string `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
@@ -2349,8 +2349,8 @@ type LightStatusPatchArgs struct {
 	// FixtureType is the light's archetype, e.g. "recessed ceiling".
 	FixtureType pulumi.StringPtrInput `pulumi:"fixtureType"`
 	// LastEnactAttempt is when the controller last attempted to push Spec
-	// to the bridge (success or failure) - also the debounce clock:
-	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	// to the bridge (success or failure) - purely informational bookkeeping,
+	// visible via kubectl.
 	LastEnactAttempt pulumi.StringPtrInput `pulumi:"lastEnactAttempt"`
 	// LastSynced is when this status was last successfully updated from
 	// the bridge.
@@ -2496,8 +2496,8 @@ func (o LightStatusPatchOutput) FixtureType() pulumi.StringPtrOutput {
 }
 
 // LastEnactAttempt is when the controller last attempted to push Spec
-// to the bridge (success or failure) - also the debounce clock:
-// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+// to the bridge (success or failure) - purely informational bookkeeping,
+// visible via kubectl.
 func (o LightStatusPatchOutput) LastEnactAttempt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightStatusPatch) *string { return v.LastEnactAttempt }).(pulumi.StringPtrOutput)
 }
@@ -2642,8 +2642,8 @@ func (o LightStatusPatchPtrOutput) FixtureType() pulumi.StringPtrOutput {
 }
 
 // LastEnactAttempt is when the controller last attempted to push Spec
-// to the bridge (success or failure) - also the debounce clock:
-// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+// to the bridge (success or failure) - purely informational bookkeeping,
+// visible via kubectl.
 func (o LightStatusPatchPtrOutput) LastEnactAttempt() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightStatusPatch) *string {
 		if v == nil {
@@ -2718,6 +2718,2147 @@ func (o LightStatusPatchPtrOutput) Reachable() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
+	Spec     *SwitchSpec        `pulumi:"spec"`
+	Status   *SwitchStatus      `pulumi:"status"`
+}
+
+// SwitchTypeInput is an input type that accepts SwitchTypeArgs and SwitchTypeOutput values.
+// You can construct a concrete instance of `SwitchTypeInput` via:
+//
+//	SwitchTypeArgs{...}
+type SwitchTypeInput interface {
+	pulumi.Input
+
+	ToSwitchTypeOutput() SwitchTypeOutput
+	ToSwitchTypeOutputWithContext(context.Context) SwitchTypeOutput
+}
+
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPtrInput `pulumi:"metadata"`
+	Spec     SwitchSpecPtrInput        `pulumi:"spec"`
+	Status   SwitchStatusPtrInput      `pulumi:"status"`
+}
+
+func (SwitchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchType)(nil)).Elem()
+}
+
+func (i SwitchTypeArgs) ToSwitchTypeOutput() SwitchTypeOutput {
+	return i.ToSwitchTypeOutputWithContext(context.Background())
+}
+
+func (i SwitchTypeArgs) ToSwitchTypeOutputWithContext(ctx context.Context) SwitchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchTypeOutput)
+}
+
+// SwitchTypeArrayInput is an input type that accepts SwitchTypeArray and SwitchTypeArrayOutput values.
+// You can construct a concrete instance of `SwitchTypeArrayInput` via:
+//
+//	SwitchTypeArray{ SwitchTypeArgs{...} }
+type SwitchTypeArrayInput interface {
+	pulumi.Input
+
+	ToSwitchTypeArrayOutput() SwitchTypeArrayOutput
+	ToSwitchTypeArrayOutputWithContext(context.Context) SwitchTypeArrayOutput
+}
+
+type SwitchTypeArray []SwitchTypeInput
+
+func (SwitchTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchType)(nil)).Elem()
+}
+
+func (i SwitchTypeArray) ToSwitchTypeArrayOutput() SwitchTypeArrayOutput {
+	return i.ToSwitchTypeArrayOutputWithContext(context.Background())
+}
+
+func (i SwitchTypeArray) ToSwitchTypeArrayOutputWithContext(ctx context.Context) SwitchTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchTypeArrayOutput)
+}
+
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchTypeOutput struct{ *pulumi.OutputState }
+
+func (SwitchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchType)(nil)).Elem()
+}
+
+func (o SwitchTypeOutput) ToSwitchTypeOutput() SwitchTypeOutput {
+	return o
+}
+
+func (o SwitchTypeOutput) ToSwitchTypeOutputWithContext(ctx context.Context) SwitchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o SwitchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SwitchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o SwitchTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
+	return o.ApplyT(func(v SwitchType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
+}
+
+func (o SwitchTypeOutput) Spec() SwitchSpecPtrOutput {
+	return o.ApplyT(func(v SwitchType) *SwitchSpec { return v.Spec }).(SwitchSpecPtrOutput)
+}
+
+func (o SwitchTypeOutput) Status() SwitchStatusPtrOutput {
+	return o.ApplyT(func(v SwitchType) *SwitchStatus { return v.Status }).(SwitchStatusPtrOutput)
+}
+
+type SwitchTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (SwitchTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchType)(nil)).Elem()
+}
+
+func (o SwitchTypeArrayOutput) ToSwitchTypeArrayOutput() SwitchTypeArrayOutput {
+	return o
+}
+
+func (o SwitchTypeArrayOutput) ToSwitchTypeArrayOutputWithContext(ctx context.Context) SwitchTypeArrayOutput {
+	return o
+}
+
+func (o SwitchTypeArrayOutput) Index(i pulumi.IntInput) SwitchTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SwitchType {
+		return vs[0].([]SwitchType)[vs[1].(int)]
+	}).(SwitchTypeOutput)
+}
+
+// SwitchList is a list of Switch
+type SwitchListType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// List of switches. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items []SwitchType `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata *metav1.ListMeta `pulumi:"metadata"`
+}
+
+// SwitchListTypeInput is an input type that accepts SwitchListTypeArgs and SwitchListTypeOutput values.
+// You can construct a concrete instance of `SwitchListTypeInput` via:
+//
+//	SwitchListTypeArgs{...}
+type SwitchListTypeInput interface {
+	pulumi.Input
+
+	ToSwitchListTypeOutput() SwitchListTypeOutput
+	ToSwitchListTypeOutputWithContext(context.Context) SwitchListTypeOutput
+}
+
+// SwitchList is a list of Switch
+type SwitchListTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// List of switches. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items SwitchTypeArrayInput `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata metav1.ListMetaPtrInput `pulumi:"metadata"`
+}
+
+func (SwitchListTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchListType)(nil)).Elem()
+}
+
+func (i SwitchListTypeArgs) ToSwitchListTypeOutput() SwitchListTypeOutput {
+	return i.ToSwitchListTypeOutputWithContext(context.Background())
+}
+
+func (i SwitchListTypeArgs) ToSwitchListTypeOutputWithContext(ctx context.Context) SwitchListTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchListTypeOutput)
+}
+
+// SwitchList is a list of Switch
+type SwitchListTypeOutput struct{ *pulumi.OutputState }
+
+func (SwitchListTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchListType)(nil)).Elem()
+}
+
+func (o SwitchListTypeOutput) ToSwitchListTypeOutput() SwitchListTypeOutput {
+	return o
+}
+
+func (o SwitchListTypeOutput) ToSwitchListTypeOutputWithContext(ctx context.Context) SwitchListTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o SwitchListTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchListType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// List of switches. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+func (o SwitchListTypeOutput) Items() SwitchTypeArrayOutput {
+	return o.ApplyT(func(v SwitchListType) []SwitchType { return v.Items }).(SwitchTypeArrayOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SwitchListTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchListType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SwitchListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
+	return o.ApplyT(func(v SwitchListType) *metav1.ListMeta { return v.Metadata }).(metav1.ListMetaPtrOutput)
+}
+
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchPatchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
+	Spec     *SwitchSpecPatch        `pulumi:"spec"`
+	Status   *SwitchStatusPatch      `pulumi:"status"`
+}
+
+// SwitchPatchTypeInput is an input type that accepts SwitchPatchTypeArgs and SwitchPatchTypeOutput values.
+// You can construct a concrete instance of `SwitchPatchTypeInput` via:
+//
+//	SwitchPatchTypeArgs{...}
+type SwitchPatchTypeInput interface {
+	pulumi.Input
+
+	ToSwitchPatchTypeOutput() SwitchPatchTypeOutput
+	ToSwitchPatchTypeOutputWithContext(context.Context) SwitchPatchTypeOutput
+}
+
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchPatchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPatchPtrInput `pulumi:"metadata"`
+	Spec     SwitchSpecPatchPtrInput        `pulumi:"spec"`
+	Status   SwitchStatusPatchPtrInput      `pulumi:"status"`
+}
+
+func (SwitchPatchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchPatchType)(nil)).Elem()
+}
+
+func (i SwitchPatchTypeArgs) ToSwitchPatchTypeOutput() SwitchPatchTypeOutput {
+	return i.ToSwitchPatchTypeOutputWithContext(context.Background())
+}
+
+func (i SwitchPatchTypeArgs) ToSwitchPatchTypeOutputWithContext(ctx context.Context) SwitchPatchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchPatchTypeOutput)
+}
+
+// Switch represents a single physical button's live, observed state plus
+// its user-declared bindings. Cluster scoped, same reasoning as Light.
+// Named after the button resource's own Hue UUID (stable, unique, valid as
+// a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+// Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+// Name/Product/Model/Battery but with distinct names/ControlID.
+type SwitchPatchTypeOutput struct{ *pulumi.OutputState }
+
+func (SwitchPatchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchPatchType)(nil)).Elem()
+}
+
+func (o SwitchPatchTypeOutput) ToSwitchPatchTypeOutput() SwitchPatchTypeOutput {
+	return o
+}
+
+func (o SwitchPatchTypeOutput) ToSwitchPatchTypeOutputWithContext(ctx context.Context) SwitchPatchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o SwitchPatchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchPatchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SwitchPatchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchPatchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o SwitchPatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
+	return o.ApplyT(func(v SwitchPatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
+}
+
+func (o SwitchPatchTypeOutput) Spec() SwitchSpecPatchPtrOutput {
+	return o.ApplyT(func(v SwitchPatchType) *SwitchSpecPatch { return v.Spec }).(SwitchSpecPatchPtrOutput)
+}
+
+func (o SwitchPatchTypeOutput) Status() SwitchStatusPatchPtrOutput {
+	return o.ApplyT(func(v SwitchPatchType) *SwitchStatusPatch { return v.Status }).(SwitchStatusPatchPtrOutput)
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpec struct {
+	Bindings []SwitchSpecBindings `pulumi:"bindings"`
+}
+
+// SwitchSpecInput is an input type that accepts SwitchSpecArgs and SwitchSpecOutput values.
+// You can construct a concrete instance of `SwitchSpecInput` via:
+//
+//	SwitchSpecArgs{...}
+type SwitchSpecInput interface {
+	pulumi.Input
+
+	ToSwitchSpecOutput() SwitchSpecOutput
+	ToSwitchSpecOutputWithContext(context.Context) SwitchSpecOutput
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpecArgs struct {
+	Bindings SwitchSpecBindingsArrayInput `pulumi:"bindings"`
+}
+
+func (SwitchSpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpec)(nil)).Elem()
+}
+
+func (i SwitchSpecArgs) ToSwitchSpecOutput() SwitchSpecOutput {
+	return i.ToSwitchSpecOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecArgs) ToSwitchSpecOutputWithContext(ctx context.Context) SwitchSpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecOutput)
+}
+
+func (i SwitchSpecArgs) ToSwitchSpecPtrOutput() SwitchSpecPtrOutput {
+	return i.ToSwitchSpecPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecArgs) ToSwitchSpecPtrOutputWithContext(ctx context.Context) SwitchSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecOutput).ToSwitchSpecPtrOutputWithContext(ctx)
+}
+
+// SwitchSpecPtrInput is an input type that accepts SwitchSpecArgs, SwitchSpecPtr and SwitchSpecPtrOutput values.
+// You can construct a concrete instance of `SwitchSpecPtrInput` via:
+//
+//	        SwitchSpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchSpecPtrInput interface {
+	pulumi.Input
+
+	ToSwitchSpecPtrOutput() SwitchSpecPtrOutput
+	ToSwitchSpecPtrOutputWithContext(context.Context) SwitchSpecPtrOutput
+}
+
+type switchSpecPtrType SwitchSpecArgs
+
+func SwitchSpecPtr(v *SwitchSpecArgs) SwitchSpecPtrInput {
+	return (*switchSpecPtrType)(v)
+}
+
+func (*switchSpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpec)(nil)).Elem()
+}
+
+func (i *switchSpecPtrType) ToSwitchSpecPtrOutput() SwitchSpecPtrOutput {
+	return i.ToSwitchSpecPtrOutputWithContext(context.Background())
+}
+
+func (i *switchSpecPtrType) ToSwitchSpecPtrOutputWithContext(ctx context.Context) SwitchSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecPtrOutput)
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpecOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpec)(nil)).Elem()
+}
+
+func (o SwitchSpecOutput) ToSwitchSpecOutput() SwitchSpecOutput {
+	return o
+}
+
+func (o SwitchSpecOutput) ToSwitchSpecOutputWithContext(ctx context.Context) SwitchSpecOutput {
+	return o
+}
+
+func (o SwitchSpecOutput) ToSwitchSpecPtrOutput() SwitchSpecPtrOutput {
+	return o.ToSwitchSpecPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchSpecOutput) ToSwitchSpecPtrOutputWithContext(ctx context.Context) SwitchSpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchSpec) *SwitchSpec {
+		return &v
+	}).(SwitchSpecPtrOutput)
+}
+
+func (o SwitchSpecOutput) Bindings() SwitchSpecBindingsArrayOutput {
+	return o.ApplyT(func(v SwitchSpec) []SwitchSpecBindings { return v.Bindings }).(SwitchSpecBindingsArrayOutput)
+}
+
+type SwitchSpecPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpec)(nil)).Elem()
+}
+
+func (o SwitchSpecPtrOutput) ToSwitchSpecPtrOutput() SwitchSpecPtrOutput {
+	return o
+}
+
+func (o SwitchSpecPtrOutput) ToSwitchSpecPtrOutputWithContext(ctx context.Context) SwitchSpecPtrOutput {
+	return o
+}
+
+func (o SwitchSpecPtrOutput) Elem() SwitchSpecOutput {
+	return o.ApplyT(func(v *SwitchSpec) SwitchSpec {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchSpec
+		return ret
+	}).(SwitchSpecOutput)
+}
+
+func (o SwitchSpecPtrOutput) Bindings() SwitchSpecBindingsArrayOutput {
+	return o.ApplyT(func(v *SwitchSpec) []SwitchSpecBindings {
+		if v == nil {
+			return nil
+		}
+		return v.Bindings
+	}).(SwitchSpecBindingsArrayOutput)
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindings struct {
+	Action *SwitchSpecBindingsAction `pulumi:"action"`
+	// Event is the Hue button event this binding fires on.
+	Event *string `pulumi:"event"`
+}
+
+// SwitchSpecBindingsInput is an input type that accepts SwitchSpecBindingsArgs and SwitchSpecBindingsOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsInput` via:
+//
+//	SwitchSpecBindingsArgs{...}
+type SwitchSpecBindingsInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsOutput() SwitchSpecBindingsOutput
+	ToSwitchSpecBindingsOutputWithContext(context.Context) SwitchSpecBindingsOutput
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindingsArgs struct {
+	Action SwitchSpecBindingsActionPtrInput `pulumi:"action"`
+	// Event is the Hue button event this binding fires on.
+	Event pulumi.StringPtrInput `pulumi:"event"`
+}
+
+func (SwitchSpecBindingsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindings)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsArgs) ToSwitchSpecBindingsOutput() SwitchSpecBindingsOutput {
+	return i.ToSwitchSpecBindingsOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsArgs) ToSwitchSpecBindingsOutputWithContext(ctx context.Context) SwitchSpecBindingsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsOutput)
+}
+
+// SwitchSpecBindingsArrayInput is an input type that accepts SwitchSpecBindingsArray and SwitchSpecBindingsArrayOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsArrayInput` via:
+//
+//	SwitchSpecBindingsArray{ SwitchSpecBindingsArgs{...} }
+type SwitchSpecBindingsArrayInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsArrayOutput() SwitchSpecBindingsArrayOutput
+	ToSwitchSpecBindingsArrayOutputWithContext(context.Context) SwitchSpecBindingsArrayOutput
+}
+
+type SwitchSpecBindingsArray []SwitchSpecBindingsInput
+
+func (SwitchSpecBindingsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchSpecBindings)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsArray) ToSwitchSpecBindingsArrayOutput() SwitchSpecBindingsArrayOutput {
+	return i.ToSwitchSpecBindingsArrayOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsArray) ToSwitchSpecBindingsArrayOutputWithContext(ctx context.Context) SwitchSpecBindingsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsArrayOutput)
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindingsOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindings)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsOutput) ToSwitchSpecBindingsOutput() SwitchSpecBindingsOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsOutput) ToSwitchSpecBindingsOutputWithContext(ctx context.Context) SwitchSpecBindingsOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsOutput) Action() SwitchSpecBindingsActionPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindings) *SwitchSpecBindingsAction { return v.Action }).(SwitchSpecBindingsActionPtrOutput)
+}
+
+// Event is the Hue button event this binding fires on.
+func (o SwitchSpecBindingsOutput) Event() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindings) *string { return v.Event }).(pulumi.StringPtrOutput)
+}
+
+type SwitchSpecBindingsArrayOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchSpecBindings)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsArrayOutput) ToSwitchSpecBindingsArrayOutput() SwitchSpecBindingsArrayOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsArrayOutput) ToSwitchSpecBindingsArrayOutputWithContext(ctx context.Context) SwitchSpecBindingsArrayOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsArrayOutput) Index(i pulumi.IntInput) SwitchSpecBindingsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SwitchSpecBindings {
+		return vs[0].([]SwitchSpecBindings)[vs[1].(int)]
+	}).(SwitchSpecBindingsOutput)
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsAction struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness *int `pulumi:"brightness"`
+	// BrightnessDelta adjusts desired brightness by this many percentage
+	// points (can be negative), clamped 0-100 - for continuous dimming via
+	// repeated "repeat" events while a button is held. No-op on a light
+	// that doesn't support dimming.
+	BrightnessDelta *int `pulumi:"brightnessDelta"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// On, if set, forces the target lights' desired on/off state.
+	On *bool `pulumi:"on"`
+	// TargetLights are the names of Light CRs this action applies to.
+	TargetLights []string `pulumi:"targetLights"`
+	// Toggle, if true, flips each target light's desired on/off state
+	// (based on its current Spec, not Status - see Reconciler). Ignored
+	// if On is also set.
+	Toggle *bool `pulumi:"toggle"`
+}
+
+// SwitchSpecBindingsActionInput is an input type that accepts SwitchSpecBindingsActionArgs and SwitchSpecBindingsActionOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsActionInput` via:
+//
+//	SwitchSpecBindingsActionArgs{...}
+type SwitchSpecBindingsActionInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsActionOutput() SwitchSpecBindingsActionOutput
+	ToSwitchSpecBindingsActionOutputWithContext(context.Context) SwitchSpecBindingsActionOutput
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsActionArgs struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// BrightnessDelta adjusts desired brightness by this many percentage
+	// points (can be negative), clamped 0-100 - for continuous dimming via
+	// repeated "repeat" events while a button is held. No-op on a light
+	// that doesn't support dimming.
+	BrightnessDelta pulumi.IntPtrInput `pulumi:"brightnessDelta"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// On, if set, forces the target lights' desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+	// TargetLights are the names of Light CRs this action applies to.
+	TargetLights pulumi.StringArrayInput `pulumi:"targetLights"`
+	// Toggle, if true, flips each target light's desired on/off state
+	// (based on its current Spec, not Status - see Reconciler). Ignored
+	// if On is also set.
+	Toggle pulumi.BoolPtrInput `pulumi:"toggle"`
+}
+
+func (SwitchSpecBindingsActionArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsAction)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsActionArgs) ToSwitchSpecBindingsActionOutput() SwitchSpecBindingsActionOutput {
+	return i.ToSwitchSpecBindingsActionOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsActionArgs) ToSwitchSpecBindingsActionOutputWithContext(ctx context.Context) SwitchSpecBindingsActionOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionOutput)
+}
+
+func (i SwitchSpecBindingsActionArgs) ToSwitchSpecBindingsActionPtrOutput() SwitchSpecBindingsActionPtrOutput {
+	return i.ToSwitchSpecBindingsActionPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsActionArgs) ToSwitchSpecBindingsActionPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionOutput).ToSwitchSpecBindingsActionPtrOutputWithContext(ctx)
+}
+
+// SwitchSpecBindingsActionPtrInput is an input type that accepts SwitchSpecBindingsActionArgs, SwitchSpecBindingsActionPtr and SwitchSpecBindingsActionPtrOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsActionPtrInput` via:
+//
+//	        SwitchSpecBindingsActionArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchSpecBindingsActionPtrInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsActionPtrOutput() SwitchSpecBindingsActionPtrOutput
+	ToSwitchSpecBindingsActionPtrOutputWithContext(context.Context) SwitchSpecBindingsActionPtrOutput
+}
+
+type switchSpecBindingsActionPtrType SwitchSpecBindingsActionArgs
+
+func SwitchSpecBindingsActionPtr(v *SwitchSpecBindingsActionArgs) SwitchSpecBindingsActionPtrInput {
+	return (*switchSpecBindingsActionPtrType)(v)
+}
+
+func (*switchSpecBindingsActionPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecBindingsAction)(nil)).Elem()
+}
+
+func (i *switchSpecBindingsActionPtrType) ToSwitchSpecBindingsActionPtrOutput() SwitchSpecBindingsActionPtrOutput {
+	return i.ToSwitchSpecBindingsActionPtrOutputWithContext(context.Background())
+}
+
+func (i *switchSpecBindingsActionPtrType) ToSwitchSpecBindingsActionPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionPtrOutput)
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsActionOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsActionOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsAction)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsActionOutput) ToSwitchSpecBindingsActionOutput() SwitchSpecBindingsActionOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionOutput) ToSwitchSpecBindingsActionOutputWithContext(ctx context.Context) SwitchSpecBindingsActionOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionOutput) ToSwitchSpecBindingsActionPtrOutput() SwitchSpecBindingsActionPtrOutput {
+	return o.ToSwitchSpecBindingsActionPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchSpecBindingsActionOutput) ToSwitchSpecBindingsActionPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchSpecBindingsAction) *SwitchSpecBindingsAction {
+		return &v
+	}).(SwitchSpecBindingsActionPtrOutput)
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SwitchSpecBindingsActionOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// BrightnessDelta adjusts desired brightness by this many percentage
+// points (can be negative), clamped 0-100 - for continuous dimming via
+// repeated "repeat" events while a button is held. No-op on a light
+// that doesn't support dimming.
+func (o SwitchSpecBindingsActionOutput) BrightnessDelta() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *int { return v.BrightnessDelta }).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SwitchSpecBindingsActionOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SwitchSpecBindingsActionOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// On, if set, forces the target lights' desired on/off state.
+func (o SwitchSpecBindingsActionOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+// TargetLights are the names of Light CRs this action applies to.
+func (o SwitchSpecBindingsActionOutput) TargetLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) []string { return v.TargetLights }).(pulumi.StringArrayOutput)
+}
+
+// Toggle, if true, flips each target light's desired on/off state
+// (based on its current Spec, not Status - see Reconciler). Ignored
+// if On is also set.
+func (o SwitchSpecBindingsActionOutput) Toggle() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsAction) *bool { return v.Toggle }).(pulumi.BoolPtrOutput)
+}
+
+type SwitchSpecBindingsActionPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsActionPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecBindingsAction)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsActionPtrOutput) ToSwitchSpecBindingsActionPtrOutput() SwitchSpecBindingsActionPtrOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPtrOutput) ToSwitchSpecBindingsActionPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPtrOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPtrOutput) Elem() SwitchSpecBindingsActionOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) SwitchSpecBindingsAction {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchSpecBindingsAction
+		return ret
+	}).(SwitchSpecBindingsActionOutput)
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SwitchSpecBindingsActionPtrOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Brightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// BrightnessDelta adjusts desired brightness by this many percentage
+// points (can be negative), clamped 0-100 - for continuous dimming via
+// repeated "repeat" events while a button is held. No-op on a light
+// that doesn't support dimming.
+func (o SwitchSpecBindingsActionPtrOutput) BrightnessDelta() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *int {
+		if v == nil {
+			return nil
+		}
+		return v.BrightnessDelta
+	}).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SwitchSpecBindingsActionPtrOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Color
+	}).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SwitchSpecBindingsActionPtrOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// On, if set, forces the target lights' desired on/off state.
+func (o SwitchSpecBindingsActionPtrOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.On
+	}).(pulumi.BoolPtrOutput)
+}
+
+// TargetLights are the names of Light CRs this action applies to.
+func (o SwitchSpecBindingsActionPtrOutput) TargetLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) []string {
+		if v == nil {
+			return nil
+		}
+		return v.TargetLights
+	}).(pulumi.StringArrayOutput)
+}
+
+// Toggle, if true, flips each target light's desired on/off state
+// (based on its current Spec, not Status - see Reconciler). Ignored
+// if On is also set.
+func (o SwitchSpecBindingsActionPtrOutput) Toggle() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsAction) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Toggle
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsActionPatch struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness *int `pulumi:"brightness"`
+	// BrightnessDelta adjusts desired brightness by this many percentage
+	// points (can be negative), clamped 0-100 - for continuous dimming via
+	// repeated "repeat" events while a button is held. No-op on a light
+	// that doesn't support dimming.
+	BrightnessDelta *int `pulumi:"brightnessDelta"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// On, if set, forces the target lights' desired on/off state.
+	On *bool `pulumi:"on"`
+	// TargetLights are the names of Light CRs this action applies to.
+	TargetLights []string `pulumi:"targetLights"`
+	// Toggle, if true, flips each target light's desired on/off state
+	// (based on its current Spec, not Status - see Reconciler). Ignored
+	// if On is also set.
+	Toggle *bool `pulumi:"toggle"`
+}
+
+// SwitchSpecBindingsActionPatchInput is an input type that accepts SwitchSpecBindingsActionPatchArgs and SwitchSpecBindingsActionPatchOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsActionPatchInput` via:
+//
+//	SwitchSpecBindingsActionPatchArgs{...}
+type SwitchSpecBindingsActionPatchInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsActionPatchOutput() SwitchSpecBindingsActionPatchOutput
+	ToSwitchSpecBindingsActionPatchOutputWithContext(context.Context) SwitchSpecBindingsActionPatchOutput
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsActionPatchArgs struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// BrightnessDelta adjusts desired brightness by this many percentage
+	// points (can be negative), clamped 0-100 - for continuous dimming via
+	// repeated "repeat" events while a button is held. No-op on a light
+	// that doesn't support dimming.
+	BrightnessDelta pulumi.IntPtrInput `pulumi:"brightnessDelta"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// On, if set, forces the target lights' desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+	// TargetLights are the names of Light CRs this action applies to.
+	TargetLights pulumi.StringArrayInput `pulumi:"targetLights"`
+	// Toggle, if true, flips each target light's desired on/off state
+	// (based on its current Spec, not Status - see Reconciler). Ignored
+	// if On is also set.
+	Toggle pulumi.BoolPtrInput `pulumi:"toggle"`
+}
+
+func (SwitchSpecBindingsActionPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsActionPatch)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsActionPatchArgs) ToSwitchSpecBindingsActionPatchOutput() SwitchSpecBindingsActionPatchOutput {
+	return i.ToSwitchSpecBindingsActionPatchOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsActionPatchArgs) ToSwitchSpecBindingsActionPatchOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionPatchOutput)
+}
+
+func (i SwitchSpecBindingsActionPatchArgs) ToSwitchSpecBindingsActionPatchPtrOutput() SwitchSpecBindingsActionPatchPtrOutput {
+	return i.ToSwitchSpecBindingsActionPatchPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsActionPatchArgs) ToSwitchSpecBindingsActionPatchPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionPatchOutput).ToSwitchSpecBindingsActionPatchPtrOutputWithContext(ctx)
+}
+
+// SwitchSpecBindingsActionPatchPtrInput is an input type that accepts SwitchSpecBindingsActionPatchArgs, SwitchSpecBindingsActionPatchPtr and SwitchSpecBindingsActionPatchPtrOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsActionPatchPtrInput` via:
+//
+//	        SwitchSpecBindingsActionPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchSpecBindingsActionPatchPtrInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsActionPatchPtrOutput() SwitchSpecBindingsActionPatchPtrOutput
+	ToSwitchSpecBindingsActionPatchPtrOutputWithContext(context.Context) SwitchSpecBindingsActionPatchPtrOutput
+}
+
+type switchSpecBindingsActionPatchPtrType SwitchSpecBindingsActionPatchArgs
+
+func SwitchSpecBindingsActionPatchPtr(v *SwitchSpecBindingsActionPatchArgs) SwitchSpecBindingsActionPatchPtrInput {
+	return (*switchSpecBindingsActionPatchPtrType)(v)
+}
+
+func (*switchSpecBindingsActionPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecBindingsActionPatch)(nil)).Elem()
+}
+
+func (i *switchSpecBindingsActionPatchPtrType) ToSwitchSpecBindingsActionPatchPtrOutput() SwitchSpecBindingsActionPatchPtrOutput {
+	return i.ToSwitchSpecBindingsActionPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *switchSpecBindingsActionPatchPtrType) ToSwitchSpecBindingsActionPatchPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsActionPatchPtrOutput)
+}
+
+// Action is what to do when Event fires.
+type SwitchSpecBindingsActionPatchOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsActionPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsActionPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsActionPatchOutput) ToSwitchSpecBindingsActionPatchOutput() SwitchSpecBindingsActionPatchOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPatchOutput) ToSwitchSpecBindingsActionPatchOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPatchOutput) ToSwitchSpecBindingsActionPatchPtrOutput() SwitchSpecBindingsActionPatchPtrOutput {
+	return o.ToSwitchSpecBindingsActionPatchPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchSpecBindingsActionPatchOutput) ToSwitchSpecBindingsActionPatchPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchSpecBindingsActionPatch) *SwitchSpecBindingsActionPatch {
+		return &v
+	}).(SwitchSpecBindingsActionPatchPtrOutput)
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SwitchSpecBindingsActionPatchOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// BrightnessDelta adjusts desired brightness by this many percentage
+// points (can be negative), clamped 0-100 - for continuous dimming via
+// repeated "repeat" events while a button is held. No-op on a light
+// that doesn't support dimming.
+func (o SwitchSpecBindingsActionPatchOutput) BrightnessDelta() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *int { return v.BrightnessDelta }).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SwitchSpecBindingsActionPatchOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SwitchSpecBindingsActionPatchOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// On, if set, forces the target lights' desired on/off state.
+func (o SwitchSpecBindingsActionPatchOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+// TargetLights are the names of Light CRs this action applies to.
+func (o SwitchSpecBindingsActionPatchOutput) TargetLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) []string { return v.TargetLights }).(pulumi.StringArrayOutput)
+}
+
+// Toggle, if true, flips each target light's desired on/off state
+// (based on its current Spec, not Status - see Reconciler). Ignored
+// if On is also set.
+func (o SwitchSpecBindingsActionPatchOutput) Toggle() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsActionPatch) *bool { return v.Toggle }).(pulumi.BoolPtrOutput)
+}
+
+type SwitchSpecBindingsActionPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsActionPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecBindingsActionPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsActionPatchPtrOutput) ToSwitchSpecBindingsActionPatchPtrOutput() SwitchSpecBindingsActionPatchPtrOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPatchPtrOutput) ToSwitchSpecBindingsActionPatchPtrOutputWithContext(ctx context.Context) SwitchSpecBindingsActionPatchPtrOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsActionPatchPtrOutput) Elem() SwitchSpecBindingsActionPatchOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) SwitchSpecBindingsActionPatch {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchSpecBindingsActionPatch
+		return ret
+	}).(SwitchSpecBindingsActionPatchOutput)
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SwitchSpecBindingsActionPatchPtrOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Brightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// BrightnessDelta adjusts desired brightness by this many percentage
+// points (can be negative), clamped 0-100 - for continuous dimming via
+// repeated "repeat" events while a button is held. No-op on a light
+// that doesn't support dimming.
+func (o SwitchSpecBindingsActionPatchPtrOutput) BrightnessDelta() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.BrightnessDelta
+	}).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SwitchSpecBindingsActionPatchPtrOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Color
+	}).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SwitchSpecBindingsActionPatchPtrOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// On, if set, forces the target lights' desired on/off state.
+func (o SwitchSpecBindingsActionPatchPtrOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.On
+	}).(pulumi.BoolPtrOutput)
+}
+
+// TargetLights are the names of Light CRs this action applies to.
+func (o SwitchSpecBindingsActionPatchPtrOutput) TargetLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) []string {
+		if v == nil {
+			return nil
+		}
+		return v.TargetLights
+	}).(pulumi.StringArrayOutput)
+}
+
+// Toggle, if true, flips each target light's desired on/off state
+// (based on its current Spec, not Status - see Reconciler). Ignored
+// if On is also set.
+func (o SwitchSpecBindingsActionPatchPtrOutput) Toggle() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchSpecBindingsActionPatch) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Toggle
+	}).(pulumi.BoolPtrOutput)
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindingsPatch struct {
+	Action *SwitchSpecBindingsActionPatch `pulumi:"action"`
+	// Event is the Hue button event this binding fires on.
+	Event *string `pulumi:"event"`
+}
+
+// SwitchSpecBindingsPatchInput is an input type that accepts SwitchSpecBindingsPatchArgs and SwitchSpecBindingsPatchOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsPatchInput` via:
+//
+//	SwitchSpecBindingsPatchArgs{...}
+type SwitchSpecBindingsPatchInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsPatchOutput() SwitchSpecBindingsPatchOutput
+	ToSwitchSpecBindingsPatchOutputWithContext(context.Context) SwitchSpecBindingsPatchOutput
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindingsPatchArgs struct {
+	Action SwitchSpecBindingsActionPatchPtrInput `pulumi:"action"`
+	// Event is the Hue button event this binding fires on.
+	Event pulumi.StringPtrInput `pulumi:"event"`
+}
+
+func (SwitchSpecBindingsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsPatch)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsPatchArgs) ToSwitchSpecBindingsPatchOutput() SwitchSpecBindingsPatchOutput {
+	return i.ToSwitchSpecBindingsPatchOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsPatchArgs) ToSwitchSpecBindingsPatchOutputWithContext(ctx context.Context) SwitchSpecBindingsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsPatchOutput)
+}
+
+// SwitchSpecBindingsPatchArrayInput is an input type that accepts SwitchSpecBindingsPatchArray and SwitchSpecBindingsPatchArrayOutput values.
+// You can construct a concrete instance of `SwitchSpecBindingsPatchArrayInput` via:
+//
+//	SwitchSpecBindingsPatchArray{ SwitchSpecBindingsPatchArgs{...} }
+type SwitchSpecBindingsPatchArrayInput interface {
+	pulumi.Input
+
+	ToSwitchSpecBindingsPatchArrayOutput() SwitchSpecBindingsPatchArrayOutput
+	ToSwitchSpecBindingsPatchArrayOutputWithContext(context.Context) SwitchSpecBindingsPatchArrayOutput
+}
+
+type SwitchSpecBindingsPatchArray []SwitchSpecBindingsPatchInput
+
+func (SwitchSpecBindingsPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchSpecBindingsPatch)(nil)).Elem()
+}
+
+func (i SwitchSpecBindingsPatchArray) ToSwitchSpecBindingsPatchArrayOutput() SwitchSpecBindingsPatchArrayOutput {
+	return i.ToSwitchSpecBindingsPatchArrayOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecBindingsPatchArray) ToSwitchSpecBindingsPatchArrayOutputWithContext(ctx context.Context) SwitchSpecBindingsPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecBindingsPatchArrayOutput)
+}
+
+// SwitchBinding fires Action whenever this button reports Event.
+type SwitchSpecBindingsPatchOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecBindingsPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsPatchOutput) ToSwitchSpecBindingsPatchOutput() SwitchSpecBindingsPatchOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsPatchOutput) ToSwitchSpecBindingsPatchOutputWithContext(ctx context.Context) SwitchSpecBindingsPatchOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsPatchOutput) Action() SwitchSpecBindingsActionPatchPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsPatch) *SwitchSpecBindingsActionPatch { return v.Action }).(SwitchSpecBindingsActionPatchPtrOutput)
+}
+
+// Event is the Hue button event this binding fires on.
+func (o SwitchSpecBindingsPatchOutput) Event() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchSpecBindingsPatch) *string { return v.Event }).(pulumi.StringPtrOutput)
+}
+
+type SwitchSpecBindingsPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecBindingsPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SwitchSpecBindingsPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecBindingsPatchArrayOutput) ToSwitchSpecBindingsPatchArrayOutput() SwitchSpecBindingsPatchArrayOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsPatchArrayOutput) ToSwitchSpecBindingsPatchArrayOutputWithContext(ctx context.Context) SwitchSpecBindingsPatchArrayOutput {
+	return o
+}
+
+func (o SwitchSpecBindingsPatchArrayOutput) Index(i pulumi.IntInput) SwitchSpecBindingsPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SwitchSpecBindingsPatch {
+		return vs[0].([]SwitchSpecBindingsPatch)[vs[1].(int)]
+	}).(SwitchSpecBindingsPatchOutput)
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpecPatch struct {
+	Bindings []SwitchSpecBindingsPatch `pulumi:"bindings"`
+}
+
+// SwitchSpecPatchInput is an input type that accepts SwitchSpecPatchArgs and SwitchSpecPatchOutput values.
+// You can construct a concrete instance of `SwitchSpecPatchInput` via:
+//
+//	SwitchSpecPatchArgs{...}
+type SwitchSpecPatchInput interface {
+	pulumi.Input
+
+	ToSwitchSpecPatchOutput() SwitchSpecPatchOutput
+	ToSwitchSpecPatchOutputWithContext(context.Context) SwitchSpecPatchOutput
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpecPatchArgs struct {
+	Bindings SwitchSpecBindingsPatchArrayInput `pulumi:"bindings"`
+}
+
+func (SwitchSpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecPatch)(nil)).Elem()
+}
+
+func (i SwitchSpecPatchArgs) ToSwitchSpecPatchOutput() SwitchSpecPatchOutput {
+	return i.ToSwitchSpecPatchOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecPatchArgs) ToSwitchSpecPatchOutputWithContext(ctx context.Context) SwitchSpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecPatchOutput)
+}
+
+func (i SwitchSpecPatchArgs) ToSwitchSpecPatchPtrOutput() SwitchSpecPatchPtrOutput {
+	return i.ToSwitchSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchSpecPatchArgs) ToSwitchSpecPatchPtrOutputWithContext(ctx context.Context) SwitchSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecPatchOutput).ToSwitchSpecPatchPtrOutputWithContext(ctx)
+}
+
+// SwitchSpecPatchPtrInput is an input type that accepts SwitchSpecPatchArgs, SwitchSpecPatchPtr and SwitchSpecPatchPtrOutput values.
+// You can construct a concrete instance of `SwitchSpecPatchPtrInput` via:
+//
+//	        SwitchSpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchSpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToSwitchSpecPatchPtrOutput() SwitchSpecPatchPtrOutput
+	ToSwitchSpecPatchPtrOutputWithContext(context.Context) SwitchSpecPatchPtrOutput
+}
+
+type switchSpecPatchPtrType SwitchSpecPatchArgs
+
+func SwitchSpecPatchPtr(v *SwitchSpecPatchArgs) SwitchSpecPatchPtrInput {
+	return (*switchSpecPatchPtrType)(v)
+}
+
+func (*switchSpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecPatch)(nil)).Elem()
+}
+
+func (i *switchSpecPatchPtrType) ToSwitchSpecPatchPtrOutput() SwitchSpecPatchPtrOutput {
+	return i.ToSwitchSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *switchSpecPatchPtrType) ToSwitchSpecPatchPtrOutputWithContext(ctx context.Context) SwitchSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchSpecPatchPtrOutput)
+}
+
+// SwitchSpec is the user-declared button->action configuration for a
+// single physical button. Unlike LightSpec, this starts nil at creation -
+// there is no seed-from-observed-state step, since a switch's desired
+// bindings are pure user configuration from day one. Empty Bindings means
+// this button is observed but does nothing.
+type SwitchSpecPatchOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchSpecPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecPatchOutput) ToSwitchSpecPatchOutput() SwitchSpecPatchOutput {
+	return o
+}
+
+func (o SwitchSpecPatchOutput) ToSwitchSpecPatchOutputWithContext(ctx context.Context) SwitchSpecPatchOutput {
+	return o
+}
+
+func (o SwitchSpecPatchOutput) ToSwitchSpecPatchPtrOutput() SwitchSpecPatchPtrOutput {
+	return o.ToSwitchSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchSpecPatchOutput) ToSwitchSpecPatchPtrOutputWithContext(ctx context.Context) SwitchSpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchSpecPatch) *SwitchSpecPatch {
+		return &v
+	}).(SwitchSpecPatchPtrOutput)
+}
+
+func (o SwitchSpecPatchOutput) Bindings() SwitchSpecBindingsPatchArrayOutput {
+	return o.ApplyT(func(v SwitchSpecPatch) []SwitchSpecBindingsPatch { return v.Bindings }).(SwitchSpecBindingsPatchArrayOutput)
+}
+
+type SwitchSpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchSpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchSpecPatch)(nil)).Elem()
+}
+
+func (o SwitchSpecPatchPtrOutput) ToSwitchSpecPatchPtrOutput() SwitchSpecPatchPtrOutput {
+	return o
+}
+
+func (o SwitchSpecPatchPtrOutput) ToSwitchSpecPatchPtrOutputWithContext(ctx context.Context) SwitchSpecPatchPtrOutput {
+	return o
+}
+
+func (o SwitchSpecPatchPtrOutput) Elem() SwitchSpecPatchOutput {
+	return o.ApplyT(func(v *SwitchSpecPatch) SwitchSpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchSpecPatch
+		return ret
+	}).(SwitchSpecPatchOutput)
+}
+
+func (o SwitchSpecPatchPtrOutput) Bindings() SwitchSpecBindingsPatchArrayOutput {
+	return o.ApplyT(func(v *SwitchSpecPatch) []SwitchSpecBindingsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Bindings
+	}).(SwitchSpecBindingsPatchArrayOutput)
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatus struct {
+	// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+	Battery *int `pulumi:"battery"`
+	// BridgeID is the Hue bridge id this switch belongs to.
+	BridgeId *string `pulumi:"bridgeId"`
+	// ControlID is which button/control this is on a multi-button device.
+	ControlId *int `pulumi:"controlId"`
+	// LastEvent is the most recent button event reported by the bridge,
+	// e.g. "short_release", "long_press" - empty if never reported.
+	LastEvent *string `pulumi:"lastEvent"`
+	// LastEventTime is when LastEvent was reported.
+	LastEventTime *string `pulumi:"lastEventTime"`
+	// LastHandledEventTime is the LastEventTime of the most recent event
+	// internal/switchcontroller.Reconciler has already acted on -
+	// comparing it to LastEventTime distinguishes a genuinely new button
+	// event from a repeat Reconcile delivery of an already-handled one.
+	LastHandledEventTime *string `pulumi:"lastHandledEventTime"`
+	// LastSynced is when this status was last successfully updated from
+	// the bridge.
+	LastSynced *string `pulumi:"lastSynced"`
+	// Model is the owning device's model ID.
+	Model *string `pulumi:"model"`
+	// Name is the owning device's name; buttons have no name of their own.
+	Name *string `pulumi:"name"`
+	// Product is the owning device's product name.
+	Product *string `pulumi:"product"`
+	// Reachable is false when the owning bridge failed to respond on the
+	// most recent poll - the rest of this status is then stale, left as
+	// of the last successful sync rather than cleared.
+	Reachable *bool `pulumi:"reachable"`
+}
+
+// SwitchStatusInput is an input type that accepts SwitchStatusArgs and SwitchStatusOutput values.
+// You can construct a concrete instance of `SwitchStatusInput` via:
+//
+//	SwitchStatusArgs{...}
+type SwitchStatusInput interface {
+	pulumi.Input
+
+	ToSwitchStatusOutput() SwitchStatusOutput
+	ToSwitchStatusOutputWithContext(context.Context) SwitchStatusOutput
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatusArgs struct {
+	// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+	Battery pulumi.IntPtrInput `pulumi:"battery"`
+	// BridgeID is the Hue bridge id this switch belongs to.
+	BridgeId pulumi.StringPtrInput `pulumi:"bridgeId"`
+	// ControlID is which button/control this is on a multi-button device.
+	ControlId pulumi.IntPtrInput `pulumi:"controlId"`
+	// LastEvent is the most recent button event reported by the bridge,
+	// e.g. "short_release", "long_press" - empty if never reported.
+	LastEvent pulumi.StringPtrInput `pulumi:"lastEvent"`
+	// LastEventTime is when LastEvent was reported.
+	LastEventTime pulumi.StringPtrInput `pulumi:"lastEventTime"`
+	// LastHandledEventTime is the LastEventTime of the most recent event
+	// internal/switchcontroller.Reconciler has already acted on -
+	// comparing it to LastEventTime distinguishes a genuinely new button
+	// event from a repeat Reconcile delivery of an already-handled one.
+	LastHandledEventTime pulumi.StringPtrInput `pulumi:"lastHandledEventTime"`
+	// LastSynced is when this status was last successfully updated from
+	// the bridge.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// Model is the owning device's model ID.
+	Model pulumi.StringPtrInput `pulumi:"model"`
+	// Name is the owning device's name; buttons have no name of their own.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// Product is the owning device's product name.
+	Product pulumi.StringPtrInput `pulumi:"product"`
+	// Reachable is false when the owning bridge failed to respond on the
+	// most recent poll - the rest of this status is then stale, left as
+	// of the last successful sync rather than cleared.
+	Reachable pulumi.BoolPtrInput `pulumi:"reachable"`
+}
+
+func (SwitchStatusArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchStatus)(nil)).Elem()
+}
+
+func (i SwitchStatusArgs) ToSwitchStatusOutput() SwitchStatusOutput {
+	return i.ToSwitchStatusOutputWithContext(context.Background())
+}
+
+func (i SwitchStatusArgs) ToSwitchStatusOutputWithContext(ctx context.Context) SwitchStatusOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusOutput)
+}
+
+func (i SwitchStatusArgs) ToSwitchStatusPtrOutput() SwitchStatusPtrOutput {
+	return i.ToSwitchStatusPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchStatusArgs) ToSwitchStatusPtrOutputWithContext(ctx context.Context) SwitchStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusOutput).ToSwitchStatusPtrOutputWithContext(ctx)
+}
+
+// SwitchStatusPtrInput is an input type that accepts SwitchStatusArgs, SwitchStatusPtr and SwitchStatusPtrOutput values.
+// You can construct a concrete instance of `SwitchStatusPtrInput` via:
+//
+//	        SwitchStatusArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchStatusPtrInput interface {
+	pulumi.Input
+
+	ToSwitchStatusPtrOutput() SwitchStatusPtrOutput
+	ToSwitchStatusPtrOutputWithContext(context.Context) SwitchStatusPtrOutput
+}
+
+type switchStatusPtrType SwitchStatusArgs
+
+func SwitchStatusPtr(v *SwitchStatusArgs) SwitchStatusPtrInput {
+	return (*switchStatusPtrType)(v)
+}
+
+func (*switchStatusPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchStatus)(nil)).Elem()
+}
+
+func (i *switchStatusPtrType) ToSwitchStatusPtrOutput() SwitchStatusPtrOutput {
+	return i.ToSwitchStatusPtrOutputWithContext(context.Background())
+}
+
+func (i *switchStatusPtrType) ToSwitchStatusPtrOutputWithContext(ctx context.Context) SwitchStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusPtrOutput)
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatusOutput struct{ *pulumi.OutputState }
+
+func (SwitchStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchStatus)(nil)).Elem()
+}
+
+func (o SwitchStatusOutput) ToSwitchStatusOutput() SwitchStatusOutput {
+	return o
+}
+
+func (o SwitchStatusOutput) ToSwitchStatusOutputWithContext(ctx context.Context) SwitchStatusOutput {
+	return o
+}
+
+func (o SwitchStatusOutput) ToSwitchStatusPtrOutput() SwitchStatusPtrOutput {
+	return o.ToSwitchStatusPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchStatusOutput) ToSwitchStatusPtrOutputWithContext(ctx context.Context) SwitchStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchStatus) *SwitchStatus {
+		return &v
+	}).(SwitchStatusPtrOutput)
+}
+
+// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+func (o SwitchStatusOutput) Battery() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *int { return v.Battery }).(pulumi.IntPtrOutput)
+}
+
+// BridgeID is the Hue bridge id this switch belongs to.
+func (o SwitchStatusOutput) BridgeId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.BridgeId }).(pulumi.StringPtrOutput)
+}
+
+// ControlID is which button/control this is on a multi-button device.
+func (o SwitchStatusOutput) ControlId() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *int { return v.ControlId }).(pulumi.IntPtrOutput)
+}
+
+// LastEvent is the most recent button event reported by the bridge,
+// e.g. "short_release", "long_press" - empty if never reported.
+func (o SwitchStatusOutput) LastEvent() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.LastEvent }).(pulumi.StringPtrOutput)
+}
+
+// LastEventTime is when LastEvent was reported.
+func (o SwitchStatusOutput) LastEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.LastEventTime }).(pulumi.StringPtrOutput)
+}
+
+// LastHandledEventTime is the LastEventTime of the most recent event
+// internal/switchcontroller.Reconciler has already acted on -
+// comparing it to LastEventTime distinguishes a genuinely new button
+// event from a repeat Reconcile delivery of an already-handled one.
+func (o SwitchStatusOutput) LastHandledEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.LastHandledEventTime }).(pulumi.StringPtrOutput)
+}
+
+// LastSynced is when this status was last successfully updated from
+// the bridge.
+func (o SwitchStatusOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// Model is the owning device's model ID.
+func (o SwitchStatusOutput) Model() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.Model }).(pulumi.StringPtrOutput)
+}
+
+// Name is the owning device's name; buttons have no name of their own.
+func (o SwitchStatusOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// Product is the owning device's product name.
+func (o SwitchStatusOutput) Product() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *string { return v.Product }).(pulumi.StringPtrOutput)
+}
+
+// Reachable is false when the owning bridge failed to respond on the
+// most recent poll - the rest of this status is then stale, left as
+// of the last successful sync rather than cleared.
+func (o SwitchStatusOutput) Reachable() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchStatus) *bool { return v.Reachable }).(pulumi.BoolPtrOutput)
+}
+
+type SwitchStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchStatus)(nil)).Elem()
+}
+
+func (o SwitchStatusPtrOutput) ToSwitchStatusPtrOutput() SwitchStatusPtrOutput {
+	return o
+}
+
+func (o SwitchStatusPtrOutput) ToSwitchStatusPtrOutputWithContext(ctx context.Context) SwitchStatusPtrOutput {
+	return o
+}
+
+func (o SwitchStatusPtrOutput) Elem() SwitchStatusOutput {
+	return o.ApplyT(func(v *SwitchStatus) SwitchStatus {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchStatus
+		return ret
+	}).(SwitchStatusOutput)
+}
+
+// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+func (o SwitchStatusPtrOutput) Battery() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Battery
+	}).(pulumi.IntPtrOutput)
+}
+
+// BridgeID is the Hue bridge id this switch belongs to.
+func (o SwitchStatusPtrOutput) BridgeId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.BridgeId
+	}).(pulumi.StringPtrOutput)
+}
+
+// ControlID is which button/control this is on a multi-button device.
+func (o SwitchStatusPtrOutput) ControlId() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ControlId
+	}).(pulumi.IntPtrOutput)
+}
+
+// LastEvent is the most recent button event reported by the bridge,
+// e.g. "short_release", "long_press" - empty if never reported.
+func (o SwitchStatusPtrOutput) LastEvent() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEvent
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastEventTime is when LastEvent was reported.
+func (o SwitchStatusPtrOutput) LastEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEventTime
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastHandledEventTime is the LastEventTime of the most recent event
+// internal/switchcontroller.Reconciler has already acted on -
+// comparing it to LastEventTime distinguishes a genuinely new button
+// event from a repeat Reconcile delivery of an already-handled one.
+func (o SwitchStatusPtrOutput) LastHandledEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastHandledEventTime
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastSynced is when this status was last successfully updated from
+// the bridge.
+func (o SwitchStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// Model is the owning device's model ID.
+func (o SwitchStatusPtrOutput) Model() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Model
+	}).(pulumi.StringPtrOutput)
+}
+
+// Name is the owning device's name; buttons have no name of their own.
+func (o SwitchStatusPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// Product is the owning device's product name.
+func (o SwitchStatusPtrOutput) Product() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Product
+	}).(pulumi.StringPtrOutput)
+}
+
+// Reachable is false when the owning bridge failed to respond on the
+// most recent poll - the rest of this status is then stale, left as
+// of the last successful sync rather than cleared.
+func (o SwitchStatusPtrOutput) Reachable() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchStatus) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Reachable
+	}).(pulumi.BoolPtrOutput)
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatusPatch struct {
+	// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+	Battery *int `pulumi:"battery"`
+	// BridgeID is the Hue bridge id this switch belongs to.
+	BridgeId *string `pulumi:"bridgeId"`
+	// ControlID is which button/control this is on a multi-button device.
+	ControlId *int `pulumi:"controlId"`
+	// LastEvent is the most recent button event reported by the bridge,
+	// e.g. "short_release", "long_press" - empty if never reported.
+	LastEvent *string `pulumi:"lastEvent"`
+	// LastEventTime is when LastEvent was reported.
+	LastEventTime *string `pulumi:"lastEventTime"`
+	// LastHandledEventTime is the LastEventTime of the most recent event
+	// internal/switchcontroller.Reconciler has already acted on -
+	// comparing it to LastEventTime distinguishes a genuinely new button
+	// event from a repeat Reconcile delivery of an already-handled one.
+	LastHandledEventTime *string `pulumi:"lastHandledEventTime"`
+	// LastSynced is when this status was last successfully updated from
+	// the bridge.
+	LastSynced *string `pulumi:"lastSynced"`
+	// Model is the owning device's model ID.
+	Model *string `pulumi:"model"`
+	// Name is the owning device's name; buttons have no name of their own.
+	Name *string `pulumi:"name"`
+	// Product is the owning device's product name.
+	Product *string `pulumi:"product"`
+	// Reachable is false when the owning bridge failed to respond on the
+	// most recent poll - the rest of this status is then stale, left as
+	// of the last successful sync rather than cleared.
+	Reachable *bool `pulumi:"reachable"`
+}
+
+// SwitchStatusPatchInput is an input type that accepts SwitchStatusPatchArgs and SwitchStatusPatchOutput values.
+// You can construct a concrete instance of `SwitchStatusPatchInput` via:
+//
+//	SwitchStatusPatchArgs{...}
+type SwitchStatusPatchInput interface {
+	pulumi.Input
+
+	ToSwitchStatusPatchOutput() SwitchStatusPatchOutput
+	ToSwitchStatusPatchOutputWithContext(context.Context) SwitchStatusPatchOutput
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatusPatchArgs struct {
+	// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+	Battery pulumi.IntPtrInput `pulumi:"battery"`
+	// BridgeID is the Hue bridge id this switch belongs to.
+	BridgeId pulumi.StringPtrInput `pulumi:"bridgeId"`
+	// ControlID is which button/control this is on a multi-button device.
+	ControlId pulumi.IntPtrInput `pulumi:"controlId"`
+	// LastEvent is the most recent button event reported by the bridge,
+	// e.g. "short_release", "long_press" - empty if never reported.
+	LastEvent pulumi.StringPtrInput `pulumi:"lastEvent"`
+	// LastEventTime is when LastEvent was reported.
+	LastEventTime pulumi.StringPtrInput `pulumi:"lastEventTime"`
+	// LastHandledEventTime is the LastEventTime of the most recent event
+	// internal/switchcontroller.Reconciler has already acted on -
+	// comparing it to LastEventTime distinguishes a genuinely new button
+	// event from a repeat Reconcile delivery of an already-handled one.
+	LastHandledEventTime pulumi.StringPtrInput `pulumi:"lastHandledEventTime"`
+	// LastSynced is when this status was last successfully updated from
+	// the bridge.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// Model is the owning device's model ID.
+	Model pulumi.StringPtrInput `pulumi:"model"`
+	// Name is the owning device's name; buttons have no name of their own.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// Product is the owning device's product name.
+	Product pulumi.StringPtrInput `pulumi:"product"`
+	// Reachable is false when the owning bridge failed to respond on the
+	// most recent poll - the rest of this status is then stale, left as
+	// of the last successful sync rather than cleared.
+	Reachable pulumi.BoolPtrInput `pulumi:"reachable"`
+}
+
+func (SwitchStatusPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchStatusPatch)(nil)).Elem()
+}
+
+func (i SwitchStatusPatchArgs) ToSwitchStatusPatchOutput() SwitchStatusPatchOutput {
+	return i.ToSwitchStatusPatchOutputWithContext(context.Background())
+}
+
+func (i SwitchStatusPatchArgs) ToSwitchStatusPatchOutputWithContext(ctx context.Context) SwitchStatusPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusPatchOutput)
+}
+
+func (i SwitchStatusPatchArgs) ToSwitchStatusPatchPtrOutput() SwitchStatusPatchPtrOutput {
+	return i.ToSwitchStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i SwitchStatusPatchArgs) ToSwitchStatusPatchPtrOutputWithContext(ctx context.Context) SwitchStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusPatchOutput).ToSwitchStatusPatchPtrOutputWithContext(ctx)
+}
+
+// SwitchStatusPatchPtrInput is an input type that accepts SwitchStatusPatchArgs, SwitchStatusPatchPtr and SwitchStatusPatchPtrOutput values.
+// You can construct a concrete instance of `SwitchStatusPatchPtrInput` via:
+//
+//	        SwitchStatusPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type SwitchStatusPatchPtrInput interface {
+	pulumi.Input
+
+	ToSwitchStatusPatchPtrOutput() SwitchStatusPatchPtrOutput
+	ToSwitchStatusPatchPtrOutputWithContext(context.Context) SwitchStatusPatchPtrOutput
+}
+
+type switchStatusPatchPtrType SwitchStatusPatchArgs
+
+func SwitchStatusPatchPtr(v *SwitchStatusPatchArgs) SwitchStatusPatchPtrInput {
+	return (*switchStatusPatchPtrType)(v)
+}
+
+func (*switchStatusPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchStatusPatch)(nil)).Elem()
+}
+
+func (i *switchStatusPatchPtrType) ToSwitchStatusPatchPtrOutput() SwitchStatusPatchPtrOutput {
+	return i.ToSwitchStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *switchStatusPatchPtrType) ToSwitchStatusPatchPtrOutputWithContext(ctx context.Context) SwitchStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SwitchStatusPatchPtrOutput)
+}
+
+// SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+// plus Reachable/LastSynced (same convention as LightStatus) and
+// LastHandledEventTime (internal/switchcontroller.Reconciler's own
+// bookkeeping of which event it has already acted on).
+type SwitchStatusPatchOutput struct{ *pulumi.OutputState }
+
+func (SwitchStatusPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SwitchStatusPatch)(nil)).Elem()
+}
+
+func (o SwitchStatusPatchOutput) ToSwitchStatusPatchOutput() SwitchStatusPatchOutput {
+	return o
+}
+
+func (o SwitchStatusPatchOutput) ToSwitchStatusPatchOutputWithContext(ctx context.Context) SwitchStatusPatchOutput {
+	return o
+}
+
+func (o SwitchStatusPatchOutput) ToSwitchStatusPatchPtrOutput() SwitchStatusPatchPtrOutput {
+	return o.ToSwitchStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (o SwitchStatusPatchOutput) ToSwitchStatusPatchPtrOutputWithContext(ctx context.Context) SwitchStatusPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SwitchStatusPatch) *SwitchStatusPatch {
+		return &v
+	}).(SwitchStatusPatchPtrOutput)
+}
+
+// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+func (o SwitchStatusPatchOutput) Battery() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *int { return v.Battery }).(pulumi.IntPtrOutput)
+}
+
+// BridgeID is the Hue bridge id this switch belongs to.
+func (o SwitchStatusPatchOutput) BridgeId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.BridgeId }).(pulumi.StringPtrOutput)
+}
+
+// ControlID is which button/control this is on a multi-button device.
+func (o SwitchStatusPatchOutput) ControlId() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *int { return v.ControlId }).(pulumi.IntPtrOutput)
+}
+
+// LastEvent is the most recent button event reported by the bridge,
+// e.g. "short_release", "long_press" - empty if never reported.
+func (o SwitchStatusPatchOutput) LastEvent() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.LastEvent }).(pulumi.StringPtrOutput)
+}
+
+// LastEventTime is when LastEvent was reported.
+func (o SwitchStatusPatchOutput) LastEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.LastEventTime }).(pulumi.StringPtrOutput)
+}
+
+// LastHandledEventTime is the LastEventTime of the most recent event
+// internal/switchcontroller.Reconciler has already acted on -
+// comparing it to LastEventTime distinguishes a genuinely new button
+// event from a repeat Reconcile delivery of an already-handled one.
+func (o SwitchStatusPatchOutput) LastHandledEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.LastHandledEventTime }).(pulumi.StringPtrOutput)
+}
+
+// LastSynced is when this status was last successfully updated from
+// the bridge.
+func (o SwitchStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// Model is the owning device's model ID.
+func (o SwitchStatusPatchOutput) Model() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.Model }).(pulumi.StringPtrOutput)
+}
+
+// Name is the owning device's name; buttons have no name of their own.
+func (o SwitchStatusPatchOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// Product is the owning device's product name.
+func (o SwitchStatusPatchOutput) Product() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *string { return v.Product }).(pulumi.StringPtrOutput)
+}
+
+// Reachable is false when the owning bridge failed to respond on the
+// most recent poll - the rest of this status is then stale, left as
+// of the last successful sync rather than cleared.
+func (o SwitchStatusPatchOutput) Reachable() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SwitchStatusPatch) *bool { return v.Reachable }).(pulumi.BoolPtrOutput)
+}
+
+type SwitchStatusPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (SwitchStatusPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SwitchStatusPatch)(nil)).Elem()
+}
+
+func (o SwitchStatusPatchPtrOutput) ToSwitchStatusPatchPtrOutput() SwitchStatusPatchPtrOutput {
+	return o
+}
+
+func (o SwitchStatusPatchPtrOutput) ToSwitchStatusPatchPtrOutputWithContext(ctx context.Context) SwitchStatusPatchPtrOutput {
+	return o
+}
+
+func (o SwitchStatusPatchPtrOutput) Elem() SwitchStatusPatchOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) SwitchStatusPatch {
+		if v != nil {
+			return *v
+		}
+		var ret SwitchStatusPatch
+		return ret
+	}).(SwitchStatusPatchOutput)
+}
+
+// Battery is a percentage 0-100, or -1 if unknown (e.g. mains-powered).
+func (o SwitchStatusPatchPtrOutput) Battery() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Battery
+	}).(pulumi.IntPtrOutput)
+}
+
+// BridgeID is the Hue bridge id this switch belongs to.
+func (o SwitchStatusPatchPtrOutput) BridgeId() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.BridgeId
+	}).(pulumi.StringPtrOutput)
+}
+
+// ControlID is which button/control this is on a multi-button device.
+func (o SwitchStatusPatchPtrOutput) ControlId() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.ControlId
+	}).(pulumi.IntPtrOutput)
+}
+
+// LastEvent is the most recent button event reported by the bridge,
+// e.g. "short_release", "long_press" - empty if never reported.
+func (o SwitchStatusPatchPtrOutput) LastEvent() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEvent
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastEventTime is when LastEvent was reported.
+func (o SwitchStatusPatchPtrOutput) LastEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastEventTime
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastHandledEventTime is the LastEventTime of the most recent event
+// internal/switchcontroller.Reconciler has already acted on -
+// comparing it to LastEventTime distinguishes a genuinely new button
+// event from a repeat Reconcile delivery of an already-handled one.
+func (o SwitchStatusPatchPtrOutput) LastHandledEventTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastHandledEventTime
+	}).(pulumi.StringPtrOutput)
+}
+
+// LastSynced is when this status was last successfully updated from
+// the bridge.
+func (o SwitchStatusPatchPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// Model is the owning device's model ID.
+func (o SwitchStatusPatchPtrOutput) Model() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Model
+	}).(pulumi.StringPtrOutput)
+}
+
+// Name is the owning device's name; buttons have no name of their own.
+func (o SwitchStatusPatchPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// Product is the owning device's product name.
+func (o SwitchStatusPatchPtrOutput) Product() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Product
+	}).(pulumi.StringPtrOutput)
+}
+
+// Reachable is false when the owning bridge failed to respond on the
+// most recent poll - the rest of this status is then stale, left as
+// of the last successful sync rather than cleared.
+func (o SwitchStatusPatchPtrOutput) Reachable() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *SwitchStatusPatch) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Reachable
+	}).(pulumi.BoolPtrOutput)
+}
+
 func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*HueBridgeTypeInput)(nil)).Elem(), HueBridgeTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*HueBridgeTypeArrayInput)(nil)).Elem(), HueBridgeTypeArray{})
@@ -2739,6 +4880,26 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPtrInput)(nil)).Elem(), LightStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPatchInput)(nil)).Elem(), LightStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPatchPtrInput)(nil)).Elem(), LightStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchTypeInput)(nil)).Elem(), SwitchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchTypeArrayInput)(nil)).Elem(), SwitchTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchListTypeInput)(nil)).Elem(), SwitchListTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchPatchTypeInput)(nil)).Elem(), SwitchPatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecInput)(nil)).Elem(), SwitchSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecPtrInput)(nil)).Elem(), SwitchSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsInput)(nil)).Elem(), SwitchSpecBindingsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsArrayInput)(nil)).Elem(), SwitchSpecBindingsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsActionInput)(nil)).Elem(), SwitchSpecBindingsActionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsActionPtrInput)(nil)).Elem(), SwitchSpecBindingsActionArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsActionPatchInput)(nil)).Elem(), SwitchSpecBindingsActionPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsActionPatchPtrInput)(nil)).Elem(), SwitchSpecBindingsActionPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsPatchInput)(nil)).Elem(), SwitchSpecBindingsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecBindingsPatchArrayInput)(nil)).Elem(), SwitchSpecBindingsPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecPatchInput)(nil)).Elem(), SwitchSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchSpecPatchPtrInput)(nil)).Elem(), SwitchSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusInput)(nil)).Elem(), SwitchStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPtrInput)(nil)).Elem(), SwitchStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchInput)(nil)).Elem(), SwitchStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchPtrInput)(nil)).Elem(), SwitchStatusPatchArgs{})
 	pulumi.RegisterOutputType(HueBridgeTypeOutput{})
 	pulumi.RegisterOutputType(HueBridgeTypeArrayOutput{})
 	pulumi.RegisterOutputType(HueBridgeListTypeOutput{})
@@ -2759,4 +4920,24 @@ func init() {
 	pulumi.RegisterOutputType(LightStatusPtrOutput{})
 	pulumi.RegisterOutputType(LightStatusPatchOutput{})
 	pulumi.RegisterOutputType(LightStatusPatchPtrOutput{})
+	pulumi.RegisterOutputType(SwitchTypeOutput{})
+	pulumi.RegisterOutputType(SwitchTypeArrayOutput{})
+	pulumi.RegisterOutputType(SwitchListTypeOutput{})
+	pulumi.RegisterOutputType(SwitchPatchTypeOutput{})
+	pulumi.RegisterOutputType(SwitchSpecOutput{})
+	pulumi.RegisterOutputType(SwitchSpecPtrOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsArrayOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsActionOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsActionPtrOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsActionPatchOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsActionPatchPtrOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsPatchOutput{})
+	pulumi.RegisterOutputType(SwitchSpecBindingsPatchArrayOutput{})
+	pulumi.RegisterOutputType(SwitchSpecPatchOutput{})
+	pulumi.RegisterOutputType(SwitchSpecPatchPtrOutput{})
+	pulumi.RegisterOutputType(SwitchStatusOutput{})
+	pulumi.RegisterOutputType(SwitchStatusPtrOutput{})
+	pulumi.RegisterOutputType(SwitchStatusPatchOutput{})
+	pulumi.RegisterOutputType(SwitchStatusPatchPtrOutput{})
 }

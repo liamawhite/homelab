@@ -108,3 +108,44 @@ func hexToXY(hex string) (x, y float64, err error) {
 	}
 	return X / (X + Y + Z), Y / (X + Y + Z), nil
 }
+
+// ColorMatchTolerance is the maximum CIE xy chromaticity distance at which
+// two "#rrggbb" colors are considered the same color. Not zero: a
+// commanded color and the bridge's later-reported observed color never
+// round-trip to an identical hex string. Two things make that
+// unavoidable, not just imprecise math - (1) gamut clamping: if a
+// requested color is outside what a specific bulb model can physically
+// produce, the bridge clamps it to the nearest color that bulb's LEDs can
+// actually render, a real hardware limit; (2) quantization: hex is
+// 8-bit-per-channel, xy is floating point, and the hex->xy->(bridge)->
+// xy->hex round trip passes through a nonlinear gamma+matrix transform
+// twice, rounding at each 8-bit boundary. ColorMatchTolerance is small
+// enough to reject a real color change, generous enough to absorb normal
+// round-trip noise from both of those.
+const ColorMatchTolerance = 0.01
+
+// ColorsMatch reports whether a and b are the same color within
+// ColorMatchTolerance, comparing in CIE xy chromaticity space rather than
+// as hex strings (see ColorMatchTolerance's doc for why exact string
+// equality is the wrong test here). "" only matches "" (both mean "light
+// doesn't support color") - never matches a real color: a malformed hex
+// string never matches anything either (a conservative "different"
+// default, not a silent false positive).
+func ColorsMatch(a, b string) bool {
+	if a == b {
+		return true
+	}
+	if a == "" || b == "" {
+		return false
+	}
+	ax, ay, err := hexToXY(a)
+	if err != nil {
+		return false
+	}
+	bx, by, err := hexToXY(b)
+	if err != nil {
+		return false
+	}
+	dx, dy := ax-bx, ay-by
+	return dx*dx+dy*dy <= ColorMatchTolerance*ColorMatchTolerance
+}

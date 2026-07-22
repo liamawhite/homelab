@@ -33,6 +33,12 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &LightList{}
 	case "kubernetes:lights.homelab.internal/v1alpha1:LightPatch":
 		r = &LightPatch{}
+	case "kubernetes:lights.homelab.internal/v1alpha1:Switch":
+		r = &Switch{}
+	case "kubernetes:lights.homelab.internal/v1alpha1:SwitchList":
+		r = &SwitchList{}
+	case "kubernetes:lights.homelab.internal/v1alpha1:SwitchPatch":
+		r = &SwitchPatch{}
 	default:
 		return nil, fmt.Errorf("unknown resource type: %s", typ)
 	}

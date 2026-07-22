@@ -24,9 +24,12 @@ spec:
     - jsonPath: .status.brightness
       name: Brightness
       type: integer
-    - jsonPath: .status.bridgeId
-      name: Bridge
+    - jsonPath: .status.color
+      name: Color
       type: string
+    - jsonPath: .status.colorTempK
+      name: Color Temp
+      type: integer
     - jsonPath: .status.reachable
       name: Reachable
       priority: 1
@@ -149,8 +152,8 @@ spec:
               lastEnactAttempt:
                 description: |-
                   LastEnactAttempt is when the controller last attempted to push Spec
-                  to the bridge (success or failure) - also the debounce clock:
-                  Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+                  to the bridge (success or failure) - purely informational bookkeeping,
+                  visible via kubectl.
                 format: date-time
                 type: string
               lastSynced:

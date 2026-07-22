@@ -3,7 +3,6 @@ package lightscontroller
 import (
 	"slices"
 	"testing"
-	"time"
 
 	lightsv1alpha1 "github.com/liamawhite/lights-controller/api/v1alpha1"
 	"github.com/liamawhite/lights-controller/internal/bridges"
@@ -87,21 +86,6 @@ func TestHasField(t *testing.T) {
 	}
 	if hasField(nil, "on") {
 		t.Error("hasField(nil, \"on\") = true, want false")
-	}
-}
-
-func TestRemainingCooldown(t *testing.T) {
-	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
-	cooldown := 30 * time.Second
-
-	if got := remainingCooldown(time.Time{}, cooldown, now); got != 0 {
-		t.Errorf("remainingCooldown with zero lastAttempt = %v, want 0", got)
-	}
-	if got := remainingCooldown(now.Add(-10*time.Second), cooldown, now); got != 20*time.Second {
-		t.Errorf("remainingCooldown 10s into a 30s cooldown = %v, want 20s", got)
-	}
-	if got := remainingCooldown(now.Add(-45*time.Second), cooldown, now); got > 0 {
-		t.Errorf("remainingCooldown after cooldown elapsed = %v, want <= 0", got)
 	}
 }
 

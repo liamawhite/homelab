@@ -340,12 +340,14 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// Kubernetes API (a missing/unreachable HueBridge is handled
 		// gracefully), not at deploy time.
 		_, err = lightscontroller.NewLightsController(ctx, "lights-controller", &lightscontroller.LightsControllerArgs{
-			Namespace:    lightsNS.Metadata.Name().Elem(),
-			Bridges:      infraCfg.Lights.Hue.Bridges,
-			PollInterval: pulumi.String("60s"),
-			// Deliberately true regardless of the binary's own default -
-			// see LightsControllerArgs.DryRun's doc comment.
-			DryRun: pulumi.Bool(true),
+			Namespace: lightsNS.Metadata.Name().Elem(),
+			Bridges:   infraCfg.Lights.Hue.Bridges,
+			// Now a drift safety net behind the real-time eventstream path,
+			// not the primary sync mechanism.
+			PollInterval: pulumi.String("30s"),
+			// Enactment enabled - the reconciler pushes Light.Spec changes
+			// to the physical bridge instead of only logging drift.
+			DryRun: pulumi.Bool(false),
 			Image:  lightsImage.Ref,
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp, lightsImage}),

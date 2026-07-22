@@ -87,8 +87,8 @@ type LightStatus struct {
 	// support (see Reconciler).
 	DeviceID string `json:"deviceId,omitempty"`
 	// LastEnactAttempt is when the controller last attempted to push Spec
-	// to the bridge (success or failure) - also the debounce clock:
-	// Reconcile won't re-attempt within --enact-cooldown of this timestamp.
+	// to the bridge (success or failure) - purely informational bookkeeping,
+	// visible via kubectl.
 	LastEnactAttempt metav1.Time `json:"lastEnactAttempt,omitempty"`
 	// EnactError is the most recent enactment failure, or "" if the last
 	// attempt succeeded (or none has been made, or nothing currently
@@ -102,7 +102,8 @@ type LightStatus struct {
 // +kubebuilder:printcolumn:name="Display Name",type="string",JSONPath=".status.name"
 // +kubebuilder:printcolumn:name="On",type="boolean",JSONPath=".status.on"
 // +kubebuilder:printcolumn:name="Brightness",type="integer",JSONPath=".status.brightness"
-// +kubebuilder:printcolumn:name="Bridge",type="string",JSONPath=".status.bridgeId"
+// +kubebuilder:printcolumn:name="Color",type="string",JSONPath=".status.color"
+// +kubebuilder:printcolumn:name="Color Temp",type="integer",JSONPath=".status.colorTempK"
 // +kubebuilder:printcolumn:name="Reachable",type="boolean",JSONPath=".status.reachable",priority=1
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 

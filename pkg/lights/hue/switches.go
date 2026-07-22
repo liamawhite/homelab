@@ -34,9 +34,9 @@ type buttonResource struct {
 		ControlID int `json:"control_id"`
 	} `json:"metadata"`
 	Button struct {
-		LastEvent    string `json:"last_event"`
 		ButtonReport struct {
 			Updated string `json:"updated"`
+			Event   string `json:"event"`
 		} `json:"button_report"`
 	} `json:"button"`
 }
@@ -119,7 +119,7 @@ func FetchSwitches(ctx context.Context, ip, bridgeID, appKey string) ([]Switch, 
 			BridgeID:      bridgeID,
 			Name:          device.Name,
 			ControlID:     r.Metadata.ControlID,
-			LastEvent:     r.Button.LastEvent,
+			LastEvent:     r.Button.ButtonReport.Event,
 			LastEventTime: lastEventTime,
 			Battery:       batteryLevel,
 			Product:       device.Product,

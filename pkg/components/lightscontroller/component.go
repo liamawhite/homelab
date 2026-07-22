@@ -96,6 +96,19 @@ func NewLightsController(ctx *pulumi.Context, name string, args *LightsControlle
 				Resources: pulumi.StringArray{pulumi.String("lights/status")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
 			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				Resources: pulumi.StringArray{pulumi.String("switches")},
+				Verbs: pulumi.StringArray{
+					pulumi.String("get"), pulumi.String("list"), pulumi.String("watch"),
+					pulumi.String("create"), pulumi.String("update"), pulumi.String("patch"), pulumi.String("delete"),
+				},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				Resources: pulumi.StringArray{pulumi.String("switches/status")},
+				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
+			},
 			// Read-only: hub-controller (pkg/components/hubcontroller) owns
 			// writing HueBridge - this controller only reads status.ip from
 			// it, never writes one.

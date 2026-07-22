@@ -1,0 +1,209 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: switches.lights.homelab.internal
+spec:
+  group: lights.homelab.internal
+  names:
+    kind: Switch
+    listKind: SwitchList
+    plural: switches
+    singular: switch
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.name
+      name: Display Name
+      type: string
+    - jsonPath: .status.controlId
+      name: Control
+      type: integer
+    - jsonPath: .status.lastEvent
+      name: Last Event
+      type: string
+    - jsonPath: .status.battery
+      name: Battery
+      type: integer
+    - jsonPath: .status.bridgeId
+      name: Bridge
+      type: string
+    - jsonPath: .status.reachable
+      name: Reachable
+      priority: 1
+      type: boolean
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Switch represents a single physical button's live, observed state plus
+          its user-declared bindings. Cluster scoped, same reasoning as Light.
+          Named after the button resource's own Hue UUID (stable, unique, valid as
+          a Kubernetes object name) - a multi-button device (e.g. a 4-button Hue
+          Dimmer Switch) produces one Switch CR per button, sharing BridgeID/
+          Name/Product/Model/Battery but with distinct names/ControlID.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              SwitchSpec is the user-declared button->action configuration for a
+              single physical button. Unlike LightSpec, this starts nil at creation -
+              there is no seed-from-observed-state step, since a switch's desired
+              bindings are pure user configuration from day one. Empty Bindings means
+              this button is observed but does nothing.
+            properties:
+              bindings:
+                items:
+                  description: SwitchBinding fires Action whenever this button reports
+                    Event.
+                  properties:
+                    action:
+                      description: Action is what to do when Event fires.
+                      properties:
+                        brightness:
+                          description: |-
+                            Brightness sets desired brightness to this absolute percentage,
+                            clamped 0-100. No-op on a light that doesn't support dimming.
+                          format: int32
+                          maximum: 100
+                          minimum: 0
+                          type: integer
+                        brightnessDelta:
+                          description: |-
+                            BrightnessDelta adjusts desired brightness by this many percentage
+                            points (can be negative), clamped 0-100 - for continuous dimming via
+                            repeated "repeat" events while a button is held. No-op on a light
+                            that doesn't support dimming.
+                          format: int32
+                          type: integer
+                        color:
+                          description: |-
+                            Color sets desired color to this "#rrggbb" swatch. No-op on a light
+                            that doesn't support color.
+                          type: string
+                        colorTempK:
+                          description: |-
+                            ColorTempK sets desired color temperature in Kelvin. No-op on a
+                            light that doesn't support color temperature.
+                          format: int32
+                          type: integer
+                        "on":
+                          description: On, if set, forces the target lights' desired
+                            on/off state.
+                          type: boolean
+                        targetLights:
+                          description: TargetLights are the names of Light CRs this
+                            action applies to.
+                          items:
+                            type: string
+                          type: array
+                        toggle:
+                          description: |-
+                            Toggle, if true, flips each target light's desired on/off state
+                            (based on its current Spec, not Status - see Reconciler). Ignored
+                            if On is also set.
+                          type: boolean
+                      type: object
+                    event:
+                      description: Event is the Hue button event this binding fires
+                        on.
+                      enum:
+                      - initial_press
+                      - repeat
+                      - short_release
+                      - long_release
+                      - double_short_release
+                      - long_press
+                      type: string
+                  required:
+                  - action
+                  - event
+                  type: object
+                type: array
+            type: object
+          status:
+            description: |-
+              SwitchStatus mirrors github.com/liamawhite/homelab/pkg/lights/hue.Switch,
+              plus Reachable/LastSynced (same convention as LightStatus) and
+              LastHandledEventTime (internal/switchcontroller.Reconciler's own
+              bookkeeping of which event it has already acted on).
+            properties:
+              battery:
+                description: Battery is a percentage 0-100, or -1 if unknown (e.g.
+                  mains-powered).
+                format: int32
+                type: integer
+              bridgeId:
+                description: BridgeID is the Hue bridge id this switch belongs to.
+                type: string
+              controlId:
+                description: ControlID is which button/control this is on a multi-button
+                  device.
+                format: int32
+                type: integer
+              lastEvent:
+                description: |-
+                  LastEvent is the most recent button event reported by the bridge,
+                  e.g. "short_release", "long_press" - empty if never reported.
+                type: string
+              lastEventTime:
+                description: LastEventTime is when LastEvent was reported.
+                format: date-time
+                type: string
+              lastHandledEventTime:
+                description: |-
+                  LastHandledEventTime is the LastEventTime of the most recent event
+                  internal/switchcontroller.Reconciler has already acted on -
+                  comparing it to LastEventTime distinguishes a genuinely new button
+                  event from a repeat Reconcile delivery of an already-handled one.
+                format: date-time
+                type: string
+              lastSynced:
+                description: |-
+                  LastSynced is when this status was last successfully updated from
+                  the bridge.
+                format: date-time
+                type: string
+              model:
+                description: Model is the owning device's model ID.
+                type: string
+              name:
+                description: Name is the owning device's name; buttons have no name
+                  of their own.
+                type: string
+              product:
+                description: Product is the owning device's product name.
+                type: string
+              reachable:
+                description: |-
+                  Reachable is false when the owning bridge failed to respond on the
+                  most recent poll - the rest of this status is then stale, left as
+                  of the last successful sync rather than cleared.
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

@@ -31,8 +31,9 @@ trap 'rm -rf "${TMP_DIR}"' EXIT
 # assume. Map each to the stable filename install.go embeds.
 mv "${TMP_DIR}/lights.homelab.internal_lights.yaml" "${SCRIPT_DIR}/light-crd.yaml"
 mv "${TMP_DIR}/lights.homelab.internal_huebridges.yaml" "${SCRIPT_DIR}/huebridge-crd.yaml"
+mv "${TMP_DIR}/lights.homelab.internal_switches.yaml" "${SCRIPT_DIR}/switch-crd.yaml"
 
 echo "Generating Pulumi Go types from CRDs..."
-(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml)
+(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml)
 
 echo "Successfully generated Light/HueBridge CRD types!"

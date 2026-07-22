@@ -145,38 +145,6 @@ func parseLightResource(r lightResource, bridgeID string, device DeviceInfo) Lig
 	}
 }
 
-// FetchLight returns the current live state of a single light by ID,
-// without the Product/Model device enrichment FetchLights does - used by
-// lightscontroller's Reconciler to poll for confirmation shortly after
-// enacting a change, where a per-light device lookup isn't needed.
-func FetchLight(ctx context.Context, ip, appKey, lightID string) (Light, error) {
-	url := fmt.Sprintf("https://%s/clip/v2/resource/light/%s", ip, lightID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return Light{}, fmt.Errorf("failed to build request for %s: %w", url, err)
-	}
-	req.Header.Set("hue-application-key", appKey)
-
-	resp, err := hueClient.Do(req)
-	if err != nil {
-		return Light{}, fmt.Errorf("failed to reach %s: %w", url, err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return Light{}, fmt.Errorf("%s returned status %d", url, resp.StatusCode)
-	}
-
-	var parsed lightsResponse
-	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
-		return Light{}, fmt.Errorf("failed to decode response from %s: %w", url, err)
-	}
-	if len(parsed.Data) == 0 {
-		return Light{}, fmt.Errorf("light %s not found on bridge %s", lightID, ip)
-	}
-	return parseLightResource(parsed.Data[0], "", DeviceInfo{}), nil
-}
-
 // UpdateLightState is the subset of a light's state that can be enacted
 // via the light resource's own PUT endpoint (renaming is not part of this
 // - see RenameDevice).
