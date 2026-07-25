@@ -1,12 +1,18 @@
 package lightscontroller
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/go-logr/logr"
 	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 )
 
 func TestMergeLightStatus(t *testing.T) {
@@ -80,4 +86,59 @@ func TestMergeLightStatus(t *testing.T) {
 			t.Errorf("got %+v, want static metadata untouched", got)
 		}
 	})
+}
+
+func TestHandleEvent_LightNotFound_SkippedSilently(t *testing.T) {
+	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).Build()
+	c := &EventConsumer{Client: fakeClient}
+
+	// Should not panic even though no Light named "missing" exists.
+	c.handleEvent(context.Background(), logr.Discard(), lighthue.LightEvent{LightID: "missing"})
+}
+
+func TestHandleEvent_MergesStatusForExistingLight(t *testing.T) {
+	boolPtr := func(b bool) *bool { return &b }
+	light := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
+		Status:     lumenetesv1alpha1.LightStatus{On: false, Brightness: 50},
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	c := &EventConsumer{Client: fakeClient}
+
+	c.handleEvent(context.Background(), logr.Discard(), lighthue.LightEvent{LightID: "light-1", On: boolPtr(true)})
+
+	var got lumenetesv1alpha1.Light
+	if err := fakeClient.Get(context.Background(), client.ObjectKey{Name: "light-1"}, &got); err != nil {
+		t.Fatalf("Get() error = %v", err)
+	}
+	if !got.Status.On {
+		t.Error("got On = false, want true after event merge")
+	}
+	if got.Status.Brightness != 50 {
+		t.Errorf("got Brightness = %d, want 50 (untouched by an on-only event)", got.Status.Brightness)
+	}
+	if !got.Status.Reachable || got.Status.LastSynced.IsZero() {
+		t.Errorf("got Status = %+v, want Reachable=true and LastSynced set", got.Status)
+	}
+}
+
+func TestHandleEvent_StatusUpdateFails_NoPanic(t *testing.T) {
+	boolPtr := func(b bool) *bool { return &b }
+	light := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
+	}
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(newScheme(t)).
+		WithObjects(light).
+		WithStatusSubresource(&lumenetesv1alpha1.Light{}).
+		WithInterceptorFuncs(interceptor.Funcs{
+			SubResourceUpdate: func(ctx context.Context, c client.Client, subResourceName string, obj client.Object, opts ...client.SubResourceUpdateOption) error {
+				return errors.New("boom")
+			},
+		}).
+		Build()
+	c := &EventConsumer{Client: fakeClient}
+
+	// Should log the failure and return without panicking.
+	c.handleEvent(context.Background(), logr.Discard(), lighthue.LightEvent{LightID: "light-1", On: boolPtr(true)})
 }
