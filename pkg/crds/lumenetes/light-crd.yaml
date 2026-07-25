@@ -1,0 +1,192 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: lights.lumenetes.io
+spec:
+  group: lumenetes.io
+  names:
+    kind: Light
+    listKind: LightList
+    plural: lights
+    singular: light
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.name
+      name: Display Name
+      type: string
+    - jsonPath: .status.on
+      name: "On"
+      type: boolean
+    - jsonPath: .status.brightness
+      name: Brightness
+      type: integer
+    - jsonPath: .status.color
+      name: Color
+      type: string
+    - jsonPath: .status.colorTempK
+      name: Color Temp
+      type: integer
+    - jsonPath: .status.reachable
+      name: Reachable
+      priority: 1
+      type: boolean
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Light represents a single Hue light's live, observed state. Cluster
+          scoped (like Node/PersistentVolume) since it represents a physical
+          device, not a namespace-scoped app resource. Named after the light's own
+          Hue UUID (stable, unique, valid as a Kubernetes object name).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              LightSpec is the desired/controllable subset of light state. It is
+              seeded exactly once - from the live light state observed at the moment
+              its Light CR is first created (see Poller.upsert in
+              internal/lightscontroller/poller.go) - after which the poller never
+              touches it again. Any later difference between Spec and Status
+              therefore reflects either a user edit (kubectl edit/apply) or a change
+              made directly at the bridge/app. internal/lightscontroller.Reconciler
+              enacts that difference back onto the physical bridge (unless run with
+              --dry-run, which only logs it).
+            properties:
+              brightness:
+                description: |-
+                  Brightness is the desired percentage (0-100), or -1 if the light
+                  doesn't support dimming - same sentinel convention as
+                  LightStatus.Brightness.
+                format: int32
+                type: integer
+              color:
+                description: |-
+                  Color is the desired approximate "#rrggbb" swatch, or "" if the
+                  light doesn't support color.
+                type: string
+              colorTempK:
+                description: |-
+                  ColorTempK is the desired color temperature in Kelvin, or 0 if the
+                  light doesn't support color temperature.
+                format: int32
+                type: integer
+              name:
+                description: |-
+                  Name is the desired human-readable Hue name. NOTE: actually renaming
+                  a Hue light requires a PUT to the owning *device* resource, not this
+                  light resource (a light's own metadata.name is deprecated/read-only
+                  in the Hue API) - see Status.DeviceID and Reconciler.
+                type: string
+              "on":
+                description: On is the desired on/off state.
+                type: boolean
+            type: object
+          status:
+            description: |-
+              LightStatus mirrors github.com/liamawhite/homelab/pkg/lumenetes/hue.Light,
+              plus Reachable/LastSynced which that type has no notion of.
+            properties:
+              bridgeId:
+                description: |-
+                  BridgeID is the Hue bridge id (see pkg/config.HueBridgeConfig) this
+                  light belongs to.
+                type: string
+              brightness:
+                description: |-
+                  Brightness is a percentage (0-100), or -1 if the light doesn't
+                  support dimming - same sentinel convention as hue.Light.Brightness,
+                  deliberately not a pointer so DeepCopyInto stays a trivial value copy.
+                format: int32
+                type: integer
+              color:
+                description: |-
+                  Color is an approximate "#rrggbb" swatch, or "" if the light doesn't
+                  support color.
+                type: string
+              colorTempK:
+                description: |-
+                  ColorTempK is the color temperature in Kelvin, or 0 if the light
+                  doesn't support color temperature - same sentinel convention as
+                  hue.Light.ColorTempK.
+                format: int32
+                type: integer
+              deviceId:
+                description: |-
+                  DeviceID is the RID of the device owning this light - needed to
+                  enact Name changes, which the light resource's own PUT doesn't
+                  support (see Reconciler).
+                type: string
+              enactError:
+                description: |-
+                  EnactError is the most recent enactment failure, or "" if the last
+                  attempt succeeded (or none has been made, or nothing currently
+                  differs between Spec and Status).
+                type: string
+              fixtureType:
+                description: FixtureType is the light's archetype, e.g. "recessed
+                  ceiling".
+                type: string
+              lastEnactAttempt:
+                description: |-
+                  LastEnactAttempt is when the controller last attempted to push Spec
+                  to the bridge (success or failure) - purely informational bookkeeping,
+                  visible via kubectl.
+                format: date-time
+                type: string
+              lastSynced:
+                description: |-
+                  LastSynced is when this status was last successfully updated from
+                  the bridge.
+                format: date-time
+                type: string
+              model:
+                description: Model is the owning device's model ID, e.g. "LCA005".
+                type: string
+              name:
+                description: |-
+                  Name is the light's human-readable Hue name (e.g. "Kitchen Sink") -
+                  metadata.name is the Hue UUID instead (stable, valid as a k8s
+                  object name), so this is the only place the friendly name appears.
+                type: string
+              "on":
+                description: On is the light's last-observed on/off state.
+                type: boolean
+              product:
+                description: Product is the owning device's product name, e.g. "Hue
+                  color lamp".
+                type: string
+              reachable:
+                description: |-
+                  Reachable is false when the owning bridge failed to respond on the
+                  most recent poll - the rest of this status is then stale, left as
+                  of the last successful sync rather than cleared.
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

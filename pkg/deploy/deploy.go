@@ -83,7 +83,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		cloudflareNS := namespaces.Get(CloudflareNamespace)
 		tailscaleNS := namespaces.Get(TailscaleNamespace)
 		healthNS := namespaces.Get(HealthNamespace)
-		lightsNS := namespaces.Get(LightsNamespace)
+		lumenetesNS := namespaces.Get(LumenetesNamespace)
 		monitoringNS := namespaces.Get(MonitoringNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
@@ -296,15 +296,15 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		// Builds the shared lights-controller/hub-controller image and
-		// deploys both against it (see pkg/deploy/applications/lights.go
+		// Builds the shared lumenetes-controller/hub-controller image and
+		// deploys both against it (see pkg/deploy/applications/lumenetes.go
 		// for the full reasoning, including hub-controller's
 		// HostNetwork: true and why there's no DependsOn between the two
 		// components - they only interact at runtime via the Kubernetes
 		// API, not at deploy time).
-		_, err = applications.NewLights(ctx, &applications.LightsArgs{
-			Namespace:       lightsNS.Metadata.Name().Elem(),
-			Bridges:         infraCfg.Lights.Hue.Bridges,
+		_, err = applications.NewLumenetes(ctx, &applications.LumenetesArgs{
+			Namespace:       lumenetesNS.Metadata.Name().Elem(),
+			Bridges:         infraCfg.Lumenetes.Hue.Bridges,
 			GHCRUsername:    infraCfg.GHCR.Username,
 			GHCRToken:       infraCfg.GHCR.Token,
 			HubPollInterval: pulumi.String("60s"),
@@ -313,11 +313,11 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			LightsPollInterval: pulumi.String("30s"),
 			// Dry-run: the reconciler only logs Light.Spec drift instead of
 			// pushing it to the physical bridge. Scoped entirely to
-			// lightscontroller.Reconciler - doesn't affect hub-controller,
+			// lumenetescontroller.Reconciler - doesn't affect hub-controller,
 			// Switch, or Group at all.
 			DryRun: pulumi.Bool(true),
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Lights, lightsNS, ciliumComp, apiserverComp}),
+			pulumi.DependsOn([]pulumi.Resource{crds.Lumenetes, lumenetesNS, ciliumComp, apiserverComp}),
 		)
 		if err != nil {
 			return err

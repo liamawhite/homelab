@@ -48,7 +48,7 @@ func prometheusPodSelector(namespace pulumi.StringInput) *ciliumv2.CiliumCluster
 //     Cilium-managed endpoints in their own right, so this is expressed as
 //     egress to Cilium's "host"/"remote-node" entities rather than a
 //     ToEndpoints selector - the same kind of "not a Cilium endpoint"
-//     reasoning pkg/components/lightscontroller's allow-egress-hue-lan CCNP
+//     reasoning pkg/components/lumenetescontroller's allow-egress-hue-lan CCNP
 //     uses for the (Cilium-external) Hue bridge, just with node/host
 //     identities instead of "world". Unverified against a live cluster as
 //     of writing - check `cilium monitor --type drop` on first deploy in

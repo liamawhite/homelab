@@ -22,7 +22,7 @@ const (
 	CloudflareNamespace     = "cloudflare"
 	TailscaleNamespace      = "tailscale"
 	HealthNamespace         = "health"
-	LightsNamespace         = "lights"
+	LumenetesNamespace      = "lumenetes"
 	MonitoringNamespace     = "monitoring"
 )
 
@@ -97,7 +97,7 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		{name: HealthNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
-		{name: LightsNamespace, labels: pulumi.StringMap{
+		{name: LumenetesNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 		{name: MonitoringNamespace, labels: pulumi.StringMap{

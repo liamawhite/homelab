@@ -3,7 +3,7 @@ package deploy
 import (
 	"github.com/liamawhite/homelab/pkg/crds/gatewayapi"
 	"github.com/liamawhite/homelab/pkg/crds/istio"
-	"github.com/liamawhite/homelab/pkg/crds/lights"
+	"github.com/liamawhite/homelab/pkg/crds/lumenetes"
 	"github.com/liamawhite/homelab/pkg/crds/prometheus"
 	yamlv2 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/yaml/v2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -14,7 +14,7 @@ import (
 type CRDs struct {
 	GatewayAPI *yamlv2.ConfigGroup
 	Istio      *yamlv2.ConfigGroup
-	Lights     *yamlv2.ConfigGroup
+	Lumenetes  *yamlv2.ConfigGroup
 	Prometheus *yamlv2.ConfigGroup
 }
 
@@ -33,7 +33,7 @@ func installCRDs(ctx *pulumi.Context, istioSystemNamespace string, opts ...pulum
 	if err != nil {
 		return nil, err
 	}
-	lightsCRD, err := lights.InstallCRDs(ctx, "lights-crd", opts...)
+	lumenetesCRD, err := lumenetes.InstallCRDs(ctx, "lumenetes-crd", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,5 +41,5 @@ func installCRDs(ctx *pulumi.Context, istioSystemNamespace string, opts ...pulum
 	if err != nil {
 		return nil, err
 	}
-	return &CRDs{GatewayAPI: gwAPI, Istio: istioCRDs, Lights: lightsCRD, Prometheus: promCRDs}, nil
+	return &CRDs{GatewayAPI: gwAPI, Istio: istioCRDs, Lumenetes: lumenetesCRD, Prometheus: promCRDs}, nil
 }

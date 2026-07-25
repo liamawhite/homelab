@@ -1,8 +1,8 @@
 // Package hubcontroller deploys hub-controller (see
-// applications/lights-controller/cmd/hub-controller): a Deployment that
+// applications/lumenetes/cmd/hub-controller): a Deployment that
 // discovers Philips Hue bridges via SSDP and publishes their current IP
-// as HueBridge custom resources (see pkg/crds/lights), for
-// pkg/components/lightscontroller to read instead of discovering bridges
+// as HueBridge custom resources (see pkg/crds/lumenetes), for
+// pkg/components/lumenetescontroller to read instead of discovering bridges
 // itself.
 //
 // Runs with HostNetwork: true - SSDP's multicast group-join can't work
@@ -21,7 +21,7 @@
 // aren't subject to the pod-level default-deny baseline at all. This is a
 // real, deliberate tradeoff (this pod's network access is effectively
 // unrestricted, unlike every other pod in the cluster) - the reason this
-// component exists at all, rather than just making lights-controller
+// component exists at all, rather than just making lumenetes-controller
 // itself hostNetwork, is to confine that tradeoff to the smallest
 // possible surface.
 //
@@ -36,7 +36,7 @@ import (
 	"strings"
 
 	"github.com/liamawhite/homelab/pkg/config"
-	lightsv1alpha1 "github.com/liamawhite/homelab/pkg/crds/lights/crds/kubernetes/lights/v1alpha1"
+	lumenetesv1alpha1 "github.com/liamawhite/homelab/pkg/crds/lumenetes/crds/kubernetes/lumenetes/v1alpha1"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
@@ -47,9 +47,9 @@ import (
 // hueBridgeResourceName maps a Hue bridge ID (uppercase hex, as stored in
 // infra.yaml) to the HueBridge CR name that identifies it - lowercased,
 // since Kubernetes object names must be a lowercase RFC 1123 subdomain.
-// Must match applications/lights-controller/internal/bridges.ResourceName
+// Must match applications/lumenetes/internal/bridges.ResourceName
 // exactly: this package creates each HueBridge CR under that name, and
-// hub-controller/lights-controller look it up by the same name.
+// hub-controller/lumenetes-controller look it up by the same name.
 func hueBridgeResourceName(bridgeID string) string {
 	return strings.ToLower(bridgeID)
 }
@@ -68,16 +68,16 @@ type HubControllerArgs struct {
 	// Namespace is created centrally by pkg/deploy/namespaces.go and
 	// passed in here - this component does not create it.
 	Namespace pulumi.StringInput
-	// Bridges is infraCfg.Lights.Hue.Bridges - every paired bridge's id,
+	// Bridges is infraCfg.Lumenetes.Hue.Bridges - every paired bridge's id,
 	// used only to create one HueBridge CR per bridge below (appKey is
-	// unused here - only lightscontroller needs it, to authenticate to a
+	// unused here - only lumenetescontroller needs it, to authenticate to a
 	// bridge's data API).
 	Bridges []config.HueBridgeConfig
 	// PollInterval is how often the controller runs an SSDP discovery
 	// round, e.g. "60s".
 	PollInterval pulumi.StringInput
-	// Image is the shared lights-controller/hub-controller image
-	// (built once in applications/lights.go and passed to both components).
+	// Image is the shared lumenetes-controller/hub-controller image
+	// (built once in applications/lumenetes.go and passed to both components).
 	Image pulumi.StringInput
 }
 
@@ -118,12 +118,12 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 		},
 		Rules: rbacv1.PolicyRuleArray{
 			&rbacv1.PolicyRuleArgs{
-				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
 				Resources: pulumi.StringArray{pulumi.String("huebridges")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("list"), pulumi.String("watch")},
 			},
 			&rbacv1.PolicyRuleArgs{
-				ApiGroups: pulumi.StringArray{pulumi.String("lights.homelab.internal")},
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
 				Resources: pulumi.StringArray{pulumi.String("huebridges/status")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
 			},
@@ -156,7 +156,7 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 
 	// 3. Namespaced Role/RoleBinding for leader-election Leases + Events -
 	// same pattern (and same "events is forbidden" lesson) as
-	// pkg/components/lightscontroller.
+	// pkg/components/lumenetescontroller.
 	leaseRole, err := rbacv1.NewRole(ctx, fmt.Sprintf("%s-lease-role", name), &rbacv1.RoleArgs{
 		Metadata: &metav1.ObjectMetaArgs{
 			Name:      pulumi.String("hub-controller-leases"),
@@ -205,16 +205,16 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 	}
 
 	// 4. One HueBridge CR per configured bridge, created here rather than
-	// by the controller itself: infra.yaml's lights.hue.bridges is the
+	// by the controller itself: infra.yaml's lumenetes.hue.bridges is the
 	// declarative source of truth for which bridges exist, the same way
 	// every other resource in this repo is Pulumi-owned - the controller
-	// (see applications/lights-controller/internal/hubcontroller) only
+	// (see applications/lumenetes/internal/hubcontroller) only
 	// syncs status (ip/reachable/etc.) onto these, it never creates or
 	// deletes a HueBridge itself. Spec is empty (see
-	// applications/lights-controller/api/v1alpha1/huebridge_types.go) -
+	// applications/lumenetes/api/v1alpha1/huebridge_types.go) -
 	// this object exists purely to carry a name and a status.
 	for _, bridge := range args.Bridges {
-		_, err := lightsv1alpha1.NewHueBridge(ctx, fmt.Sprintf("%s-huebridge-%s", name, hueBridgeResourceName(bridge.ID)), &lightsv1alpha1.HueBridgeArgs{
+		_, err := lumenetesv1alpha1.NewHueBridge(ctx, fmt.Sprintf("%s-huebridge-%s", name, hueBridgeResourceName(bridge.ID)), &lumenetesv1alpha1.HueBridgeArgs{
 			Metadata: &metav1.ObjectMetaArgs{
 				Name: pulumi.String(hueBridgeResourceName(bridge.ID)),
 			},
@@ -234,7 +234,7 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 	// correct default for a hostNetwork pod regardless). Single replica -
 	// leader election (see the lease RBAC above) makes more than one safe
 	// later, but nothing needs it yet. Image is the shared
-	// lights-controller/hub-controller image (see applications/lights.go) -
+	// lumenetes-controller/hub-controller image (see applications/lumenetes.go) -
 	// Command picks which of its two binaries this Deployment runs. No
 	// mounted config: which bridges to sync comes from listing HueBridge
 	// CRs directly (step 4 above), not a bridges.json file.
@@ -305,7 +305,7 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 								InitialDelaySeconds: pulumi.Int(5),
 								PeriodSeconds:       pulumi.Int(10),
 							},
-							// Same starting point as lightscontroller's -
+							// Same starting point as lumenetescontroller's -
 							// see that component's identical comment about
 							// 128Mi OOM-killing it on first deploy.
 							Resources: &corev1.ResourceRequirementsArgs{

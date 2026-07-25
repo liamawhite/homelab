@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	lightscmd "github.com/liamawhite/homelab/cli/cmd/lights"
+	lumenetescmd "github.com/liamawhite/homelab/cli/cmd/lumenetes"
 	pulumicmd "github.com/liamawhite/homelab/cli/cmd/pulumi"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +37,7 @@ func init() {
 	rootCmd.AddCommand(bootstrapCmd)
 	rootCmd.AddCommand(k3sCmd)
 	rootCmd.AddCommand(kubeconfigCmd)
-	rootCmd.AddCommand(lightscmd.Cmd)
+	rootCmd.AddCommand(lumenetescmd.Cmd)
 	rootCmd.AddCommand(nodeCmd)
 	rootCmd.AddCommand(pulumicmd.UpCmd)
 	rootCmd.AddCommand(pulumicmd.PreviewCmd)

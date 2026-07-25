@@ -17,22 +17,22 @@ type InfraConfig struct {
 	Nodes      []NodeConfig     `yaml:"nodes" mapstructure:"nodes"`
 	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
 	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
-	Lights     LightsConfig     `yaml:"lights" mapstructure:"lights"`
+	Lumenetes  LumenetesConfig  `yaml:"lumenetes" mapstructure:"lumenetes"`
 	GHCR       GHCRConfig       `yaml:"ghcr" mapstructure:"ghcr"`
 }
 
 // GHCRConfig holds credentials for pushing images to GitHub Container
 // Registry (ghcr.io) - Token needs the write:packages scope. Used by
-// pkg/components/lightscontroller's dockerbuild.Image resource to build
-// and push the lights-controller's image as part of `homelab up`.
+// pkg/components/lumenetescontroller's dockerbuild.Image resource to build
+// and push the lumenetes-controller's image as part of `homelab up`.
 type GHCRConfig struct {
 	Username string `yaml:"username" mapstructure:"username"`
 	Token    string `yaml:"token" mapstructure:"token"`
 }
 
-// LightsConfig holds credentials for smart-light integrations, saved by
-// commands like `homelab lights pair` rather than hand-edited.
-type LightsConfig struct {
+// LumenetesConfig holds credentials for smart-light integrations, saved by
+// commands like `homelab lumenetes hub pair` rather than hand-edited.
+type LumenetesConfig struct {
 	Hue HueConfig `yaml:"hue" mapstructure:"hue"`
 }
 
@@ -210,7 +210,7 @@ func LoadInfra(cmd *cobra.Command) (*InfraConfig, error) {
 // ResolveConfigPath returns the infra.yaml path to use: the --config flag
 // if set, otherwise the first of findConfigFile's candidate locations that
 // exists. Returns an error if neither yields a path - for commands (like
-// LoadInfra's callers, or lights pair) that need to write to a specific
+// LoadInfra's callers, or lumenetes hub pair) that need to write to a specific
 // file, not just read whatever optional config happens to be present.
 func ResolveConfigPath(cmd *cobra.Command) (string, error) {
 	configFile, _ := cmd.Flags().GetString("config")
@@ -427,9 +427,9 @@ func SetClusterToken(path, token string) error {
 }
 
 // SaveHueBridge upserts a paired Hue bridge's application key into path's
-// lights.hue.bridges list, keyed by bridge ID - editing the parsed node
+// lumenetes.hue.bridges list, keyed by bridge ID - editing the parsed node
 // tree (like SetClusterToken) rather than a plain struct so the rest of
-// the file's comments/formatting survive. Creates the lights/hue/bridges
+// the file's comments/formatting survive. Creates the lumenetes/hue/bridges
 // structure if it doesn't already exist.
 func SaveHueBridge(path, bridgeID, appKey string) error {
 	data, err := os.ReadFile(path)
@@ -446,7 +446,7 @@ func SaveHueBridge(path, bridgeID, appKey string) error {
 	}
 	root := doc.Content[0]
 
-	hueNode := ensureMapping(ensureMapping(root, "lights"), "hue")
+	hueNode := ensureMapping(ensureMapping(root, "lumenetes"), "hue")
 	bridges := ensureSequence(hueNode, "bridges")
 
 	for _, item := range bridges.Content {
