@@ -33,8 +33,9 @@ mv "${TMP_DIR}/lumenetes.io_lights.yaml" "${SCRIPT_DIR}/light-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_huebridges.yaml" "${SCRIPT_DIR}/huebridge-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_switches.yaml" "${SCRIPT_DIR}/switch-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_groups.yaml" "${SCRIPT_DIR}/group-crd.yaml"
+mv "${TMP_DIR}/lumenetes.io_scenes.yaml" "${SCRIPT_DIR}/scene-crd.yaml"
 
 echo "Generating Pulumi Go types from CRDs..."
-(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml group-crd.yaml)
+(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml group-crd.yaml scene-crd.yaml)
 
 echo "Successfully generated Light/HueBridge CRD types!"

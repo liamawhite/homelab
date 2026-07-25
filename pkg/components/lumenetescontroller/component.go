@@ -122,6 +122,19 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 				Resources: pulumi.StringArray{pulumi.String("groups/status")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
 			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
+				Resources: pulumi.StringArray{pulumi.String("scenes")},
+				Verbs: pulumi.StringArray{
+					pulumi.String("get"), pulumi.String("list"), pulumi.String("watch"),
+					pulumi.String("create"), pulumi.String("update"), pulumi.String("patch"), pulumi.String("delete"),
+				},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
+				Resources: pulumi.StringArray{pulumi.String("scenes/status")},
+				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
+			},
 			// Read-only: hub-controller (pkg/components/hubcontroller) owns
 			// writing HueBridge - this controller only reads status.ip from
 			// it, never writes one.

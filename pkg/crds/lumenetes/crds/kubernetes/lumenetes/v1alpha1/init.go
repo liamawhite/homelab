@@ -39,6 +39,12 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &LightList{}
 	case "kubernetes:lumenetes.io/v1alpha1:LightPatch":
 		r = &LightPatch{}
+	case "kubernetes:lumenetes.io/v1alpha1:Scene":
+		r = &Scene{}
+	case "kubernetes:lumenetes.io/v1alpha1:SceneList":
+		r = &SceneList{}
+	case "kubernetes:lumenetes.io/v1alpha1:ScenePatch":
+		r = &ScenePatch{}
 	case "kubernetes:lumenetes.io/v1alpha1:Switch":
 		r = &Switch{}
 	case "kubernetes:lumenetes.io/v1alpha1:SwitchList":

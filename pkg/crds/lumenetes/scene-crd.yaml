@@ -1,0 +1,141 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: scenes.lumenetes.io
+spec:
+  group: lumenetes.io
+  names:
+    kind: Scene
+    listKind: SceneList
+    plural: scenes
+    singular: scene
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.group
+      name: Group
+      type: string
+    - jsonPath: .status.invalidLights
+      name: Invalid
+      priority: 1
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Scene is a user-named, recallable lighting state for some or all of a
+          Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+          same reasoning as Group - a Scene has no Hue-side identity of its own.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              SceneSpec declares a named, recallable state for some or all of a
+              Group's lights. A Scene does no enactment itself - internal/
+              groupcontroller.Reconciler applies Lights onto each target Light.Spec
+              when the owning Group's Spec.ActiveScene names this Scene, and internal/
+              lightscontroller.Reconciler does the actual bridge push from there,
+              unchanged - a Scene has no bridge/hue dependency at all.
+            properties:
+              group:
+                description: |-
+                  Group is the name of the Group this scene applies to. A Group's
+                  Spec.ActiveScene must match this Scene's own metadata.name for it to
+                  ever be enacted - a Scene naming a Group that doesn't select it back
+                  is inert.
+                type: string
+              lights:
+                description: |-
+                  Lights are this scene's per-light desired states. Entries not
+                  naming a member of Group are reported in Status.InvalidLights and
+                  ignored during enactment.
+                items:
+                  description: |-
+                    SceneLightState is one light's desired absolute state within a Scene.
+                    Pointer fields mean "leave this light's corresponding Spec field
+                    untouched" (same convention as SwitchAction) - a Scene can address only
+                    a subset of a light's fields, or only a subset of its Group's lights.
+                    Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+                    relative/stateful adjustments appropriate for a physical button, not for
+                    "recall this absolute state."
+                  properties:
+                    brightness:
+                      description: |-
+                        Brightness sets desired brightness to this absolute percentage,
+                        clamped 0-100. No-op on a light that doesn't support dimming.
+                      format: int32
+                      maximum: 100
+                      minimum: 0
+                      type: integer
+                    color:
+                      description: |-
+                        Color sets desired color to this "#rrggbb" swatch. No-op on a light
+                        that doesn't support color.
+                      type: string
+                    colorTempK:
+                      description: |-
+                        ColorTempK sets desired color temperature in Kelvin. No-op on a
+                        light that doesn't support color temperature.
+                      format: int32
+                      type: integer
+                    name:
+                      description: |-
+                        Name is the Light CR this state applies to - must be a member of the
+                        owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+                      type: string
+                    "on":
+                      description: On, if set, forces this light's desired on/off
+                        state.
+                      type: boolean
+                  required:
+                  - name
+                  type: object
+                type: array
+            required:
+            - group
+            type: object
+          status:
+            description: |-
+              SceneStatus reports which of Spec.Lights don't currently resolve to a
+              member of Spec.Group - a typo'd, deleted, or since-moved light reference
+              would otherwise be silently ignored during enactment.
+            properties:
+              invalidLights:
+                description: |-
+                  InvalidLights are entries in Spec.Lights that don't currently exist
+                  as a Light CR, or that aren't a member of Spec.Group.
+                items:
+                  type: string
+                type: array
+              lastSynced:
+                description: LastSynced is when this status was last recomputed.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

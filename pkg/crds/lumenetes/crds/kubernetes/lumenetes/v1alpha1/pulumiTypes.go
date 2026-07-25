@@ -337,6 +337,19 @@ func (o GroupPatchTypeOutput) Status() GroupStatusPatchPtrOutput {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpec struct {
+	// ActiveScene selects this group's current state. Empty means
+	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+	// lights alone entirely, which is the safe default and what every
+	// group has today (deliberately NOT the same as "off": a newly added
+	// field's zero value must be inert, not force every light off the
+	// moment this field exists). The literal "off" is a reserved
+	// pseudo-scene that forces every light in Spec.Lights off (On only -
+	// brightness/color are left as they are). Any other value must name a
+	// Scene whose own Spec.Group equals this Group's name; enactment
+	// happens continuously (every reconcile, including the periodic
+	// resync) rather than once-on-change - manually overriding a light
+	// while a scene/off is selected will be corrected back.
+	ActiveScene *string `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights []string `pulumi:"lights"`
 }
@@ -354,6 +367,19 @@ type GroupSpecInput interface {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecArgs struct {
+	// ActiveScene selects this group's current state. Empty means
+	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+	// lights alone entirely, which is the safe default and what every
+	// group has today (deliberately NOT the same as "off": a newly added
+	// field's zero value must be inert, not force every light off the
+	// moment this field exists). The literal "off" is a reserved
+	// pseudo-scene that forces every light in Spec.Lights off (On only -
+	// brightness/color are left as they are). Any other value must name a
+	// Scene whose own Spec.Group equals this Group's name; enactment
+	// happens continuously (every reconcile, including the periodic
+	// resync) rather than once-on-change - manually overriding a light
+	// while a scene/off is selected will be corrected back.
+	ActiveScene pulumi.StringPtrInput `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights pulumi.StringArrayInput `pulumi:"lights"`
 }
@@ -436,6 +462,22 @@ func (o GroupSpecOutput) ToGroupSpecPtrOutputWithContext(ctx context.Context) Gr
 	}).(GroupSpecPtrOutput)
 }
 
+// ActiveScene selects this group's current state. Empty means
+// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+// lights alone entirely, which is the safe default and what every
+// group has today (deliberately NOT the same as "off": a newly added
+// field's zero value must be inert, not force every light off the
+// moment this field exists). The literal "off" is a reserved
+// pseudo-scene that forces every light in Spec.Lights off (On only -
+// brightness/color are left as they are). Any other value must name a
+// Scene whose own Spec.Group equals this Group's name; enactment
+// happens continuously (every reconcile, including the periodic
+// resync) rather than once-on-change - manually overriding a light
+// while a scene/off is selected will be corrected back.
+func (o GroupSpecOutput) ActiveScene() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpec) *string { return v.ActiveScene }).(pulumi.StringPtrOutput)
+}
+
 // Lights are the names of Light CRs that belong to this group.
 func (o GroupSpecOutput) Lights() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v GroupSpec) []string { return v.Lights }).(pulumi.StringArrayOutput)
@@ -465,6 +507,27 @@ func (o GroupSpecPtrOutput) Elem() GroupSpecOutput {
 	}).(GroupSpecOutput)
 }
 
+// ActiveScene selects this group's current state. Empty means
+// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+// lights alone entirely, which is the safe default and what every
+// group has today (deliberately NOT the same as "off": a newly added
+// field's zero value must be inert, not force every light off the
+// moment this field exists). The literal "off" is a reserved
+// pseudo-scene that forces every light in Spec.Lights off (On only -
+// brightness/color are left as they are). Any other value must name a
+// Scene whose own Spec.Group equals this Group's name; enactment
+// happens continuously (every reconcile, including the periodic
+// resync) rather than once-on-change - manually overriding a light
+// while a scene/off is selected will be corrected back.
+func (o GroupSpecPtrOutput) ActiveScene() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ActiveScene
+	}).(pulumi.StringPtrOutput)
+}
+
 // Lights are the names of Light CRs that belong to this group.
 func (o GroupSpecPtrOutput) Lights() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *GroupSpec) []string {
@@ -477,6 +540,19 @@ func (o GroupSpecPtrOutput) Lights() pulumi.StringArrayOutput {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecPatch struct {
+	// ActiveScene selects this group's current state. Empty means
+	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+	// lights alone entirely, which is the safe default and what every
+	// group has today (deliberately NOT the same as "off": a newly added
+	// field's zero value must be inert, not force every light off the
+	// moment this field exists). The literal "off" is a reserved
+	// pseudo-scene that forces every light in Spec.Lights off (On only -
+	// brightness/color are left as they are). Any other value must name a
+	// Scene whose own Spec.Group equals this Group's name; enactment
+	// happens continuously (every reconcile, including the periodic
+	// resync) rather than once-on-change - manually overriding a light
+	// while a scene/off is selected will be corrected back.
+	ActiveScene *string `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights []string `pulumi:"lights"`
 }
@@ -494,6 +570,19 @@ type GroupSpecPatchInput interface {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecPatchArgs struct {
+	// ActiveScene selects this group's current state. Empty means
+	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+	// lights alone entirely, which is the safe default and what every
+	// group has today (deliberately NOT the same as "off": a newly added
+	// field's zero value must be inert, not force every light off the
+	// moment this field exists). The literal "off" is a reserved
+	// pseudo-scene that forces every light in Spec.Lights off (On only -
+	// brightness/color are left as they are). Any other value must name a
+	// Scene whose own Spec.Group equals this Group's name; enactment
+	// happens continuously (every reconcile, including the periodic
+	// resync) rather than once-on-change - manually overriding a light
+	// while a scene/off is selected will be corrected back.
+	ActiveScene pulumi.StringPtrInput `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights pulumi.StringArrayInput `pulumi:"lights"`
 }
@@ -576,6 +665,22 @@ func (o GroupSpecPatchOutput) ToGroupSpecPatchPtrOutputWithContext(ctx context.C
 	}).(GroupSpecPatchPtrOutput)
 }
 
+// ActiveScene selects this group's current state. Empty means
+// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+// lights alone entirely, which is the safe default and what every
+// group has today (deliberately NOT the same as "off": a newly added
+// field's zero value must be inert, not force every light off the
+// moment this field exists). The literal "off" is a reserved
+// pseudo-scene that forces every light in Spec.Lights off (On only -
+// brightness/color are left as they are). Any other value must name a
+// Scene whose own Spec.Group equals this Group's name; enactment
+// happens continuously (every reconcile, including the periodic
+// resync) rather than once-on-change - manually overriding a light
+// while a scene/off is selected will be corrected back.
+func (o GroupSpecPatchOutput) ActiveScene() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpecPatch) *string { return v.ActiveScene }).(pulumi.StringPtrOutput)
+}
+
 // Lights are the names of Light CRs that belong to this group.
 func (o GroupSpecPatchOutput) Lights() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v GroupSpecPatch) []string { return v.Lights }).(pulumi.StringArrayOutput)
@@ -605,6 +710,27 @@ func (o GroupSpecPatchPtrOutput) Elem() GroupSpecPatchOutput {
 	}).(GroupSpecPatchOutput)
 }
 
+// ActiveScene selects this group's current state. Empty means
+// unmanaged - internal/groupcontroller.Reconciler leaves this group's
+// lights alone entirely, which is the safe default and what every
+// group has today (deliberately NOT the same as "off": a newly added
+// field's zero value must be inert, not force every light off the
+// moment this field exists). The literal "off" is a reserved
+// pseudo-scene that forces every light in Spec.Lights off (On only -
+// brightness/color are left as they are). Any other value must name a
+// Scene whose own Spec.Group equals this Group's name; enactment
+// happens continuously (every reconcile, including the periodic
+// resync) rather than once-on-change - manually overriding a light
+// while a scene/off is selected will be corrected back.
+func (o GroupSpecPatchPtrOutput) ActiveScene() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ActiveScene
+	}).(pulumi.StringPtrOutput)
+}
+
 // Lights are the names of Light CRs that belong to this group.
 func (o GroupSpecPatchPtrOutput) Lights() pulumi.StringArrayOutput {
 	return o.ApplyT(func(v *GroupSpecPatch) []string {
@@ -618,6 +744,11 @@ func (o GroupSpecPatchPtrOutput) Lights() pulumi.StringArrayOutput {
 // GroupStatus reports which of Spec.Lights don't currently resolve to a
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatus struct {
+	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+	// doesn't match this Group - empty means either ActiveScene is unset/
+	// "off", or the named Scene was found and validated fine.
+	ActiveSceneError *string `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
 	// LightCount is len(Spec.Lights) - kept in Status (rather than only
@@ -645,6 +776,11 @@ type GroupStatusInput interface {
 // GroupStatus reports which of Spec.Lights don't currently resolve to a
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusArgs struct {
+	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+	// doesn't match this Group - empty means either ActiveScene is unset/
+	// "off", or the named Scene was found and validated fine.
+	ActiveSceneError pulumi.StringPtrInput `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
 	// LightCount is len(Spec.Lights) - kept in Status (rather than only
@@ -737,6 +873,14 @@ func (o GroupStatusOutput) ToGroupStatusPtrOutputWithContext(ctx context.Context
 	}).(GroupStatusPtrOutput)
 }
 
+// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+// doesn't match this Group - empty means either ActiveScene is unset/
+// "off", or the named Scene was found and validated fine.
+func (o GroupStatusOutput) ActiveSceneError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupStatus) *string { return v.ActiveSceneError }).(pulumi.StringPtrOutput)
+}
+
 // LastSynced is when this status was last recomputed.
 func (o GroupStatusOutput) LastSynced() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
@@ -781,6 +925,19 @@ func (o GroupStatusPtrOutput) Elem() GroupStatusOutput {
 	}).(GroupStatusOutput)
 }
 
+// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+// doesn't match this Group - empty means either ActiveScene is unset/
+// "off", or the named Scene was found and validated fine.
+func (o GroupStatusPtrOutput) ActiveSceneError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ActiveSceneError
+	}).(pulumi.StringPtrOutput)
+}
+
 // LastSynced is when this status was last recomputed.
 func (o GroupStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GroupStatus) *string {
@@ -819,6 +976,11 @@ func (o GroupStatusPtrOutput) MissingLights() pulumi.StringArrayOutput {
 // GroupStatus reports which of Spec.Lights don't currently resolve to a
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusPatch struct {
+	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+	// doesn't match this Group - empty means either ActiveScene is unset/
+	// "off", or the named Scene was found and validated fine.
+	ActiveSceneError *string `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
 	// LightCount is len(Spec.Lights) - kept in Status (rather than only
@@ -846,6 +1008,11 @@ type GroupStatusPatchInput interface {
 // GroupStatus reports which of Spec.Lights don't currently resolve to a
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusPatchArgs struct {
+	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+	// doesn't match this Group - empty means either ActiveScene is unset/
+	// "off", or the named Scene was found and validated fine.
+	ActiveSceneError pulumi.StringPtrInput `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
 	// LightCount is len(Spec.Lights) - kept in Status (rather than only
@@ -938,6 +1105,14 @@ func (o GroupStatusPatchOutput) ToGroupStatusPatchPtrOutputWithContext(ctx conte
 	}).(GroupStatusPatchPtrOutput)
 }
 
+// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+// doesn't match this Group - empty means either ActiveScene is unset/
+// "off", or the named Scene was found and validated fine.
+func (o GroupStatusPatchOutput) ActiveSceneError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupStatusPatch) *string { return v.ActiveSceneError }).(pulumi.StringPtrOutput)
+}
+
 // LastSynced is when this status was last recomputed.
 func (o GroupStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
@@ -980,6 +1155,19 @@ func (o GroupStatusPatchPtrOutput) Elem() GroupStatusPatchOutput {
 		var ret GroupStatusPatch
 		return ret
 	}).(GroupStatusPatchOutput)
+}
+
+// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
+// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
+// doesn't match this Group - empty means either ActiveScene is unset/
+// "off", or the named Scene was found and validated fine.
+func (o GroupStatusPatchPtrOutput) ActiveSceneError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ActiveSceneError
+	}).(pulumi.StringPtrOutput)
 }
 
 // LastSynced is when this status was last recomputed.
@@ -3721,6 +3909,1373 @@ func (o LightStatusPatchPtrOutput) Reachable() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type SceneType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
+	Spec     *SceneSpec         `pulumi:"spec"`
+	Status   *SceneStatus       `pulumi:"status"`
+}
+
+// SceneTypeInput is an input type that accepts SceneTypeArgs and SceneTypeOutput values.
+// You can construct a concrete instance of `SceneTypeInput` via:
+//
+//	SceneTypeArgs{...}
+type SceneTypeInput interface {
+	pulumi.Input
+
+	ToSceneTypeOutput() SceneTypeOutput
+	ToSceneTypeOutputWithContext(context.Context) SceneTypeOutput
+}
+
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type SceneTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPtrInput `pulumi:"metadata"`
+	Spec     SceneSpecPtrInput         `pulumi:"spec"`
+	Status   SceneStatusPtrInput       `pulumi:"status"`
+}
+
+func (SceneTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneType)(nil)).Elem()
+}
+
+func (i SceneTypeArgs) ToSceneTypeOutput() SceneTypeOutput {
+	return i.ToSceneTypeOutputWithContext(context.Background())
+}
+
+func (i SceneTypeArgs) ToSceneTypeOutputWithContext(ctx context.Context) SceneTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneTypeOutput)
+}
+
+// SceneTypeArrayInput is an input type that accepts SceneTypeArray and SceneTypeArrayOutput values.
+// You can construct a concrete instance of `SceneTypeArrayInput` via:
+//
+//	SceneTypeArray{ SceneTypeArgs{...} }
+type SceneTypeArrayInput interface {
+	pulumi.Input
+
+	ToSceneTypeArrayOutput() SceneTypeArrayOutput
+	ToSceneTypeArrayOutputWithContext(context.Context) SceneTypeArrayOutput
+}
+
+type SceneTypeArray []SceneTypeInput
+
+func (SceneTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneType)(nil)).Elem()
+}
+
+func (i SceneTypeArray) ToSceneTypeArrayOutput() SceneTypeArrayOutput {
+	return i.ToSceneTypeArrayOutputWithContext(context.Background())
+}
+
+func (i SceneTypeArray) ToSceneTypeArrayOutputWithContext(ctx context.Context) SceneTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneTypeArrayOutput)
+}
+
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type SceneTypeOutput struct{ *pulumi.OutputState }
+
+func (SceneTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneType)(nil)).Elem()
+}
+
+func (o SceneTypeOutput) ToSceneTypeOutput() SceneTypeOutput {
+	return o
+}
+
+func (o SceneTypeOutput) ToSceneTypeOutputWithContext(ctx context.Context) SceneTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o SceneTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SceneTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o SceneTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
+	return o.ApplyT(func(v SceneType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
+}
+
+func (o SceneTypeOutput) Spec() SceneSpecPtrOutput {
+	return o.ApplyT(func(v SceneType) *SceneSpec { return v.Spec }).(SceneSpecPtrOutput)
+}
+
+func (o SceneTypeOutput) Status() SceneStatusPtrOutput {
+	return o.ApplyT(func(v SceneType) *SceneStatus { return v.Status }).(SceneStatusPtrOutput)
+}
+
+type SceneTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (SceneTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneType)(nil)).Elem()
+}
+
+func (o SceneTypeArrayOutput) ToSceneTypeArrayOutput() SceneTypeArrayOutput {
+	return o
+}
+
+func (o SceneTypeArrayOutput) ToSceneTypeArrayOutputWithContext(ctx context.Context) SceneTypeArrayOutput {
+	return o
+}
+
+func (o SceneTypeArrayOutput) Index(i pulumi.IntInput) SceneTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SceneType {
+		return vs[0].([]SceneType)[vs[1].(int)]
+	}).(SceneTypeOutput)
+}
+
+// SceneList is a list of Scene
+type SceneListType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// List of scenes. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items []SceneType `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata *metav1.ListMeta `pulumi:"metadata"`
+}
+
+// SceneListTypeInput is an input type that accepts SceneListTypeArgs and SceneListTypeOutput values.
+// You can construct a concrete instance of `SceneListTypeInput` via:
+//
+//	SceneListTypeArgs{...}
+type SceneListTypeInput interface {
+	pulumi.Input
+
+	ToSceneListTypeOutput() SceneListTypeOutput
+	ToSceneListTypeOutputWithContext(context.Context) SceneListTypeOutput
+}
+
+// SceneList is a list of Scene
+type SceneListTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// List of scenes. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items SceneTypeArrayInput `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata metav1.ListMetaPtrInput `pulumi:"metadata"`
+}
+
+func (SceneListTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneListType)(nil)).Elem()
+}
+
+func (i SceneListTypeArgs) ToSceneListTypeOutput() SceneListTypeOutput {
+	return i.ToSceneListTypeOutputWithContext(context.Background())
+}
+
+func (i SceneListTypeArgs) ToSceneListTypeOutputWithContext(ctx context.Context) SceneListTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneListTypeOutput)
+}
+
+// SceneList is a list of Scene
+type SceneListTypeOutput struct{ *pulumi.OutputState }
+
+func (SceneListTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneListType)(nil)).Elem()
+}
+
+func (o SceneListTypeOutput) ToSceneListTypeOutput() SceneListTypeOutput {
+	return o
+}
+
+func (o SceneListTypeOutput) ToSceneListTypeOutputWithContext(ctx context.Context) SceneListTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o SceneListTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneListType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// List of scenes. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+func (o SceneListTypeOutput) Items() SceneTypeArrayOutput {
+	return o.ApplyT(func(v SceneListType) []SceneType { return v.Items }).(SceneTypeArrayOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SceneListTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneListType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o SceneListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
+	return o.ApplyT(func(v SceneListType) *metav1.ListMeta { return v.Metadata }).(metav1.ListMetaPtrOutput)
+}
+
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type ScenePatchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
+	Spec     *SceneSpecPatch         `pulumi:"spec"`
+	Status   *SceneStatusPatch       `pulumi:"status"`
+}
+
+// ScenePatchTypeInput is an input type that accepts ScenePatchTypeArgs and ScenePatchTypeOutput values.
+// You can construct a concrete instance of `ScenePatchTypeInput` via:
+//
+//	ScenePatchTypeArgs{...}
+type ScenePatchTypeInput interface {
+	pulumi.Input
+
+	ToScenePatchTypeOutput() ScenePatchTypeOutput
+	ToScenePatchTypeOutputWithContext(context.Context) ScenePatchTypeOutput
+}
+
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type ScenePatchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPatchPtrInput `pulumi:"metadata"`
+	Spec     SceneSpecPatchPtrInput         `pulumi:"spec"`
+	Status   SceneStatusPatchPtrInput       `pulumi:"status"`
+}
+
+func (ScenePatchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*ScenePatchType)(nil)).Elem()
+}
+
+func (i ScenePatchTypeArgs) ToScenePatchTypeOutput() ScenePatchTypeOutput {
+	return i.ToScenePatchTypeOutputWithContext(context.Background())
+}
+
+func (i ScenePatchTypeArgs) ToScenePatchTypeOutputWithContext(ctx context.Context) ScenePatchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(ScenePatchTypeOutput)
+}
+
+// Scene is a user-named, recallable lighting state for some or all of a
+// Group's lights. Cluster scoped, user-chosen name (e.g. "movie-night"),
+// same reasoning as Group - a Scene has no Hue-side identity of its own.
+type ScenePatchTypeOutput struct{ *pulumi.OutputState }
+
+func (ScenePatchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*ScenePatchType)(nil)).Elem()
+}
+
+func (o ScenePatchTypeOutput) ToScenePatchTypeOutput() ScenePatchTypeOutput {
+	return o
+}
+
+func (o ScenePatchTypeOutput) ToScenePatchTypeOutputWithContext(ctx context.Context) ScenePatchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o ScenePatchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v ScenePatchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o ScenePatchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v ScenePatchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o ScenePatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
+	return o.ApplyT(func(v ScenePatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
+}
+
+func (o ScenePatchTypeOutput) Spec() SceneSpecPatchPtrOutput {
+	return o.ApplyT(func(v ScenePatchType) *SceneSpecPatch { return v.Spec }).(SceneSpecPatchPtrOutput)
+}
+
+func (o ScenePatchTypeOutput) Status() SceneStatusPatchPtrOutput {
+	return o.ApplyT(func(v ScenePatchType) *SceneStatusPatch { return v.Status }).(SceneStatusPatchPtrOutput)
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpec struct {
+	// Group is the name of the Group this scene applies to. A Group's
+	// Spec.ActiveScene must match this Scene's own metadata.name for it to
+	// ever be enacted - a Scene naming a Group that doesn't select it back
+	// is inert.
+	Group *string `pulumi:"group"`
+	// Lights are this scene's per-light desired states. Entries not
+	// naming a member of Group are reported in Status.InvalidLights and
+	// ignored during enactment.
+	Lights []SceneSpecLights `pulumi:"lights"`
+}
+
+// SceneSpecInput is an input type that accepts SceneSpecArgs and SceneSpecOutput values.
+// You can construct a concrete instance of `SceneSpecInput` via:
+//
+//	SceneSpecArgs{...}
+type SceneSpecInput interface {
+	pulumi.Input
+
+	ToSceneSpecOutput() SceneSpecOutput
+	ToSceneSpecOutputWithContext(context.Context) SceneSpecOutput
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpecArgs struct {
+	// Group is the name of the Group this scene applies to. A Group's
+	// Spec.ActiveScene must match this Scene's own metadata.name for it to
+	// ever be enacted - a Scene naming a Group that doesn't select it back
+	// is inert.
+	Group pulumi.StringPtrInput `pulumi:"group"`
+	// Lights are this scene's per-light desired states. Entries not
+	// naming a member of Group are reported in Status.InvalidLights and
+	// ignored during enactment.
+	Lights SceneSpecLightsArrayInput `pulumi:"lights"`
+}
+
+func (SceneSpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpec)(nil)).Elem()
+}
+
+func (i SceneSpecArgs) ToSceneSpecOutput() SceneSpecOutput {
+	return i.ToSceneSpecOutputWithContext(context.Background())
+}
+
+func (i SceneSpecArgs) ToSceneSpecOutputWithContext(ctx context.Context) SceneSpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecOutput)
+}
+
+func (i SceneSpecArgs) ToSceneSpecPtrOutput() SceneSpecPtrOutput {
+	return i.ToSceneSpecPtrOutputWithContext(context.Background())
+}
+
+func (i SceneSpecArgs) ToSceneSpecPtrOutputWithContext(ctx context.Context) SceneSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecOutput).ToSceneSpecPtrOutputWithContext(ctx)
+}
+
+// SceneSpecPtrInput is an input type that accepts SceneSpecArgs, SceneSpecPtr and SceneSpecPtrOutput values.
+// You can construct a concrete instance of `SceneSpecPtrInput` via:
+//
+//	        SceneSpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type SceneSpecPtrInput interface {
+	pulumi.Input
+
+	ToSceneSpecPtrOutput() SceneSpecPtrOutput
+	ToSceneSpecPtrOutputWithContext(context.Context) SceneSpecPtrOutput
+}
+
+type sceneSpecPtrType SceneSpecArgs
+
+func SceneSpecPtr(v *SceneSpecArgs) SceneSpecPtrInput {
+	return (*sceneSpecPtrType)(v)
+}
+
+func (*sceneSpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneSpec)(nil)).Elem()
+}
+
+func (i *sceneSpecPtrType) ToSceneSpecPtrOutput() SceneSpecPtrOutput {
+	return i.ToSceneSpecPtrOutputWithContext(context.Background())
+}
+
+func (i *sceneSpecPtrType) ToSceneSpecPtrOutputWithContext(ctx context.Context) SceneSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecPtrOutput)
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpecOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpec)(nil)).Elem()
+}
+
+func (o SceneSpecOutput) ToSceneSpecOutput() SceneSpecOutput {
+	return o
+}
+
+func (o SceneSpecOutput) ToSceneSpecOutputWithContext(ctx context.Context) SceneSpecOutput {
+	return o
+}
+
+func (o SceneSpecOutput) ToSceneSpecPtrOutput() SceneSpecPtrOutput {
+	return o.ToSceneSpecPtrOutputWithContext(context.Background())
+}
+
+func (o SceneSpecOutput) ToSceneSpecPtrOutputWithContext(ctx context.Context) SceneSpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SceneSpec) *SceneSpec {
+		return &v
+	}).(SceneSpecPtrOutput)
+}
+
+// Group is the name of the Group this scene applies to. A Group's
+// Spec.ActiveScene must match this Scene's own metadata.name for it to
+// ever be enacted - a Scene naming a Group that doesn't select it back
+// is inert.
+func (o SceneSpecOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpec) *string { return v.Group }).(pulumi.StringPtrOutput)
+}
+
+// Lights are this scene's per-light desired states. Entries not
+// naming a member of Group are reported in Status.InvalidLights and
+// ignored during enactment.
+func (o SceneSpecOutput) Lights() SceneSpecLightsArrayOutput {
+	return o.ApplyT(func(v SceneSpec) []SceneSpecLights { return v.Lights }).(SceneSpecLightsArrayOutput)
+}
+
+type SceneSpecPtrOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneSpec)(nil)).Elem()
+}
+
+func (o SceneSpecPtrOutput) ToSceneSpecPtrOutput() SceneSpecPtrOutput {
+	return o
+}
+
+func (o SceneSpecPtrOutput) ToSceneSpecPtrOutputWithContext(ctx context.Context) SceneSpecPtrOutput {
+	return o
+}
+
+func (o SceneSpecPtrOutput) Elem() SceneSpecOutput {
+	return o.ApplyT(func(v *SceneSpec) SceneSpec {
+		if v != nil {
+			return *v
+		}
+		var ret SceneSpec
+		return ret
+	}).(SceneSpecOutput)
+}
+
+// Group is the name of the Group this scene applies to. A Group's
+// Spec.ActiveScene must match this Scene's own metadata.name for it to
+// ever be enacted - a Scene naming a Group that doesn't select it back
+// is inert.
+func (o SceneSpecPtrOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SceneSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Group
+	}).(pulumi.StringPtrOutput)
+}
+
+// Lights are this scene's per-light desired states. Entries not
+// naming a member of Group are reported in Status.InvalidLights and
+// ignored during enactment.
+func (o SceneSpecPtrOutput) Lights() SceneSpecLightsArrayOutput {
+	return o.ApplyT(func(v *SceneSpec) []SceneSpecLights {
+		if v == nil {
+			return nil
+		}
+		return v.Lights
+	}).(SceneSpecLightsArrayOutput)
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLights struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness *int `pulumi:"brightness"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// Name is the Light CR this state applies to - must be a member of the
+	// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+	Name *string `pulumi:"name"`
+	// On, if set, forces this light's desired on/off state.
+	On *bool `pulumi:"on"`
+}
+
+// SceneSpecLightsInput is an input type that accepts SceneSpecLightsArgs and SceneSpecLightsOutput values.
+// You can construct a concrete instance of `SceneSpecLightsInput` via:
+//
+//	SceneSpecLightsArgs{...}
+type SceneSpecLightsInput interface {
+	pulumi.Input
+
+	ToSceneSpecLightsOutput() SceneSpecLightsOutput
+	ToSceneSpecLightsOutputWithContext(context.Context) SceneSpecLightsOutput
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLightsArgs struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// Name is the Light CR this state applies to - must be a member of the
+	// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// On, if set, forces this light's desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+}
+
+func (SceneSpecLightsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecLights)(nil)).Elem()
+}
+
+func (i SceneSpecLightsArgs) ToSceneSpecLightsOutput() SceneSpecLightsOutput {
+	return i.ToSceneSpecLightsOutputWithContext(context.Background())
+}
+
+func (i SceneSpecLightsArgs) ToSceneSpecLightsOutputWithContext(ctx context.Context) SceneSpecLightsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecLightsOutput)
+}
+
+// SceneSpecLightsArrayInput is an input type that accepts SceneSpecLightsArray and SceneSpecLightsArrayOutput values.
+// You can construct a concrete instance of `SceneSpecLightsArrayInput` via:
+//
+//	SceneSpecLightsArray{ SceneSpecLightsArgs{...} }
+type SceneSpecLightsArrayInput interface {
+	pulumi.Input
+
+	ToSceneSpecLightsArrayOutput() SceneSpecLightsArrayOutput
+	ToSceneSpecLightsArrayOutputWithContext(context.Context) SceneSpecLightsArrayOutput
+}
+
+type SceneSpecLightsArray []SceneSpecLightsInput
+
+func (SceneSpecLightsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneSpecLights)(nil)).Elem()
+}
+
+func (i SceneSpecLightsArray) ToSceneSpecLightsArrayOutput() SceneSpecLightsArrayOutput {
+	return i.ToSceneSpecLightsArrayOutputWithContext(context.Background())
+}
+
+func (i SceneSpecLightsArray) ToSceneSpecLightsArrayOutputWithContext(ctx context.Context) SceneSpecLightsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecLightsArrayOutput)
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLightsOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecLightsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecLights)(nil)).Elem()
+}
+
+func (o SceneSpecLightsOutput) ToSceneSpecLightsOutput() SceneSpecLightsOutput {
+	return o
+}
+
+func (o SceneSpecLightsOutput) ToSceneSpecLightsOutputWithContext(ctx context.Context) SceneSpecLightsOutput {
+	return o
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SceneSpecLightsOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SceneSpecLights) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SceneSpecLightsOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpecLights) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SceneSpecLightsOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SceneSpecLights) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// Name is the Light CR this state applies to - must be a member of the
+// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+func (o SceneSpecLightsOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpecLights) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// On, if set, forces this light's desired on/off state.
+func (o SceneSpecLightsOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SceneSpecLights) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+type SceneSpecLightsArrayOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecLightsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneSpecLights)(nil)).Elem()
+}
+
+func (o SceneSpecLightsArrayOutput) ToSceneSpecLightsArrayOutput() SceneSpecLightsArrayOutput {
+	return o
+}
+
+func (o SceneSpecLightsArrayOutput) ToSceneSpecLightsArrayOutputWithContext(ctx context.Context) SceneSpecLightsArrayOutput {
+	return o
+}
+
+func (o SceneSpecLightsArrayOutput) Index(i pulumi.IntInput) SceneSpecLightsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SceneSpecLights {
+		return vs[0].([]SceneSpecLights)[vs[1].(int)]
+	}).(SceneSpecLightsOutput)
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLightsPatch struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness *int `pulumi:"brightness"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color *string `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// Name is the Light CR this state applies to - must be a member of the
+	// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+	Name *string `pulumi:"name"`
+	// On, if set, forces this light's desired on/off state.
+	On *bool `pulumi:"on"`
+}
+
+// SceneSpecLightsPatchInput is an input type that accepts SceneSpecLightsPatchArgs and SceneSpecLightsPatchOutput values.
+// You can construct a concrete instance of `SceneSpecLightsPatchInput` via:
+//
+//	SceneSpecLightsPatchArgs{...}
+type SceneSpecLightsPatchInput interface {
+	pulumi.Input
+
+	ToSceneSpecLightsPatchOutput() SceneSpecLightsPatchOutput
+	ToSceneSpecLightsPatchOutputWithContext(context.Context) SceneSpecLightsPatchOutput
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLightsPatchArgs struct {
+	// Brightness sets desired brightness to this absolute percentage,
+	// clamped 0-100. No-op on a light that doesn't support dimming.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+	// that doesn't support color.
+	Color pulumi.StringPtrInput `pulumi:"color"`
+	// ColorTempK sets desired color temperature in Kelvin. No-op on a
+	// light that doesn't support color temperature.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// Name is the Light CR this state applies to - must be a member of the
+	// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+	Name pulumi.StringPtrInput `pulumi:"name"`
+	// On, if set, forces this light's desired on/off state.
+	On pulumi.BoolPtrInput `pulumi:"on"`
+}
+
+func (SceneSpecLightsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecLightsPatch)(nil)).Elem()
+}
+
+func (i SceneSpecLightsPatchArgs) ToSceneSpecLightsPatchOutput() SceneSpecLightsPatchOutput {
+	return i.ToSceneSpecLightsPatchOutputWithContext(context.Background())
+}
+
+func (i SceneSpecLightsPatchArgs) ToSceneSpecLightsPatchOutputWithContext(ctx context.Context) SceneSpecLightsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecLightsPatchOutput)
+}
+
+// SceneSpecLightsPatchArrayInput is an input type that accepts SceneSpecLightsPatchArray and SceneSpecLightsPatchArrayOutput values.
+// You can construct a concrete instance of `SceneSpecLightsPatchArrayInput` via:
+//
+//	SceneSpecLightsPatchArray{ SceneSpecLightsPatchArgs{...} }
+type SceneSpecLightsPatchArrayInput interface {
+	pulumi.Input
+
+	ToSceneSpecLightsPatchArrayOutput() SceneSpecLightsPatchArrayOutput
+	ToSceneSpecLightsPatchArrayOutputWithContext(context.Context) SceneSpecLightsPatchArrayOutput
+}
+
+type SceneSpecLightsPatchArray []SceneSpecLightsPatchInput
+
+func (SceneSpecLightsPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneSpecLightsPatch)(nil)).Elem()
+}
+
+func (i SceneSpecLightsPatchArray) ToSceneSpecLightsPatchArrayOutput() SceneSpecLightsPatchArrayOutput {
+	return i.ToSceneSpecLightsPatchArrayOutputWithContext(context.Background())
+}
+
+func (i SceneSpecLightsPatchArray) ToSceneSpecLightsPatchArrayOutputWithContext(ctx context.Context) SceneSpecLightsPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecLightsPatchArrayOutput)
+}
+
+// SceneLightState is one light's desired absolute state within a Scene.
+// Pointer fields mean "leave this light's corresponding Spec field
+// untouched" (same convention as SwitchAction) - a Scene can address only
+// a subset of a light's fields, or only a subset of its Group's lights.
+// Unlike SwitchAction there is no Toggle/BrightnessDelta: those are
+// relative/stateful adjustments appropriate for a physical button, not for
+// "recall this absolute state."
+type SceneSpecLightsPatchOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecLightsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecLightsPatch)(nil)).Elem()
+}
+
+func (o SceneSpecLightsPatchOutput) ToSceneSpecLightsPatchOutput() SceneSpecLightsPatchOutput {
+	return o
+}
+
+func (o SceneSpecLightsPatchOutput) ToSceneSpecLightsPatchOutputWithContext(ctx context.Context) SceneSpecLightsPatchOutput {
+	return o
+}
+
+// Brightness sets desired brightness to this absolute percentage,
+// clamped 0-100. No-op on a light that doesn't support dimming.
+func (o SceneSpecLightsPatchOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SceneSpecLightsPatch) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// Color sets desired color to this "#rrggbb" swatch. No-op on a light
+// that doesn't support color.
+func (o SceneSpecLightsPatchOutput) Color() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpecLightsPatch) *string { return v.Color }).(pulumi.StringPtrOutput)
+}
+
+// ColorTempK sets desired color temperature in Kelvin. No-op on a
+// light that doesn't support color temperature.
+func (o SceneSpecLightsPatchOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v SceneSpecLightsPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// Name is the Light CR this state applies to - must be a member of the
+// owning Scene's Spec.Group (see SceneStatus.InvalidLights).
+func (o SceneSpecLightsPatchOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpecLightsPatch) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+// On, if set, forces this light's desired on/off state.
+func (o SceneSpecLightsPatchOutput) On() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v SceneSpecLightsPatch) *bool { return v.On }).(pulumi.BoolPtrOutput)
+}
+
+type SceneSpecLightsPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecLightsPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]SceneSpecLightsPatch)(nil)).Elem()
+}
+
+func (o SceneSpecLightsPatchArrayOutput) ToSceneSpecLightsPatchArrayOutput() SceneSpecLightsPatchArrayOutput {
+	return o
+}
+
+func (o SceneSpecLightsPatchArrayOutput) ToSceneSpecLightsPatchArrayOutputWithContext(ctx context.Context) SceneSpecLightsPatchArrayOutput {
+	return o
+}
+
+func (o SceneSpecLightsPatchArrayOutput) Index(i pulumi.IntInput) SceneSpecLightsPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) SceneSpecLightsPatch {
+		return vs[0].([]SceneSpecLightsPatch)[vs[1].(int)]
+	}).(SceneSpecLightsPatchOutput)
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpecPatch struct {
+	// Group is the name of the Group this scene applies to. A Group's
+	// Spec.ActiveScene must match this Scene's own metadata.name for it to
+	// ever be enacted - a Scene naming a Group that doesn't select it back
+	// is inert.
+	Group *string `pulumi:"group"`
+	// Lights are this scene's per-light desired states. Entries not
+	// naming a member of Group are reported in Status.InvalidLights and
+	// ignored during enactment.
+	Lights []SceneSpecLightsPatch `pulumi:"lights"`
+}
+
+// SceneSpecPatchInput is an input type that accepts SceneSpecPatchArgs and SceneSpecPatchOutput values.
+// You can construct a concrete instance of `SceneSpecPatchInput` via:
+//
+//	SceneSpecPatchArgs{...}
+type SceneSpecPatchInput interface {
+	pulumi.Input
+
+	ToSceneSpecPatchOutput() SceneSpecPatchOutput
+	ToSceneSpecPatchOutputWithContext(context.Context) SceneSpecPatchOutput
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpecPatchArgs struct {
+	// Group is the name of the Group this scene applies to. A Group's
+	// Spec.ActiveScene must match this Scene's own metadata.name for it to
+	// ever be enacted - a Scene naming a Group that doesn't select it back
+	// is inert.
+	Group pulumi.StringPtrInput `pulumi:"group"`
+	// Lights are this scene's per-light desired states. Entries not
+	// naming a member of Group are reported in Status.InvalidLights and
+	// ignored during enactment.
+	Lights SceneSpecLightsPatchArrayInput `pulumi:"lights"`
+}
+
+func (SceneSpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecPatch)(nil)).Elem()
+}
+
+func (i SceneSpecPatchArgs) ToSceneSpecPatchOutput() SceneSpecPatchOutput {
+	return i.ToSceneSpecPatchOutputWithContext(context.Background())
+}
+
+func (i SceneSpecPatchArgs) ToSceneSpecPatchOutputWithContext(ctx context.Context) SceneSpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecPatchOutput)
+}
+
+func (i SceneSpecPatchArgs) ToSceneSpecPatchPtrOutput() SceneSpecPatchPtrOutput {
+	return i.ToSceneSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i SceneSpecPatchArgs) ToSceneSpecPatchPtrOutputWithContext(ctx context.Context) SceneSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecPatchOutput).ToSceneSpecPatchPtrOutputWithContext(ctx)
+}
+
+// SceneSpecPatchPtrInput is an input type that accepts SceneSpecPatchArgs, SceneSpecPatchPtr and SceneSpecPatchPtrOutput values.
+// You can construct a concrete instance of `SceneSpecPatchPtrInput` via:
+//
+//	        SceneSpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type SceneSpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToSceneSpecPatchPtrOutput() SceneSpecPatchPtrOutput
+	ToSceneSpecPatchPtrOutputWithContext(context.Context) SceneSpecPatchPtrOutput
+}
+
+type sceneSpecPatchPtrType SceneSpecPatchArgs
+
+func SceneSpecPatchPtr(v *SceneSpecPatchArgs) SceneSpecPatchPtrInput {
+	return (*sceneSpecPatchPtrType)(v)
+}
+
+func (*sceneSpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneSpecPatch)(nil)).Elem()
+}
+
+func (i *sceneSpecPatchPtrType) ToSceneSpecPatchPtrOutput() SceneSpecPatchPtrOutput {
+	return i.ToSceneSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *sceneSpecPatchPtrType) ToSceneSpecPatchPtrOutputWithContext(ctx context.Context) SceneSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneSpecPatchPtrOutput)
+}
+
+// SceneSpec declares a named, recallable state for some or all of a
+// Group's lights. A Scene does no enactment itself - internal/
+// groupcontroller.Reconciler applies Lights onto each target Light.Spec
+// when the owning Group's Spec.ActiveScene names this Scene, and internal/
+// lightscontroller.Reconciler does the actual bridge push from there,
+// unchanged - a Scene has no bridge/hue dependency at all.
+type SceneSpecPatchOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneSpecPatch)(nil)).Elem()
+}
+
+func (o SceneSpecPatchOutput) ToSceneSpecPatchOutput() SceneSpecPatchOutput {
+	return o
+}
+
+func (o SceneSpecPatchOutput) ToSceneSpecPatchOutputWithContext(ctx context.Context) SceneSpecPatchOutput {
+	return o
+}
+
+func (o SceneSpecPatchOutput) ToSceneSpecPatchPtrOutput() SceneSpecPatchPtrOutput {
+	return o.ToSceneSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o SceneSpecPatchOutput) ToSceneSpecPatchPtrOutputWithContext(ctx context.Context) SceneSpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SceneSpecPatch) *SceneSpecPatch {
+		return &v
+	}).(SceneSpecPatchPtrOutput)
+}
+
+// Group is the name of the Group this scene applies to. A Group's
+// Spec.ActiveScene must match this Scene's own metadata.name for it to
+// ever be enacted - a Scene naming a Group that doesn't select it back
+// is inert.
+func (o SceneSpecPatchOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneSpecPatch) *string { return v.Group }).(pulumi.StringPtrOutput)
+}
+
+// Lights are this scene's per-light desired states. Entries not
+// naming a member of Group are reported in Status.InvalidLights and
+// ignored during enactment.
+func (o SceneSpecPatchOutput) Lights() SceneSpecLightsPatchArrayOutput {
+	return o.ApplyT(func(v SceneSpecPatch) []SceneSpecLightsPatch { return v.Lights }).(SceneSpecLightsPatchArrayOutput)
+}
+
+type SceneSpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (SceneSpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneSpecPatch)(nil)).Elem()
+}
+
+func (o SceneSpecPatchPtrOutput) ToSceneSpecPatchPtrOutput() SceneSpecPatchPtrOutput {
+	return o
+}
+
+func (o SceneSpecPatchPtrOutput) ToSceneSpecPatchPtrOutputWithContext(ctx context.Context) SceneSpecPatchPtrOutput {
+	return o
+}
+
+func (o SceneSpecPatchPtrOutput) Elem() SceneSpecPatchOutput {
+	return o.ApplyT(func(v *SceneSpecPatch) SceneSpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret SceneSpecPatch
+		return ret
+	}).(SceneSpecPatchOutput)
+}
+
+// Group is the name of the Group this scene applies to. A Group's
+// Spec.ActiveScene must match this Scene's own metadata.name for it to
+// ever be enacted - a Scene naming a Group that doesn't select it back
+// is inert.
+func (o SceneSpecPatchPtrOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SceneSpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Group
+	}).(pulumi.StringPtrOutput)
+}
+
+// Lights are this scene's per-light desired states. Entries not
+// naming a member of Group are reported in Status.InvalidLights and
+// ignored during enactment.
+func (o SceneSpecPatchPtrOutput) Lights() SceneSpecLightsPatchArrayOutput {
+	return o.ApplyT(func(v *SceneSpecPatch) []SceneSpecLightsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Lights
+	}).(SceneSpecLightsPatchArrayOutput)
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatus struct {
+	// InvalidLights are entries in Spec.Lights that don't currently exist
+	// as a Light CR, or that aren't a member of Spec.Group.
+	InvalidLights []string `pulumi:"invalidLights"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+}
+
+// SceneStatusInput is an input type that accepts SceneStatusArgs and SceneStatusOutput values.
+// You can construct a concrete instance of `SceneStatusInput` via:
+//
+//	SceneStatusArgs{...}
+type SceneStatusInput interface {
+	pulumi.Input
+
+	ToSceneStatusOutput() SceneStatusOutput
+	ToSceneStatusOutputWithContext(context.Context) SceneStatusOutput
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatusArgs struct {
+	// InvalidLights are entries in Spec.Lights that don't currently exist
+	// as a Light CR, or that aren't a member of Spec.Group.
+	InvalidLights pulumi.StringArrayInput `pulumi:"invalidLights"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+}
+
+func (SceneStatusArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneStatus)(nil)).Elem()
+}
+
+func (i SceneStatusArgs) ToSceneStatusOutput() SceneStatusOutput {
+	return i.ToSceneStatusOutputWithContext(context.Background())
+}
+
+func (i SceneStatusArgs) ToSceneStatusOutputWithContext(ctx context.Context) SceneStatusOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusOutput)
+}
+
+func (i SceneStatusArgs) ToSceneStatusPtrOutput() SceneStatusPtrOutput {
+	return i.ToSceneStatusPtrOutputWithContext(context.Background())
+}
+
+func (i SceneStatusArgs) ToSceneStatusPtrOutputWithContext(ctx context.Context) SceneStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusOutput).ToSceneStatusPtrOutputWithContext(ctx)
+}
+
+// SceneStatusPtrInput is an input type that accepts SceneStatusArgs, SceneStatusPtr and SceneStatusPtrOutput values.
+// You can construct a concrete instance of `SceneStatusPtrInput` via:
+//
+//	        SceneStatusArgs{...}
+//
+//	or:
+//
+//	        nil
+type SceneStatusPtrInput interface {
+	pulumi.Input
+
+	ToSceneStatusPtrOutput() SceneStatusPtrOutput
+	ToSceneStatusPtrOutputWithContext(context.Context) SceneStatusPtrOutput
+}
+
+type sceneStatusPtrType SceneStatusArgs
+
+func SceneStatusPtr(v *SceneStatusArgs) SceneStatusPtrInput {
+	return (*sceneStatusPtrType)(v)
+}
+
+func (*sceneStatusPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneStatus)(nil)).Elem()
+}
+
+func (i *sceneStatusPtrType) ToSceneStatusPtrOutput() SceneStatusPtrOutput {
+	return i.ToSceneStatusPtrOutputWithContext(context.Background())
+}
+
+func (i *sceneStatusPtrType) ToSceneStatusPtrOutputWithContext(ctx context.Context) SceneStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusPtrOutput)
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatusOutput struct{ *pulumi.OutputState }
+
+func (SceneStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneStatus)(nil)).Elem()
+}
+
+func (o SceneStatusOutput) ToSceneStatusOutput() SceneStatusOutput {
+	return o
+}
+
+func (o SceneStatusOutput) ToSceneStatusOutputWithContext(ctx context.Context) SceneStatusOutput {
+	return o
+}
+
+func (o SceneStatusOutput) ToSceneStatusPtrOutput() SceneStatusPtrOutput {
+	return o.ToSceneStatusPtrOutputWithContext(context.Background())
+}
+
+func (o SceneStatusOutput) ToSceneStatusPtrOutputWithContext(ctx context.Context) SceneStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SceneStatus) *SceneStatus {
+		return &v
+	}).(SceneStatusPtrOutput)
+}
+
+// InvalidLights are entries in Spec.Lights that don't currently exist
+// as a Light CR, or that aren't a member of Spec.Group.
+func (o SceneStatusOutput) InvalidLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v SceneStatus) []string { return v.InvalidLights }).(pulumi.StringArrayOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o SceneStatusOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+type SceneStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (SceneStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneStatus)(nil)).Elem()
+}
+
+func (o SceneStatusPtrOutput) ToSceneStatusPtrOutput() SceneStatusPtrOutput {
+	return o
+}
+
+func (o SceneStatusPtrOutput) ToSceneStatusPtrOutputWithContext(ctx context.Context) SceneStatusPtrOutput {
+	return o
+}
+
+func (o SceneStatusPtrOutput) Elem() SceneStatusOutput {
+	return o.ApplyT(func(v *SceneStatus) SceneStatus {
+		if v != nil {
+			return *v
+		}
+		var ret SceneStatus
+		return ret
+	}).(SceneStatusOutput)
+}
+
+// InvalidLights are entries in Spec.Lights that don't currently exist
+// as a Light CR, or that aren't a member of Spec.Group.
+func (o SceneStatusPtrOutput) InvalidLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *SceneStatus) []string {
+		if v == nil {
+			return nil
+		}
+		return v.InvalidLights
+	}).(pulumi.StringArrayOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o SceneStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SceneStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatusPatch struct {
+	// InvalidLights are entries in Spec.Lights that don't currently exist
+	// as a Light CR, or that aren't a member of Spec.Group.
+	InvalidLights []string `pulumi:"invalidLights"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+}
+
+// SceneStatusPatchInput is an input type that accepts SceneStatusPatchArgs and SceneStatusPatchOutput values.
+// You can construct a concrete instance of `SceneStatusPatchInput` via:
+//
+//	SceneStatusPatchArgs{...}
+type SceneStatusPatchInput interface {
+	pulumi.Input
+
+	ToSceneStatusPatchOutput() SceneStatusPatchOutput
+	ToSceneStatusPatchOutputWithContext(context.Context) SceneStatusPatchOutput
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatusPatchArgs struct {
+	// InvalidLights are entries in Spec.Lights that don't currently exist
+	// as a Light CR, or that aren't a member of Spec.Group.
+	InvalidLights pulumi.StringArrayInput `pulumi:"invalidLights"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+}
+
+func (SceneStatusPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneStatusPatch)(nil)).Elem()
+}
+
+func (i SceneStatusPatchArgs) ToSceneStatusPatchOutput() SceneStatusPatchOutput {
+	return i.ToSceneStatusPatchOutputWithContext(context.Background())
+}
+
+func (i SceneStatusPatchArgs) ToSceneStatusPatchOutputWithContext(ctx context.Context) SceneStatusPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusPatchOutput)
+}
+
+func (i SceneStatusPatchArgs) ToSceneStatusPatchPtrOutput() SceneStatusPatchPtrOutput {
+	return i.ToSceneStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i SceneStatusPatchArgs) ToSceneStatusPatchPtrOutputWithContext(ctx context.Context) SceneStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusPatchOutput).ToSceneStatusPatchPtrOutputWithContext(ctx)
+}
+
+// SceneStatusPatchPtrInput is an input type that accepts SceneStatusPatchArgs, SceneStatusPatchPtr and SceneStatusPatchPtrOutput values.
+// You can construct a concrete instance of `SceneStatusPatchPtrInput` via:
+//
+//	        SceneStatusPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type SceneStatusPatchPtrInput interface {
+	pulumi.Input
+
+	ToSceneStatusPatchPtrOutput() SceneStatusPatchPtrOutput
+	ToSceneStatusPatchPtrOutputWithContext(context.Context) SceneStatusPatchPtrOutput
+}
+
+type sceneStatusPatchPtrType SceneStatusPatchArgs
+
+func SceneStatusPatchPtr(v *SceneStatusPatchArgs) SceneStatusPatchPtrInput {
+	return (*sceneStatusPatchPtrType)(v)
+}
+
+func (*sceneStatusPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneStatusPatch)(nil)).Elem()
+}
+
+func (i *sceneStatusPatchPtrType) ToSceneStatusPatchPtrOutput() SceneStatusPatchPtrOutput {
+	return i.ToSceneStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *sceneStatusPatchPtrType) ToSceneStatusPatchPtrOutputWithContext(ctx context.Context) SceneStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(SceneStatusPatchPtrOutput)
+}
+
+// SceneStatus reports which of Spec.Lights don't currently resolve to a
+// member of Spec.Group - a typo'd, deleted, or since-moved light reference
+// would otherwise be silently ignored during enactment.
+type SceneStatusPatchOutput struct{ *pulumi.OutputState }
+
+func (SceneStatusPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*SceneStatusPatch)(nil)).Elem()
+}
+
+func (o SceneStatusPatchOutput) ToSceneStatusPatchOutput() SceneStatusPatchOutput {
+	return o
+}
+
+func (o SceneStatusPatchOutput) ToSceneStatusPatchOutputWithContext(ctx context.Context) SceneStatusPatchOutput {
+	return o
+}
+
+func (o SceneStatusPatchOutput) ToSceneStatusPatchPtrOutput() SceneStatusPatchPtrOutput {
+	return o.ToSceneStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (o SceneStatusPatchOutput) ToSceneStatusPatchPtrOutputWithContext(ctx context.Context) SceneStatusPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v SceneStatusPatch) *SceneStatusPatch {
+		return &v
+	}).(SceneStatusPatchPtrOutput)
+}
+
+// InvalidLights are entries in Spec.Lights that don't currently exist
+// as a Light CR, or that aren't a member of Spec.Group.
+func (o SceneStatusPatchOutput) InvalidLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v SceneStatusPatch) []string { return v.InvalidLights }).(pulumi.StringArrayOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o SceneStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v SceneStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+type SceneStatusPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (SceneStatusPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**SceneStatusPatch)(nil)).Elem()
+}
+
+func (o SceneStatusPatchPtrOutput) ToSceneStatusPatchPtrOutput() SceneStatusPatchPtrOutput {
+	return o
+}
+
+func (o SceneStatusPatchPtrOutput) ToSceneStatusPatchPtrOutputWithContext(ctx context.Context) SceneStatusPatchPtrOutput {
+	return o
+}
+
+func (o SceneStatusPatchPtrOutput) Elem() SceneStatusPatchOutput {
+	return o.ApplyT(func(v *SceneStatusPatch) SceneStatusPatch {
+		if v != nil {
+			return *v
+		}
+		var ret SceneStatusPatch
+		return ret
+	}).(SceneStatusPatchOutput)
+}
+
+// InvalidLights are entries in Spec.Lights that don't currently exist
+// as a Light CR, or that aren't a member of Spec.Group.
+func (o SceneStatusPatchPtrOutput) InvalidLights() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *SceneStatusPatch) []string {
+		if v == nil {
+			return nil
+		}
+		return v.InvalidLights
+	}).(pulumi.StringArrayOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o SceneStatusPatchPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *SceneStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
 // Switch represents a single physical button's live, observed state plus
 // its user-declared bindings. Cluster scoped, same reasoning as Light.
 // Named after the button resource's own Hue UUID (stable, unique, valid as
@@ -5895,6 +7450,22 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPtrInput)(nil)).Elem(), LightStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPatchInput)(nil)).Elem(), LightStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*LightStatusPatchPtrInput)(nil)).Elem(), LightStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneTypeInput)(nil)).Elem(), SceneTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneTypeArrayInput)(nil)).Elem(), SceneTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneListTypeInput)(nil)).Elem(), SceneListTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*ScenePatchTypeInput)(nil)).Elem(), ScenePatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecInput)(nil)).Elem(), SceneSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecPtrInput)(nil)).Elem(), SceneSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecLightsInput)(nil)).Elem(), SceneSpecLightsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecLightsArrayInput)(nil)).Elem(), SceneSpecLightsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecLightsPatchInput)(nil)).Elem(), SceneSpecLightsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecLightsPatchArrayInput)(nil)).Elem(), SceneSpecLightsPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecPatchInput)(nil)).Elem(), SceneSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneSpecPatchPtrInput)(nil)).Elem(), SceneSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneStatusInput)(nil)).Elem(), SceneStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneStatusPtrInput)(nil)).Elem(), SceneStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneStatusPatchInput)(nil)).Elem(), SceneStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*SceneStatusPatchPtrInput)(nil)).Elem(), SceneStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchTypeInput)(nil)).Elem(), SwitchTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchTypeArrayInput)(nil)).Elem(), SwitchTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchListTypeInput)(nil)).Elem(), SwitchListTypeArgs{})
@@ -5947,6 +7518,22 @@ func init() {
 	pulumi.RegisterOutputType(LightStatusPtrOutput{})
 	pulumi.RegisterOutputType(LightStatusPatchOutput{})
 	pulumi.RegisterOutputType(LightStatusPatchPtrOutput{})
+	pulumi.RegisterOutputType(SceneTypeOutput{})
+	pulumi.RegisterOutputType(SceneTypeArrayOutput{})
+	pulumi.RegisterOutputType(SceneListTypeOutput{})
+	pulumi.RegisterOutputType(ScenePatchTypeOutput{})
+	pulumi.RegisterOutputType(SceneSpecOutput{})
+	pulumi.RegisterOutputType(SceneSpecPtrOutput{})
+	pulumi.RegisterOutputType(SceneSpecLightsOutput{})
+	pulumi.RegisterOutputType(SceneSpecLightsArrayOutput{})
+	pulumi.RegisterOutputType(SceneSpecLightsPatchOutput{})
+	pulumi.RegisterOutputType(SceneSpecLightsPatchArrayOutput{})
+	pulumi.RegisterOutputType(SceneSpecPatchOutput{})
+	pulumi.RegisterOutputType(SceneSpecPatchPtrOutput{})
+	pulumi.RegisterOutputType(SceneStatusOutput{})
+	pulumi.RegisterOutputType(SceneStatusPtrOutput{})
+	pulumi.RegisterOutputType(SceneStatusPatchOutput{})
+	pulumi.RegisterOutputType(SceneStatusPatchPtrOutput{})
 	pulumi.RegisterOutputType(SwitchTypeOutput{})
 	pulumi.RegisterOutputType(SwitchTypeArrayOutput{})
 	pulumi.RegisterOutputType(SwitchListTypeOutput{})

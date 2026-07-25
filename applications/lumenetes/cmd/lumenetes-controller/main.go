@@ -19,6 +19,7 @@ import (
 	"github.com/liamawhite/lumenetes/internal/eventstream"
 	"github.com/liamawhite/lumenetes/internal/groupcontroller"
 	"github.com/liamawhite/lumenetes/internal/lightscontroller"
+	"github.com/liamawhite/lumenetes/internal/scenecontroller"
 	"github.com/liamawhite/lumenetes/internal/switchcontroller"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -143,11 +144,23 @@ func main() {
 	}
 
 	// Group has no bridge-side state to sync from, so it's just a watch-
-	// driven reconciler - no Poller/EventConsumer.
+	// driven reconciler - no Poller/EventConsumer. It also enacts
+	// Spec.ActiveScene onto its target Lights' Spec (see
+	// groupcontroller's package doc).
 	if err := ctrl.NewControllerManagedBy(mgr).
 		For(&lumenetesv1alpha1.Group{}).
 		Complete(&groupcontroller.Reconciler{Client: mgr.GetClient()}); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to register group reconciler: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Scene has no bridge-side state either, and does no enactment itself
+	// (that's groupcontroller's job) - pure watch-driven validation, no
+	// Poller/EventConsumer.
+	if err := ctrl.NewControllerManagedBy(mgr).
+		For(&lumenetesv1alpha1.Scene{}).
+		Complete(&scenecontroller.Reconciler{Client: mgr.GetClient()}); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to register scene reconciler: %v\n", err)
 		os.Exit(1)
 	}
 

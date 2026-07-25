@@ -261,9 +261,17 @@ func NewLumenetes(ctx *pulumi.Context, args *LumenetesArgs, opts ...pulumi.Resou
 // createDefaultGroups creates (or updates) each of defaultGroups with its
 // declared Lights list - Pulumi is authoritative for Spec here, the same
 // way it already is for HueBridge, so a later `up` corrects any out-of-band
-// edit back to what's declared above rather than ignoring it.
+// edit back to what's declared above rather than ignoring it. The one
+// exception is spec.activeScene: that field is deliberately left out of
+// GroupSpecArgs below (an omitted optional field sends nil, not an
+// explicit "", so this doesn't force every light off on the next `up`),
+// and pulumi.IgnoreChanges pins that down further - kubectl/CLI-set
+// activeScene values are meant to survive `up` indefinitely, since
+// selecting a group's active scene is normal runtime usage, not drift to
+// correct.
 func createDefaultGroups(ctx *pulumi.Context, opts ...pulumi.ResourceOption) error {
 	for _, group := range defaultGroups {
+		groupOpts := append(append([]pulumi.ResourceOption{}, opts...), pulumi.IgnoreChanges([]string{"spec.activeScene"}))
 		_, err := lumenetesv1alpha1.NewGroup(ctx, fmt.Sprintf("group-%s", group.Name), &lumenetesv1alpha1.GroupArgs{
 			Metadata: &metav1.ObjectMetaArgs{
 				Name: pulumi.String(group.Name),
@@ -271,7 +279,7 @@ func createDefaultGroups(ctx *pulumi.Context, opts ...pulumi.ResourceOption) err
 			Spec: &lumenetesv1alpha1.GroupSpecArgs{
 				Lights: pulumi.ToStringArray(group.Lights),
 			},
-		}, opts...)
+		}, groupOpts...)
 		if err != nil {
 			return fmt.Errorf("failed to create group %q: %w", group.Name, err)
 		}
