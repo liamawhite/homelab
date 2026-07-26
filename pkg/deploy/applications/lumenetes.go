@@ -121,7 +121,7 @@ var defaultCircadianSchedules = []struct {
 		Group: "living-space",
 		Keyframes: []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs{
 			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(-60), Brightness: pulumi.Int(15), ColorTempK: pulumi.Int(2200)},
-			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(60), ColorTempK: pulumi.Int(2200)},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(60), ColorTempK: pulumi.Int(3000)},
 			{Anchor: pulumi.String("solarNoon"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(6500)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-120), Brightness: pulumi.Int(85), ColorTempK: pulumi.Int(4000)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-60), Brightness: pulumi.Int(70), ColorTempK: pulumi.Int(2700)},
