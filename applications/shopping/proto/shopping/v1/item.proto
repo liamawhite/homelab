@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package shopping.v1;
+
+option go_package = "github.com/liamawhite/shopping/gen/shopping/v1;shoppingv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Item {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message ListItemsRequest {}
+
+message ListItemsResponse {
+  repeated Item items = 1;
+}
+
+message CreateItemRequest {
+  string name = 1;
+}
+
+message CreateItemResponse {
+  Item item = 1;
+}
+
+message DeleteItemRequest {
+  string id = 1;
+}
+
+message DeleteItemResponse {}
+
+service ItemService {
+  rpc ListItems(ListItemsRequest) returns (ListItemsResponse);
+  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+}

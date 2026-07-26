@@ -1,10 +1,10 @@
 // Package grafana deploys Grafana, provisioned entirely as code (a
-// Prometheus datasource and two dashboards - see dashboards.go) and exposed
+// Prometheus datasource and its dashboards - see dashboards.go) and exposed
 // over Tailscale, following pkg/components/longhorn's UI-exposure
 // conventions: a dedicated waypoint, a Service labeled onto it, and
 // pkg/components/tailscale/ingress.NewIngress.
 //
-// Two deliberate choices, both explicit user decisions rather than defaults
+// Three deliberate choices, all explicit user decisions rather than defaults
 // carried over unexamined from the legacy TypeScript stack:
 //
 //   - Anonymous-admin auth (matches legacy): no login screen, anonymous
@@ -16,6 +16,16 @@
 //     the ConfigMaps below, so a pod restart only loses ad-hoc UI edits,
 //     annotations, and alert-silence state - an acceptable homelab
 //     tradeoff for one fewer Longhorn volume to manage.
+//   - Dedicated ServiceAccount (rather than the "monitoring" namespace's
+//     default one): exists specifically so it can be named as an exact
+//     AuthorizationPolicy principal - see the ingress.NewIngress call below.
+//     Browser-direct access (the Prometheus datasource's browser access
+//     mode, pointed straight at Prometheus's own Tailscale hostname) was
+//     tried first as an alternative that would've needed no
+//     AuthorizationPolicy change at all, but Grafana 11.6.2 has removed
+//     that mode outright ("Browser access mode in the Prometheus datasource
+//     is no longer available"), so the backend proxy path - and therefore
+//     this identity - is mandatory.
 //
 // Prometheus's and Alertmanager's own UIs are also Tailscale-exposed
 // ("prom"/"alerts" hostnames), directly by pkg/components/prometheus using
@@ -38,10 +48,18 @@ import (
 
 const (
 	image        = "grafana/grafana"
-	uiHostname   = "grafana"
+	UIHostname   = "grafana"
 	uiPodLabel   = "grafana"
 	servicePort  = 3000
 	configMapKey = "grafana-config"
+
+	// ServiceAccountName is the fixed name of the ServiceAccount NewGrafana
+	// creates for the Grafana pod - exported so pkg/components/prometheus
+	// can name it as an exact AuthorizationPolicy principal on its own UI's
+	// Tailscale ingress (Grafana's datasource proxy calls, like Prometheus's
+	// own alerting delivery to Alertmanager, are backend traffic that has to
+	// go through the same waypoint the UI's Tailscale ingress does).
+	ServiceAccountName = "grafana"
 )
 
 const grafanaINI = `[server]
@@ -101,10 +119,20 @@ type GrafanaArgs struct {
 	Namespace pulumi.StringInput
 
 	// PrometheusServiceName is the Prometheus Service's name
-	// (prometheus.NewPrometheus's caller knows this - "prometheus-k8s") -
-	// the datasource ConfigMap points at
+	// (prometheus.ServiceName, "prometheus-k8s") - the datasource ConfigMap
+	// points Grafana's backend proxy at
 	// http://<PrometheusServiceName>.<Namespace>:9090.
 	PrometheusServiceName pulumi.StringInput
+	// PrometheusWaypointName is Prometheus's own dedicated waypoint's name
+	// (prometheus.Prometheus.UIWaypointName) - network.go needs this to
+	// build the CiliumClusterwideNetworkPolicy pair letting Grafana's pod
+	// reach that waypoint pod's HBONE port at all, since Cilium's default
+	// baseline only lets Tailscale's own proxy pods do that (see
+	// pkg/components/tailscale's allow-{e,in}gress-tailscale-waypoints
+	// policies) - an ambient Service with istio.io/use-waypoint set always
+	// redirects callers to the waypoint pod itself, never straight to the
+	// backend pod, so this is the actual first hop that has to be allowed.
+	PrometheusWaypointName pulumi.StringInput
 
 	// TailscaleOperatorNamespace is where pkg/components/tailscale's
 	// operator (and its dynamically created per-Ingress proxy pods) run -
@@ -145,16 +173,27 @@ func NewGrafana(ctx *pulumi.Context, name string, args *GrafanaArgs, opts ...pul
 
 	// Network policy - see network.go. Applied before the Deployment so
 	// Grafana's pod never even briefly comes up without it.
-	if err := newNetworkPolicy(ctx, fmt.Sprintf("%s-network", name), args.Namespace, localOpts...); err != nil {
+	if err := newNetworkPolicy(ctx, fmt.Sprintf("%s-network", name), args.Namespace, args.PrometheusWaypointName, localOpts...); err != nil {
 		return nil, err
 	}
 
 	labels := pulumi.StringMap{"app": pulumi.String(uiPodLabel)}
 
+	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name:      pulumi.String(ServiceAccountName),
+			Namespace: args.Namespace,
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
 	datasourcesYML := pulumi.Sprintf(`apiVersion: 1
 datasources:
   - name: Prometheus
     type: prometheus
+    uid: prometheus
     access: proxy
     url: http://%s.%s:9090
     isDefault: true
@@ -168,7 +207,7 @@ datasources:
 			Namespace: args.Namespace,
 		},
 		Data: pulumi.StringMap{
-			"grafana.ini":     pulumi.Sprintf(grafanaINI, pulumi.Sprintf("%s.%s", pulumi.String(uiHostname), args.TailscaleMagicDNSSuffix)),
+			"grafana.ini":     pulumi.Sprintf(grafanaINI, pulumi.Sprintf("%s.%s", pulumi.String(UIHostname), args.TailscaleMagicDNSSuffix)),
 			"datasources.yml": datasourcesYML,
 			"dashboards.yml":  pulumi.String(dashboardsYML),
 		},
@@ -183,8 +222,14 @@ datasources:
 			Namespace: args.Namespace,
 		},
 		Data: pulumi.StringMap{
-			"node-metrics.json": pulumi.String(nodeMetricsDashboard),
-			"pod-metrics.json":  pulumi.String(podMetricsDashboard),
+			"node-metrics.json":                  pulumi.String(nodeMetricsDashboard),
+			"pod-metrics.json":                   pulumi.String(podMetricsDashboard),
+			"istio-control-plane-dashboard.json": pulumi.String(istioControlPlaneDashboard),
+			"istio-mesh-dashboard.json":          pulumi.String(istioMeshDashboard),
+			"istio-service-dashboard.json":       pulumi.String(istioServiceDashboard),
+			"istio-workload-dashboard.json":      pulumi.String(istioWorkloadDashboard),
+			"istio-ztunnel-dashboard.json":       pulumi.String(istioZtunnelDashboard),
+			"lumenetes-dashboard.json":           pulumi.String(lumenetesDashboard),
 		},
 	}, localOpts...)
 	if err != nil {
@@ -208,6 +253,7 @@ datasources:
 					},
 				},
 				Spec: &corev1.PodSpecArgs{
+					ServiceAccountName: serviceAccount.Metadata.Name().Elem(),
 					SecurityContext: &corev1.PodSecurityContextArgs{
 						FsGroup:      pulumi.Int(472),
 						RunAsUser:    pulumi.Int(472),
@@ -309,7 +355,7 @@ datasources:
 		Namespace:            args.Namespace,
 		ServiceName:          service.Metadata.Name().Elem(),
 		ServicePort:          servicePort,
-		Hostname:             uiHostname,
+		Hostname:             UIHostname,
 		OperatorNamespace:    args.TailscaleOperatorNamespace,
 		MagicDNSSuffix:       args.TailscaleMagicDNSSuffix,
 		CloudflareZoneID:     args.CloudflareZoneID,

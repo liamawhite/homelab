@@ -48,6 +48,15 @@ type Prometheus struct {
 	pulumi.ResourceState
 
 	Namespace pulumi.StringOutput
+	// UIWaypointName is the name of Prometheus's own dedicated waypoint
+	// (istiod stamps this as the gateway.networking.k8s.io/gateway-name
+	// label on the waypoint's pod) - exported so pkg/components/grafana can
+	// build the CiliumClusterwideNetworkPolicy pair its datasource proxy
+	// needs to reach that specific waypoint pod's HBONE port at all. Not
+	// derivable from ServiceName/UIHostname since it's this component's own
+	// Pulumi instantiation name (the "name" NewPrometheus was called with)
+	// plus "-waypoint", not a fixed literal.
+	UIWaypointName pulumi.StringOutput
 
 	redirects []ingress.RedirectRoute
 }
@@ -67,6 +76,17 @@ type PrometheusArgs struct {
 	// (MonitoringNamespace) and passed in here - this component does not
 	// create it.
 	Namespace pulumi.StringInput
+
+	// GrafanaServiceAccountName is pkg/components/grafana.ServiceAccountName
+	// ("grafana") - named as an additional AuthorizationPolicy principal on
+	// Prometheus's own UI ingress below, since Grafana's datasource proxy
+	// calls Prometheus's Service directly (backend traffic, same as
+	// Prometheus's own alerting delivery to Alertmanager further down) and
+	// would otherwise get RST'd by that Service's waypoint the same way its
+	// alerting delivery would. Passed as a plain constant string, not
+	// imported directly, to avoid a grafana<->prometheus package cycle -
+	// pkg/deploy/deploy.go (which already imports both) wires it through.
+	GrafanaServiceAccountName string
 
 	// OperatorVersion, Version (Prometheus itself), NodeExporterVersion,
 	// KubeStateMetricsVersion, AlertmanagerVersion, and KubeRBACProxyVersion
@@ -206,10 +226,18 @@ func NewPrometheus(ctx *pulumi.Context, name string, args *PrometheusArgs, opts 
 	// Put both UIs on Tailscale - see pkg/components/longhorn's identical
 	// step for the full reasoning.
 	promIngress, err := ingress.NewIngress(ctx, name+"-ui", &ingress.IngressArgs{
-		Namespace:            args.Namespace,
-		ServiceName:          pulumi.String(ServiceName),
-		ServicePort:          9090,
-		Hostname:             "prom",
+		Namespace:   args.Namespace,
+		ServiceName: pulumi.String(ServiceName),
+		ServicePort: 9090,
+		Hostname:    UIHostname,
+		// Grafana's own datasource proxy calls this Service directly
+		// (backend traffic, no browser involved - see
+		// pkg/components/grafana's doc comment for why browser-direct isn't
+		// available), so it needs the same AuthorizationPolicy bypass the
+		// Tailscale ingress proxy gets.
+		AdditionalAllowedPrincipals: pulumi.StringArray{
+			pulumi.Sprintf("cluster.local/ns/%s/sa/%s", args.Namespace, args.GrafanaServiceAccountName),
+		},
 		OperatorNamespace:    args.TailscaleOperatorNamespace,
 		MagicDNSSuffix:       args.TailscaleMagicDNSSuffix,
 		CloudflareZoneID:     args.CloudflareZoneID,
@@ -221,10 +249,20 @@ func NewPrometheus(ctx *pulumi.Context, name string, args *PrometheusArgs, opts 
 	}
 
 	alertmanagerIngress, err := ingress.NewIngress(ctx, name+"-alertmanager-ui", &ingress.IngressArgs{
-		Namespace:            args.Namespace,
-		ServiceName:          pulumi.String(AlertmanagerServiceName),
-		ServicePort:          9093,
-		Hostname:             "alerts",
+		Namespace:   args.Namespace,
+		ServiceName: pulumi.String(AlertmanagerServiceName),
+		ServicePort: 9093,
+		Hostname:    "alerts",
+		// Prometheus's own alerting evaluator pushes fired alerts to
+		// Alertmanager's API server-side (instance.go's Alerting config) -
+		// no browser is ever involved in that hop, so unlike Grafana's
+		// datasource it can't be redirected around the waypoint by going
+		// browser-direct. This is the actual fix: let Prometheus's own
+		// ServiceAccount through the same AuthorizationPolicy that
+		// otherwise only allows the Tailscale ingress proxy.
+		AdditionalAllowedPrincipals: pulumi.StringArray{
+			pulumi.Sprintf("cluster.local/ns/%s/sa/prometheus-%s", args.Namespace, instanceName),
+		},
 		OperatorNamespace:    args.TailscaleOperatorNamespace,
 		MagicDNSSuffix:       args.TailscaleMagicDNSSuffix,
 		CloudflareZoneID:     args.CloudflareZoneID,
@@ -236,9 +274,11 @@ func NewPrometheus(ctx *pulumi.Context, name string, args *PrometheusArgs, opts 
 	}
 
 	p.redirects = []ingress.RedirectRoute{promIngress.Redirect, alertmanagerIngress.Redirect}
+	p.UIWaypointName = promWaypoint.Name
 
 	if err := ctx.RegisterResourceOutputs(p, pulumi.Map{
-		"namespace": p.Namespace,
+		"namespace":      p.Namespace,
+		"uiWaypointName": p.UIWaypointName,
 	}); err != nil {
 		return nil, err
 	}

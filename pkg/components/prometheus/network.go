@@ -111,6 +111,41 @@ func newNetworkPolicy(ctx *pulumi.Context, name string, namespace pulumi.StringI
 		return err
 	}
 
+	// hub-controller (pkg/components/hubcontroller) runs HostNetwork: true,
+	// so - same reasoning as node-exporter/kubelet above - it's not a
+	// Cilium-managed endpoint Prometheus's own PodMonitor scrape can reach
+	// via a ToEndpoints selector, only via the host/remote-node entities.
+	// hubcontroller.metrics.go deliberately has no CiliumClusterwideNetworkPolicy
+	// of its own (hostNetwork pods aren't gated by Cilium's ingress baseline
+	// here at all), but that only covers the ingress side - Prometheus's
+	// own egress is still subject to the default-deny baseline regardless
+	// of the destination, confirmed live: the PodMonitor target sat "down"
+	// with "context deadline exceeded" until this rule existed. Port 8080
+	// must match hubcontroller.metricsPort.
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-egress-hub-controller", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-egress-prometheus-hub-controller"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: promSelector,
+			Egress: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressArgs{
+					ToEntities: pulumi.StringArray{pulumi.String("host"), pulumi.String("remote-node")},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecEgressToPortsPortsArgs{Port: pulumi.String("8080"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, opts...)
+	if err != nil {
+		return err
+	}
+
 	ksmSelector := pulumi.StringMap{
 		cilium.K8sNamespaceLabel: namespace,
 		apiserver.AccessLabelKey: pulumi.String(apiserver.AccessLabelValue),

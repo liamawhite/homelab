@@ -14,16 +14,17 @@ var GroupVersion = schema.GroupVersion{Group: "lumenetes.io", Version: "v1alpha1
 var SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
 
 // AddToScheme registers Light/LightList/HueBridge/HueBridgeList/Switch/
-// SwitchList/Group/GroupList/Scene/SceneList with a runtime.Scheme, for
-// controller-runtime's typed client to use. Both lumenetes-controller and
-// hub-controller call this - each only actually reads/writes a subset of
-// these kinds, but sharing one scheme is simpler than splitting it, and
-// RBAC (not scheme registration) is what actually enforces which kind each
-// binary may touch.
+// SwitchList/Group/GroupList/Scene/SceneList/CircadianSchedule/
+// CircadianScheduleList with a runtime.Scheme, for controller-runtime's
+// typed client to use. Both lumenetes-controller and hub-controller call
+// this - each only actually reads/writes a subset of these kinds, but
+// sharing one scheme is simpler than splitting it, and RBAC (not scheme
+// registration) is what actually enforces which kind each binary may
+// touch.
 var AddToScheme = SchemeBuilder.AddToScheme
 
 func addKnownTypes(scheme *runtime.Scheme) error {
-	scheme.AddKnownTypes(GroupVersion, &Light{}, &LightList{}, &HueBridge{}, &HueBridgeList{}, &Switch{}, &SwitchList{}, &Group{}, &GroupList{}, &Scene{}, &SceneList{})
+	scheme.AddKnownTypes(GroupVersion, &Light{}, &LightList{}, &HueBridge{}, &HueBridgeList{}, &Switch{}, &SwitchList{}, &Group{}, &GroupList{}, &Scene{}, &SceneList{}, &CircadianSchedule{}, &CircadianScheduleList{})
 	metav1.AddToGroupVersion(scheme, GroupVersion)
 	return nil
 }

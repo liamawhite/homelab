@@ -23,6 +23,9 @@
               go
               docker
               gnumake
+              nodejs_22
+              buf
+              sqlc
             ];
           };
         }

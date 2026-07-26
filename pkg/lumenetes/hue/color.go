@@ -149,3 +149,29 @@ func ColorsMatch(a, b string) bool {
 	dx, dy := ax-bx, ay-by
 	return dx*dx+dy*dy <= ColorMatchTolerance*ColorMatchTolerance
 }
+
+// ColorTempKMatch reports whether a and b represent the same color
+// temperature as far as the bridge is concerned, comparing via mirek (the
+// bridge's native color-temperature unit) rather than raw Kelvin equality
+// - the same class of problem ColorsMatch solves for Color, one level
+// down: Kelvin<->mirek is a lossy round-trip (both mirekToKelvin and
+// kelvinToMirek round to the nearest integer), so a commanded Kelvin
+// value and the bridge's later-reported one routinely differ by tens of
+// Kelvin even when the light did exactly what was asked - e.g. commanding
+// 5899K rounds to 170 mirek, which reports back as 5882K, never 5899K
+// again. Comparing raw Kelvin values (as internal/lightscontroller.diffLight
+// used to) means that difference reads as a permanent, real diff that
+// never converges - confirmed live, this caused the Reconciler to re-PUT
+// colorTempK to the bridge on every single reconcile, forever, for any
+// light with color temperature actively managed (e.g. a CircadianSchedule).
+// 0 only matches 0 (both mean "light doesn't support color temperature") -
+// never matches a real value.
+func ColorTempKMatch(a, b int32) bool {
+	if a == b {
+		return true
+	}
+	if a == 0 || b == 0 {
+		return false
+	}
+	return kelvinToMirek(int(a)) == kelvinToMirek(int(b))
+}

@@ -14,6 +14,1627 @@ import (
 
 var _ = utilities.GetEnvOrDefault
 
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianScheduleType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMeta       `pulumi:"metadata"`
+	Spec     *CircadianScheduleSpec   `pulumi:"spec"`
+	Status   *CircadianScheduleStatus `pulumi:"status"`
+}
+
+// CircadianScheduleTypeInput is an input type that accepts CircadianScheduleTypeArgs and CircadianScheduleTypeOutput values.
+// You can construct a concrete instance of `CircadianScheduleTypeInput` via:
+//
+//	CircadianScheduleTypeArgs{...}
+type CircadianScheduleTypeInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleTypeOutput() CircadianScheduleTypeOutput
+	ToCircadianScheduleTypeOutputWithContext(context.Context) CircadianScheduleTypeOutput
+}
+
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianScheduleTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPtrInput       `pulumi:"metadata"`
+	Spec     CircadianScheduleSpecPtrInput   `pulumi:"spec"`
+	Status   CircadianScheduleStatusPtrInput `pulumi:"status"`
+}
+
+func (CircadianScheduleTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleType)(nil)).Elem()
+}
+
+func (i CircadianScheduleTypeArgs) ToCircadianScheduleTypeOutput() CircadianScheduleTypeOutput {
+	return i.ToCircadianScheduleTypeOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleTypeArgs) ToCircadianScheduleTypeOutputWithContext(ctx context.Context) CircadianScheduleTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleTypeOutput)
+}
+
+// CircadianScheduleTypeArrayInput is an input type that accepts CircadianScheduleTypeArray and CircadianScheduleTypeArrayOutput values.
+// You can construct a concrete instance of `CircadianScheduleTypeArrayInput` via:
+//
+//	CircadianScheduleTypeArray{ CircadianScheduleTypeArgs{...} }
+type CircadianScheduleTypeArrayInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleTypeArrayOutput() CircadianScheduleTypeArrayOutput
+	ToCircadianScheduleTypeArrayOutputWithContext(context.Context) CircadianScheduleTypeArrayOutput
+}
+
+type CircadianScheduleTypeArray []CircadianScheduleTypeInput
+
+func (CircadianScheduleTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleType)(nil)).Elem()
+}
+
+func (i CircadianScheduleTypeArray) ToCircadianScheduleTypeArrayOutput() CircadianScheduleTypeArrayOutput {
+	return i.ToCircadianScheduleTypeArrayOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleTypeArray) ToCircadianScheduleTypeArrayOutputWithContext(ctx context.Context) CircadianScheduleTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleTypeArrayOutput)
+}
+
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianScheduleTypeOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleType)(nil)).Elem()
+}
+
+func (o CircadianScheduleTypeOutput) ToCircadianScheduleTypeOutput() CircadianScheduleTypeOutput {
+	return o
+}
+
+func (o CircadianScheduleTypeOutput) ToCircadianScheduleTypeOutputWithContext(ctx context.Context) CircadianScheduleTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o CircadianScheduleTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o CircadianScheduleTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o CircadianScheduleTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
+}
+
+func (o CircadianScheduleTypeOutput) Spec() CircadianScheduleSpecPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleType) *CircadianScheduleSpec { return v.Spec }).(CircadianScheduleSpecPtrOutput)
+}
+
+func (o CircadianScheduleTypeOutput) Status() CircadianScheduleStatusPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleType) *CircadianScheduleStatus { return v.Status }).(CircadianScheduleStatusPtrOutput)
+}
+
+type CircadianScheduleTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleType)(nil)).Elem()
+}
+
+func (o CircadianScheduleTypeArrayOutput) ToCircadianScheduleTypeArrayOutput() CircadianScheduleTypeArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleTypeArrayOutput) ToCircadianScheduleTypeArrayOutputWithContext(ctx context.Context) CircadianScheduleTypeArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleTypeArrayOutput) Index(i pulumi.IntInput) CircadianScheduleTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) CircadianScheduleType {
+		return vs[0].([]CircadianScheduleType)[vs[1].(int)]
+	}).(CircadianScheduleTypeOutput)
+}
+
+// CircadianScheduleList is a list of CircadianSchedule
+type CircadianScheduleListType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// List of circadianschedules. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items []CircadianScheduleType `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata *metav1.ListMeta `pulumi:"metadata"`
+}
+
+// CircadianScheduleListTypeInput is an input type that accepts CircadianScheduleListTypeArgs and CircadianScheduleListTypeOutput values.
+// You can construct a concrete instance of `CircadianScheduleListTypeInput` via:
+//
+//	CircadianScheduleListTypeArgs{...}
+type CircadianScheduleListTypeInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleListTypeOutput() CircadianScheduleListTypeOutput
+	ToCircadianScheduleListTypeOutputWithContext(context.Context) CircadianScheduleListTypeOutput
+}
+
+// CircadianScheduleList is a list of CircadianSchedule
+type CircadianScheduleListTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// List of circadianschedules. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items CircadianScheduleTypeArrayInput `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata metav1.ListMetaPtrInput `pulumi:"metadata"`
+}
+
+func (CircadianScheduleListTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleListType)(nil)).Elem()
+}
+
+func (i CircadianScheduleListTypeArgs) ToCircadianScheduleListTypeOutput() CircadianScheduleListTypeOutput {
+	return i.ToCircadianScheduleListTypeOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleListTypeArgs) ToCircadianScheduleListTypeOutputWithContext(ctx context.Context) CircadianScheduleListTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleListTypeOutput)
+}
+
+// CircadianScheduleList is a list of CircadianSchedule
+type CircadianScheduleListTypeOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleListTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleListType)(nil)).Elem()
+}
+
+func (o CircadianScheduleListTypeOutput) ToCircadianScheduleListTypeOutput() CircadianScheduleListTypeOutput {
+	return o
+}
+
+func (o CircadianScheduleListTypeOutput) ToCircadianScheduleListTypeOutputWithContext(ctx context.Context) CircadianScheduleListTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o CircadianScheduleListTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleListType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// List of circadianschedules. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+func (o CircadianScheduleListTypeOutput) Items() CircadianScheduleTypeArrayOutput {
+	return o.ApplyT(func(v CircadianScheduleListType) []CircadianScheduleType { return v.Items }).(CircadianScheduleTypeArrayOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o CircadianScheduleListTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleListType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o CircadianScheduleListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleListType) *metav1.ListMeta { return v.Metadata }).(metav1.ListMetaPtrOutput)
+}
+
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianSchedulePatchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMetaPatch       `pulumi:"metadata"`
+	Spec     *CircadianScheduleSpecPatch   `pulumi:"spec"`
+	Status   *CircadianScheduleStatusPatch `pulumi:"status"`
+}
+
+// CircadianSchedulePatchTypeInput is an input type that accepts CircadianSchedulePatchTypeArgs and CircadianSchedulePatchTypeOutput values.
+// You can construct a concrete instance of `CircadianSchedulePatchTypeInput` via:
+//
+//	CircadianSchedulePatchTypeArgs{...}
+type CircadianSchedulePatchTypeInput interface {
+	pulumi.Input
+
+	ToCircadianSchedulePatchTypeOutput() CircadianSchedulePatchTypeOutput
+	ToCircadianSchedulePatchTypeOutputWithContext(context.Context) CircadianSchedulePatchTypeOutput
+}
+
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianSchedulePatchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPatchPtrInput       `pulumi:"metadata"`
+	Spec     CircadianScheduleSpecPatchPtrInput   `pulumi:"spec"`
+	Status   CircadianScheduleStatusPatchPtrInput `pulumi:"status"`
+}
+
+func (CircadianSchedulePatchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianSchedulePatchType)(nil)).Elem()
+}
+
+func (i CircadianSchedulePatchTypeArgs) ToCircadianSchedulePatchTypeOutput() CircadianSchedulePatchTypeOutput {
+	return i.ToCircadianSchedulePatchTypeOutputWithContext(context.Background())
+}
+
+func (i CircadianSchedulePatchTypeArgs) ToCircadianSchedulePatchTypeOutputWithContext(ctx context.Context) CircadianSchedulePatchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianSchedulePatchTypeOutput)
+}
+
+// CircadianSchedule is a user-named, continuous lighting curve for all of
+// a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+// name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+// CircadianSchedule has no Hue-side identity of its own.
+type CircadianSchedulePatchTypeOutput struct{ *pulumi.OutputState }
+
+func (CircadianSchedulePatchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianSchedulePatchType)(nil)).Elem()
+}
+
+func (o CircadianSchedulePatchTypeOutput) ToCircadianSchedulePatchTypeOutput() CircadianSchedulePatchTypeOutput {
+	return o
+}
+
+func (o CircadianSchedulePatchTypeOutput) ToCircadianSchedulePatchTypeOutputWithContext(ctx context.Context) CircadianSchedulePatchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o CircadianSchedulePatchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianSchedulePatchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o CircadianSchedulePatchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianSchedulePatchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o CircadianSchedulePatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
+	return o.ApplyT(func(v CircadianSchedulePatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
+}
+
+func (o CircadianSchedulePatchTypeOutput) Spec() CircadianScheduleSpecPatchPtrOutput {
+	return o.ApplyT(func(v CircadianSchedulePatchType) *CircadianScheduleSpecPatch { return v.Spec }).(CircadianScheduleSpecPatchPtrOutput)
+}
+
+func (o CircadianSchedulePatchTypeOutput) Status() CircadianScheduleStatusPatchPtrOutput {
+	return o.ApplyT(func(v CircadianSchedulePatchType) *CircadianScheduleStatusPatch { return v.Status }).(CircadianScheduleStatusPatchPtrOutput)
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpec struct {
+	// Group is the name of the Group this schedule applies to. A Group's
+	// Spec.ActiveScene must reference this schedule's own metadata.name
+	// for it to ever be enacted - same reciprocal-match convention as
+	// SceneSpec.Group.
+	Group *string `pulumi:"group"`
+	// Keyframes define the curve, at least 2, resolved and interpolated
+	// against "now" by internal/circadian.Interpolate. Order in this list
+	// doesn't matter - they're sorted by resolved instant before
+	// interpolating.
+	Keyframes []CircadianScheduleSpecKeyframes `pulumi:"keyframes"`
+	// Latitude of the location Keyframes are anchored to, decimal degrees
+	// positive north. Required, not defaulted: 0 is a real location (Null
+	// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+	// so a schedule created without one would silently compute sun times
+	// for the wrong place instead of failing validation - confirmed live,
+	// this is exactly what happened before Latitude/Longitude moved from a
+	// global --latitude/--longitude flag onto this Spec.
+	Latitude *float64 `pulumi:"latitude"`
+	// Longitude of the location Keyframes are anchored to, decimal degrees
+	// positive east. Required - see Latitude's doc comment for why.
+	Longitude *float64 `pulumi:"longitude"`
+}
+
+// CircadianScheduleSpecInput is an input type that accepts CircadianScheduleSpecArgs and CircadianScheduleSpecOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecInput` via:
+//
+//	CircadianScheduleSpecArgs{...}
+type CircadianScheduleSpecInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecOutput() CircadianScheduleSpecOutput
+	ToCircadianScheduleSpecOutputWithContext(context.Context) CircadianScheduleSpecOutput
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpecArgs struct {
+	// Group is the name of the Group this schedule applies to. A Group's
+	// Spec.ActiveScene must reference this schedule's own metadata.name
+	// for it to ever be enacted - same reciprocal-match convention as
+	// SceneSpec.Group.
+	Group pulumi.StringPtrInput `pulumi:"group"`
+	// Keyframes define the curve, at least 2, resolved and interpolated
+	// against "now" by internal/circadian.Interpolate. Order in this list
+	// doesn't matter - they're sorted by resolved instant before
+	// interpolating.
+	Keyframes CircadianScheduleSpecKeyframesArrayInput `pulumi:"keyframes"`
+	// Latitude of the location Keyframes are anchored to, decimal degrees
+	// positive north. Required, not defaulted: 0 is a real location (Null
+	// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+	// so a schedule created without one would silently compute sun times
+	// for the wrong place instead of failing validation - confirmed live,
+	// this is exactly what happened before Latitude/Longitude moved from a
+	// global --latitude/--longitude flag onto this Spec.
+	Latitude pulumi.Float64PtrInput `pulumi:"latitude"`
+	// Longitude of the location Keyframes are anchored to, decimal degrees
+	// positive east. Required - see Latitude's doc comment for why.
+	Longitude pulumi.Float64PtrInput `pulumi:"longitude"`
+}
+
+func (CircadianScheduleSpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpec)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecArgs) ToCircadianScheduleSpecOutput() CircadianScheduleSpecOutput {
+	return i.ToCircadianScheduleSpecOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecArgs) ToCircadianScheduleSpecOutputWithContext(ctx context.Context) CircadianScheduleSpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecOutput)
+}
+
+func (i CircadianScheduleSpecArgs) ToCircadianScheduleSpecPtrOutput() CircadianScheduleSpecPtrOutput {
+	return i.ToCircadianScheduleSpecPtrOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecArgs) ToCircadianScheduleSpecPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecOutput).ToCircadianScheduleSpecPtrOutputWithContext(ctx)
+}
+
+// CircadianScheduleSpecPtrInput is an input type that accepts CircadianScheduleSpecArgs, CircadianScheduleSpecPtr and CircadianScheduleSpecPtrOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecPtrInput` via:
+//
+//	        CircadianScheduleSpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type CircadianScheduleSpecPtrInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecPtrOutput() CircadianScheduleSpecPtrOutput
+	ToCircadianScheduleSpecPtrOutputWithContext(context.Context) CircadianScheduleSpecPtrOutput
+}
+
+type circadianScheduleSpecPtrType CircadianScheduleSpecArgs
+
+func CircadianScheduleSpecPtr(v *CircadianScheduleSpecArgs) CircadianScheduleSpecPtrInput {
+	return (*circadianScheduleSpecPtrType)(v)
+}
+
+func (*circadianScheduleSpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleSpec)(nil)).Elem()
+}
+
+func (i *circadianScheduleSpecPtrType) ToCircadianScheduleSpecPtrOutput() CircadianScheduleSpecPtrOutput {
+	return i.ToCircadianScheduleSpecPtrOutputWithContext(context.Background())
+}
+
+func (i *circadianScheduleSpecPtrType) ToCircadianScheduleSpecPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecPtrOutput)
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpecOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpec)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecOutput) ToCircadianScheduleSpecOutput() CircadianScheduleSpecOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecOutput) ToCircadianScheduleSpecOutputWithContext(ctx context.Context) CircadianScheduleSpecOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecOutput) ToCircadianScheduleSpecPtrOutput() CircadianScheduleSpecPtrOutput {
+	return o.ToCircadianScheduleSpecPtrOutputWithContext(context.Background())
+}
+
+func (o CircadianScheduleSpecOutput) ToCircadianScheduleSpecPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CircadianScheduleSpec) *CircadianScheduleSpec {
+		return &v
+	}).(CircadianScheduleSpecPtrOutput)
+}
+
+// Group is the name of the Group this schedule applies to. A Group's
+// Spec.ActiveScene must reference this schedule's own metadata.name
+// for it to ever be enacted - same reciprocal-match convention as
+// SceneSpec.Group.
+func (o CircadianScheduleSpecOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpec) *string { return v.Group }).(pulumi.StringPtrOutput)
+}
+
+// Keyframes define the curve, at least 2, resolved and interpolated
+// against "now" by internal/circadian.Interpolate. Order in this list
+// doesn't matter - they're sorted by resolved instant before
+// interpolating.
+func (o CircadianScheduleSpecOutput) Keyframes() CircadianScheduleSpecKeyframesArrayOutput {
+	return o.ApplyT(func(v CircadianScheduleSpec) []CircadianScheduleSpecKeyframes { return v.Keyframes }).(CircadianScheduleSpecKeyframesArrayOutput)
+}
+
+// Latitude of the location Keyframes are anchored to, decimal degrees
+// positive north. Required, not defaulted: 0 is a real location (Null
+// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+// so a schedule created without one would silently compute sun times
+// for the wrong place instead of failing validation - confirmed live,
+// this is exactly what happened before Latitude/Longitude moved from a
+// global --latitude/--longitude flag onto this Spec.
+func (o CircadianScheduleSpecOutput) Latitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpec) *float64 { return v.Latitude }).(pulumi.Float64PtrOutput)
+}
+
+// Longitude of the location Keyframes are anchored to, decimal degrees
+// positive east. Required - see Latitude's doc comment for why.
+func (o CircadianScheduleSpecOutput) Longitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpec) *float64 { return v.Longitude }).(pulumi.Float64PtrOutput)
+}
+
+type CircadianScheduleSpecPtrOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleSpec)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecPtrOutput) ToCircadianScheduleSpecPtrOutput() CircadianScheduleSpecPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPtrOutput) ToCircadianScheduleSpecPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPtrOutput) Elem() CircadianScheduleSpecOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpec) CircadianScheduleSpec {
+		if v != nil {
+			return *v
+		}
+		var ret CircadianScheduleSpec
+		return ret
+	}).(CircadianScheduleSpecOutput)
+}
+
+// Group is the name of the Group this schedule applies to. A Group's
+// Spec.ActiveScene must reference this schedule's own metadata.name
+// for it to ever be enacted - same reciprocal-match convention as
+// SceneSpec.Group.
+func (o CircadianScheduleSpecPtrOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Group
+	}).(pulumi.StringPtrOutput)
+}
+
+// Keyframes define the curve, at least 2, resolved and interpolated
+// against "now" by internal/circadian.Interpolate. Order in this list
+// doesn't matter - they're sorted by resolved instant before
+// interpolating.
+func (o CircadianScheduleSpecPtrOutput) Keyframes() CircadianScheduleSpecKeyframesArrayOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpec) []CircadianScheduleSpecKeyframes {
+		if v == nil {
+			return nil
+		}
+		return v.Keyframes
+	}).(CircadianScheduleSpecKeyframesArrayOutput)
+}
+
+// Latitude of the location Keyframes are anchored to, decimal degrees
+// positive north. Required, not defaulted: 0 is a real location (Null
+// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+// so a schedule created without one would silently compute sun times
+// for the wrong place instead of failing validation - confirmed live,
+// this is exactly what happened before Latitude/Longitude moved from a
+// global --latitude/--longitude flag onto this Spec.
+func (o CircadianScheduleSpecPtrOutput) Latitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpec) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.Latitude
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Longitude of the location Keyframes are anchored to, decimal degrees
+// positive east. Required - see Latitude's doc comment for why.
+func (o CircadianScheduleSpecPtrOutput) Longitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpec) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.Longitude
+	}).(pulumi.Float64PtrOutput)
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframes struct {
+	// Anchor is the solar event this keyframe is offset from.
+	Anchor *string `pulumi:"anchor"`
+	// Brightness at this keyframe, 0-100.
+	Brightness *int `pulumi:"brightness"`
+	// ColorTempK at this keyframe, in Kelvin.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+	// Bounded to +/-12h so internal/circadian.Interpolate's search window
+	// (the day before/of/after "now") is always sufficient to resolve it.
+	OffsetMinutes *int `pulumi:"offsetMinutes"`
+}
+
+// CircadianScheduleSpecKeyframesInput is an input type that accepts CircadianScheduleSpecKeyframesArgs and CircadianScheduleSpecKeyframesOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecKeyframesInput` via:
+//
+//	CircadianScheduleSpecKeyframesArgs{...}
+type CircadianScheduleSpecKeyframesInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecKeyframesOutput() CircadianScheduleSpecKeyframesOutput
+	ToCircadianScheduleSpecKeyframesOutputWithContext(context.Context) CircadianScheduleSpecKeyframesOutput
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframesArgs struct {
+	// Anchor is the solar event this keyframe is offset from.
+	Anchor pulumi.StringPtrInput `pulumi:"anchor"`
+	// Brightness at this keyframe, 0-100.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// ColorTempK at this keyframe, in Kelvin.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+	// Bounded to +/-12h so internal/circadian.Interpolate's search window
+	// (the day before/of/after "now") is always sufficient to resolve it.
+	OffsetMinutes pulumi.IntPtrInput `pulumi:"offsetMinutes"`
+}
+
+func (CircadianScheduleSpecKeyframesArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecKeyframes)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecKeyframesArgs) ToCircadianScheduleSpecKeyframesOutput() CircadianScheduleSpecKeyframesOutput {
+	return i.ToCircadianScheduleSpecKeyframesOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecKeyframesArgs) ToCircadianScheduleSpecKeyframesOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecKeyframesOutput)
+}
+
+// CircadianScheduleSpecKeyframesArrayInput is an input type that accepts CircadianScheduleSpecKeyframesArray and CircadianScheduleSpecKeyframesArrayOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecKeyframesArrayInput` via:
+//
+//	CircadianScheduleSpecKeyframesArray{ CircadianScheduleSpecKeyframesArgs{...} }
+type CircadianScheduleSpecKeyframesArrayInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecKeyframesArrayOutput() CircadianScheduleSpecKeyframesArrayOutput
+	ToCircadianScheduleSpecKeyframesArrayOutputWithContext(context.Context) CircadianScheduleSpecKeyframesArrayOutput
+}
+
+type CircadianScheduleSpecKeyframesArray []CircadianScheduleSpecKeyframesInput
+
+func (CircadianScheduleSpecKeyframesArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleSpecKeyframes)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecKeyframesArray) ToCircadianScheduleSpecKeyframesArrayOutput() CircadianScheduleSpecKeyframesArrayOutput {
+	return i.ToCircadianScheduleSpecKeyframesArrayOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecKeyframesArray) ToCircadianScheduleSpecKeyframesArrayOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecKeyframesArrayOutput)
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframesOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecKeyframesOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecKeyframes)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecKeyframesOutput) ToCircadianScheduleSpecKeyframesOutput() CircadianScheduleSpecKeyframesOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesOutput) ToCircadianScheduleSpecKeyframesOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesOutput {
+	return o
+}
+
+// Anchor is the solar event this keyframe is offset from.
+func (o CircadianScheduleSpecKeyframesOutput) Anchor() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *string { return v.Anchor }).(pulumi.StringPtrOutput)
+}
+
+// Brightness at this keyframe, 0-100.
+func (o CircadianScheduleSpecKeyframesOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// ColorTempK at this keyframe, in Kelvin.
+func (o CircadianScheduleSpecKeyframesOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+// Bounded to +/-12h so internal/circadian.Interpolate's search window
+// (the day before/of/after "now") is always sufficient to resolve it.
+func (o CircadianScheduleSpecKeyframesOutput) OffsetMinutes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *int { return v.OffsetMinutes }).(pulumi.IntPtrOutput)
+}
+
+type CircadianScheduleSpecKeyframesArrayOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecKeyframesArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleSpecKeyframes)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecKeyframesArrayOutput) ToCircadianScheduleSpecKeyframesArrayOutput() CircadianScheduleSpecKeyframesArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesArrayOutput) ToCircadianScheduleSpecKeyframesArrayOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesArrayOutput) Index(i pulumi.IntInput) CircadianScheduleSpecKeyframesOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) CircadianScheduleSpecKeyframes {
+		return vs[0].([]CircadianScheduleSpecKeyframes)[vs[1].(int)]
+	}).(CircadianScheduleSpecKeyframesOutput)
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframesPatch struct {
+	// Anchor is the solar event this keyframe is offset from.
+	Anchor *string `pulumi:"anchor"`
+	// Brightness at this keyframe, 0-100.
+	Brightness *int `pulumi:"brightness"`
+	// ColorTempK at this keyframe, in Kelvin.
+	ColorTempK *int `pulumi:"colorTempK"`
+	// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+	// Bounded to +/-12h so internal/circadian.Interpolate's search window
+	// (the day before/of/after "now") is always sufficient to resolve it.
+	OffsetMinutes *int `pulumi:"offsetMinutes"`
+}
+
+// CircadianScheduleSpecKeyframesPatchInput is an input type that accepts CircadianScheduleSpecKeyframesPatchArgs and CircadianScheduleSpecKeyframesPatchOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecKeyframesPatchInput` via:
+//
+//	CircadianScheduleSpecKeyframesPatchArgs{...}
+type CircadianScheduleSpecKeyframesPatchInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecKeyframesPatchOutput() CircadianScheduleSpecKeyframesPatchOutput
+	ToCircadianScheduleSpecKeyframesPatchOutputWithContext(context.Context) CircadianScheduleSpecKeyframesPatchOutput
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframesPatchArgs struct {
+	// Anchor is the solar event this keyframe is offset from.
+	Anchor pulumi.StringPtrInput `pulumi:"anchor"`
+	// Brightness at this keyframe, 0-100.
+	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
+	// ColorTempK at this keyframe, in Kelvin.
+	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
+	// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+	// Bounded to +/-12h so internal/circadian.Interpolate's search window
+	// (the day before/of/after "now") is always sufficient to resolve it.
+	OffsetMinutes pulumi.IntPtrInput `pulumi:"offsetMinutes"`
+}
+
+func (CircadianScheduleSpecKeyframesPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecKeyframesPatch)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecKeyframesPatchArgs) ToCircadianScheduleSpecKeyframesPatchOutput() CircadianScheduleSpecKeyframesPatchOutput {
+	return i.ToCircadianScheduleSpecKeyframesPatchOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecKeyframesPatchArgs) ToCircadianScheduleSpecKeyframesPatchOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecKeyframesPatchOutput)
+}
+
+// CircadianScheduleSpecKeyframesPatchArrayInput is an input type that accepts CircadianScheduleSpecKeyframesPatchArray and CircadianScheduleSpecKeyframesPatchArrayOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecKeyframesPatchArrayInput` via:
+//
+//	CircadianScheduleSpecKeyframesPatchArray{ CircadianScheduleSpecKeyframesPatchArgs{...} }
+type CircadianScheduleSpecKeyframesPatchArrayInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecKeyframesPatchArrayOutput() CircadianScheduleSpecKeyframesPatchArrayOutput
+	ToCircadianScheduleSpecKeyframesPatchArrayOutputWithContext(context.Context) CircadianScheduleSpecKeyframesPatchArrayOutput
+}
+
+type CircadianScheduleSpecKeyframesPatchArray []CircadianScheduleSpecKeyframesPatchInput
+
+func (CircadianScheduleSpecKeyframesPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleSpecKeyframesPatch)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecKeyframesPatchArray) ToCircadianScheduleSpecKeyframesPatchArrayOutput() CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return i.ToCircadianScheduleSpecKeyframesPatchArrayOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecKeyframesPatchArray) ToCircadianScheduleSpecKeyframesPatchArrayOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecKeyframesPatchArrayOutput)
+}
+
+// CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+// point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+// time, so the schedule keeps making sense across the seasons as sunrise/
+// sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+// this untouched"), Brightness/ColorTempK here are required: a continuous
+// curve needs a value defined at every keyframe, not a sparse override -
+// there's no "untouched" between two points on a curve.
+type CircadianScheduleSpecKeyframesPatchOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecKeyframesPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecKeyframesPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecKeyframesPatchOutput) ToCircadianScheduleSpecKeyframesPatchOutput() CircadianScheduleSpecKeyframesPatchOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesPatchOutput) ToCircadianScheduleSpecKeyframesPatchOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesPatchOutput {
+	return o
+}
+
+// Anchor is the solar event this keyframe is offset from.
+func (o CircadianScheduleSpecKeyframesPatchOutput) Anchor() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *string { return v.Anchor }).(pulumi.StringPtrOutput)
+}
+
+// Brightness at this keyframe, 0-100.
+func (o CircadianScheduleSpecKeyframesPatchOutput) Brightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *int { return v.Brightness }).(pulumi.IntPtrOutput)
+}
+
+// ColorTempK at this keyframe, in Kelvin.
+func (o CircadianScheduleSpecKeyframesPatchOutput) ColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// OffsetMinutes shifts this keyframe from Anchor, positive is later.
+// Bounded to +/-12h so internal/circadian.Interpolate's search window
+// (the day before/of/after "now") is always sufficient to resolve it.
+func (o CircadianScheduleSpecKeyframesPatchOutput) OffsetMinutes() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *int { return v.OffsetMinutes }).(pulumi.IntPtrOutput)
+}
+
+type CircadianScheduleSpecKeyframesPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecKeyframesPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]CircadianScheduleSpecKeyframesPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecKeyframesPatchArrayOutput) ToCircadianScheduleSpecKeyframesPatchArrayOutput() CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesPatchArrayOutput) ToCircadianScheduleSpecKeyframesPatchArrayOutputWithContext(ctx context.Context) CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecKeyframesPatchArrayOutput) Index(i pulumi.IntInput) CircadianScheduleSpecKeyframesPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) CircadianScheduleSpecKeyframesPatch {
+		return vs[0].([]CircadianScheduleSpecKeyframesPatch)[vs[1].(int)]
+	}).(CircadianScheduleSpecKeyframesPatchOutput)
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpecPatch struct {
+	// Group is the name of the Group this schedule applies to. A Group's
+	// Spec.ActiveScene must reference this schedule's own metadata.name
+	// for it to ever be enacted - same reciprocal-match convention as
+	// SceneSpec.Group.
+	Group *string `pulumi:"group"`
+	// Keyframes define the curve, at least 2, resolved and interpolated
+	// against "now" by internal/circadian.Interpolate. Order in this list
+	// doesn't matter - they're sorted by resolved instant before
+	// interpolating.
+	Keyframes []CircadianScheduleSpecKeyframesPatch `pulumi:"keyframes"`
+	// Latitude of the location Keyframes are anchored to, decimal degrees
+	// positive north. Required, not defaulted: 0 is a real location (Null
+	// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+	// so a schedule created without one would silently compute sun times
+	// for the wrong place instead of failing validation - confirmed live,
+	// this is exactly what happened before Latitude/Longitude moved from a
+	// global --latitude/--longitude flag onto this Spec.
+	Latitude *float64 `pulumi:"latitude"`
+	// Longitude of the location Keyframes are anchored to, decimal degrees
+	// positive east. Required - see Latitude's doc comment for why.
+	Longitude *float64 `pulumi:"longitude"`
+}
+
+// CircadianScheduleSpecPatchInput is an input type that accepts CircadianScheduleSpecPatchArgs and CircadianScheduleSpecPatchOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecPatchInput` via:
+//
+//	CircadianScheduleSpecPatchArgs{...}
+type CircadianScheduleSpecPatchInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecPatchOutput() CircadianScheduleSpecPatchOutput
+	ToCircadianScheduleSpecPatchOutputWithContext(context.Context) CircadianScheduleSpecPatchOutput
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpecPatchArgs struct {
+	// Group is the name of the Group this schedule applies to. A Group's
+	// Spec.ActiveScene must reference this schedule's own metadata.name
+	// for it to ever be enacted - same reciprocal-match convention as
+	// SceneSpec.Group.
+	Group pulumi.StringPtrInput `pulumi:"group"`
+	// Keyframes define the curve, at least 2, resolved and interpolated
+	// against "now" by internal/circadian.Interpolate. Order in this list
+	// doesn't matter - they're sorted by resolved instant before
+	// interpolating.
+	Keyframes CircadianScheduleSpecKeyframesPatchArrayInput `pulumi:"keyframes"`
+	// Latitude of the location Keyframes are anchored to, decimal degrees
+	// positive north. Required, not defaulted: 0 is a real location (Null
+	// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+	// so a schedule created without one would silently compute sun times
+	// for the wrong place instead of failing validation - confirmed live,
+	// this is exactly what happened before Latitude/Longitude moved from a
+	// global --latitude/--longitude flag onto this Spec.
+	Latitude pulumi.Float64PtrInput `pulumi:"latitude"`
+	// Longitude of the location Keyframes are anchored to, decimal degrees
+	// positive east. Required - see Latitude's doc comment for why.
+	Longitude pulumi.Float64PtrInput `pulumi:"longitude"`
+}
+
+func (CircadianScheduleSpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecPatch)(nil)).Elem()
+}
+
+func (i CircadianScheduleSpecPatchArgs) ToCircadianScheduleSpecPatchOutput() CircadianScheduleSpecPatchOutput {
+	return i.ToCircadianScheduleSpecPatchOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecPatchArgs) ToCircadianScheduleSpecPatchOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecPatchOutput)
+}
+
+func (i CircadianScheduleSpecPatchArgs) ToCircadianScheduleSpecPatchPtrOutput() CircadianScheduleSpecPatchPtrOutput {
+	return i.ToCircadianScheduleSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleSpecPatchArgs) ToCircadianScheduleSpecPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecPatchOutput).ToCircadianScheduleSpecPatchPtrOutputWithContext(ctx)
+}
+
+// CircadianScheduleSpecPatchPtrInput is an input type that accepts CircadianScheduleSpecPatchArgs, CircadianScheduleSpecPatchPtr and CircadianScheduleSpecPatchPtrOutput values.
+// You can construct a concrete instance of `CircadianScheduleSpecPatchPtrInput` via:
+//
+//	        CircadianScheduleSpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type CircadianScheduleSpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleSpecPatchPtrOutput() CircadianScheduleSpecPatchPtrOutput
+	ToCircadianScheduleSpecPatchPtrOutputWithContext(context.Context) CircadianScheduleSpecPatchPtrOutput
+}
+
+type circadianScheduleSpecPatchPtrType CircadianScheduleSpecPatchArgs
+
+func CircadianScheduleSpecPatchPtr(v *CircadianScheduleSpecPatchArgs) CircadianScheduleSpecPatchPtrInput {
+	return (*circadianScheduleSpecPatchPtrType)(v)
+}
+
+func (*circadianScheduleSpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleSpecPatch)(nil)).Elem()
+}
+
+func (i *circadianScheduleSpecPatchPtrType) ToCircadianScheduleSpecPatchPtrOutput() CircadianScheduleSpecPatchPtrOutput {
+	return i.ToCircadianScheduleSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *circadianScheduleSpecPatchPtrType) ToCircadianScheduleSpecPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleSpecPatchPtrOutput)
+}
+
+// CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+// for all of a Group's lights, anchored to sun position rather than fixed
+// times. Unlike Scene, there's no per-light Lights list - a circadian
+// curve is one uniform "ambient tone" applied to every light in Group, not
+// per-fixture state. A CircadianSchedule does no enactment itself -
+// internal/groupcontroller.Reconciler applies the current interpolated
+// value onto each target Light.Spec when the owning Group's
+// Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+// reusing the same per-light capability-sentinel skip Scene enactment
+// already uses.
+type CircadianScheduleSpecPatchOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleSpecPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecPatchOutput) ToCircadianScheduleSpecPatchOutput() CircadianScheduleSpecPatchOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPatchOutput) ToCircadianScheduleSpecPatchOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPatchOutput) ToCircadianScheduleSpecPatchPtrOutput() CircadianScheduleSpecPatchPtrOutput {
+	return o.ToCircadianScheduleSpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o CircadianScheduleSpecPatchOutput) ToCircadianScheduleSpecPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CircadianScheduleSpecPatch) *CircadianScheduleSpecPatch {
+		return &v
+	}).(CircadianScheduleSpecPatchPtrOutput)
+}
+
+// Group is the name of the Group this schedule applies to. A Group's
+// Spec.ActiveScene must reference this schedule's own metadata.name
+// for it to ever be enacted - same reciprocal-match convention as
+// SceneSpec.Group.
+func (o CircadianScheduleSpecPatchOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecPatch) *string { return v.Group }).(pulumi.StringPtrOutput)
+}
+
+// Keyframes define the curve, at least 2, resolved and interpolated
+// against "now" by internal/circadian.Interpolate. Order in this list
+// doesn't matter - they're sorted by resolved instant before
+// interpolating.
+func (o CircadianScheduleSpecPatchOutput) Keyframes() CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecPatch) []CircadianScheduleSpecKeyframesPatch { return v.Keyframes }).(CircadianScheduleSpecKeyframesPatchArrayOutput)
+}
+
+// Latitude of the location Keyframes are anchored to, decimal degrees
+// positive north. Required, not defaulted: 0 is a real location (Null
+// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+// so a schedule created without one would silently compute sun times
+// for the wrong place instead of failing validation - confirmed live,
+// this is exactly what happened before Latitude/Longitude moved from a
+// global --latitude/--longitude flag onto this Spec.
+func (o CircadianScheduleSpecPatchOutput) Latitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecPatch) *float64 { return v.Latitude }).(pulumi.Float64PtrOutput)
+}
+
+// Longitude of the location Keyframes are anchored to, decimal degrees
+// positive east. Required - see Latitude's doc comment for why.
+func (o CircadianScheduleSpecPatchOutput) Longitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecPatch) *float64 { return v.Longitude }).(pulumi.Float64PtrOutput)
+}
+
+type CircadianScheduleSpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleSpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleSpecPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleSpecPatchPtrOutput) ToCircadianScheduleSpecPatchPtrOutput() CircadianScheduleSpecPatchPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPatchPtrOutput) ToCircadianScheduleSpecPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleSpecPatchPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleSpecPatchPtrOutput) Elem() CircadianScheduleSpecPatchOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpecPatch) CircadianScheduleSpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret CircadianScheduleSpecPatch
+		return ret
+	}).(CircadianScheduleSpecPatchOutput)
+}
+
+// Group is the name of the Group this schedule applies to. A Group's
+// Spec.ActiveScene must reference this schedule's own metadata.name
+// for it to ever be enacted - same reciprocal-match convention as
+// SceneSpec.Group.
+func (o CircadianScheduleSpecPatchPtrOutput) Group() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Group
+	}).(pulumi.StringPtrOutput)
+}
+
+// Keyframes define the curve, at least 2, resolved and interpolated
+// against "now" by internal/circadian.Interpolate. Order in this list
+// doesn't matter - they're sorted by resolved instant before
+// interpolating.
+func (o CircadianScheduleSpecPatchPtrOutput) Keyframes() CircadianScheduleSpecKeyframesPatchArrayOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpecPatch) []CircadianScheduleSpecKeyframesPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Keyframes
+	}).(CircadianScheduleSpecKeyframesPatchArrayOutput)
+}
+
+// Latitude of the location Keyframes are anchored to, decimal degrees
+// positive north. Required, not defaulted: 0 is a real location (Null
+// Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+// so a schedule created without one would silently compute sun times
+// for the wrong place instead of failing validation - confirmed live,
+// this is exactly what happened before Latitude/Longitude moved from a
+// global --latitude/--longitude flag onto this Spec.
+func (o CircadianScheduleSpecPatchPtrOutput) Latitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpecPatch) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.Latitude
+	}).(pulumi.Float64PtrOutput)
+}
+
+// Longitude of the location Keyframes are anchored to, decimal degrees
+// positive east. Required - see Latitude's doc comment for why.
+func (o CircadianScheduleSpecPatchPtrOutput) Longitude() pulumi.Float64PtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleSpecPatch) *float64 {
+		if v == nil {
+			return nil
+		}
+		return v.Longitude
+	}).(pulumi.Float64PtrOutput)
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatus struct {
+	// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentBrightness *int `pulumi:"currentBrightness"`
+	// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentColorTempK *int `pulumi:"currentColorTempK"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+	// ValidationError reports why Spec couldn't be interpolated - e.g.
+	// Group is unset, or internal/circadian.Interpolate rejected
+	// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+	// anchor). Empty means Spec is well-formed.
+	ValidationError *string `pulumi:"validationError"`
+}
+
+// CircadianScheduleStatusInput is an input type that accepts CircadianScheduleStatusArgs and CircadianScheduleStatusOutput values.
+// You can construct a concrete instance of `CircadianScheduleStatusInput` via:
+//
+//	CircadianScheduleStatusArgs{...}
+type CircadianScheduleStatusInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleStatusOutput() CircadianScheduleStatusOutput
+	ToCircadianScheduleStatusOutputWithContext(context.Context) CircadianScheduleStatusOutput
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatusArgs struct {
+	// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentBrightness pulumi.IntPtrInput `pulumi:"currentBrightness"`
+	// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentColorTempK pulumi.IntPtrInput `pulumi:"currentColorTempK"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// ValidationError reports why Spec couldn't be interpolated - e.g.
+	// Group is unset, or internal/circadian.Interpolate rejected
+	// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+	// anchor). Empty means Spec is well-formed.
+	ValidationError pulumi.StringPtrInput `pulumi:"validationError"`
+}
+
+func (CircadianScheduleStatusArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleStatus)(nil)).Elem()
+}
+
+func (i CircadianScheduleStatusArgs) ToCircadianScheduleStatusOutput() CircadianScheduleStatusOutput {
+	return i.ToCircadianScheduleStatusOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleStatusArgs) ToCircadianScheduleStatusOutputWithContext(ctx context.Context) CircadianScheduleStatusOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusOutput)
+}
+
+func (i CircadianScheduleStatusArgs) ToCircadianScheduleStatusPtrOutput() CircadianScheduleStatusPtrOutput {
+	return i.ToCircadianScheduleStatusPtrOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleStatusArgs) ToCircadianScheduleStatusPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusOutput).ToCircadianScheduleStatusPtrOutputWithContext(ctx)
+}
+
+// CircadianScheduleStatusPtrInput is an input type that accepts CircadianScheduleStatusArgs, CircadianScheduleStatusPtr and CircadianScheduleStatusPtrOutput values.
+// You can construct a concrete instance of `CircadianScheduleStatusPtrInput` via:
+//
+//	        CircadianScheduleStatusArgs{...}
+//
+//	or:
+//
+//	        nil
+type CircadianScheduleStatusPtrInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleStatusPtrOutput() CircadianScheduleStatusPtrOutput
+	ToCircadianScheduleStatusPtrOutputWithContext(context.Context) CircadianScheduleStatusPtrOutput
+}
+
+type circadianScheduleStatusPtrType CircadianScheduleStatusArgs
+
+func CircadianScheduleStatusPtr(v *CircadianScheduleStatusArgs) CircadianScheduleStatusPtrInput {
+	return (*circadianScheduleStatusPtrType)(v)
+}
+
+func (*circadianScheduleStatusPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleStatus)(nil)).Elem()
+}
+
+func (i *circadianScheduleStatusPtrType) ToCircadianScheduleStatusPtrOutput() CircadianScheduleStatusPtrOutput {
+	return i.ToCircadianScheduleStatusPtrOutputWithContext(context.Background())
+}
+
+func (i *circadianScheduleStatusPtrType) ToCircadianScheduleStatusPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusPtrOutput)
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatusOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleStatus)(nil)).Elem()
+}
+
+func (o CircadianScheduleStatusOutput) ToCircadianScheduleStatusOutput() CircadianScheduleStatusOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusOutput) ToCircadianScheduleStatusOutputWithContext(ctx context.Context) CircadianScheduleStatusOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusOutput) ToCircadianScheduleStatusPtrOutput() CircadianScheduleStatusPtrOutput {
+	return o.ToCircadianScheduleStatusPtrOutputWithContext(context.Background())
+}
+
+func (o CircadianScheduleStatusOutput) ToCircadianScheduleStatusPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CircadianScheduleStatus) *CircadianScheduleStatus {
+		return &v
+	}).(CircadianScheduleStatusPtrOutput)
+}
+
+// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusOutput) CurrentBrightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatus) *int { return v.CurrentBrightness }).(pulumi.IntPtrOutput)
+}
+
+// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusOutput) CurrentColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatus) *int { return v.CurrentColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o CircadianScheduleStatusOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatus) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// ValidationError reports why Spec couldn't be interpolated - e.g.
+// Group is unset, or internal/circadian.Interpolate rejected
+// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+// anchor). Empty means Spec is well-formed.
+func (o CircadianScheduleStatusOutput) ValidationError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatus) *string { return v.ValidationError }).(pulumi.StringPtrOutput)
+}
+
+type CircadianScheduleStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleStatus)(nil)).Elem()
+}
+
+func (o CircadianScheduleStatusPtrOutput) ToCircadianScheduleStatusPtrOutput() CircadianScheduleStatusPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPtrOutput) ToCircadianScheduleStatusPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPtrOutput) Elem() CircadianScheduleStatusOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatus) CircadianScheduleStatus {
+		if v != nil {
+			return *v
+		}
+		var ret CircadianScheduleStatus
+		return ret
+	}).(CircadianScheduleStatusOutput)
+}
+
+// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPtrOutput) CurrentBrightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatus) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CurrentBrightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPtrOutput) CurrentColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatus) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CurrentColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o CircadianScheduleStatusPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// ValidationError reports why Spec couldn't be interpolated - e.g.
+// Group is unset, or internal/circadian.Interpolate rejected
+// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+// anchor). Empty means Spec is well-formed.
+func (o CircadianScheduleStatusPtrOutput) ValidationError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatus) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ValidationError
+	}).(pulumi.StringPtrOutput)
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatusPatch struct {
+	// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentBrightness *int `pulumi:"currentBrightness"`
+	// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentColorTempK *int `pulumi:"currentColorTempK"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced *string `pulumi:"lastSynced"`
+	// ValidationError reports why Spec couldn't be interpolated - e.g.
+	// Group is unset, or internal/circadian.Interpolate rejected
+	// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+	// anchor). Empty means Spec is well-formed.
+	ValidationError *string `pulumi:"validationError"`
+}
+
+// CircadianScheduleStatusPatchInput is an input type that accepts CircadianScheduleStatusPatchArgs and CircadianScheduleStatusPatchOutput values.
+// You can construct a concrete instance of `CircadianScheduleStatusPatchInput` via:
+//
+//	CircadianScheduleStatusPatchArgs{...}
+type CircadianScheduleStatusPatchInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleStatusPatchOutput() CircadianScheduleStatusPatchOutput
+	ToCircadianScheduleStatusPatchOutputWithContext(context.Context) CircadianScheduleStatusPatchOutput
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatusPatchArgs struct {
+	// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentBrightness pulumi.IntPtrInput `pulumi:"currentBrightness"`
+	// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+	// nil if ValidationError is set.
+	CurrentColorTempK pulumi.IntPtrInput `pulumi:"currentColorTempK"`
+	// LastSynced is when this status was last recomputed.
+	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
+	// ValidationError reports why Spec couldn't be interpolated - e.g.
+	// Group is unset, or internal/circadian.Interpolate rejected
+	// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+	// anchor). Empty means Spec is well-formed.
+	ValidationError pulumi.StringPtrInput `pulumi:"validationError"`
+}
+
+func (CircadianScheduleStatusPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleStatusPatch)(nil)).Elem()
+}
+
+func (i CircadianScheduleStatusPatchArgs) ToCircadianScheduleStatusPatchOutput() CircadianScheduleStatusPatchOutput {
+	return i.ToCircadianScheduleStatusPatchOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleStatusPatchArgs) ToCircadianScheduleStatusPatchOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusPatchOutput)
+}
+
+func (i CircadianScheduleStatusPatchArgs) ToCircadianScheduleStatusPatchPtrOutput() CircadianScheduleStatusPatchPtrOutput {
+	return i.ToCircadianScheduleStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i CircadianScheduleStatusPatchArgs) ToCircadianScheduleStatusPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusPatchOutput).ToCircadianScheduleStatusPatchPtrOutputWithContext(ctx)
+}
+
+// CircadianScheduleStatusPatchPtrInput is an input type that accepts CircadianScheduleStatusPatchArgs, CircadianScheduleStatusPatchPtr and CircadianScheduleStatusPatchPtrOutput values.
+// You can construct a concrete instance of `CircadianScheduleStatusPatchPtrInput` via:
+//
+//	        CircadianScheduleStatusPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type CircadianScheduleStatusPatchPtrInput interface {
+	pulumi.Input
+
+	ToCircadianScheduleStatusPatchPtrOutput() CircadianScheduleStatusPatchPtrOutput
+	ToCircadianScheduleStatusPatchPtrOutputWithContext(context.Context) CircadianScheduleStatusPatchPtrOutput
+}
+
+type circadianScheduleStatusPatchPtrType CircadianScheduleStatusPatchArgs
+
+func CircadianScheduleStatusPatchPtr(v *CircadianScheduleStatusPatchArgs) CircadianScheduleStatusPatchPtrInput {
+	return (*circadianScheduleStatusPatchPtrType)(v)
+}
+
+func (*circadianScheduleStatusPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleStatusPatch)(nil)).Elem()
+}
+
+func (i *circadianScheduleStatusPatchPtrType) ToCircadianScheduleStatusPatchPtrOutput() CircadianScheduleStatusPatchPtrOutput {
+	return i.ToCircadianScheduleStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *circadianScheduleStatusPatchPtrType) ToCircadianScheduleStatusPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(CircadianScheduleStatusPatchPtrOutput)
+}
+
+// CircadianScheduleStatus reports the schedule's live-computed output,
+// independent of whether any Group currently selects it via
+// Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+// wiring it live.
+type CircadianScheduleStatusPatchOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleStatusPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*CircadianScheduleStatusPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleStatusPatchOutput) ToCircadianScheduleStatusPatchOutput() CircadianScheduleStatusPatchOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPatchOutput) ToCircadianScheduleStatusPatchOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPatchOutput) ToCircadianScheduleStatusPatchPtrOutput() CircadianScheduleStatusPatchPtrOutput {
+	return o.ToCircadianScheduleStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (o CircadianScheduleStatusPatchOutput) ToCircadianScheduleStatusPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v CircadianScheduleStatusPatch) *CircadianScheduleStatusPatch {
+		return &v
+	}).(CircadianScheduleStatusPatchPtrOutput)
+}
+
+// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPatchOutput) CurrentBrightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatusPatch) *int { return v.CurrentBrightness }).(pulumi.IntPtrOutput)
+}
+
+// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPatchOutput) CurrentColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatusPatch) *int { return v.CurrentColorTempK }).(pulumi.IntPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o CircadianScheduleStatusPatchOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatusPatch) *string { return v.LastSynced }).(pulumi.StringPtrOutput)
+}
+
+// ValidationError reports why Spec couldn't be interpolated - e.g.
+// Group is unset, or internal/circadian.Interpolate rejected
+// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+// anchor). Empty means Spec is well-formed.
+func (o CircadianScheduleStatusPatchOutput) ValidationError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleStatusPatch) *string { return v.ValidationError }).(pulumi.StringPtrOutput)
+}
+
+type CircadianScheduleStatusPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (CircadianScheduleStatusPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**CircadianScheduleStatusPatch)(nil)).Elem()
+}
+
+func (o CircadianScheduleStatusPatchPtrOutput) ToCircadianScheduleStatusPatchPtrOutput() CircadianScheduleStatusPatchPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPatchPtrOutput) ToCircadianScheduleStatusPatchPtrOutputWithContext(ctx context.Context) CircadianScheduleStatusPatchPtrOutput {
+	return o
+}
+
+func (o CircadianScheduleStatusPatchPtrOutput) Elem() CircadianScheduleStatusPatchOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatusPatch) CircadianScheduleStatusPatch {
+		if v != nil {
+			return *v
+		}
+		var ret CircadianScheduleStatusPatch
+		return ret
+	}).(CircadianScheduleStatusPatchOutput)
+}
+
+// CurrentBrightness is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPatchPtrOutput) CurrentBrightness() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatusPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CurrentBrightness
+	}).(pulumi.IntPtrOutput)
+}
+
+// CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+// nil if ValidationError is set.
+func (o CircadianScheduleStatusPatchPtrOutput) CurrentColorTempK() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatusPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.CurrentColorTempK
+	}).(pulumi.IntPtrOutput)
+}
+
+// LastSynced is when this status was last recomputed.
+func (o CircadianScheduleStatusPatchPtrOutput) LastSynced() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.LastSynced
+	}).(pulumi.StringPtrOutput)
+}
+
+// ValidationError reports why Spec couldn't be interpolated - e.g.
+// Group is unset, or internal/circadian.Interpolate rejected
+// Keyframes (degenerate/duplicate resolved instants, an unresolvable
+// anchor). Empty means Spec is well-formed.
+func (o CircadianScheduleStatusPatchPtrOutput) ValidationError() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *CircadianScheduleStatusPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ValidationError
+	}).(pulumi.StringPtrOutput)
+}
+
 // Group is a user-named collection of Lights, for other resources (switch
 // bindings, future circadian schedules) to target instead of enumerating
 // individual Lights each time. Cluster scoped like Light/Switch/HueBridge,
@@ -337,19 +1958,7 @@ func (o GroupPatchTypeOutput) Status() GroupStatusPatchPtrOutput {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpec struct {
-	// ActiveScene selects this group's current state. Empty means
-	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-	// lights alone entirely, which is the safe default and what every
-	// group has today (deliberately NOT the same as "off": a newly added
-	// field's zero value must be inert, not force every light off the
-	// moment this field exists). The literal "off" is a reserved
-	// pseudo-scene that forces every light in Spec.Lights off (On only -
-	// brightness/color are left as they are). Any other value must name a
-	// Scene whose own Spec.Group equals this Group's name; enactment
-	// happens continuously (every reconcile, including the periodic
-	// resync) rather than once-on-change - manually overriding a light
-	// while a scene/off is selected will be corrected back.
-	ActiveScene *string `pulumi:"activeScene"`
+	ActiveScene *GroupSpecActiveScene `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights []string `pulumi:"lights"`
 }
@@ -367,19 +1976,7 @@ type GroupSpecInput interface {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecArgs struct {
-	// ActiveScene selects this group's current state. Empty means
-	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-	// lights alone entirely, which is the safe default and what every
-	// group has today (deliberately NOT the same as "off": a newly added
-	// field's zero value must be inert, not force every light off the
-	// moment this field exists). The literal "off" is a reserved
-	// pseudo-scene that forces every light in Spec.Lights off (On only -
-	// brightness/color are left as they are). Any other value must name a
-	// Scene whose own Spec.Group equals this Group's name; enactment
-	// happens continuously (every reconcile, including the periodic
-	// resync) rather than once-on-change - manually overriding a light
-	// while a scene/off is selected will be corrected back.
-	ActiveScene pulumi.StringPtrInput `pulumi:"activeScene"`
+	ActiveScene GroupSpecActiveScenePtrInput `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights pulumi.StringArrayInput `pulumi:"lights"`
 }
@@ -462,20 +2059,8 @@ func (o GroupSpecOutput) ToGroupSpecPtrOutputWithContext(ctx context.Context) Gr
 	}).(GroupSpecPtrOutput)
 }
 
-// ActiveScene selects this group's current state. Empty means
-// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-// lights alone entirely, which is the safe default and what every
-// group has today (deliberately NOT the same as "off": a newly added
-// field's zero value must be inert, not force every light off the
-// moment this field exists). The literal "off" is a reserved
-// pseudo-scene that forces every light in Spec.Lights off (On only -
-// brightness/color are left as they are). Any other value must name a
-// Scene whose own Spec.Group equals this Group's name; enactment
-// happens continuously (every reconcile, including the periodic
-// resync) rather than once-on-change - manually overriding a light
-// while a scene/off is selected will be corrected back.
-func (o GroupSpecOutput) ActiveScene() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GroupSpec) *string { return v.ActiveScene }).(pulumi.StringPtrOutput)
+func (o GroupSpecOutput) ActiveScene() GroupSpecActiveScenePtrOutput {
+	return o.ApplyT(func(v GroupSpec) *GroupSpecActiveScene { return v.ActiveScene }).(GroupSpecActiveScenePtrOutput)
 }
 
 // Lights are the names of Light CRs that belong to this group.
@@ -507,25 +2092,13 @@ func (o GroupSpecPtrOutput) Elem() GroupSpecOutput {
 	}).(GroupSpecOutput)
 }
 
-// ActiveScene selects this group's current state. Empty means
-// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-// lights alone entirely, which is the safe default and what every
-// group has today (deliberately NOT the same as "off": a newly added
-// field's zero value must be inert, not force every light off the
-// moment this field exists). The literal "off" is a reserved
-// pseudo-scene that forces every light in Spec.Lights off (On only -
-// brightness/color are left as they are). Any other value must name a
-// Scene whose own Spec.Group equals this Group's name; enactment
-// happens continuously (every reconcile, including the periodic
-// resync) rather than once-on-change - manually overriding a light
-// while a scene/off is selected will be corrected back.
-func (o GroupSpecPtrOutput) ActiveScene() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *GroupSpec) *string {
+func (o GroupSpecPtrOutput) ActiveScene() GroupSpecActiveScenePtrOutput {
+	return o.ApplyT(func(v *GroupSpec) *GroupSpecActiveScene {
 		if v == nil {
 			return nil
 		}
 		return v.ActiveScene
-	}).(pulumi.StringPtrOutput)
+	}).(GroupSpecActiveScenePtrOutput)
 }
 
 // Lights are the names of Light CRs that belong to this group.
@@ -538,21 +2111,455 @@ func (o GroupSpecPtrOutput) Lights() pulumi.StringArrayOutput {
 	}).(pulumi.StringArrayOutput)
 }
 
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveScene struct {
+	// Kind of the referenced object.
+	Kind *string `pulumi:"kind"`
+	// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+	// is Off or Reactive.
+	Name *string `pulumi:"name"`
+}
+
+// GroupSpecActiveSceneInput is an input type that accepts GroupSpecActiveSceneArgs and GroupSpecActiveSceneOutput values.
+// You can construct a concrete instance of `GroupSpecActiveSceneInput` via:
+//
+//	GroupSpecActiveSceneArgs{...}
+type GroupSpecActiveSceneInput interface {
+	pulumi.Input
+
+	ToGroupSpecActiveSceneOutput() GroupSpecActiveSceneOutput
+	ToGroupSpecActiveSceneOutputWithContext(context.Context) GroupSpecActiveSceneOutput
+}
+
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveSceneArgs struct {
+	// Kind of the referenced object.
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+	// is Off or Reactive.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+}
+
+func (GroupSpecActiveSceneArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecActiveScene)(nil)).Elem()
+}
+
+func (i GroupSpecActiveSceneArgs) ToGroupSpecActiveSceneOutput() GroupSpecActiveSceneOutput {
+	return i.ToGroupSpecActiveSceneOutputWithContext(context.Background())
+}
+
+func (i GroupSpecActiveSceneArgs) ToGroupSpecActiveSceneOutputWithContext(ctx context.Context) GroupSpecActiveSceneOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveSceneOutput)
+}
+
+func (i GroupSpecActiveSceneArgs) ToGroupSpecActiveScenePtrOutput() GroupSpecActiveScenePtrOutput {
+	return i.ToGroupSpecActiveScenePtrOutputWithContext(context.Background())
+}
+
+func (i GroupSpecActiveSceneArgs) ToGroupSpecActiveScenePtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveSceneOutput).ToGroupSpecActiveScenePtrOutputWithContext(ctx)
+}
+
+// GroupSpecActiveScenePtrInput is an input type that accepts GroupSpecActiveSceneArgs, GroupSpecActiveScenePtr and GroupSpecActiveScenePtrOutput values.
+// You can construct a concrete instance of `GroupSpecActiveScenePtrInput` via:
+//
+//	        GroupSpecActiveSceneArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupSpecActiveScenePtrInput interface {
+	pulumi.Input
+
+	ToGroupSpecActiveScenePtrOutput() GroupSpecActiveScenePtrOutput
+	ToGroupSpecActiveScenePtrOutputWithContext(context.Context) GroupSpecActiveScenePtrOutput
+}
+
+type groupSpecActiveScenePtrType GroupSpecActiveSceneArgs
+
+func GroupSpecActiveScenePtr(v *GroupSpecActiveSceneArgs) GroupSpecActiveScenePtrInput {
+	return (*groupSpecActiveScenePtrType)(v)
+}
+
+func (*groupSpecActiveScenePtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecActiveScene)(nil)).Elem()
+}
+
+func (i *groupSpecActiveScenePtrType) ToGroupSpecActiveScenePtrOutput() GroupSpecActiveScenePtrOutput {
+	return i.ToGroupSpecActiveScenePtrOutputWithContext(context.Background())
+}
+
+func (i *groupSpecActiveScenePtrType) ToGroupSpecActiveScenePtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveScenePtrOutput)
+}
+
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveSceneOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecActiveSceneOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecActiveScene)(nil)).Elem()
+}
+
+func (o GroupSpecActiveSceneOutput) ToGroupSpecActiveSceneOutput() GroupSpecActiveSceneOutput {
+	return o
+}
+
+func (o GroupSpecActiveSceneOutput) ToGroupSpecActiveSceneOutputWithContext(ctx context.Context) GroupSpecActiveSceneOutput {
+	return o
+}
+
+func (o GroupSpecActiveSceneOutput) ToGroupSpecActiveScenePtrOutput() GroupSpecActiveScenePtrOutput {
+	return o.ToGroupSpecActiveScenePtrOutputWithContext(context.Background())
+}
+
+func (o GroupSpecActiveSceneOutput) ToGroupSpecActiveScenePtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupSpecActiveScene) *GroupSpecActiveScene {
+		return &v
+	}).(GroupSpecActiveScenePtrOutput)
+}
+
+// Kind of the referenced object.
+func (o GroupSpecActiveSceneOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpecActiveScene) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+// is Off or Reactive.
+func (o GroupSpecActiveSceneOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpecActiveScene) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+type GroupSpecActiveScenePtrOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecActiveScenePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecActiveScene)(nil)).Elem()
+}
+
+func (o GroupSpecActiveScenePtrOutput) ToGroupSpecActiveScenePtrOutput() GroupSpecActiveScenePtrOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePtrOutput) ToGroupSpecActiveScenePtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePtrOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePtrOutput) Elem() GroupSpecActiveSceneOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScene) GroupSpecActiveScene {
+		if v != nil {
+			return *v
+		}
+		var ret GroupSpecActiveScene
+		return ret
+	}).(GroupSpecActiveSceneOutput)
+}
+
+// Kind of the referenced object.
+func (o GroupSpecActiveScenePtrOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScene) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Kind
+	}).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+// is Off or Reactive.
+func (o GroupSpecActiveScenePtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScene) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveScenePatch struct {
+	// Kind of the referenced object.
+	Kind *string `pulumi:"kind"`
+	// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+	// is Off or Reactive.
+	Name *string `pulumi:"name"`
+}
+
+// GroupSpecActiveScenePatchInput is an input type that accepts GroupSpecActiveScenePatchArgs and GroupSpecActiveScenePatchOutput values.
+// You can construct a concrete instance of `GroupSpecActiveScenePatchInput` via:
+//
+//	GroupSpecActiveScenePatchArgs{...}
+type GroupSpecActiveScenePatchInput interface {
+	pulumi.Input
+
+	ToGroupSpecActiveScenePatchOutput() GroupSpecActiveScenePatchOutput
+	ToGroupSpecActiveScenePatchOutputWithContext(context.Context) GroupSpecActiveScenePatchOutput
+}
+
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveScenePatchArgs struct {
+	// Kind of the referenced object.
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+	// is Off or Reactive.
+	Name pulumi.StringPtrInput `pulumi:"name"`
+}
+
+func (GroupSpecActiveScenePatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecActiveScenePatch)(nil)).Elem()
+}
+
+func (i GroupSpecActiveScenePatchArgs) ToGroupSpecActiveScenePatchOutput() GroupSpecActiveScenePatchOutput {
+	return i.ToGroupSpecActiveScenePatchOutputWithContext(context.Background())
+}
+
+func (i GroupSpecActiveScenePatchArgs) ToGroupSpecActiveScenePatchOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveScenePatchOutput)
+}
+
+func (i GroupSpecActiveScenePatchArgs) ToGroupSpecActiveScenePatchPtrOutput() GroupSpecActiveScenePatchPtrOutput {
+	return i.ToGroupSpecActiveScenePatchPtrOutputWithContext(context.Background())
+}
+
+func (i GroupSpecActiveScenePatchArgs) ToGroupSpecActiveScenePatchPtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveScenePatchOutput).ToGroupSpecActiveScenePatchPtrOutputWithContext(ctx)
+}
+
+// GroupSpecActiveScenePatchPtrInput is an input type that accepts GroupSpecActiveScenePatchArgs, GroupSpecActiveScenePatchPtr and GroupSpecActiveScenePatchPtrOutput values.
+// You can construct a concrete instance of `GroupSpecActiveScenePatchPtrInput` via:
+//
+//	        GroupSpecActiveScenePatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type GroupSpecActiveScenePatchPtrInput interface {
+	pulumi.Input
+
+	ToGroupSpecActiveScenePatchPtrOutput() GroupSpecActiveScenePatchPtrOutput
+	ToGroupSpecActiveScenePatchPtrOutputWithContext(context.Context) GroupSpecActiveScenePatchPtrOutput
+}
+
+type groupSpecActiveScenePatchPtrType GroupSpecActiveScenePatchArgs
+
+func GroupSpecActiveScenePatchPtr(v *GroupSpecActiveScenePatchArgs) GroupSpecActiveScenePatchPtrInput {
+	return (*groupSpecActiveScenePatchPtrType)(v)
+}
+
+func (*groupSpecActiveScenePatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecActiveScenePatch)(nil)).Elem()
+}
+
+func (i *groupSpecActiveScenePatchPtrType) ToGroupSpecActiveScenePatchPtrOutput() GroupSpecActiveScenePatchPtrOutput {
+	return i.ToGroupSpecActiveScenePatchPtrOutputWithContext(context.Background())
+}
+
+func (i *groupSpecActiveScenePatchPtrType) ToGroupSpecActiveScenePatchPtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(GroupSpecActiveScenePatchPtrOutput)
+}
+
+// ActiveScene selects this group's current state. Nil means unmanaged -
+// internal/groupcontroller.Reconciler leaves this group's lights alone
+// entirely, which is the safe default and what every group has today
+// (deliberately NOT the same as Kind: Off: a newly added field's zero
+// value must be inert, not force every light off the moment this field
+// exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+// or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+// own Spec.Group equals this Group's name by Name; enactment happens
+// continuously (every reconcile, including the periodic resync) rather
+// than once-on-change - manually overriding a light while a scene/
+// schedule/off is selected will be corrected back. If a Scene and a
+// CircadianSchedule share a Name, Kind disambiguates which one is
+// meant - unlike a plain string, there's no lookup-order ambiguity.
+// Kind: Reactive inverts the direction entirely: each light's own
+// observed Status is mirrored onto its Spec instead of a computed
+// target being pushed down, so internal/lightscontroller.Reconciler
+// finds nothing to push to the bridge and a manual/physical change
+// simply sticks - internal/lightscontroller.Reconciler also refuses to
+// enact for any light belonging to a Reactive-mode Group, independent
+// of this Group's own reconcile timing (see that package's doc
+// comment).
+type GroupSpecActiveScenePatchOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecActiveScenePatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*GroupSpecActiveScenePatch)(nil)).Elem()
+}
+
+func (o GroupSpecActiveScenePatchOutput) ToGroupSpecActiveScenePatchOutput() GroupSpecActiveScenePatchOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePatchOutput) ToGroupSpecActiveScenePatchOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePatchOutput) ToGroupSpecActiveScenePatchPtrOutput() GroupSpecActiveScenePatchPtrOutput {
+	return o.ToGroupSpecActiveScenePatchPtrOutputWithContext(context.Background())
+}
+
+func (o GroupSpecActiveScenePatchOutput) ToGroupSpecActiveScenePatchPtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v GroupSpecActiveScenePatch) *GroupSpecActiveScenePatch {
+		return &v
+	}).(GroupSpecActiveScenePatchPtrOutput)
+}
+
+// Kind of the referenced object.
+func (o GroupSpecActiveScenePatchOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpecActiveScenePatch) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+// is Off or Reactive.
+func (o GroupSpecActiveScenePatchOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v GroupSpecActiveScenePatch) *string { return v.Name }).(pulumi.StringPtrOutput)
+}
+
+type GroupSpecActiveScenePatchPtrOutput struct{ *pulumi.OutputState }
+
+func (GroupSpecActiveScenePatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**GroupSpecActiveScenePatch)(nil)).Elem()
+}
+
+func (o GroupSpecActiveScenePatchPtrOutput) ToGroupSpecActiveScenePatchPtrOutput() GroupSpecActiveScenePatchPtrOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePatchPtrOutput) ToGroupSpecActiveScenePatchPtrOutputWithContext(ctx context.Context) GroupSpecActiveScenePatchPtrOutput {
+	return o
+}
+
+func (o GroupSpecActiveScenePatchPtrOutput) Elem() GroupSpecActiveScenePatchOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScenePatch) GroupSpecActiveScenePatch {
+		if v != nil {
+			return *v
+		}
+		var ret GroupSpecActiveScenePatch
+		return ret
+	}).(GroupSpecActiveScenePatchOutput)
+}
+
+// Kind of the referenced object.
+func (o GroupSpecActiveScenePatchPtrOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScenePatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Kind
+	}).(pulumi.StringPtrOutput)
+}
+
+// Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+// is Off or Reactive.
+func (o GroupSpecActiveScenePatchPtrOutput) Name() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *GroupSpecActiveScenePatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Name
+	}).(pulumi.StringPtrOutput)
+}
+
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecPatch struct {
-	// ActiveScene selects this group's current state. Empty means
-	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-	// lights alone entirely, which is the safe default and what every
-	// group has today (deliberately NOT the same as "off": a newly added
-	// field's zero value must be inert, not force every light off the
-	// moment this field exists). The literal "off" is a reserved
-	// pseudo-scene that forces every light in Spec.Lights off (On only -
-	// brightness/color are left as they are). Any other value must name a
-	// Scene whose own Spec.Group equals this Group's name; enactment
-	// happens continuously (every reconcile, including the periodic
-	// resync) rather than once-on-change - manually overriding a light
-	// while a scene/off is selected will be corrected back.
-	ActiveScene *string `pulumi:"activeScene"`
+	ActiveScene *GroupSpecActiveScenePatch `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights []string `pulumi:"lights"`
 }
@@ -570,19 +2577,7 @@ type GroupSpecPatchInput interface {
 
 // GroupSpec is the user-declared list of Lights belonging to this group.
 type GroupSpecPatchArgs struct {
-	// ActiveScene selects this group's current state. Empty means
-	// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-	// lights alone entirely, which is the safe default and what every
-	// group has today (deliberately NOT the same as "off": a newly added
-	// field's zero value must be inert, not force every light off the
-	// moment this field exists). The literal "off" is a reserved
-	// pseudo-scene that forces every light in Spec.Lights off (On only -
-	// brightness/color are left as they are). Any other value must name a
-	// Scene whose own Spec.Group equals this Group's name; enactment
-	// happens continuously (every reconcile, including the periodic
-	// resync) rather than once-on-change - manually overriding a light
-	// while a scene/off is selected will be corrected back.
-	ActiveScene pulumi.StringPtrInput `pulumi:"activeScene"`
+	ActiveScene GroupSpecActiveScenePatchPtrInput `pulumi:"activeScene"`
 	// Lights are the names of Light CRs that belong to this group.
 	Lights pulumi.StringArrayInput `pulumi:"lights"`
 }
@@ -665,20 +2660,8 @@ func (o GroupSpecPatchOutput) ToGroupSpecPatchPtrOutputWithContext(ctx context.C
 	}).(GroupSpecPatchPtrOutput)
 }
 
-// ActiveScene selects this group's current state. Empty means
-// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-// lights alone entirely, which is the safe default and what every
-// group has today (deliberately NOT the same as "off": a newly added
-// field's zero value must be inert, not force every light off the
-// moment this field exists). The literal "off" is a reserved
-// pseudo-scene that forces every light in Spec.Lights off (On only -
-// brightness/color are left as they are). Any other value must name a
-// Scene whose own Spec.Group equals this Group's name; enactment
-// happens continuously (every reconcile, including the periodic
-// resync) rather than once-on-change - manually overriding a light
-// while a scene/off is selected will be corrected back.
-func (o GroupSpecPatchOutput) ActiveScene() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v GroupSpecPatch) *string { return v.ActiveScene }).(pulumi.StringPtrOutput)
+func (o GroupSpecPatchOutput) ActiveScene() GroupSpecActiveScenePatchPtrOutput {
+	return o.ApplyT(func(v GroupSpecPatch) *GroupSpecActiveScenePatch { return v.ActiveScene }).(GroupSpecActiveScenePatchPtrOutput)
 }
 
 // Lights are the names of Light CRs that belong to this group.
@@ -710,25 +2693,13 @@ func (o GroupSpecPatchPtrOutput) Elem() GroupSpecPatchOutput {
 	}).(GroupSpecPatchOutput)
 }
 
-// ActiveScene selects this group's current state. Empty means
-// unmanaged - internal/groupcontroller.Reconciler leaves this group's
-// lights alone entirely, which is the safe default and what every
-// group has today (deliberately NOT the same as "off": a newly added
-// field's zero value must be inert, not force every light off the
-// moment this field exists). The literal "off" is a reserved
-// pseudo-scene that forces every light in Spec.Lights off (On only -
-// brightness/color are left as they are). Any other value must name a
-// Scene whose own Spec.Group equals this Group's name; enactment
-// happens continuously (every reconcile, including the periodic
-// resync) rather than once-on-change - manually overriding a light
-// while a scene/off is selected will be corrected back.
-func (o GroupSpecPatchPtrOutput) ActiveScene() pulumi.StringPtrOutput {
-	return o.ApplyT(func(v *GroupSpecPatch) *string {
+func (o GroupSpecPatchPtrOutput) ActiveScene() GroupSpecActiveScenePatchPtrOutput {
+	return o.ApplyT(func(v *GroupSpecPatch) *GroupSpecActiveScenePatch {
 		if v == nil {
 			return nil
 		}
 		return v.ActiveScene
-	}).(pulumi.StringPtrOutput)
+	}).(GroupSpecActiveScenePatchPtrOutput)
 }
 
 // Lights are the names of Light CRs that belong to this group.
@@ -745,9 +2716,10 @@ func (o GroupSpecPatchPtrOutput) Lights() pulumi.StringArrayOutput {
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatus struct {
 	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-	// doesn't match this Group - empty means either ActiveScene is unset/
-	// "off", or the named Scene was found and validated fine.
+	// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+	// whose Spec.Group doesn't match this Group - empty means either
+	// ActiveScene is unset/Off, or the named referent was found and
+	// validated fine.
 	ActiveSceneError *string `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
@@ -777,9 +2749,10 @@ type GroupStatusInput interface {
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusArgs struct {
 	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-	// doesn't match this Group - empty means either ActiveScene is unset/
-	// "off", or the named Scene was found and validated fine.
+	// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+	// whose Spec.Group doesn't match this Group - empty means either
+	// ActiveScene is unset/Off, or the named referent was found and
+	// validated fine.
 	ActiveSceneError pulumi.StringPtrInput `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
@@ -874,9 +2847,10 @@ func (o GroupStatusOutput) ToGroupStatusPtrOutputWithContext(ctx context.Context
 }
 
 // ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-// doesn't match this Group - empty means either ActiveScene is unset/
-// "off", or the named Scene was found and validated fine.
+// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+// whose Spec.Group doesn't match this Group - empty means either
+// ActiveScene is unset/Off, or the named referent was found and
+// validated fine.
 func (o GroupStatusOutput) ActiveSceneError() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatus) *string { return v.ActiveSceneError }).(pulumi.StringPtrOutput)
 }
@@ -926,9 +2900,10 @@ func (o GroupStatusPtrOutput) Elem() GroupStatusOutput {
 }
 
 // ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-// doesn't match this Group - empty means either ActiveScene is unset/
-// "off", or the named Scene was found and validated fine.
+// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+// whose Spec.Group doesn't match this Group - empty means either
+// ActiveScene is unset/Off, or the named referent was found and
+// validated fine.
 func (o GroupStatusPtrOutput) ActiveSceneError() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GroupStatus) *string {
 		if v == nil {
@@ -977,9 +2952,10 @@ func (o GroupStatusPtrOutput) MissingLights() pulumi.StringArrayOutput {
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusPatch struct {
 	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-	// doesn't match this Group - empty means either ActiveScene is unset/
-	// "off", or the named Scene was found and validated fine.
+	// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+	// whose Spec.Group doesn't match this Group - empty means either
+	// ActiveScene is unset/Off, or the named referent was found and
+	// validated fine.
 	ActiveSceneError *string `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced *string `pulumi:"lastSynced"`
@@ -1009,9 +2985,10 @@ type GroupStatusPatchInput interface {
 // Light CR - a typo'd or since-deleted reference would otherwise be silent.
 type GroupStatusPatchArgs struct {
 	// ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-	// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-	// doesn't match this Group - empty means either ActiveScene is unset/
-	// "off", or the named Scene was found and validated fine.
+	// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+	// whose Spec.Group doesn't match this Group - empty means either
+	// ActiveScene is unset/Off, or the named referent was found and
+	// validated fine.
 	ActiveSceneError pulumi.StringPtrInput `pulumi:"activeSceneError"`
 	// LastSynced is when this status was last recomputed.
 	LastSynced pulumi.StringPtrInput `pulumi:"lastSynced"`
@@ -1106,9 +3083,10 @@ func (o GroupStatusPatchOutput) ToGroupStatusPatchPtrOutputWithContext(ctx conte
 }
 
 // ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-// doesn't match this Group - empty means either ActiveScene is unset/
-// "off", or the named Scene was found and validated fine.
+// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+// whose Spec.Group doesn't match this Group - empty means either
+// ActiveScene is unset/Off, or the named referent was found and
+// validated fine.
 func (o GroupStatusPatchOutput) ActiveSceneError() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v GroupStatusPatch) *string { return v.ActiveSceneError }).(pulumi.StringPtrOutput)
 }
@@ -1158,9 +3136,10 @@ func (o GroupStatusPatchPtrOutput) Elem() GroupStatusPatchOutput {
 }
 
 // ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-// e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-// doesn't match this Group - empty means either ActiveScene is unset/
-// "off", or the named Scene was found and validated fine.
+// e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+// whose Spec.Group doesn't match this Group - empty means either
+// ActiveScene is unset/Off, or the named referent was found and
+// validated fine.
 func (o GroupStatusPatchPtrOutput) ActiveSceneError() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *GroupStatusPatch) *string {
 		if v == nil {
@@ -2484,6 +4463,21 @@ type LightSpec struct {
 	Name *string `pulumi:"name"`
 	// On is the desired on/off state.
 	On *bool `pulumi:"on"`
+	// Reactive is true when this light is currently owned by a Group whose
+	// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+	// (alongside mirroring the fields above from Status) when enacting
+	// Reactive, and clears it back to false whenever it enacts Off/Scene/
+	// CircadianSchedule instead, so the flag never goes stale once a Group
+	// moves on. internal/lightscontroller.Reconciler checks this field
+	// directly - not the owning Group - before ever diffing Spec against
+	// Status, and skips enactment entirely when it's true: this is a
+	// deliberate choice to keep lightscontroller fully decoupled from
+	// Group (it only ever reads its own object), at the cost of one
+	// accepted edge case - on the very first reconcile after a Group
+	// transitions into Reactive mode, this field hasn't been set yet, so
+	// there's a narrow window where lightscontroller could still enact a
+	// stale Spec before internal/groupcontroller's next reconcile sets it.
+	Reactive *bool `pulumi:"reactive"`
 }
 
 // LightSpecInput is an input type that accepts LightSpecArgs and LightSpecOutput values.
@@ -2524,6 +4518,21 @@ type LightSpecArgs struct {
 	Name pulumi.StringPtrInput `pulumi:"name"`
 	// On is the desired on/off state.
 	On pulumi.BoolPtrInput `pulumi:"on"`
+	// Reactive is true when this light is currently owned by a Group whose
+	// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+	// (alongside mirroring the fields above from Status) when enacting
+	// Reactive, and clears it back to false whenever it enacts Off/Scene/
+	// CircadianSchedule instead, so the flag never goes stale once a Group
+	// moves on. internal/lightscontroller.Reconciler checks this field
+	// directly - not the owning Group - before ever diffing Spec against
+	// Status, and skips enactment entirely when it's true: this is a
+	// deliberate choice to keep lightscontroller fully decoupled from
+	// Group (it only ever reads its own object), at the cost of one
+	// accepted edge case - on the very first reconcile after a Group
+	// transitions into Reactive mode, this field hasn't been set yet, so
+	// there's a narrow window where lightscontroller could still enact a
+	// stale Spec before internal/groupcontroller's next reconcile sets it.
+	Reactive pulumi.BoolPtrInput `pulumi:"reactive"`
 }
 
 func (LightSpecArgs) ElementType() reflect.Type {
@@ -2644,6 +4653,24 @@ func (o LightSpecOutput) On() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v LightSpec) *bool { return v.On }).(pulumi.BoolPtrOutput)
 }
 
+// Reactive is true when this light is currently owned by a Group whose
+// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+// (alongside mirroring the fields above from Status) when enacting
+// Reactive, and clears it back to false whenever it enacts Off/Scene/
+// CircadianSchedule instead, so the flag never goes stale once a Group
+// moves on. internal/lightscontroller.Reconciler checks this field
+// directly - not the owning Group - before ever diffing Spec against
+// Status, and skips enactment entirely when it's true: this is a
+// deliberate choice to keep lightscontroller fully decoupled from
+// Group (it only ever reads its own object), at the cost of one
+// accepted edge case - on the very first reconcile after a Group
+// transitions into Reactive mode, this field hasn't been set yet, so
+// there's a narrow window where lightscontroller could still enact a
+// stale Spec before internal/groupcontroller's next reconcile sets it.
+func (o LightSpecOutput) Reactive() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v LightSpec) *bool { return v.Reactive }).(pulumi.BoolPtrOutput)
+}
+
 type LightSpecPtrOutput struct{ *pulumi.OutputState }
 
 func (LightSpecPtrOutput) ElementType() reflect.Type {
@@ -2725,6 +4752,29 @@ func (o LightSpecPtrOutput) On() pulumi.BoolPtrOutput {
 	}).(pulumi.BoolPtrOutput)
 }
 
+// Reactive is true when this light is currently owned by a Group whose
+// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+// (alongside mirroring the fields above from Status) when enacting
+// Reactive, and clears it back to false whenever it enacts Off/Scene/
+// CircadianSchedule instead, so the flag never goes stale once a Group
+// moves on. internal/lightscontroller.Reconciler checks this field
+// directly - not the owning Group - before ever diffing Spec against
+// Status, and skips enactment entirely when it's true: this is a
+// deliberate choice to keep lightscontroller fully decoupled from
+// Group (it only ever reads its own object), at the cost of one
+// accepted edge case - on the very first reconcile after a Group
+// transitions into Reactive mode, this field hasn't been set yet, so
+// there's a narrow window where lightscontroller could still enact a
+// stale Spec before internal/groupcontroller's next reconcile sets it.
+func (o LightSpecPtrOutput) Reactive() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LightSpec) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Reactive
+	}).(pulumi.BoolPtrOutput)
+}
+
 // LightSpec is the desired/controllable subset of light state. It is
 // seeded exactly once - from the live light state observed at the moment
 // its Light CR is first created (see Poller.upsert in
@@ -2752,6 +4802,21 @@ type LightSpecPatch struct {
 	Name *string `pulumi:"name"`
 	// On is the desired on/off state.
 	On *bool `pulumi:"on"`
+	// Reactive is true when this light is currently owned by a Group whose
+	// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+	// (alongside mirroring the fields above from Status) when enacting
+	// Reactive, and clears it back to false whenever it enacts Off/Scene/
+	// CircadianSchedule instead, so the flag never goes stale once a Group
+	// moves on. internal/lightscontroller.Reconciler checks this field
+	// directly - not the owning Group - before ever diffing Spec against
+	// Status, and skips enactment entirely when it's true: this is a
+	// deliberate choice to keep lightscontroller fully decoupled from
+	// Group (it only ever reads its own object), at the cost of one
+	// accepted edge case - on the very first reconcile after a Group
+	// transitions into Reactive mode, this field hasn't been set yet, so
+	// there's a narrow window where lightscontroller could still enact a
+	// stale Spec before internal/groupcontroller's next reconcile sets it.
+	Reactive *bool `pulumi:"reactive"`
 }
 
 // LightSpecPatchInput is an input type that accepts LightSpecPatchArgs and LightSpecPatchOutput values.
@@ -2792,6 +4857,21 @@ type LightSpecPatchArgs struct {
 	Name pulumi.StringPtrInput `pulumi:"name"`
 	// On is the desired on/off state.
 	On pulumi.BoolPtrInput `pulumi:"on"`
+	// Reactive is true when this light is currently owned by a Group whose
+	// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+	// (alongside mirroring the fields above from Status) when enacting
+	// Reactive, and clears it back to false whenever it enacts Off/Scene/
+	// CircadianSchedule instead, so the flag never goes stale once a Group
+	// moves on. internal/lightscontroller.Reconciler checks this field
+	// directly - not the owning Group - before ever diffing Spec against
+	// Status, and skips enactment entirely when it's true: this is a
+	// deliberate choice to keep lightscontroller fully decoupled from
+	// Group (it only ever reads its own object), at the cost of one
+	// accepted edge case - on the very first reconcile after a Group
+	// transitions into Reactive mode, this field hasn't been set yet, so
+	// there's a narrow window where lightscontroller could still enact a
+	// stale Spec before internal/groupcontroller's next reconcile sets it.
+	Reactive pulumi.BoolPtrInput `pulumi:"reactive"`
 }
 
 func (LightSpecPatchArgs) ElementType() reflect.Type {
@@ -2912,6 +4992,24 @@ func (o LightSpecPatchOutput) On() pulumi.BoolPtrOutput {
 	return o.ApplyT(func(v LightSpecPatch) *bool { return v.On }).(pulumi.BoolPtrOutput)
 }
 
+// Reactive is true when this light is currently owned by a Group whose
+// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+// (alongside mirroring the fields above from Status) when enacting
+// Reactive, and clears it back to false whenever it enacts Off/Scene/
+// CircadianSchedule instead, so the flag never goes stale once a Group
+// moves on. internal/lightscontroller.Reconciler checks this field
+// directly - not the owning Group - before ever diffing Spec against
+// Status, and skips enactment entirely when it's true: this is a
+// deliberate choice to keep lightscontroller fully decoupled from
+// Group (it only ever reads its own object), at the cost of one
+// accepted edge case - on the very first reconcile after a Group
+// transitions into Reactive mode, this field hasn't been set yet, so
+// there's a narrow window where lightscontroller could still enact a
+// stale Spec before internal/groupcontroller's next reconcile sets it.
+func (o LightSpecPatchOutput) Reactive() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v LightSpecPatch) *bool { return v.Reactive }).(pulumi.BoolPtrOutput)
+}
+
 type LightSpecPatchPtrOutput struct{ *pulumi.OutputState }
 
 func (LightSpecPatchPtrOutput) ElementType() reflect.Type {
@@ -2990,6 +5088,29 @@ func (o LightSpecPatchPtrOutput) On() pulumi.BoolPtrOutput {
 			return nil
 		}
 		return v.On
+	}).(pulumi.BoolPtrOutput)
+}
+
+// Reactive is true when this light is currently owned by a Group whose
+// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+// (alongside mirroring the fields above from Status) when enacting
+// Reactive, and clears it back to false whenever it enacts Off/Scene/
+// CircadianSchedule instead, so the flag never goes stale once a Group
+// moves on. internal/lightscontroller.Reconciler checks this field
+// directly - not the owning Group - before ever diffing Spec against
+// Status, and skips enactment entirely when it's true: this is a
+// deliberate choice to keep lightscontroller fully decoupled from
+// Group (it only ever reads its own object), at the cost of one
+// accepted edge case - on the very first reconcile after a Group
+// transitions into Reactive mode, this field hasn't been set yet, so
+// there's a narrow window where lightscontroller could still enact a
+// stale Spec before internal/groupcontroller's next reconcile sets it.
+func (o LightSpecPatchPtrOutput) Reactive() pulumi.BoolPtrOutput {
+	return o.ApplyT(func(v *LightSpecPatch) *bool {
+		if v == nil {
+			return nil
+		}
+		return v.Reactive
 	}).(pulumi.BoolPtrOutput)
 }
 
@@ -7418,12 +9539,32 @@ func (o SwitchStatusPatchPtrOutput) Reachable() pulumi.BoolPtrOutput {
 }
 
 func init() {
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleTypeInput)(nil)).Elem(), CircadianScheduleTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleTypeArrayInput)(nil)).Elem(), CircadianScheduleTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleListTypeInput)(nil)).Elem(), CircadianScheduleListTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianSchedulePatchTypeInput)(nil)).Elem(), CircadianSchedulePatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecInput)(nil)).Elem(), CircadianScheduleSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecPtrInput)(nil)).Elem(), CircadianScheduleSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecKeyframesInput)(nil)).Elem(), CircadianScheduleSpecKeyframesArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecKeyframesArrayInput)(nil)).Elem(), CircadianScheduleSpecKeyframesArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecKeyframesPatchInput)(nil)).Elem(), CircadianScheduleSpecKeyframesPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecKeyframesPatchArrayInput)(nil)).Elem(), CircadianScheduleSpecKeyframesPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecPatchInput)(nil)).Elem(), CircadianScheduleSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleSpecPatchPtrInput)(nil)).Elem(), CircadianScheduleSpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleStatusInput)(nil)).Elem(), CircadianScheduleStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleStatusPtrInput)(nil)).Elem(), CircadianScheduleStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleStatusPatchInput)(nil)).Elem(), CircadianScheduleStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*CircadianScheduleStatusPatchPtrInput)(nil)).Elem(), CircadianScheduleStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupTypeInput)(nil)).Elem(), GroupTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupTypeArrayInput)(nil)).Elem(), GroupTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupListTypeInput)(nil)).Elem(), GroupListTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupPatchTypeInput)(nil)).Elem(), GroupPatchTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecInput)(nil)).Elem(), GroupSpecArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPtrInput)(nil)).Elem(), GroupSpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecActiveSceneInput)(nil)).Elem(), GroupSpecActiveSceneArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecActiveScenePtrInput)(nil)).Elem(), GroupSpecActiveSceneArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecActiveScenePatchInput)(nil)).Elem(), GroupSpecActiveScenePatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecActiveScenePatchPtrInput)(nil)).Elem(), GroupSpecActiveScenePatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPatchInput)(nil)).Elem(), GroupSpecPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupSpecPatchPtrInput)(nil)).Elem(), GroupSpecPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*GroupStatusInput)(nil)).Elem(), GroupStatusArgs{})
@@ -7486,12 +9627,32 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPtrInput)(nil)).Elem(), SwitchStatusArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchInput)(nil)).Elem(), SwitchStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*SwitchStatusPatchPtrInput)(nil)).Elem(), SwitchStatusPatchArgs{})
+	pulumi.RegisterOutputType(CircadianScheduleTypeOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleTypeArrayOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleListTypeOutput{})
+	pulumi.RegisterOutputType(CircadianSchedulePatchTypeOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecPtrOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecKeyframesOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecKeyframesArrayOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecKeyframesPatchOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecKeyframesPatchArrayOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecPatchOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleSpecPatchPtrOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleStatusOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleStatusPtrOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleStatusPatchOutput{})
+	pulumi.RegisterOutputType(CircadianScheduleStatusPatchPtrOutput{})
 	pulumi.RegisterOutputType(GroupTypeOutput{})
 	pulumi.RegisterOutputType(GroupTypeArrayOutput{})
 	pulumi.RegisterOutputType(GroupListTypeOutput{})
 	pulumi.RegisterOutputType(GroupPatchTypeOutput{})
 	pulumi.RegisterOutputType(GroupSpecOutput{})
 	pulumi.RegisterOutputType(GroupSpecPtrOutput{})
+	pulumi.RegisterOutputType(GroupSpecActiveSceneOutput{})
+	pulumi.RegisterOutputType(GroupSpecActiveScenePtrOutput{})
+	pulumi.RegisterOutputType(GroupSpecActiveScenePatchOutput{})
+	pulumi.RegisterOutputType(GroupSpecActiveScenePatchPtrOutput{})
 	pulumi.RegisterOutputType(GroupSpecPatchOutput{})
 	pulumi.RegisterOutputType(GroupSpecPatchPtrOutput{})
 	pulumi.RegisterOutputType(GroupStatusOutput{})

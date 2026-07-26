@@ -17,11 +17,16 @@ const (
 	prometheusImage = "quay.io/prometheus/prometheus"
 
 	// ServiceName is the fixed name of the Service newInstance creates for
-	// the Prometheus CR - exported so callers (pkg/deploy/deploy.go, to
-	// wire pkg/components/grafana's datasource at
-	// <ServiceName>.<namespace>:9090) can reference it without needing an
-	// extra component output plumbed through.
+	// the Prometheus CR - exported so callers (pkg/deploy/deploy.go) can
+	// reference it without needing an extra component output plumbed
+	// through.
 	ServiceName = "prometheus-" + instanceName
+
+	// UIHostname is the Tailscale-side hostname prefix component.go's
+	// promIngress registers Prometheus's UI at ("prom" ->
+	// prom.<MagicDNSSuffix>) - exported so component.go can reference it
+	// without duplicating the literal.
+	UIHostname = "prom"
 )
 
 // instanceArgs bundles the knobs newInstance needs beyond the operator's own

@@ -20,6 +20,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 )
 
 func main() {
@@ -27,11 +28,13 @@ func main() {
 		pollInterval     time.Duration
 		discoveryTimeout time.Duration
 		healthProbeAddr  string
+		metricsBindAddr  string
 		leaderElectionID = "hub-controller-leader"
 	)
 	flag.DurationVar(&pollInterval, "poll-interval", 60*time.Second, "How often to run an SSDP discovery round")
 	flag.DurationVar(&discoveryTimeout, "discovery-timeout", 5*time.Second, "Timeout for each SSDP discovery round")
 	flag.StringVar(&healthProbeAddr, "health-probe-bind-address", ":8081", "Address the health/readiness endpoints bind to")
+	flag.StringVar(&metricsBindAddr, "metrics-bind-address", ":8080", "Address the /metrics endpoint binds to")
 	flag.Parse()
 
 	// See lumenetes-controller/main.go's identical comment: ctrl.Log.WithName(...)
@@ -51,6 +54,7 @@ func main() {
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                  scheme,
 		HealthProbeBindAddress:  healthProbeAddr,
+		Metrics:                 metricsserver.Options{BindAddress: metricsBindAddr},
 		LeaderElection:          true,
 		LeaderElectionID:        leaderElectionID,
 		LeaderElectionNamespace: os.Getenv("POD_NAMESPACE"),

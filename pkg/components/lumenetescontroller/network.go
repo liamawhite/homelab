@@ -86,5 +86,39 @@ func newNetworkPolicy(ctx *pulumi.Context, name string, opts ...pulumi.ResourceO
 			},
 		},
 	}, opts...)
+	if err != nil {
+		return err
+	}
+
+	// kube-apiserver ingress access - the mirror image of the egress rules
+	// above: the Light validating webhook (see webhook.go) needs the API
+	// server to be able to reach this pod on webhookPort, which the
+	// default-deny baseline otherwise blocks (it only allows ingress from
+	// "host"/"remote-node", not "kube-apiserver" - see
+	// pkg/components/cilium's default-deny policy).
+	_, err = ciliumv2.NewCiliumClusterwideNetworkPolicy(ctx, fmt.Sprintf("%s-allow-ingress-webhook-apiserver", name), &ciliumv2.CiliumClusterwideNetworkPolicyArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name: pulumi.String("allow-ingress-lumenetes-controller-webhook"),
+		},
+		Spec: &ciliumv2.CiliumClusterwideNetworkPolicySpecArgs{
+			EndpointSelector: &ciliumv2.CiliumClusterwideNetworkPolicySpecEndpointSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					"app": pulumi.String("lumenetes-controller"),
+				},
+			},
+			Ingress: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArray{
+				&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressArgs{
+					FromEntities: pulumi.StringArray{pulumi.String("kube-apiserver")},
+					ToPorts: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArray{
+						&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsArgs{
+							Ports: ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArray{
+								&ciliumv2.CiliumClusterwideNetworkPolicySpecIngressToPortsPortsArgs{Port: pulumi.String("9443"), Protocol: pulumi.String("TCP")},
+							},
+						},
+					},
+				},
+			},
+		},
+	}, opts...)
 	return err
 }

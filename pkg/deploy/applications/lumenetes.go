@@ -24,12 +24,21 @@ const lumenetesControllerImageName = "ghcr.io/liamawhite/lumenetes"
 // hand-edited live" convention as infra.yaml's lumenetes.hue.bridges for
 // HueBridge). Groups with no known membership yet are left with an empty
 // Lights list.
+//
+// ActiveScene is optional and nil for most groups - see
+// createDefaultGroups' doc comment for what nil vs. set means. living-space
+// is Pulumi-declared to the circadian schedule seeded below, as the
+// deliberate exception: once a group's ActiveScene is meant to be
+// permanently driven by code rather than toggled live, declaring it here
+// is what makes `up` keep re-asserting it.
 var defaultGroups = []struct {
-	Name   string
-	Lights []string
+	Name        string
+	Lights      []string
+	ActiveScene *lumenetesv1alpha1.GroupSpecActiveSceneArgs
 }{
 	{
-		Name: "living-space",
+		Name:        "living-space",
+		ActiveScene: &lumenetesv1alpha1.GroupSpecActiveSceneArgs{Kind: pulumi.String("CircadianSchedule"), Name: pulumi.String("living-space-circadian")},
 		Lights: []string{
 			"c535e296-856a-4f5b-8d9f-bf0bc51ded05", // Kitchen Dryer
 			"a9a33139-495b-4a68-a9b0-c2d377cbda10", // Kitchen Island
@@ -80,6 +89,55 @@ var defaultGroups = []struct {
 		Name: "back-bedroom",
 		Lights: []string{
 			"5ed5f32b-cdce-4937-bce4-0d430ed6406e", // Baby Ceiling
+		},
+	},
+}
+
+// defaultCircadianSchedules are the CircadianSchedule CRs NewLumenetes
+// seeds - each one's Group/Keyframes declared here as the single source of
+// truth, same "declared in code, not hand-edited live" convention as
+// defaultGroups. Unlike Group.Spec.ActiveScene (deliberately left for
+// live/kubectl toggling - see createDefaultGroups' doc comment), a
+// schedule's own fields are just configuration data with no "normal
+// runtime usage" reason to drift from what's declared here, so Pulumi
+// stays fully authoritative for them, with no IgnoreChanges needed.
+// Latitude/Longitude are deliberately NOT declared per-entry here - every
+// schedule shares the one infra.yaml-sourced location (this homelab is
+// physically in one place), passed in by createDefaultCircadianSchedules
+// so infra.yaml stays the single place that value is configured, while
+// CircadianScheduleSpec itself still requires it at the CRD level (see
+// that field's doc comment for why: a schedule created without one must
+// fail validation, not silently compute sun times for Null Island - which
+// is exactly what happened, live, before Latitude/Longitude existed on the
+// CRD at all).
+var defaultCircadianSchedules = []struct {
+	Name      string
+	Group     string
+	Keyframes []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs
+}{
+	{
+		Name:  "living-space-circadian",
+		Group: "living-space",
+		Keyframes: []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs{
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(-30), Brightness: pulumi.Int(15), ColorTempK: pulumi.Int(2200)},
+			{Anchor: pulumi.String("solarNoon"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(6500)},
+			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-60), Brightness: pulumi.Int(70), ColorTempK: pulumi.Int(3500)},
+			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(5), ColorTempK: pulumi.Int(2000)},
+		},
+	},
+	{
+		Name:  "external-office-circadian",
+		Group: "external-office",
+		Keyframes: []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs{
+			// Office curve: full-bright/cool for the whole working day
+			// rather than peaking briefly at solar noon, since desk work
+			// hours don't track the sun the way a living space's usage
+			// does.
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(40), ColorTempK: pulumi.Int(3000)},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(90), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5500)},
+			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-90), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5500)},
+			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(50), ColorTempK: pulumi.Int(3000)},
+			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(10), ColorTempK: pulumi.Int(2200)},
 		},
 	},
 }
@@ -191,6 +249,9 @@ type LumenetesArgs struct {
 	// Bridges is infraCfg.Lumenetes.Hue.Bridges - every paired bridge's id
 	// and application key.
 	Bridges []config.HueBridgeConfig
+	// Location is infraCfg.Lumenetes.Location - used to interpolate
+	// CircadianSchedule keyframes against real sun position.
+	Location config.LocationConfig
 	// GHCRUsername/GHCRToken authenticate BuildLumenetesControllerImage's push.
 	GHCRUsername string
 	GHCRToken    string
@@ -201,6 +262,13 @@ type LumenetesArgs struct {
 	// DryRun controls whether the Light reconciler enacts spec changes
 	// against the bridge (false) or only logs drift (true).
 	DryRun pulumi.BoolInput
+	// PrometheusNamespace is "monitoring", created centrally by
+	// pkg/deploy/namespaces.go - threaded through to lumenetescontroller's
+	// own Prometheus scrape-target wiring (see that package's metrics.go).
+	// Not needed by hub-controller, which gets no CiliumClusterwideNetworkPolicy
+	// for its own metrics scraping (HostNetwork, outside Cilium's policy
+	// baseline entirely).
+	PrometheusNamespace pulumi.StringInput
 }
 
 // Lumenetes groups the Hue-specific deploy-time wiring: building the one
@@ -241,11 +309,12 @@ func NewLumenetes(ctx *pulumi.Context, args *LumenetesArgs, opts ...pulumi.Resou
 	}
 
 	lc, err := lumenetescontroller.NewLumenetesController(ctx, "lumenetes-controller", &lumenetescontroller.LumenetesControllerArgs{
-		Namespace:    args.Namespace,
-		Bridges:      args.Bridges,
-		PollInterval: args.LightsPollInterval,
-		DryRun:       args.DryRun,
-		Image:        image.Ref,
+		Namespace:           args.Namespace,
+		Bridges:             args.Bridges,
+		PollInterval:        args.LightsPollInterval,
+		DryRun:              args.DryRun,
+		Image:               image.Ref,
+		PrometheusNamespace: args.PrometheusNamespace,
 	}, imageOpts...)
 	if err != nil {
 		return nil, err
@@ -255,34 +324,93 @@ func NewLumenetes(ctx *pulumi.Context, args *LumenetesArgs, opts ...pulumi.Resou
 		return nil, err
 	}
 
+	if err := createDefaultCircadianSchedules(ctx, args.Location, opts...); err != nil {
+		return nil, err
+	}
+
 	return &Lumenetes{HubController: hub, LumenetesController: lc}, nil
 }
 
 // createDefaultGroups creates (or updates) each of defaultGroups with its
 // declared Lights list - Pulumi is authoritative for Spec here, the same
 // way it already is for HueBridge, so a later `up` corrects any out-of-band
-// edit back to what's declared above rather than ignoring it. The one
-// exception is spec.activeScene: that field is deliberately left out of
-// GroupSpecArgs below (an omitted optional field sends nil, not an
-// explicit "", so this doesn't force every light off on the next `up`),
-// and pulumi.IgnoreChanges pins that down further - kubectl/CLI-set
-// activeScene values are meant to survive `up` indefinitely, since
-// selecting a group's active scene is normal runtime usage, not drift to
-// correct.
+// edit back to what's declared above rather than ignoring it. spec.activeScene
+// is the one field that's conditional per group: when a defaultGroups entry
+// leaves ActiveScene nil (the common case), it's left out of GroupSpecArgs
+// entirely (an omitted optional field sends nil, not an explicit "", so
+// this doesn't force every light off on the next `up`) and
+// pulumi.IgnoreChanges pins that down further - kubectl/CLI-set
+// activeScene values are meant to survive `up` indefinitely for those
+// groups, since selecting a group's active scene is normally runtime
+// usage, not drift to correct. When an entry declares ActiveScene (e.g.
+// living-space's circadian schedule), that's a deliberate opt-in to the
+// opposite: Pulumi becomes authoritative for it too, so `up` re-asserts it
+// and a live kubectl override of that specific group gets corrected back.
 func createDefaultGroups(ctx *pulumi.Context, opts ...pulumi.ResourceOption) error {
 	for _, group := range defaultGroups {
-		groupOpts := append(append([]pulumi.ResourceOption{}, opts...), pulumi.IgnoreChanges([]string{"spec.activeScene"}))
+		groupOpts := append([]pulumi.ResourceOption{}, opts...)
+		if group.ActiveScene == nil {
+			groupOpts = append(groupOpts, pulumi.IgnoreChanges([]string{"spec.activeScene"}))
+		}
+		spec := &lumenetesv1alpha1.GroupSpecArgs{
+			Lights: pulumi.ToStringArray(group.Lights),
+		}
+		if group.ActiveScene != nil {
+			// GroupSpecActiveSceneArgs (the plain value) already satisfies
+			// GroupSpecActiveScenePtrInput directly - the generated
+			// GroupSpecActiveScenePtr(...) wrapper panics on marshal here,
+			// so this deliberately doesn't use it.
+			spec.ActiveScene = *group.ActiveScene
+		}
 		_, err := lumenetesv1alpha1.NewGroup(ctx, fmt.Sprintf("group-%s", group.Name), &lumenetesv1alpha1.GroupArgs{
 			Metadata: &metav1.ObjectMetaArgs{
 				Name: pulumi.String(group.Name),
 			},
-			Spec: &lumenetesv1alpha1.GroupSpecArgs{
-				Lights: pulumi.ToStringArray(group.Lights),
-			},
+			Spec: spec,
 		}, groupOpts...)
 		if err != nil {
 			return fmt.Errorf("failed to create group %q: %w", group.Name, err)
 		}
 	}
 	return nil
+}
+
+// createDefaultCircadianSchedules creates (or updates) each of
+// defaultCircadianSchedules with its declared Group/Keyframes plus the one
+// shared location - Pulumi is fully authoritative here (see
+// defaultCircadianSchedules' doc comment for why, unlike
+// Group.Spec.ActiveScene). Selecting one of these as a Group's active
+// target is a separate, deliberate step (kubectl-patch
+// Group.Spec.ActiveScene to {kind: CircadianSchedule, name: <this
+// schedule's name>}) - not done here, same reasoning as ActiveScene being
+// excluded from createDefaultGroups.
+func createDefaultCircadianSchedules(ctx *pulumi.Context, location config.LocationConfig, opts ...pulumi.ResourceOption) error {
+	for _, schedule := range defaultCircadianSchedules {
+		_, err := lumenetesv1alpha1.NewCircadianSchedule(ctx, fmt.Sprintf("circadian-schedule-%s", schedule.Name), &lumenetesv1alpha1.CircadianScheduleArgs{
+			Metadata: &metav1.ObjectMetaArgs{
+				Name: pulumi.String(schedule.Name),
+			},
+			Spec: &lumenetesv1alpha1.CircadianScheduleSpecArgs{
+				Group:     pulumi.String(schedule.Group),
+				Latitude:  pulumi.Float64(location.Latitude),
+				Longitude: pulumi.Float64(location.Longitude),
+				Keyframes: toKeyframesArray(schedule.Keyframes),
+			},
+		}, opts...)
+		if err != nil {
+			return fmt.Errorf("failed to create circadian schedule %q: %w", schedule.Name, err)
+		}
+	}
+	return nil
+}
+
+// toKeyframesArray adapts a []CircadianScheduleSpecKeyframesArgs to the
+// generated CircadianScheduleSpecKeyframesArrayInput's underlying
+// concrete slice type.
+func toKeyframesArray(keyframes []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs) lumenetesv1alpha1.CircadianScheduleSpecKeyframesArray {
+	array := make(lumenetesv1alpha1.CircadianScheduleSpecKeyframesArray, len(keyframes))
+	for i, kf := range keyframes {
+		array[i] = kf
+	}
+	return array
 }

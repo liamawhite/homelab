@@ -85,6 +85,8 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		healthNS := namespaces.Get(HealthNamespace)
 		lumenetesNS := namespaces.Get(LumenetesNamespace)
 		monitoringNS := namespaces.Get(MonitoringNamespace)
+		workoutsNS := namespaces.Get(WorkoutsNamespace)
+		shoppingNS := namespaces.Get(ShoppingNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -103,10 +105,16 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		}
 
 		mesh, err := istio.NewIstio(ctx, "istio", &istio.IstioArgs{
-			Version:   versions.Istio,
-			Namespace: istioSystemNS.Metadata.Name().Elem(),
+			Version:             versions.Istio,
+			Namespace:           istioSystemNS.Metadata.Name().Elem(),
+			PrometheusNamespace: monitoringNS.Metadata.Name().Elem(),
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Istio, crds.GatewayAPI, istioSystemNS, ciliumComp}),
+			// crds.Prometheus: monitoring.go's PodMonitor objects need that
+			// CRD to already exist - istiod/ztunnel/waypoint scraping is
+			// wired up here even though Prometheus itself isn't deployed
+			// until later, since these are just static label-selector
+			// definitions, not live references to Prometheus's own pod.
+			pulumi.DependsOn([]pulumi.Resource{crds.Istio, crds.GatewayAPI, crds.Prometheus, istioSystemNS, monitoringNS, ciliumComp}),
 		)
 		if err != nil {
 			return err
@@ -243,6 +251,45 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
+		// Workouts: SQLite-backed app on a Longhorn PVC, Tailscale-only -
+		// needs storage.DefaultStorageClass, so has to come after Longhorn.
+		workouts, err := applications.NewWorkouts(ctx, "workouts", &applications.WorkoutsArgs{
+			Namespace:                  workoutsNS.Metadata.Name().Elem(),
+			StorageClassName:           storage.DefaultStorageClass,
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, workoutsNS, tsOperator, storage}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Shopping: same shape as Workouts - SQLite-backed app on a Longhorn
+		// PVC, Tailscale-only - needs storage.DefaultStorageClass, so has to
+		// come after Longhorn.
+		shopping, err := applications.NewShopping(ctx, "shopping", &applications.ShoppingArgs{
+			Namespace:                  shoppingNS.Metadata.Name().Elem(),
+			StorageClassName:           storage.DefaultStorageClass,
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, shoppingNS, tsOperator, storage}),
+		)
+		if err != nil {
+			return err
+		}
+
 		// Metrics-collection plane: prometheus-operator, the Prometheus CR,
 		// and its exporters (node-exporter, kube-state-metrics, cadvisor's
 		// ServiceMonitor) - hand-rolled Go resources rather than a Helm
@@ -250,14 +297,15 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// why). Depends on storage.DefaultStorageClass for its PVC, so has
 		// to come after Longhorn.
 		monitoring, err := prometheus.NewPrometheus(ctx, "monitoring", &prometheus.PrometheusArgs{
-			Namespace:               monitoringNS.Metadata.Name().Elem(),
-			OperatorVersion:         versions.PrometheusOperator,
-			Version:                 versions.Prometheus,
-			NodeExporterVersion:     versions.NodeExporter,
-			KubeStateMetricsVersion: versions.KubeStateMetrics,
-			AlertmanagerVersion:     versions.Alertmanager,
-			KubeRBACProxyVersion:    versions.KubeRBACProxy,
-			StorageClassName:        storage.DefaultStorageClass,
+			Namespace:                 monitoringNS.Metadata.Name().Elem(),
+			GrafanaServiceAccountName: grafana.ServiceAccountName,
+			OperatorVersion:           versions.PrometheusOperator,
+			Version:                   versions.Prometheus,
+			NodeExporterVersion:       versions.NodeExporter,
+			KubeStateMetricsVersion:   versions.KubeStateMetrics,
+			AlertmanagerVersion:       versions.Alertmanager,
+			KubeRBACProxyVersion:      versions.KubeRBACProxy,
+			StorageClassName:          storage.DefaultStorageClass,
 			// Data retention strategy: a size cap alongside the time-based
 			// one, so Prometheus proactively compacts away old blocks the
 			// moment either limit is hit rather than risking a disk-full
@@ -284,6 +332,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			Version:                    versions.Grafana,
 			Namespace:                  monitoringNS.Metadata.Name().Elem(),
 			PrometheusServiceName:      pulumi.String(prometheus.ServiceName),
+			PrometheusWaypointName:     monitoring.UIWaypointName,
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
 			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
 			CloudflareZoneID:           zoneID,
@@ -305,6 +354,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		_, err = applications.NewLumenetes(ctx, &applications.LumenetesArgs{
 			Namespace:       lumenetesNS.Metadata.Name().Elem(),
 			Bridges:         infraCfg.Lumenetes.Hue.Bridges,
+			Location:        infraCfg.Lumenetes.Location,
 			GHCRUsername:    infraCfg.GHCR.Username,
 			GHCRToken:       infraCfg.GHCR.Token,
 			HubPollInterval: pulumi.String("60s"),
@@ -314,10 +364,17 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			// Dry-run: the reconciler only logs Light.Spec drift instead of
 			// pushing it to the physical bridge. Scoped entirely to
 			// lumenetescontroller.Reconciler - doesn't affect hub-controller,
-			// Switch, or Group at all.
-			DryRun: pulumi.Bool(true),
+			// Switch, or Group at all. Flipped to real enactment now that
+			// living-space's circadian schedule and every other group's
+			// Reactive mode are both live and expected to actually reach
+			// the bridge.
+			DryRun:              pulumi.Bool(false),
+			PrometheusNamespace: monitoringNS.Metadata.Name().Elem(),
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.Lumenetes, lumenetesNS, ciliumComp, apiserverComp}),
+			// crds.Prometheus/monitoringNS: lumenetescontroller's own
+			// PodMonitor+CCNP metrics wiring needs both - same reasoning as
+			// mesh's (istio.NewIstio) identical DependsOn addition above.
+			pulumi.DependsOn([]pulumi.Resource{crds.Lumenetes, crds.Prometheus, lumenetesNS, monitoringNS, ciliumComp, apiserverComp}),
 		)
 		if err != nil {
 			return err
@@ -331,10 +388,10 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
 			providers.Cloudflare,
 			append(
-				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect()},
+				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect(), workouts.TailscaleRedirect(), shopping.TailscaleRedirect()},
 				monitoring.TailscaleRedirects()...,
 			),
-			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring}),
+			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring, workouts, shopping}),
 		)
 		if err != nil {
 			return err

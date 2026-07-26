@@ -44,6 +44,16 @@ import (
 // re-deliveries (a resync relist re-delivers the same object at the same
 // generation purely to force reprocessing) - so Poller's/EventConsumer's
 // own writes are accepted as harmless extra Reconcile calls instead.
+//
+// Stays fully decoupled from internal/groupcontroller - it never reads
+// Group at all. Before diffing, Reconcile checks light.Spec.Reactive (see
+// that field's doc comment) and skips enactment entirely if it's set;
+// internal/groupcontroller is the one responsible for setting/clearing it
+// as a Group's ActiveScene changes. This trades a narrow, accepted edge
+// case - immediately after a Group first transitions into Reactive mode,
+// there's a brief window before groupcontroller's next reconcile sets the
+// flag on each member Light, during which this Reconciler could still
+// enact a stale Spec - for never depending on Group at all.
 type Reconciler struct {
 	Client  client.Client
 	Bridges []bridges.Config
@@ -68,6 +78,13 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 	// Stale status (bridge unreachable last poll) can't be trusted to diff
 	// against - wait for the next successful poll to say anything.
 	if !light.Status.Reachable {
+		return ctrl.Result{}, nil
+	}
+
+	// A Reactive-mode Group owns this light's Spec now (mirroring Status
+	// onto it) - never enact against the bridge for it, regardless of
+	// what diffLight would find (see LightSpec.Reactive's doc comment).
+	if light.Spec.Reactive {
 		return ctrl.Result{}, nil
 	}
 
@@ -132,6 +149,21 @@ func (r *Reconciler) resolveBridge(ctx context.Context, bridgeID string) (ip, ap
 // in diffs, returning a combined error if any call failed. It never
 // touches light.Status itself - that's the caller's job (bookkeeping
 // fields) and the Poller's job (bridge-derived fields, via confirmAndTrigger).
+//
+// Color and ColorTempK are included in the UpdateLightState sent to the
+// bridge only when they're actually in diffs - not, as On/Brightness are,
+// unconditionally from light.Spec whenever anything differs. A Hue light
+// has exactly one active color mode (xy vs. mirek) at a time, and
+// UpdateLight puts both color.xy and color_temperature.mirek in the same
+// PUT whenever both UpdateLightState.Color and .ColorTempK are non-empty/
+// non-zero (its own "leave alone" sentinel only kicks in for a genuinely
+// empty/zero value) - so naively resending Spec.Color alongside a
+// colorTempK-only change (as internal/groupcontroller.enactCircadianSchedule
+// does) would silently throw the bulb back into xy mode using whatever
+// stale Color happened to be seeded at Light creation, since that field is
+// never intentionally cleared. Confirmed live: a CircadianSchedule's
+// colorTempK changes were reaching Spec but not visibly taking effect,
+// because Color was going along for the ride on every single PUT.
 func (r *Reconciler) enact(ctx context.Context, light *lumenetesv1alpha1.Light, diffs []fieldDiff) error {
 	ip, appKey, err := r.resolveBridge(ctx, light.Status.BridgeID)
 	if err != nil {
@@ -143,8 +175,12 @@ func (r *Reconciler) enact(ctx context.Context, light *lumenetesv1alpha1.Light, 
 		desired := lighthue.UpdateLightState{
 			On:         light.Spec.On,
 			Brightness: float64(light.Spec.Brightness),
-			Color:      light.Spec.Color,
-			ColorTempK: int(light.Spec.ColorTempK),
+		}
+		if hasField(diffs, "color") {
+			desired.Color = light.Spec.Color
+		}
+		if hasField(diffs, "colorTempK") {
+			desired.ColorTempK = int(light.Spec.ColorTempK)
 		}
 		if err := lighthue.UpdateLight(ctx, ip, appKey, light.Name, desired); err != nil {
 			errs = append(errs, fmt.Errorf("light update: %w", err))
@@ -180,12 +216,31 @@ type fieldDiff struct {
 // diffLight returns every field where spec and status disagree. Plain,
 // dependency-free function so it's unit-testable without envtest. Every
 // LightSpec field is always fully seeded from live state at creation (see
-// Poller.upsert), so this is a direct field-by-field comparison with no
-// zero-value/"unset" special-casing - except color, which compares via
-// hue.ColorsMatch's chromaticity-distance tolerance rather than exact
-// string equality, since a commanded hex color and the bridge's later-
-// reported one never round-trip to an identical string (see that
-// function's doc comment).
+// Poller.upsert), so this is mostly a direct field-by-field comparison
+// with no zero-value/"unset" special-casing, except:
+//   - color and colorTempK compare via hue.ColorsMatch/hue.ColorTempKMatch's
+//     tolerance rather than exact equality, since a commanded value and
+//     the bridge's later-reported one never round-trip to an identical
+//     string/Kelvin figure (see those functions' doc comments) - without
+//     this, colorTempK in particular disagreed on *every* reconcile
+//     forever for any light with color temperature actively managed,
+//     since Kelvin<->mirek rounding means the bridge's reported Kelvin
+//     almost never exactly equals what was commanded (confirmed live:
+//     this was silently re-triggering a real bridge PUT on every single
+//     reconcile for a CircadianSchedule-managed light).
+//   - color is skipped entirely when spec.Color == "" - unlike every
+//     other field, "" here doesn't just mean "light doesn't support this
+//     capability", it also means "not currently managed" (e.g. by
+//     internal/groupcontroller.enactCircadianSchedule, which only
+//     controls Brightness/ColorTempK and explicitly relinquishes Color).
+//     Comparing a relinquished "" against whatever real xy-derived color
+//     the bridge happens to be rendering (which, in color-temperature
+//     mode, is a legitimate consequence of ColorTempK, not drift) would
+//     otherwise flag a permanent "diff" and cause this Reconciler to keep
+//     pushing the stale pre-relinquish color back to the bridge, kicking
+//     it out of color-temperature mode - confirmed live, this produced a
+//     repeating ~1s flash to the correct color followed by a revert to a
+//     stale, wrong one.
 func diffLight(spec lumenetesv1alpha1.LightSpec, status lumenetesv1alpha1.LightStatus) []fieldDiff {
 	var diffs []fieldDiff
 	if spec.Name != status.Name {
@@ -197,10 +252,10 @@ func diffLight(spec lumenetesv1alpha1.LightSpec, status lumenetesv1alpha1.LightS
 	if spec.Brightness != status.Brightness {
 		diffs = append(diffs, fieldDiff{"brightness", spec.Brightness, status.Brightness})
 	}
-	if !lighthue.ColorsMatch(spec.Color, status.Color) {
+	if spec.Color != "" && !lighthue.ColorsMatch(spec.Color, status.Color) {
 		diffs = append(diffs, fieldDiff{"color", spec.Color, status.Color})
 	}
-	if spec.ColorTempK != status.ColorTempK {
+	if !lighthue.ColorTempKMatch(spec.ColorTempK, status.ColorTempK) {
 		diffs = append(diffs, fieldDiff{"colorTempK", spec.ColorTempK, status.ColorTempK})
 	}
 	return diffs

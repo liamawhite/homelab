@@ -10,6 +10,7 @@ import (
 	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	"github.com/liamawhite/lumenetes/internal/metrics"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -89,21 +90,27 @@ func (p *Poller) syncBridge(ctx context.Context, logger logr.Logger, b bridges.C
 		if !apierrors.IsNotFound(err) {
 			logger.Error(err, "failed to get HueBridge", "bridge", b.ID)
 		}
+		metrics.BridgePollTotal.WithLabelValues(b.ID, "lights", "error").Inc()
 		p.markUnreachable(ctx, logger, b.ID)
 		return
 	}
 	if !hueBridge.Status.Reachable || hueBridge.Status.IP == "" {
 		logger.Info("bridge not reachable this cycle", "bridge", b.ID)
+		metrics.BridgePollTotal.WithLabelValues(b.ID, "lights", "error").Inc()
 		p.markUnreachable(ctx, logger, b.ID)
 		return
 	}
 
+	start := time.Now()
 	lights, err := lighthue.FetchLights(ctx, hueBridge.Status.IP, b.ID, b.AppKey)
+	metrics.BridgePollDurationSeconds.WithLabelValues(b.ID, "lights").Observe(time.Since(start).Seconds())
 	if err != nil {
 		logger.Error(err, "failed to fetch lights from bridge", "bridge", b.ID, "ip", hueBridge.Status.IP)
+		metrics.BridgePollTotal.WithLabelValues(b.ID, "lights", "error").Inc()
 		p.markUnreachable(ctx, logger, b.ID)
 		return
 	}
+	metrics.BridgePollTotal.WithLabelValues(b.ID, "lights", "success").Inc()
 
 	seen := make(map[string]bool, len(lights))
 	for _, l := range lights {

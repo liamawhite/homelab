@@ -37,11 +37,32 @@ type LightSpec struct {
 	// LightStatus.Brightness.
 	Brightness int32 `json:"brightness,omitempty"`
 	// Color is the desired approximate "#rrggbb" swatch, or "" if the
-	// light doesn't support color.
+	// light doesn't support color (or isn't currently color-managed - see
+	// internal/lightscontroller.diffLight's doc comment). Mutually
+	// exclusive with ColorTempK - a Hue light has one active color mode
+	// (xy vs. mirek) at a time; setting both is rejected at admission by
+	// internal/lightwebhook.Validator, not just papered over at
+	// enactment time.
 	Color string `json:"color,omitempty"`
 	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
-	// light doesn't support color temperature.
+	// light doesn't support color temperature. Mutually exclusive with
+	// Color - see that field's doc comment.
 	ColorTempK int32 `json:"colorTempK,omitempty"`
+	// Reactive is true when this light is currently owned by a Group whose
+	// Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+	// (alongside mirroring the fields above from Status) when enacting
+	// Reactive, and clears it back to false whenever it enacts Off/Scene/
+	// CircadianSchedule instead, so the flag never goes stale once a Group
+	// moves on. internal/lightscontroller.Reconciler checks this field
+	// directly - not the owning Group - before ever diffing Spec against
+	// Status, and skips enactment entirely when it's true: this is a
+	// deliberate choice to keep lightscontroller fully decoupled from
+	// Group (it only ever reads its own object), at the cost of one
+	// accepted edge case - on the very first reconcile after a Group
+	// transitions into Reactive mode, this field hasn't been set yet, so
+	// there's a narrow window where lightscontroller could still enact a
+	// stale Spec before internal/groupcontroller's next reconcile sets it.
+	Reactive bool `json:"reactive,omitempty"`
 }
 
 // +kubebuilder:object:generate=true
@@ -104,6 +125,7 @@ type LightStatus struct {
 // +kubebuilder:printcolumn:name="Brightness",type="integer",JSONPath=".status.brightness"
 // +kubebuilder:printcolumn:name="Color",type="string",JSONPath=".status.color"
 // +kubebuilder:printcolumn:name="Color Temp",type="integer",JSONPath=".status.colorTempK"
+// +kubebuilder:printcolumn:name="Reactive",type="boolean",JSONPath=".spec.reactive"
 // +kubebuilder:printcolumn:name="Reachable",type="boolean",JSONPath=".status.reachable",priority=1
 // +kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 

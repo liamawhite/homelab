@@ -13,6 +13,7 @@ import (
 	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	"github.com/liamawhite/lumenetes/internal/metrics"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
@@ -78,22 +79,35 @@ func (s *Streamer) Start(ctx context.Context) error {
 // affects any other bridge's goroutine.
 func (s *Streamer) runBridge(ctx context.Context, logger logr.Logger, b bridges.Config) {
 	backoff := minReconnectBackoff
+	// attempted distinguishes the first connection attempt from every
+	// subsequent one, so EventstreamReconnectsTotal only counts actual
+	// reconnects, not the initial connect.
+	attempted := false
 	for {
 		if ctx.Err() != nil {
+			metrics.EventstreamConnected.WithLabelValues(b.ID).Set(0)
 			return
 		}
 
 		ip, ok := s.resolveIP(ctx, b.ID)
 		if !ok {
+			metrics.EventstreamConnected.WithLabelValues(b.ID).Set(0)
 			s.sleep(ctx, backoff)
 			backoff = nextBackoff(backoff)
 			continue
 		}
 
+		if attempted {
+			metrics.EventstreamReconnectsTotal.WithLabelValues(b.ID).Inc()
+		}
+		attempted = true
+
+		metrics.EventstreamConnected.WithLabelValues(b.ID).Set(1)
 		err := lighthue.StreamEvents(ctx, ip, b.AppKey,
 			func(ev lighthue.ButtonEvent) { s.publishButton(ctx, ev) },
 			func(ev lighthue.LightEvent) { s.publishLight(ctx, ev) },
 		)
+		metrics.EventstreamConnected.WithLabelValues(b.ID).Set(0)
 		if ctx.Err() != nil {
 			return
 		}

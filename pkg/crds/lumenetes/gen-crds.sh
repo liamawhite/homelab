@@ -24,7 +24,10 @@ echo "Generating DeepCopy methods..."
 echo "Generating CRD manifests..."
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "${TMP_DIR}"' EXIT
-(cd "${CONTROLLER_MODULE_DIR}" && controller-gen crd paths=./api/... output:crd:dir="${TMP_DIR}")
+# allowDangerousTypes: controller-gen refuses float64 fields by default
+# (cross-language float support varies) - CircadianScheduleSpec.Latitude/
+# Longitude are deliberately float64, matching internal/sun.Coordinates.
+(cd "${CONTROLLER_MODULE_DIR}" && controller-gen crd:allowDangerousTypes=true paths=./api/... output:crd:dir="${TMP_DIR}")
 
 # controller-gen names each output "<group>_<plural>.yaml" - one file per
 # Kind found in ./api/..., not the single fixed name this script used to
@@ -34,8 +37,9 @@ mv "${TMP_DIR}/lumenetes.io_huebridges.yaml" "${SCRIPT_DIR}/huebridge-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_switches.yaml" "${SCRIPT_DIR}/switch-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_groups.yaml" "${SCRIPT_DIR}/group-crd.yaml"
 mv "${TMP_DIR}/lumenetes.io_scenes.yaml" "${SCRIPT_DIR}/scene-crd.yaml"
+mv "${TMP_DIR}/lumenetes.io_circadianschedules.yaml" "${SCRIPT_DIR}/circadianschedule-crd.yaml"
 
 echo "Generating Pulumi Go types from CRDs..."
-(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml group-crd.yaml scene-crd.yaml)
+(cd "${SCRIPT_DIR}" && crd2pulumi --goPath crds --goName crds -f light-crd.yaml huebridge-crd.yaml switch-crd.yaml group-crd.yaml scene-crd.yaml circadianschedule-crd.yaml)
 
 echo "Successfully generated Light/HueBridge CRD types!"

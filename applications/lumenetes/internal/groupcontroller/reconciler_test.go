@@ -6,8 +6,11 @@ import (
 	"slices"
 	"sync"
 	"testing"
+	"time"
 
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
+	"github.com/liamawhite/lumenetes/internal/circadian"
+	"github.com/liamawhite/lumenetes/internal/sun"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -15,6 +18,33 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 )
+
+var equator = sun.Coordinates{Latitude: 0, Longitude: 0}
+
+func sceneRef(name string) *lumenetesv1alpha1.ActiveSceneRef {
+	return &lumenetesv1alpha1.ActiveSceneRef{Kind: lumenetesv1alpha1.ActiveSceneKindScene, Name: name}
+}
+
+func circadianRef(name string) *lumenetesv1alpha1.ActiveSceneRef {
+	return &lumenetesv1alpha1.ActiveSceneRef{Kind: lumenetesv1alpha1.ActiveSceneKindCircadianSchedule, Name: name}
+}
+
+func offRef() *lumenetesv1alpha1.ActiveSceneRef {
+	return &lumenetesv1alpha1.ActiveSceneRef{Kind: lumenetesv1alpha1.ActiveSceneKindOff}
+}
+
+func reactiveRef() *lumenetesv1alpha1.ActiveSceneRef {
+	return &lumenetesv1alpha1.ActiveSceneRef{Kind: lumenetesv1alpha1.ActiveSceneKindReactive}
+}
+
+func fourKeyframes() []lumenetesv1alpha1.CircadianKeyframe {
+	return []lumenetesv1alpha1.CircadianKeyframe{
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 15, ColorTempK: 2200},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSolarNoon, Brightness: 100, ColorTempK: 6500},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunset, Brightness: 70, ColorTempK: 3500},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSolarMidnight, Brightness: 5, ColorTempK: 2000},
+	}
+}
 
 func TestMissingLights(t *testing.T) {
 	cases := []struct {
@@ -192,7 +222,7 @@ func newFakeClient(t *testing.T, objs ...client.Object) client.WithWatch {
 	return fake.NewClientBuilder().
 		WithScheme(newScheme(t)).
 		WithObjects(objs...).
-		WithStatusSubresource(&lumenetesv1alpha1.Group{}, &lumenetesv1alpha1.Scene{}, &lumenetesv1alpha1.Light{}).
+		WithStatusSubresource(&lumenetesv1alpha1.Group{}, &lumenetesv1alpha1.Scene{}, &lumenetesv1alpha1.Light{}, &lumenetesv1alpha1.CircadianSchedule{}).
 		Build()
 }
 
@@ -270,7 +300,7 @@ func TestReconcile_SomeLightsMissing(t *testing.T) {
 func TestReconcile_ActiveSceneEmpty(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{ActiveScene: ""},
+		Spec:       lumenetesv1alpha1.GroupSpec{ActiveScene: nil},
 		Status:     lumenetesv1alpha1.GroupStatus{ActiveSceneError: "stale error from a previous scene"},
 	}
 	c := newFakeClient(t, group)
@@ -292,7 +322,7 @@ func TestReconcile_ActiveSceneEmpty(t *testing.T) {
 func TestReconcile_ActiveSceneOff(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a", "b"}, ActiveScene: "off"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a", "b"}, ActiveScene: offRef()},
 	}
 	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true}}
 	lightB := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "b"}, Spec: lumenetesv1alpha1.LightSpec{On: false}}
@@ -321,7 +351,7 @@ func TestReconcile_ActiveSceneOff(t *testing.T) {
 func TestReconcile_ActiveSceneNotFound(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: "missing-scene"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: sceneRef("missing-scene")},
 	}
 	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: false}}
 	c := newFakeClient(t, group, lightA)
@@ -347,7 +377,7 @@ func TestReconcile_ActiveSceneNotFound(t *testing.T) {
 func TestReconcile_ActiveSceneWrongGroup(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: "movie"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: sceneRef("movie")},
 	}
 	scene := &lumenetesv1alpha1.Scene{
 		ObjectMeta: metav1.ObjectMeta{Name: "movie"},
@@ -374,7 +404,7 @@ func TestReconcile_ActiveSceneWrongGroup(t *testing.T) {
 func TestReconcile_ActiveSceneValid(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a", "b"}, ActiveScene: "movie"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a", "b"}, ActiveScene: sceneRef("movie")},
 	}
 	scene := &lumenetesv1alpha1.Scene{
 		ObjectMeta: metav1.ObjectMeta{Name: "movie"},
@@ -418,7 +448,7 @@ func TestReconcile_ActiveSceneValid(t *testing.T) {
 func TestReconcile_EnactScene_PartialFailure(t *testing.T) {
 	group := &lumenetesv1alpha1.Group{
 		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
-		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"good", "bad"}, ActiveScene: "movie"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"good", "bad"}, ActiveScene: sceneRef("movie")},
 	}
 	scene := &lumenetesv1alpha1.Scene{
 		ObjectMeta: metav1.ObjectMeta{Name: "movie"},
@@ -462,5 +492,319 @@ func TestReconcile_EnactScene_PartialFailure(t *testing.T) {
 	}
 	if getLight(t, base, "bad").Spec.On {
 		t.Errorf("light bad Spec.On = true, want untouched (its Get failed before Update)")
+	}
+}
+
+func TestReconcile_ActiveCircadianScheduleValid(t *testing.T) {
+	date := time.Date(2026, time.March, 20, 0, 0, 0, 0, time.UTC)
+	sunTimes, err := sun.Compute(equator, date)
+	if err != nil {
+		t.Fatalf("sun.Compute: %v", err)
+	}
+	now := sunTimes.SolarNoon
+	wantBrightness, wantColorTempK, err := circadian.Interpolate(fourKeyframes(), equator, now)
+	if err != nil {
+		t.Fatalf("circadian.Interpolate: %v", err)
+	}
+
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a", "b"}, ActiveScene: circadianRef("living-room-circadian")},
+	}
+	schedule := &lumenetesv1alpha1.CircadianSchedule{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room-circadian"},
+		Spec:       lumenetesv1alpha1.CircadianScheduleSpec{Group: "living-room", Keyframes: fourKeyframes()},
+	}
+	// "b" has no colorTempK support - the sentinel skip must still apply
+	// via the synthetic SceneLightState, exactly as it would for a Scene.
+	// "a" starts with a stale Color (as if seeded long ago at Light
+	// creation) - enactCircadianSchedule must relinquish it to "", or
+	// lightscontroller.Reconciler would fight the bridge's real
+	// color-temperature rendering with this stale value (see
+	// enactCircadianSchedule's doc comment).
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 1, Color: "#ffd483", ColorTempK: 1}}
+	lightB := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "b"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 1, ColorTempK: 0}}
+	c := newFakeClient(t, group, schedule, lightA, lightB)
+	r := &Reconciler{Client: c, Now: func() time.Time { return now }}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v", err)
+	}
+
+	var got lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &got); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	if got.Status.ActiveSceneError != "" {
+		t.Errorf("Status.ActiveSceneError = %q, want empty", got.Status.ActiveSceneError)
+	}
+
+	afterA := getLight(t, c, "a")
+	if afterA.Spec.Brightness != wantBrightness {
+		t.Errorf("light a Spec.Brightness = %d, want %d", afterA.Spec.Brightness, wantBrightness)
+	}
+	if afterA.Spec.ColorTempK != wantColorTempK {
+		t.Errorf("light a Spec.ColorTempK = %d, want %d", afterA.Spec.ColorTempK, wantColorTempK)
+	}
+	if afterA.Spec.Color != "" {
+		t.Errorf("light a Spec.Color = %q, want relinquished (\"\") - a circadian curve never manages Color", afterA.Spec.Color)
+	}
+
+	afterB := getLight(t, c, "b")
+	if afterB.Spec.Brightness != wantBrightness {
+		t.Errorf("light b Spec.Brightness = %d, want %d", afterB.Spec.Brightness, wantBrightness)
+	}
+	if afterB.Spec.ColorTempK != 0 {
+		t.Errorf("light b Spec.ColorTempK = %d, want untouched (0, colorTempK unsupported)", afterB.Spec.ColorTempK)
+	}
+}
+
+func TestReconcile_ActiveCircadianScheduleWrongGroup(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: circadianRef("bedroom-circadian")},
+	}
+	schedule := &lumenetesv1alpha1.CircadianSchedule{
+		ObjectMeta: metav1.ObjectMeta{Name: "bedroom-circadian"},
+		Spec:       lumenetesv1alpha1.CircadianScheduleSpec{Group: "bedroom", Keyframes: fourKeyframes()},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}}
+	c := newFakeClient(t, group, schedule, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	var got lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &got); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	want := `circadian schedule "bedroom-circadian" targets group "bedroom", not "living-room"`
+	if got.Status.ActiveSceneError != want {
+		t.Errorf("Status.ActiveSceneError = %q, want %q", got.Status.ActiveSceneError, want)
+	}
+}
+
+func TestReconcile_ActiveCircadianScheduleInterpolateError(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: circadianRef("broken-circadian")},
+	}
+	schedule := &lumenetesv1alpha1.CircadianSchedule{
+		ObjectMeta: metav1.ObjectMeta{Name: "broken-circadian"},
+		Spec: lumenetesv1alpha1.CircadianScheduleSpec{
+			Group:     "living-room",
+			Keyframes: []lumenetesv1alpha1.CircadianKeyframe{{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 10, ColorTempK: 2000}},
+		},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: false}}
+	c := newFakeClient(t, group, schedule, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	var got lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &got); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	if got.Status.ActiveSceneError == "" {
+		t.Error("Status.ActiveSceneError = \"\", want the surfaced Interpolate error")
+	}
+	if getLight(t, c, "a").Spec.On {
+		t.Errorf("light a Spec.On = true, want untouched")
+	}
+}
+
+func TestReconcile_ActiveSceneNeitherSceneNorCircadianSchedule(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: circadianRef("missing-schedule")},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	var got lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &got); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	want := `circadian schedule "missing-schedule" not found`
+	if got.Status.ActiveSceneError != want {
+		t.Errorf("Status.ActiveSceneError = %q, want %q", got.Status.ActiveSceneError, want)
+	}
+}
+
+func TestReconcile_ActiveSceneUnknownKind(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: &lumenetesv1alpha1.ActiveSceneRef{Kind: "Bogus", Name: "whatever"}},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	var got lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &got); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	want := `unknown activeScene kind "Bogus"`
+	if got.Status.ActiveSceneError != want {
+		t.Errorf("Status.ActiveSceneError = %q, want %q", got.Status.ActiveSceneError, want)
+	}
+}
+
+func TestReconcile_ActiveReactive_MirrorsStatusToSpec(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: reactiveRef()},
+	}
+	lightA := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "a"},
+		Spec:       lumenetesv1alpha1.LightSpec{Name: "Kitchen", On: false, Brightness: 10, Color: "#000000", ColorTempK: 2000},
+		Status: lumenetesv1alpha1.LightStatus{
+			Reachable: true, On: true, Brightness: 80, Color: "#ffffff", ColorTempK: 5000,
+		},
+	}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	got := getLight(t, c, "a")
+	if got.Spec.On != true || got.Spec.Brightness != 80 || got.Spec.Color != "#ffffff" || got.Spec.ColorTempK != 5000 {
+		t.Errorf("Spec = %+v, want mirrored from Status", got.Spec)
+	}
+	if !got.Spec.Reactive {
+		t.Error("Spec.Reactive = false, want true - this is what internal/lightscontroller.Reconciler checks before enacting")
+	}
+	if got.Spec.Name != "Kitchen" {
+		t.Errorf("Spec.Name = %q, want untouched (%q) - renaming isn't part of reactive mirroring", got.Spec.Name, "Kitchen")
+	}
+
+	var gotGroup lumenetesv1alpha1.Group
+	if err := c.Get(t.Context(), client.ObjectKey{Name: "living-room"}, &gotGroup); err != nil {
+		t.Fatalf("get group: %v", err)
+	}
+	if gotGroup.Status.ActiveSceneError != "" {
+		t.Errorf("Status.ActiveSceneError = %q, want empty", gotGroup.Status.ActiveSceneError)
+	}
+}
+
+func TestReconcile_ActiveReactive_UnreachableSkipped(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: reactiveRef()},
+	}
+	lightA := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "a"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: false, Brightness: 10},
+		Status:     lumenetesv1alpha1.LightStatus{Reachable: false, On: true, Brightness: 80},
+	}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	got := getLight(t, c, "a")
+	if got.Spec.On != false || got.Spec.Brightness != 10 {
+		t.Errorf("Spec = %+v, want untouched (unreachable Status is stale)", got.Spec)
+	}
+}
+
+func TestReconcile_ActiveReactive_NoOpSkipsUpdate(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: reactiveRef()},
+	}
+	lightA := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "a"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: true, Brightness: 80, Color: "#ffffff", ColorTempK: 5000, Reactive: true},
+		Status:     lumenetesv1alpha1.LightStatus{Reachable: true, On: true, Brightness: 80, Color: "#ffffff", ColorTempK: 5000},
+	}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	before := getLight(t, c, "a")
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	after := getLight(t, c, "a")
+	if after.ResourceVersion != before.ResourceVersion {
+		t.Errorf("ResourceVersion changed from %s to %s, want no-op (Spec already matches Status and Reactive already true)", before.ResourceVersion, after.ResourceVersion)
+	}
+}
+
+func TestReconcile_ActiveReactive_NonMemberUntouched(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: reactiveRef()},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Status: lumenetesv1alpha1.LightStatus{Reachable: true, On: true}}
+	// "b" is not a member of group.Spec.Lights - must be left alone even
+	// though it exists.
+	lightB := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "b"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: false},
+		Status:     lumenetesv1alpha1.LightStatus{Reachable: true, On: true},
+	}
+	c := newFakeClient(t, group, lightA, lightB)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	if getLight(t, c, "b").Spec.On {
+		t.Errorf("light b Spec.On = true, want untouched (false) - not a group member")
+	}
+}
+
+// TestReconcile_TransitionOutOfReactive_ClearsReactiveFlag covers the
+// regression LightSpec.Reactive's doc comment warns about: every
+// non-Reactive enactment path must clear a light's Spec.Reactive itself,
+// or a light that was once in a Reactive-mode Group would stay invisible
+// to internal/lightscontroller.Reconciler forever, even after this Group
+// moves it to Off. Off is exercised directly here; enactScene and
+// enactCircadianSchedule share the same clearing via applySceneStateToSpec
+// (see that function's doc comment), not re-tested per Kind.
+func TestReconcile_TransitionOutOfReactive_ClearsReactiveFlag(t *testing.T) {
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "living-room"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: offRef()},
+	}
+	lightA := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "a"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: true, Reactive: true},
+	}
+	c := newFakeClient(t, group, lightA)
+	r := &Reconciler{Client: c}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "living-room"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	got := getLight(t, c, "a")
+	if got.Spec.On {
+		t.Errorf("light a Spec.On = true, want false (Off)")
+	}
+	if got.Spec.Reactive {
+		t.Error("light a Spec.Reactive = true, want false - stuck reactive flag would hide this light from lightscontroller forever")
 	}
 }

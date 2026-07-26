@@ -88,6 +88,42 @@ func TestColorsMatch(t *testing.T) {
 	}
 }
 
+func TestColorTempKMatch(t *testing.T) {
+	cases := []struct {
+		name string
+		a, b int32
+		want bool
+	}{
+		{"identical values match", int32(2700), int32(2700), true},
+		{"both zero (unsupported) match", int32(0), int32(0), true},
+		{"zero never matches a real value", int32(0), int32(2700), false},
+		{"real value never matches zero", int32(2700), int32(0), false},
+		// 5899 and 5882 are the real observed round trip for a commanded
+		// 5899K, seen live against an actual bridge - both round to mirek
+		// 170 (round(1e6/5899)=170, round(1e6/170)=5882). Before
+		// ColorTempKMatch existed, comparing raw Kelvin here reported this
+		// as a permanent diff, causing the Reconciler to re-enact
+		// colorTempK on every single reconcile forever.
+		{"within the same mirek", int32(5899), int32(5882), true},
+		// 6090 and 6111 both round to mirek 164 too - a second real
+		// observed pair from the same incident, different point on the
+		// curve.
+		{"a second within-mirek pair", int32(6090), int32(6111), true},
+		{"clearly different color temps don't match", int32(2700), int32(6500), false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := ColorTempKMatch(tc.a, tc.b); got != tc.want {
+				t.Errorf("ColorTempKMatch(%d, %d) = %v, want %v", tc.a, tc.b, got, tc.want)
+			}
+			// Symmetric by construction - assert it stays that way.
+			if got := ColorTempKMatch(tc.b, tc.a); got != tc.want {
+				t.Errorf("ColorTempKMatch(%d, %d) (swapped) = %v, want %v", tc.b, tc.a, got, tc.want)
+			}
+		})
+	}
+}
+
 func hexInts(t *testing.T, hex string) (int, int, int) {
 	t.Helper()
 	var r, g, b int

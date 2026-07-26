@@ -63,6 +63,15 @@ type IngressArgs struct {
 	// its dynamically created per-Ingress proxy pods) run - used to build
 	// the AuthorizationPolicy bypass's source-principal check below.
 	OperatorNamespace pulumi.StringInput
+	// AdditionalAllowedPrincipals extends the AuthorizationPolicy bypass
+	// beyond the Tailscale ingress proxy identity, for other in-mesh callers
+	// that legitimately need to reach this same Service directly - e.g.
+	// Prometheus's own alerting delivery to Alertmanager, a server-to-server
+	// call with no browser in the loop to redirect around the waypoint the
+	// way pkg/components/grafana's datasource now does. Optional - nil means
+	// only the Tailscale proxy identity is allowed, same as before this
+	// field existed.
+	AdditionalAllowedPrincipals pulumi.StringArray
 
 	// MagicDNSSuffix is your tailnet's real MagicDNS suffix
 	// (infraCfg.Tailscale.MagicDNSSuffix) - used only to build the redirect
@@ -145,6 +154,18 @@ func NewIngress(ctx *pulumi.Context, name string, args *IngressArgs, opts ...pul
 	// confirmed live (kubectl -o jsonpath='{.spec.serviceAccountName}' ->
 	// "proxies") - so this can and should pin the exact identity rather
 	// than a namespace-prefix wildcard.
+	//
+	// args.AdditionalAllowedPrincipals appends more exact-match principals
+	// to the same rule (OR'd together) for in-mesh callers that need direct,
+	// non-Tailscale-routed access to this Service too - discovered the hard
+	// way when Grafana's own datasource proxy calls to Prometheus got RST'd
+	// by this exact policy, since being routed through a waypoint at all
+	// means ALL traffic to the Service is subject to it, not just the
+	// Tailscale-ingress traffic it was written for.
+	principals := append(pulumi.StringArray{
+		pulumi.Sprintf("cluster.local/ns/%s/sa/%s", args.OperatorNamespace, tailscale.ProxiesServiceAccountName),
+	}, args.AdditionalAllowedPrincipals...)
+
 	_, err = securityv1.NewAuthorizationPolicy(ctx, fmt.Sprintf("%s-allow-tailscale", name), &securityv1.AuthorizationPolicyArgs{
 		Metadata: &metav1.ObjectMetaArgs{
 			Name:      pulumi.String(fmt.Sprintf("%s-allow-tailscale", name)),
@@ -164,9 +185,7 @@ func NewIngress(ctx *pulumi.Context, name string, args *IngressArgs, opts ...pul
 					From: securityv1.AuthorizationPolicySpecRulesFromArray{
 						&securityv1.AuthorizationPolicySpecRulesFromArgs{
 							Source: &securityv1.AuthorizationPolicySpecRulesFromSourceArgs{
-								Principals: pulumi.StringArray{
-									pulumi.Sprintf("cluster.local/ns/%s/sa/%s", args.OperatorNamespace, tailscale.ProxiesServiceAccountName),
-								},
+								Principals: principals,
 							},
 						},
 					},

@@ -21,8 +21,11 @@ spec:
     - jsonPath: .status.missingLights
       name: Missing
       type: string
-    - jsonPath: .spec.activeScene
-      name: Active Scene
+    - jsonPath: .spec.activeScene.kind
+      name: Active Kind
+      type: string
+    - jsonPath: .spec.activeScene.name
+      name: Active Name
       type: string
     - jsonPath: .status.activeSceneError
       name: Scene Error
@@ -64,19 +67,43 @@ spec:
             properties:
               activeScene:
                 description: |-
-                  ActiveScene selects this group's current state. Empty means
-                  unmanaged - internal/groupcontroller.Reconciler leaves this group's
-                  lights alone entirely, which is the safe default and what every
-                  group has today (deliberately NOT the same as "off": a newly added
-                  field's zero value must be inert, not force every light off the
-                  moment this field exists). The literal "off" is a reserved
-                  pseudo-scene that forces every light in Spec.Lights off (On only -
-                  brightness/color are left as they are). Any other value must name a
-                  Scene whose own Spec.Group equals this Group's name; enactment
-                  happens continuously (every reconcile, including the periodic
-                  resync) rather than once-on-change - manually overriding a light
-                  while a scene/off is selected will be corrected back.
-                type: string
+                  ActiveScene selects this group's current state. Nil means unmanaged -
+                  internal/groupcontroller.Reconciler leaves this group's lights alone
+                  entirely, which is the safe default and what every group has today
+                  (deliberately NOT the same as Kind: Off: a newly added field's zero
+                  value must be inert, not force every light off the moment this field
+                  exists). Kind: Off forces every light in Spec.Lights off. Kind: Scene
+                  or Kind: CircadianSchedule reference a Scene/CircadianSchedule whose
+                  own Spec.Group equals this Group's name by Name; enactment happens
+                  continuously (every reconcile, including the periodic resync) rather
+                  than once-on-change - manually overriding a light while a scene/
+                  schedule/off is selected will be corrected back. If a Scene and a
+                  CircadianSchedule share a Name, Kind disambiguates which one is
+                  meant - unlike a plain string, there's no lookup-order ambiguity.
+                  Kind: Reactive inverts the direction entirely: each light's own
+                  observed Status is mirrored onto its Spec instead of a computed
+                  target being pushed down, so internal/lightscontroller.Reconciler
+                  finds nothing to push to the bridge and a manual/physical change
+                  simply sticks - internal/lightscontroller.Reconciler also refuses to
+                  enact for any light belonging to a Reactive-mode Group, independent
+                  of this Group's own reconcile timing (see that package's doc
+                  comment).
+                properties:
+                  kind:
+                    default: Scene
+                    description: Kind of the referenced object.
+                    enum:
+                    - Scene
+                    - CircadianSchedule
+                    - "Off"
+                    - Reactive
+                    type: string
+                  name:
+                    description: |-
+                      Name of the referenced Scene or CircadianSchedule. Ignored when Kind
+                      is Off or Reactive.
+                    type: string
+                type: object
               lights:
                 description: Lights are the names of Light CRs that belong to this
                   group.
@@ -92,9 +119,10 @@ spec:
               activeSceneError:
                 description: |-
                   ActiveSceneError reports why Spec.ActiveScene couldn't be enacted -
-                  e.g. it names a Scene that doesn't exist, or one whose Spec.Group
-                  doesn't match this Group - empty means either ActiveScene is unset/
-                  "off", or the named Scene was found and validated fine.
+                  e.g. it names a Scene/CircadianSchedule that doesn't exist, or one
+                  whose Spec.Group doesn't match this Group - empty means either
+                  ActiveScene is unset/Off, or the named referent was found and
+                  validated fine.
                 type: string
               lastSynced:
                 description: LastSynced is when this status was last recomputed.

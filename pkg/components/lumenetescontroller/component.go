@@ -48,6 +48,13 @@ type LumenetesControllerArgs struct {
 	// Image is the shared lumenetes-controller/hub-controller image
 	// (built once in applications/lumenetes.go and passed to both components).
 	Image pulumi.StringInput
+	// PrometheusNamespace is "monitoring", created centrally by
+	// pkg/deploy/namespaces.go - used only to build the CiliumClusterwideNetworkPolicy
+	// pair in metrics.go letting Prometheus's own pod scrape this pod's
+	// /metrics. pkg/components/prometheus is imported directly here (no
+	// import-cycle risk, unlike pkg/components/istio) for its exported
+	// PrometheusPodLabel.
+	PrometheusNamespace pulumi.StringInput
 }
 
 // NewLumenetesController creates the lumenetes-controller Deployment, its RBAC,
@@ -133,6 +140,19 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 			&rbacv1.PolicyRuleArgs{
 				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
 				Resources: pulumi.StringArray{pulumi.String("scenes/status")},
+				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
+				Resources: pulumi.StringArray{pulumi.String("circadianschedules")},
+				Verbs: pulumi.StringArray{
+					pulumi.String("get"), pulumi.String("list"), pulumi.String("watch"),
+					pulumi.String("create"), pulumi.String("update"), pulumi.String("patch"), pulumi.String("delete"),
+				},
+			},
+			&rbacv1.PolicyRuleArgs{
+				ApiGroups: pulumi.StringArray{pulumi.String("lumenetes.io")},
+				Resources: pulumi.StringArray{pulumi.String("circadianschedules/status")},
 				Verbs:     pulumi.StringArray{pulumi.String("get"), pulumi.String("update"), pulumi.String("patch")},
 			},
 			// Read-only: hub-controller (pkg/components/hubcontroller) owns
@@ -250,6 +270,15 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 		return nil, err
 	}
 
+	// 4b. TLS cert (self-signed CA + CA-signed server cert, via the Pulumi
+	// tls provider) for the Light validating webhook - see webhook.go's
+	// doc comment for why this is generated here rather than via
+	// cert-manager.
+	webhookCert, err := newWebhookCert(ctx, name, args.Namespace, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
 	// 5. Deployment. Single replica - leader election (see the lease
 	// RBAC above) makes more than one safe later, but nothing needs it
 	// yet. Image is the shared lumenetes-controller/hub-controller image
@@ -299,6 +328,7 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 								pulumi.Sprintf("--bridges-file=%s/bridges.json", mountPath),
 								pulumi.Sprintf("--poll-interval=%s", args.PollInterval),
 								pulumi.Sprintf("--dry-run=%v", args.DryRun),
+								pulumi.Sprintf("--webhook-cert-dir=%s", webhookCertMountPath),
 							},
 							Env: corev1.EnvVarArray{
 								&corev1.EnvVarArgs{
@@ -315,6 +345,23 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 									Name:      pulumi.String(volumeName),
 									MountPath: pulumi.String(mountPath),
 									ReadOnly:  pulumi.Bool(true),
+								},
+								&corev1.VolumeMountArgs{
+									Name:      pulumi.String(webhookCertVolumeName),
+									MountPath: pulumi.String(webhookCertMountPath),
+									ReadOnly:  pulumi.Bool(true),
+								},
+							},
+							Ports: corev1.ContainerPortArray{
+								&corev1.ContainerPortArgs{
+									Name:          pulumi.String("webhook"),
+									ContainerPort: pulumi.Int(webhookPort),
+									Protocol:      pulumi.String("TCP"),
+								},
+								&corev1.ContainerPortArgs{
+									Name:          pulumi.String("metrics"),
+									ContainerPort: pulumi.Int(metricsPort),
+									Protocol:      pulumi.String("TCP"),
 								},
 							},
 							LivenessProbe: &corev1.ProbeArgs{
@@ -356,6 +403,12 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 								SecretName: secret.Metadata.Name().Elem(),
 							},
 						},
+						&corev1.VolumeArgs{
+							Name: pulumi.String(webhookCertVolumeName),
+							Secret: &corev1.SecretVolumeSourceArgs{
+								SecretName: webhookCert.SecretName,
+							},
+						},
 					},
 				},
 			},
@@ -367,6 +420,17 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 
 	// 6. Network policy - see network.go.
 	if err := newNetworkPolicy(ctx, name, localOpts...); err != nil {
+		return nil, err
+	}
+
+	// 6b. Prometheus scrape target (PodMonitor + Cilium HBONE CCNP pair) -
+	// see metrics.go.
+	if err := newMetricsScrapeTarget(ctx, name, args.Namespace, args.PrometheusNamespace, localOpts...); err != nil {
+		return nil, err
+	}
+
+	// 7. Webhook Service + ValidatingWebhookConfiguration - see webhook.go.
+	if err := newWebhookService(ctx, name, args.Namespace, webhookCert.CACertPEM, localOpts...); err != nil {
 		return nil, err
 	}
 

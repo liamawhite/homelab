@@ -8,9 +8,10 @@ import (
 )
 
 // lightCRDManifest, huebridgeCRDManifest, switchCRDManifest,
-// groupCRDManifest, and sceneCRDManifest are the generated CRD manifests
-// (see gen-crds.sh), embedded at build time so installing them doesn't
-// depend on these files being present on disk at runtime.
+// groupCRDManifest, sceneCRDManifest, and circadianscheduleCRDManifest are
+// the generated CRD manifests (see gen-crds.sh), embedded at build time so
+// installing them doesn't depend on these files being present on disk at
+// runtime.
 //
 //go:embed light-crd.yaml
 var lightCRDManifest string
@@ -27,13 +28,16 @@ var groupCRDManifest string
 //go:embed scene-crd.yaml
 var sceneCRDManifest string
 
-// InstallCRDs applies the Light, HueBridge, Switch, Group, and Scene CRDs
-// to the cluster. Nothing in any manifest is namespaced (all five CRDs are
-// cluster-scoped, like the CustomResourceDefinition objects that define
-// them), so unlike pkg/crds/istio.InstallCRDs this takes no namespace
-// argument.
+//go:embed circadianschedule-crd.yaml
+var circadianscheduleCRDManifest string
+
+// InstallCRDs applies the Light, HueBridge, Switch, Group, Scene, and
+// CircadianSchedule CRDs to the cluster. Nothing in any manifest is
+// namespaced (all six CRDs are cluster-scoped, like the
+// CustomResourceDefinition objects that define them), so unlike
+// pkg/crds/istio.InstallCRDs this takes no namespace argument.
 func InstallCRDs(ctx *pulumi.Context, name string, opts ...pulumi.ResourceOption) (*yamlv2.ConfigGroup, error) {
 	return yamlv2.NewConfigGroup(ctx, name, &yamlv2.ConfigGroupArgs{
-		Yaml: pulumi.String(lightCRDManifest + "\n---\n" + huebridgeCRDManifest + "\n---\n" + switchCRDManifest + "\n---\n" + groupCRDManifest + "\n---\n" + sceneCRDManifest),
+		Yaml: pulumi.String(lightCRDManifest + "\n---\n" + huebridgeCRDManifest + "\n---\n" + switchCRDManifest + "\n---\n" + groupCRDManifest + "\n---\n" + sceneCRDManifest + "\n---\n" + circadianscheduleCRDManifest),
 	}, opts...)
 }

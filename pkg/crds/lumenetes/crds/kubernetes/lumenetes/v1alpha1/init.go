@@ -21,6 +21,12 @@ func (m *module) Version() semver.Version {
 
 func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi.Resource, err error) {
 	switch typ {
+	case "kubernetes:lumenetes.io/v1alpha1:CircadianSchedule":
+		r = &CircadianSchedule{}
+	case "kubernetes:lumenetes.io/v1alpha1:CircadianScheduleList":
+		r = &CircadianScheduleList{}
+	case "kubernetes:lumenetes.io/v1alpha1:CircadianSchedulePatch":
+		r = &CircadianSchedulePatch{}
 	case "kubernetes:lumenetes.io/v1alpha1:Group":
 		r = &Group{}
 	case "kubernetes:lumenetes.io/v1alpha1:GroupList":

@@ -14,6 +14,7 @@ import (
 	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	"github.com/liamawhite/lumenetes/internal/metrics"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -73,9 +74,14 @@ func (p *Poller) Start(ctx context.Context) error {
 // there's no caching/cooldown layer here: every tick just discovers
 // fresh.
 func (p *Poller) sync(ctx context.Context, logger logr.Logger) {
+	start := time.Now()
 	discovered, err := lighthue.Discover(ctx, p.Timeout, lighthue.MethodSSDP)
+	metrics.BridgePollDurationSeconds.WithLabelValues("", "hub_discovery").Observe(time.Since(start).Seconds())
 	if err != nil {
 		logger.Error(err, "discovery failed")
+		metrics.BridgePollTotal.WithLabelValues("", "hub_discovery", "error").Inc()
+	} else {
+		metrics.BridgePollTotal.WithLabelValues("", "hub_discovery", "success").Inc()
 	}
 	byName := make(map[string]lighthue.Bridge, len(discovered))
 	for _, b := range discovered {

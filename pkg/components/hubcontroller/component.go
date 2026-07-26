@@ -289,6 +289,13 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 									},
 								},
 							},
+							Ports: corev1.ContainerPortArray{
+								&corev1.ContainerPortArgs{
+									Name:          pulumi.String("metrics"),
+									ContainerPort: pulumi.Int(metricsPort),
+									Protocol:      pulumi.String("TCP"),
+								},
+							},
 							LivenessProbe: &corev1.ProbeArgs{
 								HttpGet: &corev1.HTTPGetActionArgs{
 									Path: pulumi.String("/healthz"),
@@ -325,6 +332,13 @@ func NewHubController(ctx *pulumi.Context, name string, args *HubControllerArgs,
 		},
 	}, localOpts...)
 	if err != nil {
+		return nil, err
+	}
+
+	// 6. Prometheus scrape target - see metrics.go for why this is only a
+	// PodMonitor and no CiliumClusterwideNetworkPolicy (HostNetwork pods
+	// aren't subject to Cilium's default-deny baseline at all here).
+	if err := newMetricsPodMonitor(ctx, name, args.Namespace, localOpts...); err != nil {
 		return nil, err
 	}
 

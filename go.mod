@@ -10,6 +10,7 @@ require (
 	github.com/pulumi/pulumi-kubernetes/sdk/v4 v4.20.0
 	github.com/pulumi/pulumi-random/sdk/v4 v4.18.4
 	github.com/pulumi/pulumi-tailscale/sdk v0.29.0
+	github.com/pulumi/pulumi-tls/sdk/v4 v4.11.4
 	github.com/pulumi/pulumi/sdk/v3 v3.246.0
 	github.com/pulumiverse/pulumi-time/sdk v0.1.0
 	github.com/spf13/cobra v1.10.2

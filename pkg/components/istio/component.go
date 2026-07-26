@@ -35,6 +35,14 @@ type IstioArgs struct {
 	// pkg/deploy/namespaces.go and passed in here - this component does not
 	// create it.
 	Namespace pulumi.StringInput
+	// PrometheusNamespace is "monitoring", created centrally by
+	// pkg/deploy/namespaces.go - used only to build the CiliumClusterwideNetworkPolicy
+	// pairs in monitoring.go letting Prometheus's own pod scrape istiod/
+	// ztunnel/every waypoint's metrics. pkg/components/prometheus itself
+	// isn't imported for this (see monitoring.go's prometheusPodLabelKey
+	// doc comment for why), so the caller (pkg/deploy/deploy.go, which
+	// already imports both) passes this through instead.
+	PrometheusNamespace pulumi.StringInput
 }
 
 // NewIstio creates a new Istio component with ambient mesh profile
@@ -419,6 +427,14 @@ func NewIstio(ctx *pulumi.Context, name string, args *IstioArgs, opts ...pulumi.
 		},
 	}, localOpts...)
 	if err != nil {
+		return nil, err
+	}
+
+	// Prometheus scraping for istiod/ztunnel/every waypoint - see
+	// monitoring.go's own doc comment. Requires the Prometheus PodMonitor
+	// CRD to already exist alongside Cilium's - callers must pass
+	// pulumi.DependsOn on both (see this function's own doc comment).
+	if err := newMonitoring(ctx, name, args.Namespace, args.PrometheusNamespace, localOpts...); err != nil {
 		return nil, err
 	}
 

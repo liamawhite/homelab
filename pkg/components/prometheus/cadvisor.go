@@ -61,11 +61,23 @@ func newCadvisorServiceMonitor(ctx *pulumi.Context, name string, opts ...pulumi.
 					},
 					// Drops the highest-cardinality/least useful container
 					// metrics - same set _migrateme's Cadvisor component
-					// dropped.
+					// dropped (that set used a blanket ".*_seconds_total"
+					// which is unrepresentable here with one metric excluded,
+					// since RE2 has no negative lookahead - enumerated
+					// explicitly instead), minus
+					// container_cpu_usage_seconds_total:
+					// pkg/components/grafana's Pod CPU Usage panel
+					// (rate(container_cpu_usage_seconds_total[5m])) needs it,
+					// and it's only one series per container (not per-core
+					// like cpu_load_average_10s), so it's cheap enough to
+					// keep - confirmed empty in Prometheus's own TSDB before
+					// this exclusion, and confirmed against the kubelet's raw
+					// /metrics/cadvisor output that these are the only other
+					// "_seconds_total" metrics this cAdvisor version exposes.
 					MetricRelabelings: monitoringv1.ServiceMonitorSpecEndpointsMetricRelabelingsArray{
 						&monitoringv1.ServiceMonitorSpecEndpointsMetricRelabelingsArgs{
 							Action:       pulumi.String("drop"),
-							Regex:        pulumi.String("container_(.*_seconds_total|cpu_cfs_throttled_periods_total|cpu_cfs_periods_total|tasks_state|memory_failures_total|spec_.*)"),
+							Regex:        pulumi.String("container_(cpu_cfs_throttled_seconds_total|cpu_system_seconds_total|cpu_user_seconds_total|fs_io_time_seconds_total|fs_io_time_weighted_seconds_total|fs_read_seconds_total|fs_write_seconds_total|cpu_cfs_throttled_periods_total|cpu_cfs_periods_total|tasks_state|memory_failures_total|spec_.*)"),
 							SourceLabels: pulumi.StringArray{pulumi.String("__name__")},
 						},
 					},

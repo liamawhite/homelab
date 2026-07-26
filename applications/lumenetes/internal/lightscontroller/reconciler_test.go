@@ -29,6 +29,11 @@ func newScheme(t *testing.T) *runtime.Scheme {
 	return scheme
 }
 
+func newFakeClientBuilder(t *testing.T) *fake.ClientBuilder {
+	t.Helper()
+	return fake.NewClientBuilder().WithScheme(newScheme(t))
+}
+
 func TestDiffLight(t *testing.T) {
 	synced := lumenetesv1alpha1.LightSpec{Name: "Kitchen", On: true, Brightness: 50, Color: "#ffffff", ColorTempK: 2700}
 	syncedStatus := lumenetesv1alpha1.LightStatus{Name: "Kitchen", On: true, Brightness: 50, Color: "#ffffff", ColorTempK: 2700}
@@ -70,10 +75,39 @@ func TestDiffLight(t *testing.T) {
 			want:   []string{"color"},
 		},
 		{
+			// Regression: spec.Color=="" means "not managed" (e.g. a
+			// CircadianSchedule-driven light, which relinquishes Color to
+			// let ColorTempK alone drive the bridge - see
+			// groupcontroller.enactCircadianSchedule's doc comment), not
+			// "compare against empty". Before this, an empty spec.Color
+			// against any real status.Color was reported as a permanent
+			// diff (ColorsMatch's own "empty never matches a real color"
+			// rule), causing the Reconciler to keep pushing a stale color
+			// back to the bridge and knocking it out of color-temperature
+			// mode - confirmed live, this produced a repeating ~1s flash
+			// to the correct color followed by a revert to a wrong one.
+			name:   "relinquished color (empty spec) is never a diff",
+			spec:   lumenetesv1alpha1.LightSpec{Color: ""},
+			status: lumenetesv1alpha1.LightStatus{Color: "#fcfff2"},
+			want:   nil,
+		},
+		{
 			name:   "colorTempK differs",
 			spec:   lumenetesv1alpha1.LightSpec{ColorTempK: 4000},
 			status: lumenetesv1alpha1.LightStatus{ColorTempK: 2700},
 			want:   []string{"colorTempK"},
+		},
+		{
+			// Regression: 5899K and 5882K are different Kelvin values, but
+			// both round to mirek 170 - the bridge's own reported Kelvin
+			// after a commanded 5899K, in fact (see hue.ColorTempKMatch's
+			// doc comment). Comparing raw Kelvin here would report this as
+			// a permanent, never-converging diff and cause the Reconciler
+			// to re-PUT colorTempK to the bridge forever - confirmed live.
+			name:   "colorTempK within the same mirek is not a diff",
+			spec:   lumenetesv1alpha1.LightSpec{ColorTempK: 5899},
+			status: lumenetesv1alpha1.LightStatus{ColorTempK: 5882},
+			want:   nil,
 		},
 		{
 			name:   "multi-field drift",
@@ -123,7 +157,7 @@ func TestBridgesFindByID(t *testing.T) {
 }
 
 func TestReconcile_LightNotFound(t *testing.T) {
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).Build()
+	fakeClient := newFakeClientBuilder(t).Build()
 	r := &Reconciler{Client: fakeClient}
 
 	res, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "missing"}})
@@ -141,7 +175,7 @@ func TestReconcile_StatusUnreachable_ShortCircuits(t *testing.T) {
 		Spec:       lumenetesv1alpha1.LightSpec{On: true},
 		Status:     lumenetesv1alpha1.LightStatus{On: false, Reachable: false},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient}
 
 	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
@@ -157,6 +191,47 @@ func TestReconcile_StatusUnreachable_ShortCircuits(t *testing.T) {
 	}
 }
 
+// TestReconcile_ReactiveGroupMember_SkipsEnactmentEntirely confirms
+// Reconcile refuses to enact for a Light with Spec.Reactive set, even
+// though Spec and Status differ on every field (which would otherwise be
+// a textbook enactment case, per
+// TestReconcile_StateDiff_BrightnessColorColorTempK) - not just "no diff
+// found", but no Status().Update at all, since groupcontroller's own
+// Reactive sync (not this Reconciler) owns bringing Spec back in line
+// with Status for this Light. See this package's Reconciler doc comment.
+func TestReconcile_ReactiveGroupMember_SkipsEnactmentEntirely(t *testing.T) {
+	light := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: false, Brightness: 10, Color: "#000000", ColorTempK: 2000, Reactive: true},
+		Status: lumenetesv1alpha1.LightStatus{
+			On: true, Brightness: 80, Color: "#ffffff", ColorTempK: 5000, Reachable: true,
+			EnactError: "stale error from before this group went reactive",
+		},
+	}
+	fakeClient := newFakeClientBuilder(t).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	r := &Reconciler{Client: fakeClient}
+
+	var before lumenetesv1alpha1.Light
+	if err := fakeClient.Get(context.Background(), client.ObjectKey{Name: "light-1"}, &before); err != nil {
+		t.Fatalf("Get() error = %v", err)
+	}
+
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	var after lumenetesv1alpha1.Light
+	if err := fakeClient.Get(context.Background(), client.ObjectKey{Name: "light-1"}, &after); err != nil {
+		t.Fatalf("Get() error = %v", err)
+	}
+	if after.ResourceVersion != before.ResourceVersion {
+		t.Errorf("resourceVersion changed from %s to %s, want no write at all - not even to clear the stale EnactError", before.ResourceVersion, after.ResourceVersion)
+	}
+	if after.Status.EnactError != "stale error from before this group went reactive" {
+		t.Errorf("Status.EnactError = %q, want untouched", after.Status.EnactError)
+	}
+}
+
 func TestReconcile_NoDiff_NoWrite(t *testing.T) {
 	synced := lumenetesv1alpha1.LightSpec{Name: "Kitchen", On: true, Brightness: 50, Color: "#ffffff", ColorTempK: 2700}
 	light := &lumenetesv1alpha1.Light{
@@ -164,7 +239,7 @@ func TestReconcile_NoDiff_NoWrite(t *testing.T) {
 		Spec:       synced,
 		Status:     lumenetesv1alpha1.LightStatus{Name: "Kitchen", On: true, Brightness: 50, Color: "#ffffff", ColorTempK: 2700, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient}
 
 	var before lumenetesv1alpha1.Light
@@ -195,7 +270,7 @@ func TestReconcile_NoDiff_ClearsStaleEnactError(t *testing.T) {
 			Reachable: true, EnactError: "stale error from a previous attempt",
 		},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient}
 
 	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
@@ -234,7 +309,7 @@ func TestReconcile_DryRun_NoBridgeCallNoStatusWrite(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}, DryRun: true}
 
 	var before lumenetesv1alpha1.Light
@@ -290,7 +365,7 @@ func TestReconcile_StateDiff_BrightnessColorColorTempK(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
@@ -320,13 +395,117 @@ func TestReconcile_StateDiff_BrightnessColorColorTempK(t *testing.T) {
 	}
 }
 
+// TestReconcile_StateDiff_ColorTempKOnly_DoesNotResendStaleColor is the
+// regression test for the bug fixed in enact()'s doc comment: a
+// colorTempK-only diff must not also resend Spec.Color, or the Hue bridge
+// falls back to xy-color mode and the color-temperature change never
+// visibly takes effect. Confirmed live with the circadian schedule feature
+// before this fix - Spec.colorTempK kept changing but status.colorTempK
+// disappeared entirely (the bridge no longer reporting CT mode as active).
+func TestReconcile_StateDiff_ColorTempKOnly_DoesNotResendStaleColor(t *testing.T) {
+	var mu sync.Mutex
+	var putBody map[string]any
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/clip/v2/resource/light/light-1", func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		if err := json.NewDecoder(r.Body).Decode(&putBody); err != nil {
+			t.Errorf("failed to decode PUT body: %v", err)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	})
+	srv := httptest.NewTLSServer(mux)
+	defer srv.Close()
+	ip := strings.TrimPrefix(srv.URL, "https://")
+
+	light := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
+		// Color matches Status (long-stale, seeded at creation) - only
+		// ColorTempK actually differs, e.g. a CircadianSchedule update.
+		Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 50, Color: "#ffd483", ColorTempK: 4000},
+		Status: lumenetesv1alpha1.LightStatus{
+			On: true, Brightness: 50, Color: "#ffd483", ColorTempK: 2700, Reachable: true, BridgeID: "BRIDGE1",
+		},
+	}
+	hueBridge := &lumenetesv1alpha1.HueBridge{
+		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
+		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
+	}
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
+
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	colorTemperature, _ := putBody["color_temperature"].(map[string]any)
+	if colorTemperature == nil || colorTemperature["mirek"] != float64(250) {
+		t.Errorf("PUT body color_temperature = %v, want mirek 250", colorTemperature)
+	}
+	if _, present := putBody["color"]; present {
+		t.Errorf("PUT body unexpectedly included color %v - colorTempK-only diff must not resend stale Color, or the bridge falls back to xy mode", putBody["color"])
+	}
+}
+
+// TestReconcile_StateDiff_ColorOnly_DoesNotResendStaleColorTempK is the
+// mirror case: a color-only diff must not resend Spec.ColorTempK either.
+func TestReconcile_StateDiff_ColorOnly_DoesNotResendStaleColorTempK(t *testing.T) {
+	var mu sync.Mutex
+	var putBody map[string]any
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/clip/v2/resource/light/light-1", func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		defer mu.Unlock()
+		if err := json.NewDecoder(r.Body).Decode(&putBody); err != nil {
+			t.Errorf("failed to decode PUT body: %v", err)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	})
+	srv := httptest.NewTLSServer(mux)
+	defer srv.Close()
+	ip := strings.TrimPrefix(srv.URL, "https://")
+
+	light := &lumenetesv1alpha1.Light{
+		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
+		Spec:       lumenetesv1alpha1.LightSpec{On: true, Brightness: 50, Color: "#ff0000", ColorTempK: 2700},
+		Status: lumenetesv1alpha1.LightStatus{
+			On: true, Brightness: 50, Color: "#ffffff", ColorTempK: 2700, Reachable: true, BridgeID: "BRIDGE1",
+		},
+	}
+	hueBridge := &lumenetesv1alpha1.HueBridge{
+		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
+		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
+	}
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
+
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v, want nil", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	if _, present := putBody["color"]; !present {
+		t.Error("PUT body missing color, want it present for a differing spec.Color")
+	}
+	if _, present := putBody["color_temperature"]; present {
+		t.Errorf("PUT body unexpectedly included color_temperature %v - color-only diff must not resend stale ColorTempK", putBody["color_temperature"])
+	}
+}
+
 func TestReconcile_ResolveBridgeFails_SetsEnactError(t *testing.T) {
 	light := &lumenetesv1alpha1.Light{
 		ObjectMeta: metav1.ObjectMeta{Name: "light-1"},
 		Spec:       lumenetesv1alpha1.LightSpec{On: true, Brightness: -1},
 		Status:     lumenetesv1alpha1.LightStatus{On: false, Brightness: -1, Reachable: true, BridgeID: "BRIDGE1"},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient} // no HueBridge CR at all
 
 	_, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}})
@@ -359,7 +538,7 @@ func TestReconcile_ResolveBridgeFails_HueBridgeUnreachable(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{Reachable: false},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	_, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}})
@@ -386,7 +565,7 @@ func TestReconcile_ResolveBridgeFails_NoPairedConfig(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: "203.0.113.1", Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient} // Bridges is nil - no paired config for BRIDGE1
 
 	_, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}})
@@ -432,7 +611,7 @@ func TestReconcile_StateDiff_CallsUpdateLight(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
@@ -473,7 +652,7 @@ func TestReconcile_Rename_NoDeviceID(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: "203.0.113.1", Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	_, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}})
@@ -521,7 +700,7 @@ func TestReconcile_Rename_CallsRenameDevice(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}}); err != nil {
@@ -564,7 +743,7 @@ func TestReconcile_CombinedDiff_PartialFailureStillErrors(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: bridges.ResourceName("BRIDGE1")},
 		Status:     lumenetesv1alpha1.HueBridgeStatus{IP: ip, Reachable: true},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(newScheme(t)).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
+	fakeClient := newFakeClientBuilder(t).WithObjects(light, hueBridge).WithStatusSubresource(&lumenetesv1alpha1.Light{}).Build()
 	r := &Reconciler{Client: fakeClient, Bridges: []bridges.Config{{ID: "BRIDGE1", AppKey: "key1"}}}
 
 	_, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "light-1"}})

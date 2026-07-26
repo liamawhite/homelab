@@ -30,6 +30,9 @@ spec:
     - jsonPath: .status.colorTempK
       name: Color Temp
       type: integer
+    - jsonPath: .spec.reactive
+      name: Reactive
+      type: boolean
     - jsonPath: .status.reachable
       name: Reachable
       priority: 1
@@ -102,6 +105,23 @@ spec:
                 type: string
               "on":
                 description: On is the desired on/off state.
+                type: boolean
+              reactive:
+                description: |-
+                  Reactive is true when this light is currently owned by a Group whose
+                  Spec.ActiveScene.Kind is Reactive - internal/groupcontroller sets it
+                  (alongside mirroring the fields above from Status) when enacting
+                  Reactive, and clears it back to false whenever it enacts Off/Scene/
+                  CircadianSchedule instead, so the flag never goes stale once a Group
+                  moves on. internal/lightscontroller.Reconciler checks this field
+                  directly - not the owning Group - before ever diffing Spec against
+                  Status, and skips enactment entirely when it's true: this is a
+                  deliberate choice to keep lightscontroller fully decoupled from
+                  Group (it only ever reads its own object), at the cost of one
+                  accepted edge case - on the very first reconcile after a Group
+                  transitions into Reactive mode, this field hasn't been set yet, so
+                  there's a narrow window where lightscontroller could still enact a
+                  stale Spec before internal/groupcontroller's next reconcile sets it.
                 type: boolean
             type: object
           status:

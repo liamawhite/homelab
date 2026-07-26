@@ -30,14 +30,29 @@ type GHCRConfig struct {
 	Token    string `yaml:"token" mapstructure:"token"`
 }
 
-// LumenetesConfig holds credentials for smart-light integrations, saved by
-// commands like `homelab lumenetes hub pair` rather than hand-edited.
+// LumenetesConfig holds lumenetes-specific configuration: paired-bridge
+// credentials (saved by commands like `homelab lumenetes hub pair` rather
+// than hand-edited) plus the hand-edited Location used to anchor
+// CircadianSchedule keyframes to real sunrise/sunset.
 type LumenetesConfig struct {
-	Hue HueConfig `yaml:"hue" mapstructure:"hue"`
+	Hue      HueConfig      `yaml:"hue" mapstructure:"hue"`
+	Location LocationConfig `yaml:"location" mapstructure:"location"`
 }
 
 type HueConfig struct {
 	Bridges []HueBridgeConfig `yaml:"bridges" mapstructure:"bridges"`
+}
+
+// LocationConfig is the latitude/longitude of the homelab itself, decimal
+// degrees positive north/east - the single source of truth
+// pkg/deploy/applications.createDefaultCircadianSchedules stamps onto
+// every CircadianSchedule CR's own required Spec.Latitude/Longitude (see
+// that field's doc comment for why it's required there rather than left
+// implicit) via `homelab up`, rather than something the lumenetes-controller
+// binary itself reads directly.
+type LocationConfig struct {
+	Latitude  float64 `yaml:"latitude" mapstructure:"latitude"`
+	Longitude float64 `yaml:"longitude" mapstructure:"longitude"`
 }
 
 // HueBridgeConfig is one paired Hue bridge: its stable bridge ID (from
@@ -303,6 +318,16 @@ func validateInfraConfig(cfg *InfraConfig) error {
 		if net.ParseIP(cfg.Cluster.VIP) == nil {
 			return fmt.Errorf("invalid cluster VIP: %s", cfg.Cluster.VIP)
 		}
+	}
+
+	// Validate lumenetes.location - only meaningful once a CircadianSchedule
+	// is actually created, but checked eagerly here like every other
+	// infra.yaml field rather than deferred to the controller.
+	if lat := cfg.Lumenetes.Location.Latitude; lat < -90 || lat > 90 {
+		return fmt.Errorf("invalid lumenetes.location.latitude: %v (must be between -90 and 90)", lat)
+	}
+	if lon := cfg.Lumenetes.Location.Longitude; lon < -180 || lon > 180 {
+		return fmt.Errorf("invalid lumenetes.location.longitude: %v (must be between -180 and 180)", lon)
 	}
 
 	return nil

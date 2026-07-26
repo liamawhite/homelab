@@ -1,0 +1,193 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: circadianschedules.lumenetes.io
+spec:
+  group: lumenetes.io
+  names:
+    kind: CircadianSchedule
+    listKind: CircadianScheduleList
+    plural: circadianschedules
+    singular: circadianschedule
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.group
+      name: Group
+      type: string
+    - jsonPath: .status.currentBrightness
+      name: Brightness
+      type: integer
+    - jsonPath: .status.currentColorTempK
+      name: ColorTempK
+      type: integer
+    - jsonPath: .status.validationError
+      name: Error
+      priority: 1
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          CircadianSchedule is a user-named, continuous lighting curve for all of
+          a Group's lights, anchored to sun position. Cluster scoped, user-chosen
+          name (e.g. "living-space-circadian"), same reasoning as Scene/Group - a
+          CircadianSchedule has no Hue-side identity of its own.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              CircadianScheduleSpec declares a continuous brightness/colorTempK curve
+              for all of a Group's lights, anchored to sun position rather than fixed
+              times. Unlike Scene, there's no per-light Lights list - a circadian
+              curve is one uniform "ambient tone" applied to every light in Group, not
+              per-fixture state. A CircadianSchedule does no enactment itself -
+              internal/groupcontroller.Reconciler applies the current interpolated
+              value onto each target Light.Spec when the owning Group's
+              Spec.ActiveScene references this schedule (Kind: CircadianSchedule),
+              reusing the same per-light capability-sentinel skip Scene enactment
+              already uses.
+            properties:
+              group:
+                description: |-
+                  Group is the name of the Group this schedule applies to. A Group's
+                  Spec.ActiveScene must reference this schedule's own metadata.name
+                  for it to ever be enacted - same reciprocal-match convention as
+                  SceneSpec.Group.
+                type: string
+              keyframes:
+                description: |-
+                  Keyframes define the curve, at least 2, resolved and interpolated
+                  against "now" by internal/circadian.Interpolate. Order in this list
+                  doesn't matter - they're sorted by resolved instant before
+                  interpolating.
+                items:
+                  description: |-
+                    CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
+                    point in the solar day - Anchor plus OffsetMinutes, not a wall-clock
+                    time, so the schedule keeps making sense across the seasons as sunrise/
+                    sunset drift. Unlike SceneLightState's pointer fields (which mean "leave
+                    this untouched"), Brightness/ColorTempK here are required: a continuous
+                    curve needs a value defined at every keyframe, not a sparse override -
+                    there's no "untouched" between two points on a curve.
+                  properties:
+                    anchor:
+                      description: Anchor is the solar event this keyframe is offset
+                        from.
+                      enum:
+                      - sunrise
+                      - solarNoon
+                      - sunset
+                      - solarMidnight
+                      type: string
+                    brightness:
+                      description: Brightness at this keyframe, 0-100.
+                      format: int32
+                      maximum: 100
+                      minimum: 0
+                      type: integer
+                    colorTempK:
+                      description: ColorTempK at this keyframe, in Kelvin.
+                      format: int32
+                      maximum: 10000
+                      minimum: 1000
+                      type: integer
+                    offsetMinutes:
+                      description: |-
+                        OffsetMinutes shifts this keyframe from Anchor, positive is later.
+                        Bounded to +/-12h so internal/circadian.Interpolate's search window
+                        (the day before/of/after "now") is always sufficient to resolve it.
+                      format: int32
+                      maximum: 720
+                      minimum: -720
+                      type: integer
+                  required:
+                  - anchor
+                  - brightness
+                  - colorTempK
+                  type: object
+                minItems: 2
+                type: array
+              latitude:
+                description: |-
+                  Latitude of the location Keyframes are anchored to, decimal degrees
+                  positive north. Required, not defaulted: 0 is a real location (Null
+                  Island, off the coast of Ghana) rather than a safe "unset" sentinel,
+                  so a schedule created without one would silently compute sun times
+                  for the wrong place instead of failing validation - confirmed live,
+                  this is exactly what happened before Latitude/Longitude moved from a
+                  global --latitude/--longitude flag onto this Spec.
+                maximum: 90
+                minimum: -90
+                type: number
+              longitude:
+                description: |-
+                  Longitude of the location Keyframes are anchored to, decimal degrees
+                  positive east. Required - see Latitude's doc comment for why.
+                maximum: 180
+                minimum: -180
+                type: number
+            required:
+            - group
+            - keyframes
+            - latitude
+            - longitude
+            type: object
+          status:
+            description: |-
+              CircadianScheduleStatus reports the schedule's live-computed output,
+              independent of whether any Group currently selects it via
+              Spec.ActiveScene - useful for tuning Keyframes via `kubectl get` before
+              wiring it live.
+            properties:
+              currentBrightness:
+                description: |-
+                  CurrentBrightness is what Spec.Keyframes interpolates to right now,
+                  nil if ValidationError is set.
+                format: int32
+                type: integer
+              currentColorTempK:
+                description: |-
+                  CurrentColorTempK is what Spec.Keyframes interpolates to right now,
+                  nil if ValidationError is set.
+                format: int32
+                type: integer
+              lastSynced:
+                description: LastSynced is when this status was last recomputed.
+                format: date-time
+                type: string
+              validationError:
+                description: |-
+                  ValidationError reports why Spec couldn't be interpolated - e.g.
+                  Group is unset, or internal/circadian.Interpolate rejected
+                  Keyframes (degenerate/duplicate resolved instants, an unresolvable
+                  anchor). Empty means Spec is well-formed.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
