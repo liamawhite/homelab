@@ -13,6 +13,7 @@ const CHIP_NAME_ATTR = "data-chip-label-name";
 interface ItemInputProps {
   labels: Label[];
   onManageLabels: () => void;
+  defaultLabelId?: string;
 }
 
 interface TokenMatch {
@@ -30,7 +31,7 @@ interface TokenMatch {
 // hand-rolling the caret/selection logic below rather than tracking a
 // string, since contentEditable's DOM is the source of truth, not a value
 // prop.
-export function ItemInput({ labels, onManageLabels }: ItemInputProps) {
+export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState<{ text: string } | null>(null);
   const tokenRef = useRef<TokenMatch | null>(null);
@@ -197,7 +198,7 @@ export function ItemInput({ labels, onManageLabels }: ItemInputProps) {
   }
 
   function submit() {
-    const labelId = chipLabelId();
+    const labelId = chipLabelId() ?? defaultLabelId ?? null;
     const name = plainName();
 
     if (!name) return;
@@ -245,7 +246,9 @@ export function ItemInput({ labels, onManageLabels }: ItemInputProps) {
         onClick={handleInput}
         onKeyDown={handleKeyDown}
         onBlur={() => setQuery(null)}
-        data-placeholder="Add an item… type @ to pick a list"
+        data-placeholder={
+          defaultLabelId ? "Add an item…" : "Add an item… type @ to pick a list"
+        }
         className={cn(
           "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base leading-6 whitespace-pre-wrap outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm",
           "empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]",
