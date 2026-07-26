@@ -9,6 +9,87 @@ import (
 	"context"
 )
 
+const archiveExercise = `-- name: ArchiveExercise :execrows
+UPDATE exercises SET archived = 1 WHERE id = ?
+`
+
+func (q *Queries) ArchiveExercise(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, archiveExercise, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const createExercise = `-- name: CreateExercise :one
+INSERT INTO exercises (id, name, category, archived, created_at) VALUES (?, ?, ?, 0, ?)
+RETURNING id, name, category, archived, created_at
+`
+
+type CreateExerciseParams struct {
+	ID        string
+	Name      string
+	Category  string
+	CreatedAt string
+}
+
+func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error) {
+	row := q.db.QueryRowContext(ctx, createExercise,
+		arg.ID,
+		arg.Name,
+		arg.Category,
+		arg.CreatedAt,
+	)
+	var i Exercise
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Category,
+		&i.Archived,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createTrainingMax = `-- name: CreateTrainingMax :one
+INSERT INTO training_maxes (id, user_id, exercise_id, weight, unit, effective_at, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+RETURNING id, user_id, exercise_id, weight, unit, effective_at, created_at
+`
+
+type CreateTrainingMaxParams struct {
+	ID          string
+	UserID      string
+	ExerciseID  string
+	Weight      float64
+	Unit        string
+	EffectiveAt string
+	CreatedAt   string
+}
+
+func (q *Queries) CreateTrainingMax(ctx context.Context, arg CreateTrainingMaxParams) (TrainingMax, error) {
+	row := q.db.QueryRowContext(ctx, createTrainingMax,
+		arg.ID,
+		arg.UserID,
+		arg.ExerciseID,
+		arg.Weight,
+		arg.Unit,
+		arg.EffectiveAt,
+		arg.CreatedAt,
+	)
+	var i TrainingMax
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ExerciseID,
+		&i.Weight,
+		&i.Unit,
+		&i.EffectiveAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, name, created_at) VALUES (?, ?, ?) RETURNING id, name, created_at
 `
@@ -38,6 +119,183 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (int64, error) {
 	return result.RowsAffected()
 }
 
+const getExercise = `-- name: GetExercise :one
+SELECT id, name, category, archived, created_at FROM exercises WHERE id = ?
+`
+
+func (q *Queries) GetExercise(ctx context.Context, id string) (Exercise, error) {
+	row := q.db.QueryRowContext(ctx, getExercise, id)
+	var i Exercise
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Category,
+		&i.Archived,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getUser = `-- name: GetUser :one
+SELECT id, name, created_at FROM users WHERE id = ?
+`
+
+func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, id)
+	var i User
+	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
+	return i, err
+}
+
+const listCurrentTrainingMaxes = `-- name: ListCurrentTrainingMaxes :many
+SELECT tm.id, tm.user_id, tm.exercise_id, tm.weight, tm.unit, tm.effective_at, tm.created_at, ex.name AS exercise_name
+FROM training_maxes tm
+JOIN exercises ex ON ex.id = tm.exercise_id
+WHERE tm.user_id = ?
+  AND tm.id = (
+    SELECT latest.id FROM training_maxes AS latest
+    WHERE latest.user_id = tm.user_id AND latest.exercise_id = tm.exercise_id
+    ORDER BY latest.effective_at DESC, latest.rowid DESC
+    LIMIT 1
+  )
+ORDER BY ex.name ASC
+`
+
+type ListCurrentTrainingMaxesRow struct {
+	ID           string
+	UserID       string
+	ExerciseID   string
+	Weight       float64
+	Unit         string
+	EffectiveAt  string
+	CreatedAt    string
+	ExerciseName string
+}
+
+// One row per exercise: whichever training_maxes row for (user_id,
+// exercise_id) has the latest effective_at, ties broken by rowid (i.e.
+// most-recently-inserted wins) - see 0003_create_training_maxes.sql.
+func (q *Queries) ListCurrentTrainingMaxes(ctx context.Context, userID string) ([]ListCurrentTrainingMaxesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCurrentTrainingMaxes, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCurrentTrainingMaxesRow
+	for rows.Next() {
+		var i ListCurrentTrainingMaxesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ExerciseID,
+			&i.Weight,
+			&i.Unit,
+			&i.EffectiveAt,
+			&i.CreatedAt,
+			&i.ExerciseName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listExercises = `-- name: ListExercises :many
+SELECT id, name, category, archived, created_at FROM exercises ORDER BY created_at ASC
+`
+
+func (q *Queries) ListExercises(ctx context.Context) ([]Exercise, error) {
+	rows, err := q.db.QueryContext(ctx, listExercises)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Exercise
+	for rows.Next() {
+		var i Exercise
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Category,
+			&i.Archived,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTrainingMaxHistory = `-- name: ListTrainingMaxHistory :many
+SELECT tm.id, tm.user_id, tm.exercise_id, tm.weight, tm.unit, tm.effective_at, tm.created_at, ex.name AS exercise_name
+FROM training_maxes tm
+JOIN exercises ex ON ex.id = tm.exercise_id
+WHERE tm.user_id = ? AND tm.exercise_id = ?
+ORDER BY tm.effective_at DESC
+`
+
+type ListTrainingMaxHistoryParams struct {
+	UserID     string
+	ExerciseID string
+}
+
+type ListTrainingMaxHistoryRow struct {
+	ID           string
+	UserID       string
+	ExerciseID   string
+	Weight       float64
+	Unit         string
+	EffectiveAt  string
+	CreatedAt    string
+	ExerciseName string
+}
+
+func (q *Queries) ListTrainingMaxHistory(ctx context.Context, arg ListTrainingMaxHistoryParams) ([]ListTrainingMaxHistoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, listTrainingMaxHistory, arg.UserID, arg.ExerciseID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListTrainingMaxHistoryRow
+	for rows.Next() {
+		var i ListTrainingMaxHistoryRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.ExerciseID,
+			&i.Weight,
+			&i.Unit,
+			&i.EffectiveAt,
+			&i.CreatedAt,
+			&i.ExerciseName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, name, created_at FROM users ORDER BY created_at ASC
 `
@@ -63,4 +321,16 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const restoreExercise = `-- name: RestoreExercise :execrows
+UPDATE exercises SET archived = 0 WHERE id = ?
+`
+
+func (q *Queries) RestoreExercise(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, restoreExercise, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }

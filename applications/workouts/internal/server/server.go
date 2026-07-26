@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/liamawhite/workouts/gen/workouts/v1/workoutsv1connect"
+	"github.com/liamawhite/workouts/internal/exerciseservice"
+	"github.com/liamawhite/workouts/internal/trainingmaxservice"
 	"github.com/liamawhite/workouts/internal/userservice"
 	"github.com/liamawhite/workouts/internal/webui"
 )
@@ -19,11 +21,17 @@ import (
 // so gRPC/gRPC-Web clients need HTTP/2 over cleartext (h2c) to negotiate at
 // all; the caller enables that via http.Server's Protocols field rather than
 // wrapping the handler, since Go 1.24+ supports h2c natively.
-func New(svc *userservice.Service) (http.Handler, error) {
+func New(userSvc *userservice.Service, exerciseSvc *exerciseservice.Service, trainingMaxSvc *trainingmaxservice.Service) (http.Handler, error) {
 	mux := http.NewServeMux()
 
-	path, handler := workoutsv1connect.NewUserServiceHandler(svc)
-	mux.Handle(path, handler)
+	userPath, userHandler := workoutsv1connect.NewUserServiceHandler(userSvc)
+	mux.Handle(userPath, userHandler)
+
+	exercisePath, exerciseHandler := workoutsv1connect.NewExerciseServiceHandler(exerciseSvc)
+	mux.Handle(exercisePath, exerciseHandler)
+
+	trainingMaxPath, trainingMaxHandler := workoutsv1connect.NewTrainingMaxServiceHandler(trainingMaxSvc)
+	mux.Handle(trainingMaxPath, trainingMaxHandler)
 
 	spa, err := newSPAHandler()
 	if err != nil {

@@ -20,6 +20,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/workouts.v1.UserService": "http://localhost:8080",
+      "/workouts.v1.ExerciseService": "http://localhost:8080",
+      "/workouts.v1.TrainingMaxService": "http://localhost:8080",
     },
   },
 });

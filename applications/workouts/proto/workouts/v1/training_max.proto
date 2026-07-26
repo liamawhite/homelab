@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package workouts.v1;
+
+option go_package = "github.com/liamawhite/workouts/gen/workouts/v1;workoutsv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum WeightUnit {
+  WEIGHT_UNIT_UNSPECIFIED = 0;
+  WEIGHT_UNIT_KG = 1;
+  WEIGHT_UNIT_LB = 2;
+}
+
+// TrainingMax is one recorded value, not the "current" concept - a user can
+// have many of these per exercise over time, see TrainingMaxService's rpcs
+// for how "current" vs. "history" are surfaced.
+message TrainingMax {
+  string id = 1;
+  string user_id = 2;
+  string exercise_id = 3;
+  string exercise_name = 4;
+  double weight = 5;
+  WeightUnit unit = 6;
+  google.protobuf.Timestamp effective_at = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+message ListCurrentTrainingMaxesRequest {
+  string user_id = 1;
+}
+
+message ListCurrentTrainingMaxesResponse {
+  repeated TrainingMax training_maxes = 1;
+}
+
+message ListTrainingMaxHistoryRequest {
+  string user_id = 1;
+  string exercise_id = 2;
+}
+
+message ListTrainingMaxHistoryResponse {
+  repeated TrainingMax training_maxes = 1;
+}
+
+message RecordTrainingMaxRequest {
+  string user_id = 1;
+  string exercise_id = 2;
+  double weight = 3;
+  WeightUnit unit = 4;
+  // effective_at is optional - if unset, the server stamps "now".
+  google.protobuf.Timestamp effective_at = 5;
+}
+
+message RecordTrainingMaxResponse {
+  TrainingMax training_max = 1;
+}
+
+service TrainingMaxService {
+  rpc ListCurrentTrainingMaxes(ListCurrentTrainingMaxesRequest) returns (ListCurrentTrainingMaxesResponse);
+  rpc ListTrainingMaxHistory(ListTrainingMaxHistoryRequest) returns (ListTrainingMaxHistoryResponse);
+  rpc RecordTrainingMax(RecordTrainingMaxRequest) returns (RecordTrainingMaxResponse);
+}

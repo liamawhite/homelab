@@ -4,6 +4,24 @@
 
 package sqlcgen
 
+type Exercise struct {
+	ID        string
+	Name      string
+	Category  string
+	Archived  int64
+	CreatedAt string
+}
+
+type TrainingMax struct {
+	ID          string
+	UserID      string
+	ExerciseID  string
+	Weight      float64
+	Unit        string
+	EffectiveAt string
+	CreatedAt   string
+}
+
 type User struct {
 	ID        string
 	Name      string

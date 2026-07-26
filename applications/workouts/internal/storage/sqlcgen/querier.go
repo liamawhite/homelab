@@ -9,9 +9,21 @@ import (
 )
 
 type Querier interface {
+	ArchiveExercise(ctx context.Context, id string) (int64, error)
+	CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error)
+	CreateTrainingMax(ctx context.Context, arg CreateTrainingMaxParams) (TrainingMax, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteUser(ctx context.Context, id string) (int64, error)
+	GetExercise(ctx context.Context, id string) (Exercise, error)
+	GetUser(ctx context.Context, id string) (User, error)
+	// One row per exercise: whichever training_maxes row for (user_id,
+	// exercise_id) has the latest effective_at, ties broken by rowid (i.e.
+	// most-recently-inserted wins) - see 0003_create_training_maxes.sql.
+	ListCurrentTrainingMaxes(ctx context.Context, userID string) ([]ListCurrentTrainingMaxesRow, error)
+	ListExercises(ctx context.Context) ([]Exercise, error)
+	ListTrainingMaxHistory(ctx context.Context, arg ListTrainingMaxHistoryParams) ([]ListTrainingMaxHistoryRow, error)
 	ListUsers(ctx context.Context) ([]User, error)
+	RestoreExercise(ctx context.Context, id string) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -11,8 +11,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/liamawhite/workouts/internal/exerciseservice"
 	"github.com/liamawhite/workouts/internal/server"
 	"github.com/liamawhite/workouts/internal/storage"
+	"github.com/liamawhite/workouts/internal/trainingmaxservice"
 	"github.com/liamawhite/workouts/internal/userservice"
 )
 
@@ -36,9 +38,15 @@ func run() error {
 		return err
 	}
 
-	svc := userservice.New(storage.NewUsers(db))
+	users := storage.NewUsers(db)
+	exercises := storage.NewExercises(db)
+	trainingMaxes := storage.NewTrainingMaxes(db)
 
-	handler, err := server.New(svc)
+	userSvc := userservice.New(users)
+	exerciseSvc := exerciseservice.New(exercises)
+	trainingMaxSvc := trainingmaxservice.New(trainingMaxes, users, exercises)
+
+	handler, err := server.New(userSvc, exerciseSvc, trainingMaxSvc)
 	if err != nil {
 		return err
 	}

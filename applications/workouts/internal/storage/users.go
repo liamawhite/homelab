@@ -55,6 +55,20 @@ func (u *Users) List(ctx context.Context) ([]User, error) {
 	return users, nil
 }
 
+// Get returns the user with the given ID. It returns ErrUserNotFound if no
+// such user exists.
+func (u *Users) Get(ctx context.Context, id string) (User, error) {
+	row, err := u.q.GetUser(ctx, id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return User{}, ErrUserNotFound
+		}
+		return User{}, fmt.Errorf("getting user: %w", err)
+	}
+
+	return fromRow(row)
+}
+
 // Create inserts a new user with a generated ID and returns it.
 func (u *Users) Create(ctx context.Context, name string) (User, error) {
 	row, err := u.q.CreateUser(ctx, sqlcgen.CreateUserParams{

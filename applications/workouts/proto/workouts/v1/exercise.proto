@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package workouts.v1;
+
+option go_package = "github.com/liamawhite/workouts/gen/workouts/v1;workoutsv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum ExerciseCategory {
+  EXERCISE_CATEGORY_UNSPECIFIED = 0;
+  EXERCISE_CATEGORY_MAIN_LIFT = 1;
+  EXERCISE_CATEGORY_ACCESSORY = 2;
+}
+
+message Exercise {
+  string id = 1;
+  string name = 2;
+  ExerciseCategory category = 3;
+  bool archived = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message ListExercisesRequest {}
+
+message ListExercisesResponse {
+  repeated Exercise exercises = 1;
+}
+
+message CreateExerciseRequest {
+  string name = 1;
+  ExerciseCategory category = 2;
+}
+
+message CreateExerciseResponse {
+  Exercise exercise = 1;
+}
+
+message ArchiveExerciseRequest {
+  string id = 1;
+}
+
+message ArchiveExerciseResponse {}
+
+message RestoreExerciseRequest {
+  string id = 1;
+}
+
+message RestoreExerciseResponse {}
+
+service ExerciseService {
+  rpc ListExercises(ListExercisesRequest) returns (ListExercisesResponse);
+  rpc CreateExercise(CreateExerciseRequest) returns (CreateExerciseResponse);
+  rpc ArchiveExercise(ArchiveExerciseRequest) returns (ArchiveExerciseResponse);
+  rpc RestoreExercise(RestoreExerciseRequest) returns (RestoreExerciseResponse);
+}

@@ -3,6 +3,7 @@ import { createRootRoute, createRoute, createRouter } from "@tanstack/react-rout
 import { RootLayout } from "@/components/RootLayout";
 import { HomePage } from "@/routes/HomePage";
 import { UsersPage } from "@/routes/UsersPage";
+import { ExercisesPage } from "@/routes/ExercisesPage";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -20,7 +21,13 @@ const usersRoute = createRoute({
   component: UsersPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, usersRoute]);
+const exercisesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/exercises",
+  component: ExercisesPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, usersRoute, exercisesRoute]);
 
 export const router = createRouter({ routeTree });
 
