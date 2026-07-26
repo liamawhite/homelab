@@ -25,11 +25,23 @@ const (
 	ExerciseCategoryAccessory ExerciseCategory = "accessory"
 )
 
+// ExerciseEquipment is what an exercise is performed with - add new values
+// here and to the CHECK constraint in 0004_add_exercises_equipment.sql
+// together.
+type ExerciseEquipment string
+
+const (
+	ExerciseEquipmentBarbell    ExerciseEquipment = "barbell"
+	ExerciseEquipmentDumbbell   ExerciseEquipment = "dumbbell"
+	ExerciseEquipmentBodyweight ExerciseEquipment = "bodyweight"
+)
+
 // Exercise is a row from the exercises table.
 type Exercise struct {
 	ID        string
 	Name      string
 	Category  ExerciseCategory
+	Equipment ExerciseEquipment
 	Archived  bool
 	CreatedAt time.Time
 }
@@ -54,7 +66,7 @@ func (e *Exercises) List(ctx context.Context) ([]Exercise, error) {
 
 	exercises := make([]Exercise, 0, len(rows))
 	for _, row := range rows {
-		exercise, err := exerciseFromRow(row)
+		exercise, err := newExercise(row.ID, row.Name, row.Category, row.Equipment, row.Archived, row.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -75,22 +87,23 @@ func (e *Exercises) Get(ctx context.Context, id string) (Exercise, error) {
 		return Exercise{}, fmt.Errorf("getting exercise: %w", err)
 	}
 
-	return exerciseFromRow(row)
+	return newExercise(row.ID, row.Name, row.Category, row.Equipment, row.Archived, row.CreatedAt)
 }
 
 // Create inserts a new, active exercise with a generated ID and returns it.
-func (e *Exercises) Create(ctx context.Context, name string, category ExerciseCategory) (Exercise, error) {
+func (e *Exercises) Create(ctx context.Context, name string, category ExerciseCategory, equipment ExerciseEquipment) (Exercise, error) {
 	row, err := e.q.CreateExercise(ctx, sqlcgen.CreateExerciseParams{
 		ID:        uuid.NewString(),
 		Name:      name,
 		Category:  string(category),
+		Equipment: string(equipment),
 		CreatedAt: time.Now().UTC().Format(time.RFC3339Nano),
 	})
 	if err != nil {
 		return Exercise{}, fmt.Errorf("creating exercise: %w", err)
 	}
 
-	return exerciseFromRow(row)
+	return newExercise(row.ID, row.Name, row.Category, row.Equipment, row.Archived, row.CreatedAt)
 }
 
 // Archive hides the exercise with the given ID from selection without
@@ -122,17 +135,22 @@ func (e *Exercises) Restore(ctx context.Context, id string) error {
 	return nil
 }
 
-func exerciseFromRow(row sqlcgen.Exercise) (Exercise, error) {
-	createdAt, err := time.Parse(time.RFC3339Nano, row.CreatedAt)
+// newExercise adapts the columns shared by ListExercises/GetExercise/
+// CreateExercise's distinct sqlc row types (they differ because the
+// equipment column, added by 0004_add_exercises_equipment.sql, doesn't
+// match the Exercise model struct's field order) into an Exercise.
+func newExercise(id, name, category, equipment string, archived int64, createdAtStr string) (Exercise, error) {
+	createdAt, err := time.Parse(time.RFC3339Nano, createdAtStr)
 	if err != nil {
 		return Exercise{}, fmt.Errorf("parsing exercise created_at: %w", err)
 	}
 
 	return Exercise{
-		ID:        row.ID,
-		Name:      row.Name,
-		Category:  ExerciseCategory(row.Category),
-		Archived:  row.Archived != 0,
+		ID:        id,
+		Name:      name,
+		Category:  ExerciseCategory(category),
+		Equipment: ExerciseEquipment(equipment),
+		Archived:  archived != 0,
 		CreatedAt: createdAt,
 	}, nil
 }

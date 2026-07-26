@@ -22,29 +22,41 @@ func (q *Queries) ArchiveExercise(ctx context.Context, id string) (int64, error)
 }
 
 const createExercise = `-- name: CreateExercise :one
-INSERT INTO exercises (id, name, category, archived, created_at) VALUES (?, ?, ?, 0, ?)
-RETURNING id, name, category, archived, created_at
+INSERT INTO exercises (id, name, category, equipment, archived, created_at) VALUES (?, ?, ?, ?, 0, ?)
+RETURNING id, name, category, equipment, archived, created_at
 `
 
 type CreateExerciseParams struct {
 	ID        string
 	Name      string
 	Category  string
+	Equipment string
 	CreatedAt string
 }
 
-func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) (Exercise, error) {
+type CreateExerciseRow struct {
+	ID        string
+	Name      string
+	Category  string
+	Equipment string
+	Archived  int64
+	CreatedAt string
+}
+
+func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) (CreateExerciseRow, error) {
 	row := q.db.QueryRowContext(ctx, createExercise,
 		arg.ID,
 		arg.Name,
 		arg.Category,
+		arg.Equipment,
 		arg.CreatedAt,
 	)
-	var i Exercise
+	var i CreateExerciseRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Category,
+		&i.Equipment,
 		&i.Archived,
 		&i.CreatedAt,
 	)
@@ -120,16 +132,26 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (int64, error) {
 }
 
 const getExercise = `-- name: GetExercise :one
-SELECT id, name, category, archived, created_at FROM exercises WHERE id = ?
+SELECT id, name, category, equipment, archived, created_at FROM exercises WHERE id = ?
 `
 
-func (q *Queries) GetExercise(ctx context.Context, id string) (Exercise, error) {
+type GetExerciseRow struct {
+	ID        string
+	Name      string
+	Category  string
+	Equipment string
+	Archived  int64
+	CreatedAt string
+}
+
+func (q *Queries) GetExercise(ctx context.Context, id string) (GetExerciseRow, error) {
 	row := q.db.QueryRowContext(ctx, getExercise, id)
-	var i Exercise
+	var i GetExerciseRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Category,
+		&i.Equipment,
 		&i.Archived,
 		&i.CreatedAt,
 	)
@@ -208,22 +230,32 @@ func (q *Queries) ListCurrentTrainingMaxes(ctx context.Context, userID string) (
 }
 
 const listExercises = `-- name: ListExercises :many
-SELECT id, name, category, archived, created_at FROM exercises ORDER BY created_at ASC
+SELECT id, name, category, equipment, archived, created_at FROM exercises ORDER BY created_at ASC
 `
 
-func (q *Queries) ListExercises(ctx context.Context) ([]Exercise, error) {
+type ListExercisesRow struct {
+	ID        string
+	Name      string
+	Category  string
+	Equipment string
+	Archived  int64
+	CreatedAt string
+}
+
+func (q *Queries) ListExercises(ctx context.Context) ([]ListExercisesRow, error) {
 	rows, err := q.db.QueryContext(ctx, listExercises)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Exercise
+	var items []ListExercisesRow
 	for rows.Next() {
-		var i Exercise
+		var i ListExercisesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Category,
+			&i.Equipment,
 			&i.Archived,
 			&i.CreatedAt,
 		); err != nil {

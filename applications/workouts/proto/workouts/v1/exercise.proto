@@ -12,12 +12,20 @@ enum ExerciseCategory {
   EXERCISE_CATEGORY_ACCESSORY = 2;
 }
 
+enum ExerciseEquipment {
+  EXERCISE_EQUIPMENT_UNSPECIFIED = 0;
+  EXERCISE_EQUIPMENT_BARBELL = 1;
+  EXERCISE_EQUIPMENT_DUMBBELL = 2;
+  EXERCISE_EQUIPMENT_BODYWEIGHT = 3;
+}
+
 message Exercise {
   string id = 1;
   string name = 2;
   ExerciseCategory category = 3;
   bool archived = 4;
   google.protobuf.Timestamp created_at = 5;
+  ExerciseEquipment equipment = 6;
 }
 
 message ListExercisesRequest {}
@@ -29,6 +37,7 @@ message ListExercisesResponse {
 message CreateExerciseRequest {
   string name = 1;
   ExerciseCategory category = 2;
+  ExerciseEquipment equipment = 3;
 }
 
 message CreateExerciseResponse {

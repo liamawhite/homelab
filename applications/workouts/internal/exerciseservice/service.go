@@ -53,7 +53,12 @@ func (s *Service) CreateExercise(ctx context.Context, req *connect.Request[v1.Cr
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	exercise, err := s.exercises.Create(ctx, name, category)
+	equipment, err := fromProtoEquipment(req.Msg.GetEquipment())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
+	exercise, err := s.exercises.Create(ctx, name, category, equipment)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -102,6 +107,7 @@ func toProto(exercise storage.Exercise) *v1.Exercise {
 		Id:        exercise.ID,
 		Name:      exercise.Name,
 		Category:  toProtoCategory(exercise.Category),
+		Equipment: toProtoEquipment(exercise.Equipment),
 		Archived:  exercise.Archived,
 		CreatedAt: timestamppb.New(exercise.CreatedAt),
 	}
@@ -126,5 +132,31 @@ func fromProtoCategory(category v1.ExerciseCategory) (storage.ExerciseCategory, 
 		return storage.ExerciseCategoryAccessory, nil
 	default:
 		return "", errors.New("category must be MAIN_LIFT or ACCESSORY")
+	}
+}
+
+func toProtoEquipment(equipment storage.ExerciseEquipment) v1.ExerciseEquipment {
+	switch equipment {
+	case storage.ExerciseEquipmentBarbell:
+		return v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL
+	case storage.ExerciseEquipmentDumbbell:
+		return v1.ExerciseEquipment_EXERCISE_EQUIPMENT_DUMBBELL
+	case storage.ExerciseEquipmentBodyweight:
+		return v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BODYWEIGHT
+	default:
+		return v1.ExerciseEquipment_EXERCISE_EQUIPMENT_UNSPECIFIED
+	}
+}
+
+func fromProtoEquipment(equipment v1.ExerciseEquipment) (storage.ExerciseEquipment, error) {
+	switch equipment {
+	case v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL:
+		return storage.ExerciseEquipmentBarbell, nil
+	case v1.ExerciseEquipment_EXERCISE_EQUIPMENT_DUMBBELL:
+		return storage.ExerciseEquipmentDumbbell, nil
+	case v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BODYWEIGHT:
+		return storage.ExerciseEquipmentBodyweight, nil
+	default:
+		return "", errors.New("equipment must be BARBELL, DUMBBELL, or BODYWEIGHT")
 	}
 }

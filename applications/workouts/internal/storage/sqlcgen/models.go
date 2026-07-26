@@ -10,6 +10,7 @@ type Exercise struct {
 	Category  string
 	Archived  int64
 	CreatedAt string
+	Equipment string
 }
 
 type TrainingMax struct {

@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file workouts/v1/exercise.proto.
  */
 export const file_workouts_v1_exercise: GenFile = /*@__PURE__*/
-  fileDesc("Chp3b3Jrb3V0cy92MS9leGVyY2lzZS5wcm90bxILd29ya291dHMudjEilwEKCEV4ZXJjaXNlEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSLwoIY2F0ZWdvcnkYAyABKA4yHS53b3Jrb3V0cy52MS5FeGVyY2lzZUNhdGVnb3J5EhAKCGFyY2hpdmVkGAQgASgIEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhYKFExpc3RFeGVyY2lzZXNSZXF1ZXN0IkEKFUxpc3RFeGVyY2lzZXNSZXNwb25zZRIoCglleGVyY2lzZXMYASADKAsyFS53b3Jrb3V0cy52MS5FeGVyY2lzZSJWChVDcmVhdGVFeGVyY2lzZVJlcXVlc3QSDAoEbmFtZRgBIAEoCRIvCghjYXRlZ29yeRgCIAEoDjIdLndvcmtvdXRzLnYxLkV4ZXJjaXNlQ2F0ZWdvcnkiQQoWQ3JlYXRlRXhlcmNpc2VSZXNwb25zZRInCghleGVyY2lzZRgBIAEoCzIVLndvcmtvdXRzLnYxLkV4ZXJjaXNlIiQKFkFyY2hpdmVFeGVyY2lzZVJlcXVlc3QSCgoCaWQYASABKAkiGQoXQXJjaGl2ZUV4ZXJjaXNlUmVzcG9uc2UiJAoWUmVzdG9yZUV4ZXJjaXNlUmVxdWVzdBIKCgJpZBgBIAEoCSIZChdSZXN0b3JlRXhlcmNpc2VSZXNwb25zZSp3ChBFeGVyY2lzZUNhdGVnb3J5EiEKHUVYRVJDSVNFX0NBVEVHT1JZX1VOU1BFQ0lGSUVEEAASHwobRVhFUkNJU0VfQ0FURUdPUllfTUFJTl9MSUZUEAESHwobRVhFUkNJU0VfQ0FURUdPUllfQUNDRVNTT1JZEAIygAMKD0V4ZXJjaXNlU2VydmljZRJWCg1MaXN0RXhlcmNpc2VzEiEud29ya291dHMudjEuTGlzdEV4ZXJjaXNlc1JlcXVlc3QaIi53b3Jrb3V0cy52MS5MaXN0RXhlcmNpc2VzUmVzcG9uc2USWQoOQ3JlYXRlRXhlcmNpc2USIi53b3Jrb3V0cy52MS5DcmVhdGVFeGVyY2lzZVJlcXVlc3QaIy53b3Jrb3V0cy52MS5DcmVhdGVFeGVyY2lzZVJlc3BvbnNlElwKD0FyY2hpdmVFeGVyY2lzZRIjLndvcmtvdXRzLnYxLkFyY2hpdmVFeGVyY2lzZVJlcXVlc3QaJC53b3Jrb3V0cy52MS5BcmNoaXZlRXhlcmNpc2VSZXNwb25zZRJcCg9SZXN0b3JlRXhlcmNpc2USIy53b3Jrb3V0cy52MS5SZXN0b3JlRXhlcmNpc2VSZXF1ZXN0GiQud29ya291dHMudjEuUmVzdG9yZUV4ZXJjaXNlUmVzcG9uc2VCO1o5Z2l0aHViLmNvbS9saWFtYXdoaXRlL3dvcmtvdXRzL2dlbi93b3Jrb3V0cy92MTt3b3Jrb3V0c3YxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("Chp3b3Jrb3V0cy92MS9leGVyY2lzZS5wcm90bxILd29ya291dHMudjEiygEKCEV4ZXJjaXNlEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSLwoIY2F0ZWdvcnkYAyABKA4yHS53b3Jrb3V0cy52MS5FeGVyY2lzZUNhdGVnb3J5EhAKCGFyY2hpdmVkGAQgASgIEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKCWVxdWlwbWVudBgGIAEoDjIeLndvcmtvdXRzLnYxLkV4ZXJjaXNlRXF1aXBtZW50IhYKFExpc3RFeGVyY2lzZXNSZXF1ZXN0IkEKFUxpc3RFeGVyY2lzZXNSZXNwb25zZRIoCglleGVyY2lzZXMYASADKAsyFS53b3Jrb3V0cy52MS5FeGVyY2lzZSKJAQoVQ3JlYXRlRXhlcmNpc2VSZXF1ZXN0EgwKBG5hbWUYASABKAkSLwoIY2F0ZWdvcnkYAiABKA4yHS53b3Jrb3V0cy52MS5FeGVyY2lzZUNhdGVnb3J5EjEKCWVxdWlwbWVudBgDIAEoDjIeLndvcmtvdXRzLnYxLkV4ZXJjaXNlRXF1aXBtZW50IkEKFkNyZWF0ZUV4ZXJjaXNlUmVzcG9uc2USJwoIZXhlcmNpc2UYASABKAsyFS53b3Jrb3V0cy52MS5FeGVyY2lzZSIkChZBcmNoaXZlRXhlcmNpc2VSZXF1ZXN0EgoKAmlkGAEgASgJIhkKF0FyY2hpdmVFeGVyY2lzZVJlc3BvbnNlIiQKFlJlc3RvcmVFeGVyY2lzZVJlcXVlc3QSCgoCaWQYASABKAkiGQoXUmVzdG9yZUV4ZXJjaXNlUmVzcG9uc2UqdwoQRXhlcmNpc2VDYXRlZ29yeRIhCh1FWEVSQ0lTRV9DQVRFR09SWV9VTlNQRUNJRklFRBAAEh8KG0VYRVJDSVNFX0NBVEVHT1JZX01BSU5fTElGVBABEh8KG0VYRVJDSVNFX0NBVEVHT1JZX0FDQ0VTU09SWRACKpsBChFFeGVyY2lzZUVxdWlwbWVudBIiCh5FWEVSQ0lTRV9FUVVJUE1FTlRfVU5TUEVDSUZJRUQQABIeChpFWEVSQ0lTRV9FUVVJUE1FTlRfQkFSQkVMTBABEh8KG0VYRVJDSVNFX0VRVUlQTUVOVF9EVU1CQkVMTBACEiEKHUVYRVJDSVNFX0VRVUlQTUVOVF9CT0RZV0VJR0hUEAMygAMKD0V4ZXJjaXNlU2VydmljZRJWCg1MaXN0RXhlcmNpc2VzEiEud29ya291dHMudjEuTGlzdEV4ZXJjaXNlc1JlcXVlc3QaIi53b3Jrb3V0cy52MS5MaXN0RXhlcmNpc2VzUmVzcG9uc2USWQoOQ3JlYXRlRXhlcmNpc2USIi53b3Jrb3V0cy52MS5DcmVhdGVFeGVyY2lzZVJlcXVlc3QaIy53b3Jrb3V0cy52MS5DcmVhdGVFeGVyY2lzZVJlc3BvbnNlElwKD0FyY2hpdmVFeGVyY2lzZRIjLndvcmtvdXRzLnYxLkFyY2hpdmVFeGVyY2lzZVJlcXVlc3QaJC53b3Jrb3V0cy52MS5BcmNoaXZlRXhlcmNpc2VSZXNwb25zZRJcCg9SZXN0b3JlRXhlcmNpc2USIy53b3Jrb3V0cy52MS5SZXN0b3JlRXhlcmNpc2VSZXF1ZXN0GiQud29ya291dHMudjEuUmVzdG9yZUV4ZXJjaXNlUmVzcG9uc2VCO1o5Z2l0aHViLmNvbS9saWFtYXdoaXRlL3dvcmtvdXRzL2dlbi93b3Jrb3V0cy92MTt3b3Jrb3V0c3YxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message workouts.v1.Exercise
@@ -42,6 +42,11 @@ export type Exercise = Message<"workouts.v1.Exercise"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 5;
    */
   createdAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: workouts.v1.ExerciseEquipment equipment = 6;
+   */
+  equipment: ExerciseEquipment;
 };
 
 /**
@@ -94,6 +99,11 @@ export type CreateExerciseRequest = Message<"workouts.v1.CreateExerciseRequest">
    * @generated from field: workouts.v1.ExerciseCategory category = 2;
    */
   category: ExerciseCategory;
+
+  /**
+   * @generated from field: workouts.v1.ExerciseEquipment equipment = 3;
+   */
+  equipment: ExerciseEquipment;
 };
 
 /**
@@ -205,6 +215,37 @@ export enum ExerciseCategory {
  */
 export const ExerciseCategorySchema: GenEnum<ExerciseCategory> = /*@__PURE__*/
   enumDesc(file_workouts_v1_exercise, 0);
+
+/**
+ * @generated from enum workouts.v1.ExerciseEquipment
+ */
+export enum ExerciseEquipment {
+  /**
+   * @generated from enum value: EXERCISE_EQUIPMENT_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: EXERCISE_EQUIPMENT_BARBELL = 1;
+   */
+  BARBELL = 1,
+
+  /**
+   * @generated from enum value: EXERCISE_EQUIPMENT_DUMBBELL = 2;
+   */
+  DUMBBELL = 2,
+
+  /**
+   * @generated from enum value: EXERCISE_EQUIPMENT_BODYWEIGHT = 3;
+   */
+  BODYWEIGHT = 3,
+}
+
+/**
+ * Describes the enum workouts.v1.ExerciseEquipment.
+ */
+export const ExerciseEquipmentSchema: GenEnum<ExerciseEquipment> = /*@__PURE__*/
+  enumDesc(file_workouts_v1_exercise, 1);
 
 /**
  * @generated from service workouts.v1.ExerciseService

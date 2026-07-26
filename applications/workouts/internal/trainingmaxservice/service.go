@@ -110,8 +110,8 @@ func (s *Service) RecordTrainingMax(ctx context.Context, req *connect.Request[v1
 	if exerciseID == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("exercise_id must not be empty"))
 	}
-	if req.Msg.GetWeight() <= 0 {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("weight must be greater than zero"))
+	if req.Msg.GetWeight() < 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("weight must not be negative"))
 	}
 	unit, err := fromProtoUnit(req.Msg.GetUnit())
 	if err != nil {

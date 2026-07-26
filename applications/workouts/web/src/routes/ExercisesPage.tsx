@@ -1,141 +1,174 @@
-import { useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
-import { Archive as ArchiveIcon, ArchiveRestore } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { Archive as ArchiveIcon, ArchiveRestore, Plus } from "lucide-react";
 
-import { ExerciseCategory } from "@/gen/workouts/v1/exercise_pb";
-import { useExercises, useCreateExercise, useArchiveExercise, useRestoreExercise } from "@/lib/exercises";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExerciseCategory, ExerciseEquipment, type Exercise } from "@/gen/workouts/v1/exercise_pb";
+import { useExercises, useArchiveExercise, useRestoreExercise } from "@/lib/exercises";
+import { AddExerciseDialog } from "@/components/AddExerciseDialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 function categoryLabel(category: ExerciseCategory): string {
   return category === ExerciseCategory.MAIN_LIFT ? "Main lift" : "Accessory";
 }
 
+function equipmentLabel(equipment: ExerciseEquipment): string {
+  switch (equipment) {
+    case ExerciseEquipment.BARBELL:
+      return "Barbell";
+    case ExerciseEquipment.DUMBBELL:
+      return "Dumbbell";
+    case ExerciseEquipment.BODYWEIGHT:
+      return "Bodyweight";
+    default:
+      return "Unknown";
+  }
+}
+
+const columnHelper = createColumnHelper<Exercise>();
+
 export function ExercisesPage() {
   const { data: exercises, isLoading, isError, error } = useExercises();
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<ExerciseCategory>(ExerciseCategory.MAIN_LIFT);
-  const createExercise = useCreateExercise();
+  const [addOpen, setAddOpen] = useState(false);
   const archiveExercise = useArchiveExercise();
   const restoreExercise = useRestoreExercise();
 
-  const active = exercises?.filter((e) => !e.archived) ?? [];
-  const archived = exercises?.filter((e) => e.archived) ?? [];
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("name", {
+        header: "Name",
+        cell: (info) => (
+          <span className={cn(info.row.original.archived && "text-muted-foreground line-through")}>
+            {info.getValue()}
+          </span>
+        ),
+      }),
+      columnHelper.accessor("category", {
+        header: "Category",
+        cell: (info) => (
+          <Badge variant={info.getValue() === ExerciseCategory.MAIN_LIFT ? "default" : "secondary"}>
+            {categoryLabel(info.getValue())}
+          </Badge>
+        ),
+      }),
+      columnHelper.accessor("equipment", {
+        header: "Equipment",
+        cell: (info) => <Badge variant="outline">{equipmentLabel(info.getValue())}</Badge>,
+      }),
+      columnHelper.accessor("archived", {
+        header: "Status",
+        cell: (info) => (
+          <Badge variant={info.getValue() ? "outline" : "secondary"}>
+            {info.getValue() ? "Archived" : "Active"}
+          </Badge>
+        ),
+      }),
+      columnHelper.display({
+        id: "actions",
+        cell: (info) => (
+          <div className="flex justify-end">
+            {info.row.original.archived ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Restore ${info.row.original.name}`}
+                disabled={restoreExercise.isPending}
+                onClick={() => restoreExercise.mutate(info.row.original.id)}
+              >
+                <ArchiveRestore />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Archive ${info.row.original.name}`}
+                disabled={archiveExercise.isPending}
+                onClick={() => archiveExercise.mutate(info.row.original.id)}
+              >
+                <ArchiveIcon />
+              </Button>
+            )}
+          </div>
+        ),
+      }),
+    ],
+    [archiveExercise, restoreExercise],
+  );
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!name.trim()) return;
-    createExercise.mutate({ name: name.trim(), category }, { onSuccess: () => setName("") });
-  }
+  const table = useReactTable({
+    data: exercises ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-4 p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Manage exercises</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading exercises…</p>}
-          {isError && <p className="text-sm text-destructive">{error.message}</p>}
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold">Exercises</h1>
+        <Button size="sm" className="gap-1" onClick={() => setAddOpen(true)}>
+          <Plus />
+          New exercise
+        </Button>
+      </div>
 
-          {active.length > 0 && (
-            <div className="grid gap-1">
-              {active.map((exercise) => (
-                <div key={exercise.id} className="flex items-center justify-between gap-2 text-sm">
-                  <span>
-                    {exercise.name}
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {categoryLabel(exercise.category)}
-                    </span>
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Archive ${exercise.name}`}
-                    disabled={archiveExercise.isPending}
-                    onClick={() => archiveExercise.mutate(exercise.id)}
-                  >
-                    <ArchiveIcon />
-                  </Button>
-                </div>
+      {isLoading && <p className="text-sm text-muted-foreground">Loading exercises…</p>}
+      {isError && <p className="text-sm text-destructive">{error.message}</p>}
+      {archiveExercise.isError && (
+        <p className="text-sm text-destructive">{archiveExercise.error.message}</p>
+      )}
+      {restoreExercise.isError && (
+        <p className="text-sm text-destructive">{restoreExercise.error.message}</p>
+      )}
+
+      {exercises && exercises.length > 0 && (
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-              {archiveExercise.isError && (
-                <p className="text-sm text-destructive">{archiveExercise.error.message}</p>
-              )}
-            </div>
-          )}
-          {active.length === 0 && !isLoading && (
-            <p className="text-sm text-muted-foreground">No exercises yet.</p>
-          )}
-
-          {archived.length > 0 && (
-            <div className="grid gap-1 border-t pt-3">
-              <span className="text-xs font-medium text-muted-foreground">Archived</span>
-              {archived.map((exercise) => (
-                <div
-                  key={exercise.id}
-                  className="flex items-center justify-between gap-2 text-sm text-muted-foreground"
-                >
-                  <span>{exercise.name}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Restore ${exercise.name}`}
-                    disabled={restoreExercise.isPending}
-                    onClick={() => restoreExercise.mutate(exercise.id)}
-                  >
-                    <ArchiveRestore />
-                  </Button>
-                </div>
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-              {restoreExercise.isError && (
-                <p className="text-sm text-destructive">{restoreExercise.error.message}</p>
-              )}
-            </div>
-          )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+      {exercises && exercises.length === 0 && (
+        <p className="text-sm text-muted-foreground">No exercises yet.</p>
+      )}
 
-          <form onSubmit={handleSubmit} className="grid gap-1.5 border-t pt-3">
-            <Label htmlFor="new-exercise-name">New exercise</Label>
-            <div className="flex gap-2">
-              <Input
-                id="new-exercise-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Name"
-                disabled={createExercise.isPending}
-              />
-              <Button type="submit" disabled={createExercise.isPending || !name.trim()}>
-                Add
-              </Button>
-            </div>
-            <div className="flex gap-1.5">
-              {[ExerciseCategory.MAIN_LIFT, ExerciseCategory.ACCESSORY].map((option) => (
-                <Button
-                  key={option}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  aria-expanded={category === option}
-                  className={cn(category === option && "border-ring")}
-                  onClick={() => setCategory(option)}
-                >
-                  {categoryLabel(option)}
-                </Button>
-              ))}
-            </div>
-            {createExercise.isError && (
-              <p className="text-sm text-destructive">{createExercise.error.message}</p>
-            )}
-          </form>
-
-          <Link to="/" className="text-sm text-muted-foreground underline underline-offset-4">
-            Back
-          </Link>
-        </CardContent>
-      </Card>
+      <AddExerciseDialog open={addOpen} onOpenChange={setAddOpen} />
     </div>
   );
 }

@@ -49,8 +49,10 @@ export function RecordTrainingMaxDialog({
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!exerciseId || weight.trim() === "") return;
     const parsed = Number(weight);
-    if (!exerciseId || !(parsed > 0)) return;
+    // 0 is valid - it means bodyweight only, no added load.
+    if (Number.isNaN(parsed) || parsed < 0) return;
 
     recordTrainingMax.mutate(
       { userId, exerciseId, weight: parsed, unit },
@@ -120,7 +122,13 @@ export function RecordTrainingMaxDialog({
           <DialogFooter>
             <Button
               type="submit"
-              disabled={recordTrainingMax.isPending || !exerciseId || !(Number(weight) > 0)}
+              disabled={
+                recordTrainingMax.isPending ||
+                !exerciseId ||
+                weight.trim() === "" ||
+                Number.isNaN(Number(weight)) ||
+                Number(weight) < 0
+              }
             >
               Record
             </Button>

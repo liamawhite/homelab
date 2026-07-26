@@ -1,4 +1,4 @@
-import { ChevronDown, Dumbbell, Settings, User as UserIcon } from "lucide-react";
+import { ChevronDown, Settings, User as UserIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import type { User } from "@/gen/workouts/v1/user_pb";
@@ -40,12 +40,6 @@ export function UserMenu({ users, activeUserId, onSelect }: UserMenuProps) {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to="/exercises">
-            <Dumbbell />
-            Exercises
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/users">
             <Settings />

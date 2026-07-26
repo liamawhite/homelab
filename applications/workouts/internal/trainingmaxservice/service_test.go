@@ -39,7 +39,7 @@ func newTestFixture(t *testing.T) testFixture {
 	if err != nil {
 		t.Fatalf("users.Create() error = %v", err)
 	}
-	exercise, err := exercises.Create(ctx, "Squat", storage.ExerciseCategoryMainLift)
+	exercise, err := exercises.Create(ctx, "Squat", storage.ExerciseCategoryMainLift, storage.ExerciseEquipmentBarbell)
 	if err != nil {
 		t.Fatalf("exercises.Create() error = %v", err)
 	}
@@ -92,7 +92,23 @@ func TestService_RecordTrainingMax_RejectsUnspecifiedUnit(t *testing.T) {
 	}
 }
 
-func TestService_RecordTrainingMax_RejectsNonPositiveWeight(t *testing.T) {
+func TestService_RecordTrainingMax_RejectsNegativeWeight(t *testing.T) {
+	f := newTestFixture(t)
+
+	_, err := f.svc.RecordTrainingMax(context.Background(), connect.NewRequest(&v1.RecordTrainingMaxRequest{
+		UserId:     f.userID,
+		ExerciseId: f.exerciseID,
+		Weight:     -1,
+		Unit:       v1.WeightUnit_WEIGHT_UNIT_KG,
+	}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("RecordTrainingMax() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
+// Zero is a legitimate training max for a bodyweight exercise - it means
+// bodyweight only, no added load (e.g. an unweighted pull-up).
+func TestService_RecordTrainingMax_AllowsZeroWeight(t *testing.T) {
 	f := newTestFixture(t)
 
 	_, err := f.svc.RecordTrainingMax(context.Background(), connect.NewRequest(&v1.RecordTrainingMaxRequest{
@@ -101,8 +117,8 @@ func TestService_RecordTrainingMax_RejectsNonPositiveWeight(t *testing.T) {
 		Weight:     0,
 		Unit:       v1.WeightUnit_WEIGHT_UNIT_KG,
 	}))
-	if connect.CodeOf(err) != connect.CodeInvalidArgument {
-		t.Fatalf("RecordTrainingMax() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	if err != nil {
+		t.Fatalf("RecordTrainingMax() error = %v", err)
 	}
 }
 

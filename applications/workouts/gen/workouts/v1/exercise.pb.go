@@ -71,6 +71,58 @@ func (ExerciseCategory) EnumDescriptor() ([]byte, []int) {
 	return file_workouts_v1_exercise_proto_rawDescGZIP(), []int{0}
 }
 
+type ExerciseEquipment int32
+
+const (
+	ExerciseEquipment_EXERCISE_EQUIPMENT_UNSPECIFIED ExerciseEquipment = 0
+	ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL     ExerciseEquipment = 1
+	ExerciseEquipment_EXERCISE_EQUIPMENT_DUMBBELL    ExerciseEquipment = 2
+	ExerciseEquipment_EXERCISE_EQUIPMENT_BODYWEIGHT  ExerciseEquipment = 3
+)
+
+// Enum value maps for ExerciseEquipment.
+var (
+	ExerciseEquipment_name = map[int32]string{
+		0: "EXERCISE_EQUIPMENT_UNSPECIFIED",
+		1: "EXERCISE_EQUIPMENT_BARBELL",
+		2: "EXERCISE_EQUIPMENT_DUMBBELL",
+		3: "EXERCISE_EQUIPMENT_BODYWEIGHT",
+	}
+	ExerciseEquipment_value = map[string]int32{
+		"EXERCISE_EQUIPMENT_UNSPECIFIED": 0,
+		"EXERCISE_EQUIPMENT_BARBELL":     1,
+		"EXERCISE_EQUIPMENT_DUMBBELL":    2,
+		"EXERCISE_EQUIPMENT_BODYWEIGHT":  3,
+	}
+)
+
+func (x ExerciseEquipment) Enum() *ExerciseEquipment {
+	p := new(ExerciseEquipment)
+	*p = x
+	return p
+}
+
+func (x ExerciseEquipment) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ExerciseEquipment) Descriptor() protoreflect.EnumDescriptor {
+	return file_workouts_v1_exercise_proto_enumTypes[1].Descriptor()
+}
+
+func (ExerciseEquipment) Type() protoreflect.EnumType {
+	return &file_workouts_v1_exercise_proto_enumTypes[1]
+}
+
+func (x ExerciseEquipment) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ExerciseEquipment.Descriptor instead.
+func (ExerciseEquipment) EnumDescriptor() ([]byte, []int) {
+	return file_workouts_v1_exercise_proto_rawDescGZIP(), []int{1}
+}
+
 type Exercise struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -78,6 +130,7 @@ type Exercise struct {
 	Category      ExerciseCategory       `protobuf:"varint,3,opt,name=category,proto3,enum=workouts.v1.ExerciseCategory" json:"category,omitempty"`
 	Archived      bool                   `protobuf:"varint,4,opt,name=archived,proto3" json:"archived,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Equipment     ExerciseEquipment      `protobuf:"varint,6,opt,name=equipment,proto3,enum=workouts.v1.ExerciseEquipment" json:"equipment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -145,6 +198,13 @@ func (x *Exercise) GetCreatedAt() *timestamppb.Timestamp {
 		return x.CreatedAt
 	}
 	return nil
+}
+
+func (x *Exercise) GetEquipment() ExerciseEquipment {
+	if x != nil {
+		return x.Equipment
+	}
+	return ExerciseEquipment_EXERCISE_EQUIPMENT_UNSPECIFIED
 }
 
 type ListExercisesRequest struct {
@@ -231,6 +291,7 @@ type CreateExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Category      ExerciseCategory       `protobuf:"varint,2,opt,name=category,proto3,enum=workouts.v1.ExerciseCategory" json:"category,omitempty"`
+	Equipment     ExerciseEquipment      `protobuf:"varint,3,opt,name=equipment,proto3,enum=workouts.v1.ExerciseEquipment" json:"equipment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -277,6 +338,13 @@ func (x *CreateExerciseRequest) GetCategory() ExerciseCategory {
 		return x.Category
 	}
 	return ExerciseCategory_EXERCISE_CATEGORY_UNSPECIFIED
+}
+
+func (x *CreateExerciseRequest) GetEquipment() ExerciseEquipment {
+	if x != nil {
+		return x.Equipment
+	}
+	return ExerciseEquipment_EXERCISE_EQUIPMENT_UNSPECIFIED
 }
 
 type CreateExerciseResponse struct {
@@ -487,20 +555,22 @@ var File_workouts_v1_exercise_proto protoreflect.FileDescriptor
 
 const file_workouts_v1_exercise_proto_rawDesc = "" +
 	"\n" +
-	"\x1aworkouts/v1/exercise.proto\x12\vworkouts.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc0\x01\n" +
+	"\x1aworkouts/v1/exercise.proto\x12\vworkouts.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfe\x01\n" +
 	"\bExercise\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\bcategory\x18\x03 \x01(\x0e2\x1d.workouts.v1.ExerciseCategoryR\bcategory\x12\x1a\n" +
 	"\barchived\x18\x04 \x01(\bR\barchived\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x16\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12<\n" +
+	"\tequipment\x18\x06 \x01(\x0e2\x1e.workouts.v1.ExerciseEquipmentR\tequipment\"\x16\n" +
 	"\x14ListExercisesRequest\"L\n" +
 	"\x15ListExercisesResponse\x123\n" +
-	"\texercises\x18\x01 \x03(\v2\x15.workouts.v1.ExerciseR\texercises\"f\n" +
+	"\texercises\x18\x01 \x03(\v2\x15.workouts.v1.ExerciseR\texercises\"\xa4\x01\n" +
 	"\x15CreateExerciseRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x129\n" +
-	"\bcategory\x18\x02 \x01(\x0e2\x1d.workouts.v1.ExerciseCategoryR\bcategory\"K\n" +
+	"\bcategory\x18\x02 \x01(\x0e2\x1d.workouts.v1.ExerciseCategoryR\bcategory\x12<\n" +
+	"\tequipment\x18\x03 \x01(\x0e2\x1e.workouts.v1.ExerciseEquipmentR\tequipment\"K\n" +
 	"\x16CreateExerciseResponse\x121\n" +
 	"\bexercise\x18\x01 \x01(\v2\x15.workouts.v1.ExerciseR\bexercise\"(\n" +
 	"\x16ArchiveExerciseRequest\x12\x0e\n" +
@@ -512,7 +582,12 @@ const file_workouts_v1_exercise_proto_rawDesc = "" +
 	"\x10ExerciseCategory\x12!\n" +
 	"\x1dEXERCISE_CATEGORY_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bEXERCISE_CATEGORY_MAIN_LIFT\x10\x01\x12\x1f\n" +
-	"\x1bEXERCISE_CATEGORY_ACCESSORY\x10\x022\x80\x03\n" +
+	"\x1bEXERCISE_CATEGORY_ACCESSORY\x10\x02*\x9b\x01\n" +
+	"\x11ExerciseEquipment\x12\"\n" +
+	"\x1eEXERCISE_EQUIPMENT_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aEXERCISE_EQUIPMENT_BARBELL\x10\x01\x12\x1f\n" +
+	"\x1bEXERCISE_EQUIPMENT_DUMBBELL\x10\x02\x12!\n" +
+	"\x1dEXERCISE_EQUIPMENT_BODYWEIGHT\x10\x032\x80\x03\n" +
 	"\x0fExerciseService\x12V\n" +
 	"\rListExercises\x12!.workouts.v1.ListExercisesRequest\x1a\".workouts.v1.ListExercisesResponse\x12Y\n" +
 	"\x0eCreateExercise\x12\".workouts.v1.CreateExerciseRequest\x1a#.workouts.v1.CreateExerciseResponse\x12\\\n" +
@@ -531,40 +606,43 @@ func file_workouts_v1_exercise_proto_rawDescGZIP() []byte {
 	return file_workouts_v1_exercise_proto_rawDescData
 }
 
-var file_workouts_v1_exercise_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_workouts_v1_exercise_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_workouts_v1_exercise_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_workouts_v1_exercise_proto_goTypes = []any{
 	(ExerciseCategory)(0),           // 0: workouts.v1.ExerciseCategory
-	(*Exercise)(nil),                // 1: workouts.v1.Exercise
-	(*ListExercisesRequest)(nil),    // 2: workouts.v1.ListExercisesRequest
-	(*ListExercisesResponse)(nil),   // 3: workouts.v1.ListExercisesResponse
-	(*CreateExerciseRequest)(nil),   // 4: workouts.v1.CreateExerciseRequest
-	(*CreateExerciseResponse)(nil),  // 5: workouts.v1.CreateExerciseResponse
-	(*ArchiveExerciseRequest)(nil),  // 6: workouts.v1.ArchiveExerciseRequest
-	(*ArchiveExerciseResponse)(nil), // 7: workouts.v1.ArchiveExerciseResponse
-	(*RestoreExerciseRequest)(nil),  // 8: workouts.v1.RestoreExerciseRequest
-	(*RestoreExerciseResponse)(nil), // 9: workouts.v1.RestoreExerciseResponse
-	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
+	(ExerciseEquipment)(0),          // 1: workouts.v1.ExerciseEquipment
+	(*Exercise)(nil),                // 2: workouts.v1.Exercise
+	(*ListExercisesRequest)(nil),    // 3: workouts.v1.ListExercisesRequest
+	(*ListExercisesResponse)(nil),   // 4: workouts.v1.ListExercisesResponse
+	(*CreateExerciseRequest)(nil),   // 5: workouts.v1.CreateExerciseRequest
+	(*CreateExerciseResponse)(nil),  // 6: workouts.v1.CreateExerciseResponse
+	(*ArchiveExerciseRequest)(nil),  // 7: workouts.v1.ArchiveExerciseRequest
+	(*ArchiveExerciseResponse)(nil), // 8: workouts.v1.ArchiveExerciseResponse
+	(*RestoreExerciseRequest)(nil),  // 9: workouts.v1.RestoreExerciseRequest
+	(*RestoreExerciseResponse)(nil), // 10: workouts.v1.RestoreExerciseResponse
+	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
 }
 var file_workouts_v1_exercise_proto_depIdxs = []int32{
 	0,  // 0: workouts.v1.Exercise.category:type_name -> workouts.v1.ExerciseCategory
-	10, // 1: workouts.v1.Exercise.created_at:type_name -> google.protobuf.Timestamp
-	1,  // 2: workouts.v1.ListExercisesResponse.exercises:type_name -> workouts.v1.Exercise
-	0,  // 3: workouts.v1.CreateExerciseRequest.category:type_name -> workouts.v1.ExerciseCategory
-	1,  // 4: workouts.v1.CreateExerciseResponse.exercise:type_name -> workouts.v1.Exercise
-	2,  // 5: workouts.v1.ExerciseService.ListExercises:input_type -> workouts.v1.ListExercisesRequest
-	4,  // 6: workouts.v1.ExerciseService.CreateExercise:input_type -> workouts.v1.CreateExerciseRequest
-	6,  // 7: workouts.v1.ExerciseService.ArchiveExercise:input_type -> workouts.v1.ArchiveExerciseRequest
-	8,  // 8: workouts.v1.ExerciseService.RestoreExercise:input_type -> workouts.v1.RestoreExerciseRequest
-	3,  // 9: workouts.v1.ExerciseService.ListExercises:output_type -> workouts.v1.ListExercisesResponse
-	5,  // 10: workouts.v1.ExerciseService.CreateExercise:output_type -> workouts.v1.CreateExerciseResponse
-	7,  // 11: workouts.v1.ExerciseService.ArchiveExercise:output_type -> workouts.v1.ArchiveExerciseResponse
-	9,  // 12: workouts.v1.ExerciseService.RestoreExercise:output_type -> workouts.v1.RestoreExerciseResponse
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	11, // 1: workouts.v1.Exercise.created_at:type_name -> google.protobuf.Timestamp
+	1,  // 2: workouts.v1.Exercise.equipment:type_name -> workouts.v1.ExerciseEquipment
+	2,  // 3: workouts.v1.ListExercisesResponse.exercises:type_name -> workouts.v1.Exercise
+	0,  // 4: workouts.v1.CreateExerciseRequest.category:type_name -> workouts.v1.ExerciseCategory
+	1,  // 5: workouts.v1.CreateExerciseRequest.equipment:type_name -> workouts.v1.ExerciseEquipment
+	2,  // 6: workouts.v1.CreateExerciseResponse.exercise:type_name -> workouts.v1.Exercise
+	3,  // 7: workouts.v1.ExerciseService.ListExercises:input_type -> workouts.v1.ListExercisesRequest
+	5,  // 8: workouts.v1.ExerciseService.CreateExercise:input_type -> workouts.v1.CreateExerciseRequest
+	7,  // 9: workouts.v1.ExerciseService.ArchiveExercise:input_type -> workouts.v1.ArchiveExerciseRequest
+	9,  // 10: workouts.v1.ExerciseService.RestoreExercise:input_type -> workouts.v1.RestoreExerciseRequest
+	4,  // 11: workouts.v1.ExerciseService.ListExercises:output_type -> workouts.v1.ListExercisesResponse
+	6,  // 12: workouts.v1.ExerciseService.CreateExercise:output_type -> workouts.v1.CreateExerciseResponse
+	8,  // 13: workouts.v1.ExerciseService.ArchiveExercise:output_type -> workouts.v1.ArchiveExerciseResponse
+	10, // 14: workouts.v1.ExerciseService.RestoreExercise:output_type -> workouts.v1.RestoreExerciseResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_workouts_v1_exercise_proto_init() }
@@ -577,7 +655,7 @@ func file_workouts_v1_exercise_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_workouts_v1_exercise_proto_rawDesc), len(file_workouts_v1_exercise_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,

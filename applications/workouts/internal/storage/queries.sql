@@ -11,14 +11,14 @@ DELETE FROM users WHERE id = ?;
 SELECT id, name, created_at FROM users WHERE id = ?;
 
 -- name: ListExercises :many
-SELECT id, name, category, archived, created_at FROM exercises ORDER BY created_at ASC;
+SELECT id, name, category, equipment, archived, created_at FROM exercises ORDER BY created_at ASC;
 
 -- name: GetExercise :one
-SELECT id, name, category, archived, created_at FROM exercises WHERE id = ?;
+SELECT id, name, category, equipment, archived, created_at FROM exercises WHERE id = ?;
 
 -- name: CreateExercise :one
-INSERT INTO exercises (id, name, category, archived, created_at) VALUES (?, ?, ?, 0, ?)
-RETURNING id, name, category, archived, created_at;
+INSERT INTO exercises (id, name, category, equipment, archived, created_at) VALUES (?, ?, ?, ?, 0, ?)
+RETURNING id, name, category, equipment, archived, created_at;
 
 -- name: ArchiveExercise :execrows
 UPDATE exercises SET archived = 1 WHERE id = ?;

@@ -48,13 +48,26 @@ func TestService_CreateExercise_RejectsUnspecifiedCategory(t *testing.T) {
 	}
 }
 
+func TestService_CreateExercise_RejectsUnspecifiedEquipment(t *testing.T) {
+	svc := newTestService(t)
+
+	_, err := svc.CreateExercise(context.Background(), connect.NewRequest(&v1.CreateExerciseRequest{
+		Name:     "Squat",
+		Category: v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT,
+	}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("CreateExercise() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
 func TestService_CreateExercise_ThenListExercises(t *testing.T) {
 	ctx := context.Background()
 	svc := newTestService(t)
 
 	created, err := svc.CreateExercise(ctx, connect.NewRequest(&v1.CreateExerciseRequest{
-		Name:     "Squat",
-		Category: v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT,
+		Name:      "Squat",
+		Category:  v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT,
+		Equipment: v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL,
 	}))
 	if err != nil {
 		t.Fatalf("CreateExercise() error = %v", err)
@@ -64,6 +77,9 @@ func TestService_CreateExercise_ThenListExercises(t *testing.T) {
 	}
 	if created.Msg.GetExercise().GetCategory() != v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT {
 		t.Fatalf("CreateExercise() category = %v, want MAIN_LIFT", created.Msg.GetExercise().GetCategory())
+	}
+	if created.Msg.GetExercise().GetEquipment() != v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL {
+		t.Fatalf("CreateExercise() equipment = %v, want BARBELL", created.Msg.GetExercise().GetEquipment())
 	}
 	if created.Msg.GetExercise().GetArchived() {
 		t.Fatal("CreateExercise() returned an archived exercise")
@@ -92,8 +108,9 @@ func TestService_ArchiveExercise_ThenRestore(t *testing.T) {
 	svc := newTestService(t)
 
 	created, err := svc.CreateExercise(ctx, connect.NewRequest(&v1.CreateExerciseRequest{
-		Name:     "Squat",
-		Category: v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT,
+		Name:      "Squat",
+		Category:  v1.ExerciseCategory_EXERCISE_CATEGORY_MAIN_LIFT,
+		Equipment: v1.ExerciseEquipment_EXERCISE_EQUIPMENT_BARBELL,
 	}))
 	if err != nil {
 		t.Fatalf("CreateExercise() error = %v", err)

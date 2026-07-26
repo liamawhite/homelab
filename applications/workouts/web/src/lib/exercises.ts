@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { exerciseClient } from "./client";
-import { ExerciseCategory, type Exercise } from "@/gen/workouts/v1/exercise_pb";
+import { ExerciseCategory, ExerciseEquipment, type Exercise } from "@/gen/workouts/v1/exercise_pb";
 
 const exercisesQueryKey = ["exercises"];
 
@@ -26,8 +26,16 @@ export function useCreateExercise() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ name, category }: { name: string; category: ExerciseCategory }) => {
-      const res = await exerciseClient.createExercise({ name, category });
+    mutationFn: async ({
+      name,
+      category,
+      equipment,
+    }: {
+      name: string;
+      category: ExerciseCategory;
+      equipment: ExerciseEquipment;
+    }) => {
+      const res = await exerciseClient.createExercise({ name, category, equipment });
       if (!res.exercise) {
         throw new Error("CreateExercise response did not include an exercise");
       }
