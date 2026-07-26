@@ -5,6 +5,7 @@ import (
 
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
 	ciliumv2 "github.com/liamawhite/homelab/pkg/crds/cilium/crds/kubernetes/cilium/v2"
+	securityv1 "github.com/liamawhite/homelab/pkg/crds/istio/crds/kubernetes/security/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
@@ -116,6 +117,43 @@ func newNetworkPolicy(ctx *pulumi.Context, name string, opts ...pulumi.ResourceO
 							},
 						},
 					},
+				},
+			},
+		},
+	}, opts...)
+	return err
+}
+
+// newPeerAuthentication overrides the mesh-wide STRICT PeerAuthentication
+// (pkg/components/istio's istio-system/default) down to PERMISSIVE for just
+// webhookPort on this workload - the Light validating webhook is called
+// directly by kube-apiserver, which has no Istio identity/certificate, so
+// mesh-wide STRICT mTLS otherwise has ztunnel reject every admission
+// request outright. Confirmed live: ztunnel logged "connection closed due
+// to policy rejection: explicitly denied by: istio-system/istio_converted_static_strict"
+// for every webhook call crossing nodes (same-node calls were unaffected,
+// which is what made this look like a network/MTU bug for a long time
+// before ztunnel's own access log surfaced the real cause). Port-level
+// mTLS is additive per Istio semantics - this doesn't touch or need to
+// alias the mesh-wide policy.
+func newPeerAuthentication(ctx *pulumi.Context, name string, namespace pulumi.StringInput, opts ...pulumi.ResourceOption) error {
+	_, err := securityv1.NewPeerAuthentication(ctx, fmt.Sprintf("%s-webhook-permissive-mtls", name), &securityv1.PeerAuthenticationArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name:      pulumi.String("lumenetes-controller-webhook-permissive"),
+			Namespace: namespace,
+		},
+		Spec: &securityv1.PeerAuthenticationSpecArgs{
+			Selector: &securityv1.PeerAuthenticationSpecSelectorArgs{
+				MatchLabels: pulumi.StringMap{
+					"app": pulumi.String("lumenetes-controller"),
+				},
+			},
+			Mtls: &securityv1.PeerAuthenticationSpecMtlsArgs{
+				Mode: pulumi.String("STRICT"),
+			},
+			PortLevelMtls: pulumi.StringMapMap{
+				fmt.Sprintf("%d", webhookPort): pulumi.StringMap{
+					"mode": pulumi.String("PERMISSIVE"),
 				},
 			},
 		},

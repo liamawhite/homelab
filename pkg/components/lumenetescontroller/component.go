@@ -423,6 +423,13 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 		return nil, err
 	}
 
+	// 6a. Permissive-mTLS override for the webhook port - see network.go's
+	// newPeerAuthentication doc comment for why kube-apiserver's webhook
+	// calls need this against the mesh-wide STRICT default.
+	if err := newPeerAuthentication(ctx, name, args.Namespace, localOpts...); err != nil {
+		return nil, err
+	}
+
 	// 6b. Prometheus scrape target (PodMonitor + Cilium HBONE CCNP pair) -
 	// see metrics.go.
 	if err := newMetricsScrapeTarget(ctx, name, args.Namespace, args.PrometheusNamespace, localOpts...); err != nil {
