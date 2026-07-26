@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
 function categoryLabel(category: ExerciseCategory): string {
   return category === ExerciseCategory.MAIN_LIFT ? "Main lift" : "Accessory";
@@ -86,10 +85,9 @@ export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps
                 <Button
                   key={option}
                   type="button"
-                  variant="outline"
+                  variant={category === option ? "default" : "outline"}
                   size="sm"
-                  aria-expanded={category === option}
-                  className={cn(category === option && "border-ring")}
+                  aria-pressed={category === option}
                   onClick={() => setCategory(option)}
                 >
                   {categoryLabel(option)}
@@ -106,10 +104,9 @@ export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps
                   <Button
                     key={option}
                     type="button"
-                    variant="outline"
+                    variant={equipment === option ? "default" : "outline"}
                     size="sm"
-                    aria-expanded={equipment === option}
-                    className={cn(equipment === option && "border-ring")}
+                    aria-pressed={equipment === option}
                     onClick={() => setEquipment(option)}
                   >
                     {equipmentLabel(option)}

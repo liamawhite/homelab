@@ -1,30 +1,103 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
-import { Plus } from "lucide-react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
-import { WeightUnit } from "@/gen/workouts/v1/training_max_pb";
+import type { Exercise } from "@/gen/workouts/v1/exercise_pb";
+import type { TrainingMax } from "@/gen/workouts/v1/training_max_pb";
 import { useActiveUser } from "@/lib/activeUser";
 import { useExercises } from "@/lib/exercises";
 import { useCurrentTrainingMaxes } from "@/lib/trainingMaxes";
 import { relativeTime } from "@/lib/time";
-import { RecordTrainingMaxDialog } from "@/components/RecordTrainingMaxDialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { TrainingMaxCell } from "@/components/TrainingMaxCell";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+interface Row {
+  exercise: Exercise;
+  current?: TrainingMax;
+}
+
+const columnHelper = createColumnHelper<Row>();
 
 export function TrainingMaxesPage() {
   const [activeUserId] = useActiveUser();
-  const { data: exercises } = useExercises();
-  const { data: trainingMaxes, isLoading, isError, error } = useCurrentTrainingMaxes(activeUserId);
-  const [dialogExerciseId, setDialogExerciseId] = useState<string | undefined>(undefined);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { data: exercises, isLoading: exercisesLoading } = useExercises();
+  const {
+    data: trainingMaxes,
+    isLoading: maxesLoading,
+    isError,
+    error,
+  } = useCurrentTrainingMaxes(activeUserId);
+  // Both queries must have settled before rendering any row: exercises and
+  // trainingMaxes resolve independently, and TrainingMaxCell only reads its
+  // `current` prop once (via useState's initializer) to seed its inline
+  // input - if it mounted before trainingMaxes resolved, it would latch
+  // onto `current: undefined` and never pick up the real value once the
+  // query finished, showing a blank input for an exercise that does have a
+  // recorded max.
+  const isLoading = exercisesLoading || maxesLoading;
 
-  const activeExercises = exercises?.filter((e) => !e.archived) ?? [];
+  const activeExercises = useMemo(() => exercises?.filter((e) => !e.archived) ?? [], [exercises]);
+  const currentByExerciseId = useMemo(
+    () => new Map((trainingMaxes ?? []).map((max) => [max.exerciseId, max])),
+    [trainingMaxes],
+  );
+  const rows = useMemo<Row[]>(
+    () => activeExercises.map((exercise) => ({ exercise, current: currentByExerciseId.get(exercise.id) })),
+    [activeExercises, currentByExerciseId],
+  );
 
-  function openDialog(exerciseId?: string) {
-    setDialogExerciseId(exerciseId);
-    setDialogOpen(true);
-  }
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor((row) => row.exercise.name, {
+        id: "name",
+        header: "Exercise",
+      }),
+      columnHelper.display({
+        id: "current",
+        header: "Current max",
+        cell: (info) =>
+          activeUserId ? (
+            <TrainingMaxCell
+              userId={activeUserId}
+              exerciseId={info.row.original.exercise.id}
+              current={info.row.original.current}
+            />
+          ) : null,
+      }),
+      columnHelper.display({
+        id: "lastRecorded",
+        header: "Last recorded",
+        cell: (info) => {
+          const effectiveAt = info.row.original.current?.effectiveAt;
+          return (
+            <span className="text-sm text-muted-foreground">
+              {effectiveAt ? relativeTime(timestampDate(effectiveAt)) : "—"}
+            </span>
+          );
+        },
+      }),
+    ],
+    [activeUserId],
+  );
+
+  const table = useReactTable({
+    data: rows,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   if (!activeUserId) {
     return (
@@ -41,64 +114,51 @@ export function TrainingMaxesPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-4 p-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-2">
-          <CardTitle>Training maxes</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1"
-            disabled={activeExercises.length === 0}
-            onClick={() => openDialog(undefined)}
-          >
-            <Plus />
-            Record
-          </Button>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-          {isError && <p className="text-sm text-destructive">{error.message}</p>}
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
+      <h1 className="text-lg font-semibold">Training maxes</h1>
 
-          {trainingMaxes && trainingMaxes.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No training maxes recorded yet.{" "}
-              {activeExercises.length === 0 && (
-                <>
-                  Add an exercise on the{" "}
-                  <Link to="/exercises" className="underline underline-offset-4">
-                    exercises
-                  </Link>{" "}
-                  page first.
-                </>
-              )}
-            </p>
-          )}
+      {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {isError && <p className="text-sm text-destructive">{error.message}</p>}
 
-          {trainingMaxes?.map((max) => (
-            <div key={max.exerciseId} className="flex items-center justify-between gap-2 text-sm">
-              <div>
-                <div className="font-medium">{max.exerciseName}</div>
-                <div className="text-xs text-muted-foreground">
-                  {max.weight} {max.unit === WeightUnit.KG ? "kg" : "lb"}
-                  {max.effectiveAt && <> · {relativeTime(timestampDate(max.effectiveAt))}</>}
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => openDialog(max.exerciseId)}>
-                Record new
-              </Button>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <RecordTrainingMaxDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        userId={activeUserId}
-        exercises={activeExercises}
-        initialExerciseId={dialogExerciseId}
-      />
+      {!isLoading && rows.length > 0 && (
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+      {rows.length === 0 && !isLoading && (
+        <p className="text-sm text-muted-foreground">
+          No exercises yet. Add one on the{" "}
+          <Link to="/exercises" className="underline underline-offset-4">
+            exercises
+          </Link>{" "}
+          page first.
+        </p>
+      )}
     </div>
   );
 }
