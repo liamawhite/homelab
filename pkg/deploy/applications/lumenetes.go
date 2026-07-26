@@ -67,6 +67,7 @@ var defaultGroups = []struct {
 		Name: "front-office",
 		Lights: []string{
 			"8f69d609-4faf-4f5b-ae89-eb7f316042ba", // Liam Office Ceiling
+			"c5fbf27a-0be3-4d54-8f48-c871471ef8ae", // Desk Lightstrip
 		},
 	},
 	{
