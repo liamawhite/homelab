@@ -7,22 +7,92 @@ package sqlcgen
 
 import (
 	"context"
+	"database/sql"
 )
 
+const archiveLabel = `-- name: ArchiveLabel :execrows
+UPDATE labels SET archived = 1 WHERE id = ?
+`
+
+func (q *Queries) ArchiveLabel(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, archiveLabel, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const countLabels = `-- name: CountLabels :one
+SELECT COUNT(*) FROM labels
+`
+
+func (q *Queries) CountLabels(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countLabels)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createItem = `-- name: CreateItem :one
-INSERT INTO items (id, name, created_at) VALUES (?, ?, ?) RETURNING id, name, created_at
+INSERT INTO items (id, name, label_id, status, completed_at, created_at)
+VALUES (?, ?, ?, 'todo', NULL, ?)
+RETURNING id, name, label_id, status, completed_at, created_at
 `
 
 type CreateItemParams struct {
 	ID        string
 	Name      string
+	LabelID   string
 	CreatedAt string
 }
 
+// New items always start todo/uncompleted - status and completed_at are
+// never caller-supplied.
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
-	row := q.db.QueryRowContext(ctx, createItem, arg.ID, arg.Name, arg.CreatedAt)
+	row := q.db.QueryRowContext(ctx, createItem,
+		arg.ID,
+		arg.Name,
+		arg.LabelID,
+		arg.CreatedAt,
+	)
 	var i Item
-	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.LabelID,
+		&i.Status,
+		&i.CompletedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createLabel = `-- name: CreateLabel :one
+INSERT INTO labels (id, name, archived, created_at, color) VALUES (?, ?, 0, ?, ?) RETURNING id, name, archived, created_at, color
+`
+
+type CreateLabelParams struct {
+	ID        string
+	Name      string
+	CreatedAt string
+	Color     string
+}
+
+func (q *Queries) CreateLabel(ctx context.Context, arg CreateLabelParams) (Label, error) {
+	row := q.db.QueryRowContext(ctx, createLabel,
+		arg.ID,
+		arg.Name,
+		arg.CreatedAt,
+		arg.Color,
+	)
+	var i Label
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Archived,
+		&i.CreatedAt,
+		&i.Color,
+	)
 	return i, err
 }
 
@@ -38,20 +108,59 @@ func (q *Queries) DeleteItem(ctx context.Context, id string) (int64, error) {
 	return result.RowsAffected()
 }
 
-const listItems = `-- name: ListItems :many
-SELECT id, name, created_at FROM items ORDER BY created_at ASC
+const getLabel = `-- name: GetLabel :one
+SELECT id, name, archived, created_at, color FROM labels WHERE id = ?
 `
 
-func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
+func (q *Queries) GetLabel(ctx context.Context, id string) (Label, error) {
+	row := q.db.QueryRowContext(ctx, getLabel, id)
+	var i Label
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Archived,
+		&i.CreatedAt,
+		&i.Color,
+	)
+	return i, err
+}
+
+const listItems = `-- name: ListItems :many
+SELECT items.id, items.name, items.created_at, items.label_id, items.status, items.completed_at, labels.name AS label_name
+FROM items
+JOIN labels ON labels.id = items.label_id
+`
+
+type ListItemsRow struct {
+	ID          string
+	Name        string
+	CreatedAt   string
+	LabelID     string
+	Status      string
+	CompletedAt sql.NullString
+	LabelName   string
+}
+
+// No ORDER BY - display order is a client concern, not the server's (see
+// web/src/lib/items.ts's useItems for the actual sort).
+func (q *Queries) ListItems(ctx context.Context) ([]ListItemsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listItems)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Item
+	var items []ListItemsRow
 	for rows.Next() {
-		var i Item
-		if err := rows.Scan(&i.ID, &i.Name, &i.CreatedAt); err != nil {
+		var i ListItemsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.CreatedAt,
+			&i.LabelID,
+			&i.Status,
+			&i.CompletedAt,
+			&i.LabelName,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -63,4 +172,98 @@ func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const listLabels = `-- name: ListLabels :many
+SELECT id, name, archived, created_at, color FROM labels
+`
+
+// No ORDER BY - display order is a client concern, not the server's (see
+// web/src/lib/labels.ts's useLabels for the actual sort).
+func (q *Queries) ListLabels(ctx context.Context) ([]Label, error) {
+	rows, err := q.db.QueryContext(ctx, listLabels)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Label
+	for rows.Next() {
+		var i Label
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Archived,
+			&i.CreatedAt,
+			&i.Color,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const restoreLabel = `-- name: RestoreLabel :execrows
+UPDATE labels SET archived = 0 WHERE id = ?
+`
+
+func (q *Queries) RestoreLabel(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, restoreLabel, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const setItemStatus = `-- name: SetItemStatus :one
+UPDATE items SET status = ?, completed_at = ? WHERE id = ?
+RETURNING id, name, label_id, status, completed_at, created_at
+`
+
+type SetItemStatusParams struct {
+	Status      string
+	CompletedAt sql.NullString
+	ID          string
+}
+
+func (q *Queries) SetItemStatus(ctx context.Context, arg SetItemStatusParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, setItemStatus, arg.Status, arg.CompletedAt, arg.ID)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.LabelID,
+		&i.Status,
+		&i.CompletedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const setLabelColor = `-- name: SetLabelColor :one
+UPDATE labels SET color = ? WHERE id = ? RETURNING id, name, archived, created_at, color
+`
+
+type SetLabelColorParams struct {
+	Color string
+	ID    string
+}
+
+func (q *Queries) SetLabelColor(ctx context.Context, arg SetLabelColorParams) (Label, error) {
+	row := q.db.QueryRowContext(ctx, setLabelColor, arg.Color, arg.ID)
+	var i Label
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Archived,
+		&i.CreatedAt,
+		&i.Color,
+	)
+	return i, err
 }

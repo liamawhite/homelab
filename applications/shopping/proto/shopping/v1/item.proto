@@ -6,10 +6,21 @@ option go_package = "github.com/liamawhite/shopping/gen/shopping/v1;shoppingv1";
 
 import "google/protobuf/timestamp.proto";
 
+enum ItemStatus {
+  ITEM_STATUS_UNSPECIFIED = 0;
+  ITEM_STATUS_TODO = 1;
+  ITEM_STATUS_DONE = 2;
+}
+
 message Item {
   string id = 1;
   string name = 2;
-  google.protobuf.Timestamp created_at = 3;
+  string label_id = 3;
+  string label_name = 4;
+  google.protobuf.Timestamp created_at = 5;
+  ItemStatus status = 6;
+  // completed_at is set if and only if status is ITEM_STATUS_DONE.
+  google.protobuf.Timestamp completed_at = 7;
 }
 
 message ListItemsRequest {}
@@ -20,6 +31,9 @@ message ListItemsResponse {
 
 message CreateItemRequest {
   string name = 1;
+  // label_id is optional - if empty, the item resolves to the
+  // "Uncategorized" label.
+  string label_id = 2;
 }
 
 message CreateItemResponse {
@@ -32,8 +46,18 @@ message DeleteItemRequest {
 
 message DeleteItemResponse {}
 
+message UpdateItemStatusRequest {
+  string id = 1;
+  ItemStatus status = 2;
+}
+
+message UpdateItemStatusResponse {
+  Item item = 1;
+}
+
 service ItemService {
   rpc ListItems(ListItemsRequest) returns (ListItemsResponse);
   rpc CreateItem(CreateItemRequest) returns (CreateItemResponse);
   rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+  rpc UpdateItemStatus(UpdateItemStatusRequest) returns (UpdateItemStatusResponse);
 }

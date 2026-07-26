@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package shopping.v1;
+
+option go_package = "github.com/liamawhite/shopping/gen/shopping/v1;shoppingv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Label {
+  string id = 1;
+  string name = 2;
+  bool archived = 3;
+  google.protobuf.Timestamp created_at = 4;
+  // color is a hex string (e.g. "#e03131") - always one of a fixed set of
+  // palette values, never arbitrary.
+  string color = 5;
+}
+
+message ListLabelsRequest {}
+
+message ListLabelsResponse {
+  repeated Label labels = 1;
+}
+
+message CreateLabelRequest {
+  string name = 1;
+}
+
+message CreateLabelResponse {
+  Label label = 1;
+}
+
+message ArchiveLabelRequest {
+  string id = 1;
+}
+
+message ArchiveLabelResponse {}
+
+message RestoreLabelRequest {
+  string id = 1;
+}
+
+message RestoreLabelResponse {}
+
+message UpdateLabelColorRequest {
+  string id = 1;
+  string color = 2;
+}
+
+message UpdateLabelColorResponse {
+  Label label = 1;
+}
+
+service LabelService {
+  rpc ListLabels(ListLabelsRequest) returns (ListLabelsResponse);
+  rpc CreateLabel(CreateLabelRequest) returns (CreateLabelResponse);
+  rpc ArchiveLabel(ArchiveLabelRequest) returns (ArchiveLabelResponse);
+  rpc RestoreLabel(RestoreLabelRequest) returns (RestoreLabelResponse);
+  rpc UpdateLabelColor(UpdateLabelColorRequest) returns (UpdateLabelColorResponse);
+}

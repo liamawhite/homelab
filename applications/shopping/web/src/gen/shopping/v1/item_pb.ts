@@ -2,8 +2,8 @@
 // @generated from file shopping/v1/item.proto (package shopping.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file shopping/v1/item.proto.
  */
 export const file_shopping_v1_item: GenFile = /*@__PURE__*/
-  fileDesc("ChZzaG9wcGluZy92MS9pdGVtLnByb3RvEgtzaG9wcGluZy52MSJQCgRJdGVtEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiEgoQTGlzdEl0ZW1zUmVxdWVzdCI1ChFMaXN0SXRlbXNSZXNwb25zZRIgCgVpdGVtcxgBIAMoCzIRLnNob3BwaW5nLnYxLkl0ZW0iIQoRQ3JlYXRlSXRlbVJlcXVlc3QSDAoEbmFtZRgBIAEoCSI1ChJDcmVhdGVJdGVtUmVzcG9uc2USHwoEaXRlbRgBIAEoCzIRLnNob3BwaW5nLnYxLkl0ZW0iHwoRRGVsZXRlSXRlbVJlcXVlc3QSCgoCaWQYASABKAkiFAoSRGVsZXRlSXRlbVJlc3BvbnNlMvcBCgtJdGVtU2VydmljZRJKCglMaXN0SXRlbXMSHS5zaG9wcGluZy52MS5MaXN0SXRlbXNSZXF1ZXN0Gh4uc2hvcHBpbmcudjEuTGlzdEl0ZW1zUmVzcG9uc2USTQoKQ3JlYXRlSXRlbRIeLnNob3BwaW5nLnYxLkNyZWF0ZUl0ZW1SZXF1ZXN0Gh8uc2hvcHBpbmcudjEuQ3JlYXRlSXRlbVJlc3BvbnNlEk0KCkRlbGV0ZUl0ZW0SHi5zaG9wcGluZy52MS5EZWxldGVJdGVtUmVxdWVzdBofLnNob3BwaW5nLnYxLkRlbGV0ZUl0ZW1SZXNwb25zZUI7WjlnaXRodWIuY29tL2xpYW1hd2hpdGUvc2hvcHBpbmcvZ2VuL3Nob3BwaW5nL3YxO3Nob3BwaW5ndjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("ChZzaG9wcGluZy92MS9pdGVtLnByb3RvEgtzaG9wcGluZy52MSLRAQoESXRlbRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhAKCGxhYmVsX2lkGAMgASgJEhIKCmxhYmVsX25hbWUYBCABKAkSLgoKY3JlYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJwoGc3RhdHVzGAYgASgOMhcuc2hvcHBpbmcudjEuSXRlbVN0YXR1cxIwCgxjb21wbGV0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhIKEExpc3RJdGVtc1JlcXVlc3QiNQoRTGlzdEl0ZW1zUmVzcG9uc2USIAoFaXRlbXMYASADKAsyES5zaG9wcGluZy52MS5JdGVtIjMKEUNyZWF0ZUl0ZW1SZXF1ZXN0EgwKBG5hbWUYASABKAkSEAoIbGFiZWxfaWQYAiABKAkiNQoSQ3JlYXRlSXRlbVJlc3BvbnNlEh8KBGl0ZW0YASABKAsyES5zaG9wcGluZy52MS5JdGVtIh8KEURlbGV0ZUl0ZW1SZXF1ZXN0EgoKAmlkGAEgASgJIhQKEkRlbGV0ZUl0ZW1SZXNwb25zZSJOChdVcGRhdGVJdGVtU3RhdHVzUmVxdWVzdBIKCgJpZBgBIAEoCRInCgZzdGF0dXMYAiABKA4yFy5zaG9wcGluZy52MS5JdGVtU3RhdHVzIjsKGFVwZGF0ZUl0ZW1TdGF0dXNSZXNwb25zZRIfCgRpdGVtGAEgASgLMhEuc2hvcHBpbmcudjEuSXRlbSpVCgpJdGVtU3RhdHVzEhsKF0lURU1fU1RBVFVTX1VOU1BFQ0lGSUVEEAASFAoQSVRFTV9TVEFUVVNfVE9ETxABEhQKEElURU1fU1RBVFVTX0RPTkUQAjLYAgoLSXRlbVNlcnZpY2USSgoJTGlzdEl0ZW1zEh0uc2hvcHBpbmcudjEuTGlzdEl0ZW1zUmVxdWVzdBoeLnNob3BwaW5nLnYxLkxpc3RJdGVtc1Jlc3BvbnNlEk0KCkNyZWF0ZUl0ZW0SHi5zaG9wcGluZy52MS5DcmVhdGVJdGVtUmVxdWVzdBofLnNob3BwaW5nLnYxLkNyZWF0ZUl0ZW1SZXNwb25zZRJNCgpEZWxldGVJdGVtEh4uc2hvcHBpbmcudjEuRGVsZXRlSXRlbVJlcXVlc3QaHy5zaG9wcGluZy52MS5EZWxldGVJdGVtUmVzcG9uc2USXwoQVXBkYXRlSXRlbVN0YXR1cxIkLnNob3BwaW5nLnYxLlVwZGF0ZUl0ZW1TdGF0dXNSZXF1ZXN0GiUuc2hvcHBpbmcudjEuVXBkYXRlSXRlbVN0YXR1c1Jlc3BvbnNlQjtaOWdpdGh1Yi5jb20vbGlhbWF3aGl0ZS9zaG9wcGluZy9nZW4vc2hvcHBpbmcvdjE7c2hvcHBpbmd2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message shopping.v1.Item
@@ -29,9 +29,31 @@ export type Item = Message<"shopping.v1.Item"> & {
   name: string;
 
   /**
-   * @generated from field: google.protobuf.Timestamp created_at = 3;
+   * @generated from field: string label_id = 3;
+   */
+  labelId: string;
+
+  /**
+   * @generated from field: string label_name = 4;
+   */
+  labelName: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 5;
    */
   createdAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: shopping.v1.ItemStatus status = 6;
+   */
+  status: ItemStatus;
+
+  /**
+   * completed_at is set if and only if status is ITEM_STATUS_DONE.
+   *
+   * @generated from field: google.protobuf.Timestamp completed_at = 7;
+   */
+  completedAt?: Timestamp | undefined;
 };
 
 /**
@@ -79,6 +101,14 @@ export type CreateItemRequest = Message<"shopping.v1.CreateItemRequest"> & {
    * @generated from field: string name = 1;
    */
   name: string;
+
+  /**
+   * label_id is optional - if empty, the item resolves to the
+   * "Uncategorized" label.
+   *
+   * @generated from field: string label_id = 2;
+   */
+  labelId: string;
 };
 
 /**
@@ -136,6 +166,71 @@ export const DeleteItemResponseSchema: GenMessage<DeleteItemResponse> = /*@__PUR
   messageDesc(file_shopping_v1_item, 6);
 
 /**
+ * @generated from message shopping.v1.UpdateItemStatusRequest
+ */
+export type UpdateItemStatusRequest = Message<"shopping.v1.UpdateItemStatusRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: shopping.v1.ItemStatus status = 2;
+   */
+  status: ItemStatus;
+};
+
+/**
+ * Describes the message shopping.v1.UpdateItemStatusRequest.
+ * Use `create(UpdateItemStatusRequestSchema)` to create a new message.
+ */
+export const UpdateItemStatusRequestSchema: GenMessage<UpdateItemStatusRequest> = /*@__PURE__*/
+  messageDesc(file_shopping_v1_item, 7);
+
+/**
+ * @generated from message shopping.v1.UpdateItemStatusResponse
+ */
+export type UpdateItemStatusResponse = Message<"shopping.v1.UpdateItemStatusResponse"> & {
+  /**
+   * @generated from field: shopping.v1.Item item = 1;
+   */
+  item?: Item | undefined;
+};
+
+/**
+ * Describes the message shopping.v1.UpdateItemStatusResponse.
+ * Use `create(UpdateItemStatusResponseSchema)` to create a new message.
+ */
+export const UpdateItemStatusResponseSchema: GenMessage<UpdateItemStatusResponse> = /*@__PURE__*/
+  messageDesc(file_shopping_v1_item, 8);
+
+/**
+ * @generated from enum shopping.v1.ItemStatus
+ */
+export enum ItemStatus {
+  /**
+   * @generated from enum value: ITEM_STATUS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ITEM_STATUS_TODO = 1;
+   */
+  TODO = 1,
+
+  /**
+   * @generated from enum value: ITEM_STATUS_DONE = 2;
+   */
+  DONE = 2,
+}
+
+/**
+ * Describes the enum shopping.v1.ItemStatus.
+ */
+export const ItemStatusSchema: GenEnum<ItemStatus> = /*@__PURE__*/
+  enumDesc(file_shopping_v1_item, 0);
+
+/**
  * @generated from service shopping.v1.ItemService
  */
 export const ItemService: GenService<{
@@ -162,6 +257,14 @@ export const ItemService: GenService<{
     methodKind: "unary";
     input: typeof DeleteItemRequestSchema;
     output: typeof DeleteItemResponseSchema;
+  },
+  /**
+   * @generated from rpc shopping.v1.ItemService.UpdateItemStatus
+   */
+  updateItemStatus: {
+    methodKind: "unary";
+    input: typeof UpdateItemStatusRequestSchema;
+    output: typeof UpdateItemStatusResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_shopping_v1_item, 0);

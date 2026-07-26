@@ -9,9 +9,23 @@ import (
 )
 
 type Querier interface {
+	ArchiveLabel(ctx context.Context, id string) (int64, error)
+	CountLabels(ctx context.Context) (int64, error)
+	// New items always start todo/uncompleted - status and completed_at are
+	// never caller-supplied.
 	CreateItem(ctx context.Context, arg CreateItemParams) (Item, error)
+	CreateLabel(ctx context.Context, arg CreateLabelParams) (Label, error)
 	DeleteItem(ctx context.Context, id string) (int64, error)
-	ListItems(ctx context.Context) ([]Item, error)
+	GetLabel(ctx context.Context, id string) (Label, error)
+	// No ORDER BY - display order is a client concern, not the server's (see
+	// web/src/lib/items.ts's useItems for the actual sort).
+	ListItems(ctx context.Context) ([]ListItemsRow, error)
+	// No ORDER BY - display order is a client concern, not the server's (see
+	// web/src/lib/labels.ts's useLabels for the actual sort).
+	ListLabels(ctx context.Context) ([]Label, error)
+	RestoreLabel(ctx context.Context, id string) (int64, error)
+	SetItemStatus(ctx context.Context, arg SetItemStatusParams) (Item, error)
+	SetLabelColor(ctx context.Context, arg SetLabelColorParams) (Label, error)
 }
 
 var _ Querier = (*Queries)(nil)

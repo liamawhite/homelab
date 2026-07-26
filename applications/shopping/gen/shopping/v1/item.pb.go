@@ -22,11 +22,65 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ItemStatus int32
+
+const (
+	ItemStatus_ITEM_STATUS_UNSPECIFIED ItemStatus = 0
+	ItemStatus_ITEM_STATUS_TODO        ItemStatus = 1
+	ItemStatus_ITEM_STATUS_DONE        ItemStatus = 2
+)
+
+// Enum value maps for ItemStatus.
+var (
+	ItemStatus_name = map[int32]string{
+		0: "ITEM_STATUS_UNSPECIFIED",
+		1: "ITEM_STATUS_TODO",
+		2: "ITEM_STATUS_DONE",
+	}
+	ItemStatus_value = map[string]int32{
+		"ITEM_STATUS_UNSPECIFIED": 0,
+		"ITEM_STATUS_TODO":        1,
+		"ITEM_STATUS_DONE":        2,
+	}
+)
+
+func (x ItemStatus) Enum() *ItemStatus {
+	p := new(ItemStatus)
+	*p = x
+	return p
+}
+
+func (x ItemStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ItemStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_shopping_v1_item_proto_enumTypes[0].Descriptor()
+}
+
+func (ItemStatus) Type() protoreflect.EnumType {
+	return &file_shopping_v1_item_proto_enumTypes[0]
+}
+
+func (x ItemStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ItemStatus.Descriptor instead.
+func (ItemStatus) EnumDescriptor() ([]byte, []int) {
+	return file_shopping_v1_item_proto_rawDescGZIP(), []int{0}
+}
+
 type Item struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	LabelId   string                 `protobuf:"bytes,3,opt,name=label_id,json=labelId,proto3" json:"label_id,omitempty"`
+	LabelName string                 `protobuf:"bytes,4,opt,name=label_name,json=labelName,proto3" json:"label_name,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Status    ItemStatus             `protobuf:"varint,6,opt,name=status,proto3,enum=shopping.v1.ItemStatus" json:"status,omitempty"`
+	// completed_at is set if and only if status is ITEM_STATUS_DONE.
+	CompletedAt   *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,9 +129,37 @@ func (x *Item) GetName() string {
 	return ""
 }
 
+func (x *Item) GetLabelId() string {
+	if x != nil {
+		return x.LabelId
+	}
+	return ""
+}
+
+func (x *Item) GetLabelName() string {
+	if x != nil {
+		return x.LabelName
+	}
+	return ""
+}
+
 func (x *Item) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Item) GetStatus() ItemStatus {
+	if x != nil {
+		return x.Status
+	}
+	return ItemStatus_ITEM_STATUS_UNSPECIFIED
+}
+
+func (x *Item) GetCompletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletedAt
 	}
 	return nil
 }
@@ -163,8 +245,11 @@ func (x *ListItemsResponse) GetItems() []*Item {
 }
 
 type CreateItemRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// label_id is optional - if empty, the item resolves to the
+	// "Uncategorized" label.
+	LabelId       string `protobuf:"bytes,2,opt,name=label_id,json=labelId,proto3" json:"label_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -202,6 +287,13 @@ func (*CreateItemRequest) Descriptor() ([]byte, []int) {
 func (x *CreateItemRequest) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateItemRequest) GetLabelId() string {
+	if x != nil {
+		return x.LabelId
 	}
 	return ""
 }
@@ -330,32 +422,145 @@ func (*DeleteItemResponse) Descriptor() ([]byte, []int) {
 	return file_shopping_v1_item_proto_rawDescGZIP(), []int{6}
 }
 
+type UpdateItemStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        ItemStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=shopping.v1.ItemStatus" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateItemStatusRequest) Reset() {
+	*x = UpdateItemStatusRequest{}
+	mi := &file_shopping_v1_item_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateItemStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateItemStatusRequest) ProtoMessage() {}
+
+func (x *UpdateItemStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_shopping_v1_item_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateItemStatusRequest.ProtoReflect.Descriptor instead.
+func (*UpdateItemStatusRequest) Descriptor() ([]byte, []int) {
+	return file_shopping_v1_item_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateItemStatusRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateItemStatusRequest) GetStatus() ItemStatus {
+	if x != nil {
+		return x.Status
+	}
+	return ItemStatus_ITEM_STATUS_UNSPECIFIED
+}
+
+type UpdateItemStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateItemStatusResponse) Reset() {
+	*x = UpdateItemStatusResponse{}
+	mi := &file_shopping_v1_item_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateItemStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateItemStatusResponse) ProtoMessage() {}
+
+func (x *UpdateItemStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_shopping_v1_item_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateItemStatusResponse.ProtoReflect.Descriptor instead.
+func (*UpdateItemStatusResponse) Descriptor() ([]byte, []int) {
+	return file_shopping_v1_item_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateItemStatusResponse) GetItem() *Item {
+	if x != nil {
+		return x.Item
+	}
+	return nil
+}
+
 var File_shopping_v1_item_proto protoreflect.FileDescriptor
 
 const file_shopping_v1_item_proto_rawDesc = "" +
 	"\n" +
-	"\x16shopping/v1/item.proto\x12\vshopping.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"e\n" +
+	"\x16shopping/v1/item.proto\x12\vshopping.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8f\x02\n" +
 	"\x04Item\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
+	"\blabel_id\x18\x03 \x01(\tR\alabelId\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x12\n" +
+	"label_name\x18\x04 \x01(\tR\tlabelName\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12/\n" +
+	"\x06status\x18\x06 \x01(\x0e2\x17.shopping.v1.ItemStatusR\x06status\x12=\n" +
+	"\fcompleted_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\"\x12\n" +
 	"\x10ListItemsRequest\"<\n" +
 	"\x11ListItemsResponse\x12'\n" +
-	"\x05items\x18\x01 \x03(\v2\x11.shopping.v1.ItemR\x05items\"'\n" +
+	"\x05items\x18\x01 \x03(\v2\x11.shopping.v1.ItemR\x05items\"B\n" +
 	"\x11CreateItemRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\";\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x19\n" +
+	"\blabel_id\x18\x02 \x01(\tR\alabelId\";\n" +
 	"\x12CreateItemResponse\x12%\n" +
 	"\x04item\x18\x01 \x01(\v2\x11.shopping.v1.ItemR\x04item\"#\n" +
 	"\x11DeleteItemRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
-	"\x12DeleteItemResponse2\xf7\x01\n" +
+	"\x12DeleteItemResponse\"Z\n" +
+	"\x17UpdateItemStatusRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12/\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x17.shopping.v1.ItemStatusR\x06status\"A\n" +
+	"\x18UpdateItemStatusResponse\x12%\n" +
+	"\x04item\x18\x01 \x01(\v2\x11.shopping.v1.ItemR\x04item*U\n" +
+	"\n" +
+	"ItemStatus\x12\x1b\n" +
+	"\x17ITEM_STATUS_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10ITEM_STATUS_TODO\x10\x01\x12\x14\n" +
+	"\x10ITEM_STATUS_DONE\x10\x022\xd8\x02\n" +
 	"\vItemService\x12J\n" +
 	"\tListItems\x12\x1d.shopping.v1.ListItemsRequest\x1a\x1e.shopping.v1.ListItemsResponse\x12M\n" +
 	"\n" +
 	"CreateItem\x12\x1e.shopping.v1.CreateItemRequest\x1a\x1f.shopping.v1.CreateItemResponse\x12M\n" +
 	"\n" +
-	"DeleteItem\x12\x1e.shopping.v1.DeleteItemRequest\x1a\x1f.shopping.v1.DeleteItemResponseB;Z9github.com/liamawhite/shopping/gen/shopping/v1;shoppingv1b\x06proto3"
+	"DeleteItem\x12\x1e.shopping.v1.DeleteItemRequest\x1a\x1f.shopping.v1.DeleteItemResponse\x12_\n" +
+	"\x10UpdateItemStatus\x12$.shopping.v1.UpdateItemStatusRequest\x1a%.shopping.v1.UpdateItemStatusResponseB;Z9github.com/liamawhite/shopping/gen/shopping/v1;shoppingv1b\x06proto3"
 
 var (
 	file_shopping_v1_item_proto_rawDescOnce sync.Once
@@ -369,32 +574,42 @@ func file_shopping_v1_item_proto_rawDescGZIP() []byte {
 	return file_shopping_v1_item_proto_rawDescData
 }
 
-var file_shopping_v1_item_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_shopping_v1_item_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_shopping_v1_item_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_shopping_v1_item_proto_goTypes = []any{
-	(*Item)(nil),                  // 0: shopping.v1.Item
-	(*ListItemsRequest)(nil),      // 1: shopping.v1.ListItemsRequest
-	(*ListItemsResponse)(nil),     // 2: shopping.v1.ListItemsResponse
-	(*CreateItemRequest)(nil),     // 3: shopping.v1.CreateItemRequest
-	(*CreateItemResponse)(nil),    // 4: shopping.v1.CreateItemResponse
-	(*DeleteItemRequest)(nil),     // 5: shopping.v1.DeleteItemRequest
-	(*DeleteItemResponse)(nil),    // 6: shopping.v1.DeleteItemResponse
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
+	(ItemStatus)(0),                  // 0: shopping.v1.ItemStatus
+	(*Item)(nil),                     // 1: shopping.v1.Item
+	(*ListItemsRequest)(nil),         // 2: shopping.v1.ListItemsRequest
+	(*ListItemsResponse)(nil),        // 3: shopping.v1.ListItemsResponse
+	(*CreateItemRequest)(nil),        // 4: shopping.v1.CreateItemRequest
+	(*CreateItemResponse)(nil),       // 5: shopping.v1.CreateItemResponse
+	(*DeleteItemRequest)(nil),        // 6: shopping.v1.DeleteItemRequest
+	(*DeleteItemResponse)(nil),       // 7: shopping.v1.DeleteItemResponse
+	(*UpdateItemStatusRequest)(nil),  // 8: shopping.v1.UpdateItemStatusRequest
+	(*UpdateItemStatusResponse)(nil), // 9: shopping.v1.UpdateItemStatusResponse
+	(*timestamppb.Timestamp)(nil),    // 10: google.protobuf.Timestamp
 }
 var file_shopping_v1_item_proto_depIdxs = []int32{
-	7, // 0: shopping.v1.Item.created_at:type_name -> google.protobuf.Timestamp
-	0, // 1: shopping.v1.ListItemsResponse.items:type_name -> shopping.v1.Item
-	0, // 2: shopping.v1.CreateItemResponse.item:type_name -> shopping.v1.Item
-	1, // 3: shopping.v1.ItemService.ListItems:input_type -> shopping.v1.ListItemsRequest
-	3, // 4: shopping.v1.ItemService.CreateItem:input_type -> shopping.v1.CreateItemRequest
-	5, // 5: shopping.v1.ItemService.DeleteItem:input_type -> shopping.v1.DeleteItemRequest
-	2, // 6: shopping.v1.ItemService.ListItems:output_type -> shopping.v1.ListItemsResponse
-	4, // 7: shopping.v1.ItemService.CreateItem:output_type -> shopping.v1.CreateItemResponse
-	6, // 8: shopping.v1.ItemService.DeleteItem:output_type -> shopping.v1.DeleteItemResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	10, // 0: shopping.v1.Item.created_at:type_name -> google.protobuf.Timestamp
+	0,  // 1: shopping.v1.Item.status:type_name -> shopping.v1.ItemStatus
+	10, // 2: shopping.v1.Item.completed_at:type_name -> google.protobuf.Timestamp
+	1,  // 3: shopping.v1.ListItemsResponse.items:type_name -> shopping.v1.Item
+	1,  // 4: shopping.v1.CreateItemResponse.item:type_name -> shopping.v1.Item
+	0,  // 5: shopping.v1.UpdateItemStatusRequest.status:type_name -> shopping.v1.ItemStatus
+	1,  // 6: shopping.v1.UpdateItemStatusResponse.item:type_name -> shopping.v1.Item
+	2,  // 7: shopping.v1.ItemService.ListItems:input_type -> shopping.v1.ListItemsRequest
+	4,  // 8: shopping.v1.ItemService.CreateItem:input_type -> shopping.v1.CreateItemRequest
+	6,  // 9: shopping.v1.ItemService.DeleteItem:input_type -> shopping.v1.DeleteItemRequest
+	8,  // 10: shopping.v1.ItemService.UpdateItemStatus:input_type -> shopping.v1.UpdateItemStatusRequest
+	3,  // 11: shopping.v1.ItemService.ListItems:output_type -> shopping.v1.ListItemsResponse
+	5,  // 12: shopping.v1.ItemService.CreateItem:output_type -> shopping.v1.CreateItemResponse
+	7,  // 13: shopping.v1.ItemService.DeleteItem:output_type -> shopping.v1.DeleteItemResponse
+	9,  // 14: shopping.v1.ItemService.UpdateItemStatus:output_type -> shopping.v1.UpdateItemStatusResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_shopping_v1_item_proto_init() }
@@ -407,13 +622,14 @@ func file_shopping_v1_item_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_shopping_v1_item_proto_rawDesc), len(file_shopping_v1_item_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   7,
+			NumEnums:      1,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_shopping_v1_item_proto_goTypes,
 		DependencyIndexes: file_shopping_v1_item_proto_depIdxs,
+		EnumInfos:         file_shopping_v1_item_proto_enumTypes,
 		MessageInfos:      file_shopping_v1_item_proto_msgTypes,
 	}.Build()
 	File_shopping_v1_item_proto = out.File

@@ -10,6 +10,7 @@ import (
 
 	"github.com/liamawhite/shopping/gen/shopping/v1/shoppingv1connect"
 	"github.com/liamawhite/shopping/internal/itemservice"
+	"github.com/liamawhite/shopping/internal/labelservice"
 	"github.com/liamawhite/shopping/internal/webui"
 )
 
@@ -19,11 +20,14 @@ import (
 // so gRPC/gRPC-Web clients need HTTP/2 over cleartext (h2c) to negotiate at
 // all; the caller enables that via http.Server's Protocols field rather than
 // wrapping the handler, since Go 1.24+ supports h2c natively.
-func New(svc *itemservice.Service) (http.Handler, error) {
+func New(items *itemservice.Service, labels *labelservice.Service) (http.Handler, error) {
 	mux := http.NewServeMux()
 
-	path, handler := shoppingv1connect.NewItemServiceHandler(svc)
-	mux.Handle(path, handler)
+	itemsPath, itemsHandler := shoppingv1connect.NewItemServiceHandler(items)
+	mux.Handle(itemsPath, itemsHandler)
+
+	labelsPath, labelsHandler := shoppingv1connect.NewLabelServiceHandler(labels)
+	mux.Handle(labelsPath, labelsHandler)
 
 	spa, err := newSPAHandler()
 	if err != nil {

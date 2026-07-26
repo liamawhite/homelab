@@ -39,6 +39,9 @@ const (
 	ItemServiceCreateItemProcedure = "/shopping.v1.ItemService/CreateItem"
 	// ItemServiceDeleteItemProcedure is the fully-qualified name of the ItemService's DeleteItem RPC.
 	ItemServiceDeleteItemProcedure = "/shopping.v1.ItemService/DeleteItem"
+	// ItemServiceUpdateItemStatusProcedure is the fully-qualified name of the ItemService's
+	// UpdateItemStatus RPC.
+	ItemServiceUpdateItemStatusProcedure = "/shopping.v1.ItemService/UpdateItemStatus"
 )
 
 // ItemServiceClient is a client for the shopping.v1.ItemService service.
@@ -46,6 +49,7 @@ type ItemServiceClient interface {
 	ListItems(context.Context, *connect.Request[v1.ListItemsRequest]) (*connect.Response[v1.ListItemsResponse], error)
 	CreateItem(context.Context, *connect.Request[v1.CreateItemRequest]) (*connect.Response[v1.CreateItemResponse], error)
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	UpdateItemStatus(context.Context, *connect.Request[v1.UpdateItemStatusRequest]) (*connect.Response[v1.UpdateItemStatusResponse], error)
 }
 
 // NewItemServiceClient constructs a client for the shopping.v1.ItemService service. By default, it
@@ -77,14 +81,21 @@ func NewItemServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(itemServiceMethods.ByName("DeleteItem")),
 			connect.WithClientOptions(opts...),
 		),
+		updateItemStatus: connect.NewClient[v1.UpdateItemStatusRequest, v1.UpdateItemStatusResponse](
+			httpClient,
+			baseURL+ItemServiceUpdateItemStatusProcedure,
+			connect.WithSchema(itemServiceMethods.ByName("UpdateItemStatus")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // itemServiceClient implements ItemServiceClient.
 type itemServiceClient struct {
-	listItems  *connect.Client[v1.ListItemsRequest, v1.ListItemsResponse]
-	createItem *connect.Client[v1.CreateItemRequest, v1.CreateItemResponse]
-	deleteItem *connect.Client[v1.DeleteItemRequest, v1.DeleteItemResponse]
+	listItems        *connect.Client[v1.ListItemsRequest, v1.ListItemsResponse]
+	createItem       *connect.Client[v1.CreateItemRequest, v1.CreateItemResponse]
+	deleteItem       *connect.Client[v1.DeleteItemRequest, v1.DeleteItemResponse]
+	updateItemStatus *connect.Client[v1.UpdateItemStatusRequest, v1.UpdateItemStatusResponse]
 }
 
 // ListItems calls shopping.v1.ItemService.ListItems.
@@ -102,11 +113,17 @@ func (c *itemServiceClient) DeleteItem(ctx context.Context, req *connect.Request
 	return c.deleteItem.CallUnary(ctx, req)
 }
 
+// UpdateItemStatus calls shopping.v1.ItemService.UpdateItemStatus.
+func (c *itemServiceClient) UpdateItemStatus(ctx context.Context, req *connect.Request[v1.UpdateItemStatusRequest]) (*connect.Response[v1.UpdateItemStatusResponse], error) {
+	return c.updateItemStatus.CallUnary(ctx, req)
+}
+
 // ItemServiceHandler is an implementation of the shopping.v1.ItemService service.
 type ItemServiceHandler interface {
 	ListItems(context.Context, *connect.Request[v1.ListItemsRequest]) (*connect.Response[v1.ListItemsResponse], error)
 	CreateItem(context.Context, *connect.Request[v1.CreateItemRequest]) (*connect.Response[v1.CreateItemResponse], error)
 	DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error)
+	UpdateItemStatus(context.Context, *connect.Request[v1.UpdateItemStatusRequest]) (*connect.Response[v1.UpdateItemStatusResponse], error)
 }
 
 // NewItemServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -134,6 +151,12 @@ func NewItemServiceHandler(svc ItemServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(itemServiceMethods.ByName("DeleteItem")),
 		connect.WithHandlerOptions(opts...),
 	)
+	itemServiceUpdateItemStatusHandler := connect.NewUnaryHandler(
+		ItemServiceUpdateItemStatusProcedure,
+		svc.UpdateItemStatus,
+		connect.WithSchema(itemServiceMethods.ByName("UpdateItemStatus")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/shopping.v1.ItemService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ItemServiceListItemsProcedure:
@@ -142,6 +165,8 @@ func NewItemServiceHandler(svc ItemServiceHandler, opts ...connect.HandlerOption
 			itemServiceCreateItemHandler.ServeHTTP(w, r)
 		case ItemServiceDeleteItemProcedure:
 			itemServiceDeleteItemHandler.ServeHTTP(w, r)
+		case ItemServiceUpdateItemStatusProcedure:
+			itemServiceUpdateItemStatusHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -161,4 +186,8 @@ func (UnimplementedItemServiceHandler) CreateItem(context.Context, *connect.Requ
 
 func (UnimplementedItemServiceHandler) DeleteItem(context.Context, *connect.Request[v1.DeleteItemRequest]) (*connect.Response[v1.DeleteItemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("shopping.v1.ItemService.DeleteItem is not implemented"))
+}
+
+func (UnimplementedItemServiceHandler) UpdateItemStatus(context.Context, *connect.Request[v1.UpdateItemStatusRequest]) (*connect.Response[v1.UpdateItemStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("shopping.v1.ItemService.UpdateItemStatus is not implemented"))
 }

@@ -4,8 +4,23 @@
 
 package sqlcgen
 
+import (
+	"database/sql"
+)
+
 type Item struct {
+	ID          string
+	Name        string
+	LabelID     string
+	Status      string
+	CompletedAt sql.NullString
+	CreatedAt   string
+}
+
+type Label struct {
 	ID        string
 	Name      string
+	Archived  int64
 	CreatedAt string
+	Color     string
 }

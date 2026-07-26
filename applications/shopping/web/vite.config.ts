@@ -20,6 +20,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/shopping.v1.ItemService": "http://localhost:8080",
+      "/shopping.v1.LabelService": "http://localhost:8080",
     },
   },
 });

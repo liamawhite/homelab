@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shopping List</title>
     <script>
-      // Applied before React mounts to avoid a flash of the wrong theme on
-      // load - just follows the system preference, no manual toggle exists.
+      // Applied before React mounts (see src/lib/theme.tsx) to avoid a
+      // flash of the wrong theme on load.
       (function () {
-        var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var stored = localStorage.getItem("shopping.theme");
+        var dark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
         document.documentElement.classList.toggle("dark", dark);
       })();
     </script>

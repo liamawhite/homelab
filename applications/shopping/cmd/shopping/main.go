@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/liamawhite/shopping/internal/itemservice"
+	"github.com/liamawhite/shopping/internal/labelservice"
 	"github.com/liamawhite/shopping/internal/server"
 	"github.com/liamawhite/shopping/internal/storage"
 )
@@ -36,9 +37,11 @@ func run() error {
 		return err
 	}
 
-	svc := itemservice.New(storage.NewItems(db))
+	labels := storage.NewLabels(db)
+	items := itemservice.New(storage.NewItems(db), labels)
+	labelsSvc := labelservice.New(labels)
 
-	handler, err := server.New(svc)
+	handler, err := server.New(items, labelsSvc)
 	if err != nil {
 		return err
 	}
