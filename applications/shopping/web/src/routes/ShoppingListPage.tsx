@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { createRootRoute } from "@tanstack/react-router";
 import {
   createColumnHelper,
   flexRender,
@@ -35,12 +36,23 @@ const ALL_TAB = "all";
 
 const columnHelper = createColumnHelper<Item>();
 
-export function ShoppingListPage() {
+export const Route = createRootRoute({
+  validateSearch: (search: Record<string, unknown>): { label?: string } => ({
+    label: typeof search.label === "string" && search.label !== ALL_TAB ? search.label : undefined,
+  }),
+  component: ShoppingListPage,
+});
+
+function ShoppingListPage() {
   const { data: items, isLoading, isError, error } = useItems();
   const { data: labels } = useLabels();
   const deleteItem = useDeleteItem();
   const updateStatus = useUpdateItemStatus();
-  const [selectedTab, setSelectedTab] = useState(ALL_TAB);
+  const { label } = Route.useSearch();
+  const selectedTab = label ?? ALL_TAB;
+  const navigate = Route.useNavigate();
+  const setSelectedTab = (next: string) =>
+    navigate({ search: { label: next === ALL_TAB ? undefined : next }, replace: true });
   const [manageOpen, setManageOpen] = useState(false);
 
   const activeLabels = useMemo(() => labels?.filter((l) => !l.archived) ?? [], [labels]);
@@ -48,6 +60,12 @@ export function ShoppingListPage() {
     () => new Map((labels ?? []).map((l) => [l.id, l.color])),
     [labels],
   );
+
+  useEffect(() => {
+    if (labels && selectedTab !== ALL_TAB && !activeLabels.some((l) => l.id === selectedTab)) {
+      setSelectedTab(ALL_TAB);
+    }
+  }, [labels, activeLabels, selectedTab]);
 
   const visibleItems = useMemo(
     () => (selectedTab === ALL_TAB ? (items ?? []) : (items ?? []).filter((i) => i.labelId === selectedTab)),
@@ -132,7 +150,11 @@ export function ShoppingListPage() {
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-4 p-4">
         <Card>
           <CardContent className="grid gap-4">
-            <ItemInput labels={activeLabels} onManageLabels={() => setManageOpen(true)} />
+            <ItemInput
+              labels={activeLabels}
+              onManageLabels={() => setManageOpen(true)}
+              defaultLabelId={selectedTab === ALL_TAB ? undefined : selectedTab}
+            />
 
             <Tabs value={selectedTab} onValueChange={setSelectedTab}>
               <TabsList>
