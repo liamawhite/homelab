@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Bridge {
+  string id = 1;
+  string name = 2;
+  string ip = 3;
+  string model_id = 4;
+  string api_version = 5;
+  string sw_version = 6;
+  string mac = 7;
+  bool reachable = 8;
+  google.protobuf.Timestamp last_resolved = 9;
+}
+
+message ListBridgesRequest {}
+
+message ListBridgesResponse {
+  repeated Bridge bridges = 1;
+}
+
+service BridgeService {
+  rpc ListBridges(ListBridgesRequest) returns (ListBridgesResponse);
+}

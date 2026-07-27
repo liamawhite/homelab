@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+message SceneLightState {
+  string name = 1;
+  optional bool on = 2;
+  optional int32 brightness = 3;
+  optional string color = 4;
+  optional int32 color_temp_k = 5;
+}
+
+message Scene {
+  string id = 1;
+  string group = 2;
+  repeated SceneLightState lights = 3;
+  repeated string invalid_lights = 4;
+  google.protobuf.Timestamp last_synced = 5;
+}
+
+message ListScenesRequest {}
+
+message ListScenesResponse {
+  repeated Scene scenes = 1;
+}
+
+service SceneService {
+  rpc ListScenes(ListScenesRequest) returns (ListScenesResponse);
+}

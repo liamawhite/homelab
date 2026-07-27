@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Light {
+  string id = 1;
+  string name = 2;
+  string bridge_id = 3;
+
+  // Observed (status) state, as last synced from the bridge.
+  bool observed_on = 4;
+  int32 observed_brightness = 5;
+  string observed_color = 6;
+  int32 observed_color_temp_k = 7;
+
+  // Desired (spec) state - differs from observed when a change hasn't been
+  // enacted yet, or enactment is failing (see enact_error).
+  bool desired_on = 8;
+  int32 desired_brightness = 9;
+  string desired_color = 10;
+  int32 desired_color_temp_k = 11;
+  // Reactive is true while this light is owned by a Group in Reactive mode -
+  // desired state is intentionally not enacted in that case.
+  bool reactive = 12;
+
+  string fixture_type = 13;
+  string product = 14;
+  string model = 15;
+  bool reachable = 16;
+  google.protobuf.Timestamp last_synced = 17;
+  google.protobuf.Timestamp last_enact_attempt = 18;
+  string enact_error = 19;
+}
+
+message ListLightsRequest {}
+
+message ListLightsResponse {
+  repeated Light lights = 1;
+}
+
+service LightService {
+  rpc ListLights(ListLightsRequest) returns (ListLightsResponse);
+}

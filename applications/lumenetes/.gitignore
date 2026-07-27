@@ -1,0 +1,7 @@
+# Generated protobuf/Connect code (gen/, web/src/gen/) is committed, like
+# pkg/crds/*'s generated CRD bindings elsewhere in this repo - regenerate
+# both with `make gen` after editing proto/. Only build *output* (installed
+# deps, bundled JS) is ignored here.
+/web/node_modules/
+/web/dist/
+/internal/webui/dist/

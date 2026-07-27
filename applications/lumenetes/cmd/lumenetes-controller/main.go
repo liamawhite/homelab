@@ -11,20 +11,28 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
 	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	"github.com/liamawhite/lumenetes/internal/bridgeservice"
 	"github.com/liamawhite/lumenetes/internal/circadianschedulecontroller"
+	"github.com/liamawhite/lumenetes/internal/circadianscheduleservice"
 	"github.com/liamawhite/lumenetes/internal/eventstream"
 	"github.com/liamawhite/lumenetes/internal/groupcontroller"
+	"github.com/liamawhite/lumenetes/internal/groupservice"
 	"github.com/liamawhite/lumenetes/internal/lightscontroller"
+	"github.com/liamawhite/lumenetes/internal/lightservice"
 	"github.com/liamawhite/lumenetes/internal/lightwebhook"
 	"github.com/liamawhite/lumenetes/internal/scenecontroller"
+	"github.com/liamawhite/lumenetes/internal/sceneservice"
+	"github.com/liamawhite/lumenetes/internal/server"
 	"github.com/liamawhite/lumenetes/internal/statuscollector"
 	"github.com/liamawhite/lumenetes/internal/switchcontroller"
+	"github.com/liamawhite/lumenetes/internal/switchservice"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -33,6 +41,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 	ctrlmetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -54,6 +63,7 @@ func main() {
 		dryRun             bool
 		switchPollInterval time.Duration
 		webhookCertDir     string
+		uiBindAddr         string
 		leaderElectionID   = "lumenetes-controller-leader"
 	)
 	flag.StringVar(&bridgesFile, "bridges-file", "/etc/lumenetes-controller/bridges.json", "Path to the mounted bridges Secret (JSON array of {id, appKey})")
@@ -64,6 +74,7 @@ func main() {
 	flag.BoolVar(&dryRun, "dry-run", false, "If true, the Light reconciler only logs spec/status drift instead of enacting it against the bridge")
 	flag.DurationVar(&switchPollInterval, "switch-poll-interval", 5*time.Minute, "How often to poll bridges for switch discovery/battery/reachability - the sub-second event path is handled by the eventstream, not this poller")
 	flag.StringVar(&webhookCertDir, "webhook-cert-dir", "/tmp/k8s-webhook-server/serving-certs", "Directory containing tls.crt/tls.key for the Light validating webhook server - controller-runtime's own default locally, overridden to the mounted cert Secret's path in-cluster (see pkg/components/lumenetescontroller)")
+	flag.StringVar(&uiBindAddr, "ui-bind-address", ":8082", "Address the read-only web UI (Connect API + embedded frontend, see internal/server) binds to")
 	flag.Parse()
 
 	// ctrl.Log.WithName(...) alone never attaches a real logging backend -
@@ -254,6 +265,37 @@ func main() {
 	}
 	if err := mgr.Add(&switchcontroller.EventConsumer{Client: mgr.GetClient(), Events: buttonEvents}); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to register switch event consumer: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Read-only web UI over the same lumenetes.io CRDs this manager already
+	// watches/reconciles - a Connect API (internal/*service, backed by
+	// mgr.GetClient() rather than a second client of its own) plus the
+	// embedded React frontend (internal/webui), served as a plain
+	// manager.Server Runnable rather than a separate binary/container: this
+	// process already holds the RBAC and cached client the UI's reads need,
+	// so a second container would only duplicate both for no benefit.
+	// OnlyServeWhenLeader is left false (the zero value) - unlike the
+	// reconcilers above, serving read-only data has no correctness reason to
+	// sit idle on a non-leader replica, though with a single replica today
+	// this doesn't yet matter in practice.
+	uiHandler, err := server.New(
+		bridgeservice.New(mgr.GetClient()),
+		lightservice.New(mgr.GetClient()),
+		switchservice.New(mgr.GetClient()),
+		groupservice.New(mgr.GetClient()),
+		sceneservice.New(mgr.GetClient()),
+		circadianscheduleservice.New(mgr.GetClient()),
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to build web UI handler: %v\n", err)
+		os.Exit(1)
+	}
+	if err := mgr.Add(&manager.Server{
+		Name:   "ui",
+		Server: &http.Server{Addr: uiBindAddr, Handler: uiHandler},
+	}); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to register web UI server: %v\n", err)
 		os.Exit(1)
 	}
 

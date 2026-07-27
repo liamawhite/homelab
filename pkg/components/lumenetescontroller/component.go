@@ -11,7 +11,9 @@ import (
 	"fmt"
 
 	"github.com/liamawhite/homelab/pkg/components/apiserver"
+	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
 	"github.com/liamawhite/homelab/pkg/config"
+	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
@@ -26,6 +28,15 @@ type LumenetesController struct {
 	pulumi.ResourceState
 
 	Namespace pulumi.StringOutput
+
+	redirect ingress.RedirectRoute
+}
+
+// TailscaleRedirect returns the read-only web UI's Cloudflare-redirect data
+// - see applications.Private.TailscaleRedirect's doc comment for why this
+// only hands back data rather than applying anything itself.
+func (lc *LumenetesController) TailscaleRedirect() ingress.RedirectRoute {
+	return lc.redirect
 }
 
 // LumenetesControllerArgs contains the configuration for LumenetesController.
@@ -55,6 +66,16 @@ type LumenetesControllerArgs struct {
 	// import-cycle risk, unlike pkg/components/istio) for its exported
 	// PrometheusPodLabel.
 	PrometheusNamespace pulumi.StringInput
+	// TailscaleOperatorNamespace/TailscaleMagicDNSSuffix/CloudflareZoneID/
+	// CloudflareBaseDomain/CloudflareProvider are threaded straight through
+	// to ui.go's newUIExposure, which puts the embedded read-only web UI on
+	// Tailscale - see PrivateArgs' doc comments (pkg/deploy/applications)
+	// for each.
+	TailscaleOperatorNamespace pulumi.StringInput
+	TailscaleMagicDNSSuffix    pulumi.StringInput
+	CloudflareZoneID           pulumi.StringInput
+	CloudflareBaseDomain       pulumi.StringInput
+	CloudflareProvider         *cloudflare.Provider
 }
 
 // NewLumenetesController creates the lumenetes-controller Deployment, its RBAC,
@@ -287,7 +308,7 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 	const volumeName = "hue-bridges"
 	const mountPath = "/etc/lumenetes-controller"
 
-	_, err = appsv1.NewDeployment(ctx, fmt.Sprintf("%s-deployment", name), &appsv1.DeploymentArgs{
+	deployment, err := appsv1.NewDeployment(ctx, fmt.Sprintf("%s-deployment", name), &appsv1.DeploymentArgs{
 		Metadata: &metav1.ObjectMetaArgs{
 			Name:      pulumi.String("lumenetes-controller"),
 			Namespace: args.Namespace,
@@ -329,6 +350,7 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 								pulumi.Sprintf("--poll-interval=%s", args.PollInterval),
 								pulumi.Sprintf("--dry-run=%v", args.DryRun),
 								pulumi.Sprintf("--webhook-cert-dir=%s", webhookCertMountPath),
+								pulumi.String(fmt.Sprintf("--ui-bind-address=:%d", uiPort)),
 							},
 							Env: corev1.EnvVarArray{
 								&corev1.EnvVarArgs{
@@ -361,6 +383,11 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 								&corev1.ContainerPortArgs{
 									Name:          pulumi.String("metrics"),
 									ContainerPort: pulumi.Int(metricsPort),
+									Protocol:      pulumi.String("TCP"),
+								},
+								&corev1.ContainerPortArgs{
+									Name:          pulumi.String("ui"),
+									ContainerPort: pulumi.Int(uiPort),
 									Protocol:      pulumi.String("TCP"),
 								},
 							},
@@ -440,6 +467,20 @@ func NewLumenetesController(ctx *pulumi.Context, name string, args *LumenetesCon
 	if err := newWebhookService(ctx, name, args.Namespace, webhookCert.CACertPEM, localOpts...); err != nil {
 		return nil, err
 	}
+
+	// 8. Put the embedded read-only web UI on Tailscale - see ui.go.
+	redirect, err := newUIExposure(ctx, name, &uiExposureArgs{
+		Namespace:                  args.Namespace,
+		TailscaleOperatorNamespace: args.TailscaleOperatorNamespace,
+		TailscaleMagicDNSSuffix:    args.TailscaleMagicDNSSuffix,
+		CloudflareZoneID:           args.CloudflareZoneID,
+		CloudflareBaseDomain:       args.CloudflareBaseDomain,
+		CloudflareProvider:         args.CloudflareProvider,
+	}, append(localOpts, pulumi.DependsOn([]pulumi.Resource{deployment}))...)
+	if err != nil {
+		return nil, err
+	}
+	lc.redirect = redirect
 
 	if err := ctx.RegisterResourceOutputs(lc, pulumi.Map{
 		"namespace": lc.Namespace,

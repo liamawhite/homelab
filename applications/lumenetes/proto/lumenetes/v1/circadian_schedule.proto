@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum CircadianAnchor {
+  CIRCADIAN_ANCHOR_UNSPECIFIED = 0;
+  CIRCADIAN_ANCHOR_SUNRISE = 1;
+  CIRCADIAN_ANCHOR_SOLAR_NOON = 2;
+  CIRCADIAN_ANCHOR_SUNSET = 3;
+  CIRCADIAN_ANCHOR_SOLAR_MIDNIGHT = 4;
+}
+
+message CircadianKeyframe {
+  CircadianAnchor anchor = 1;
+  int32 offset_minutes = 2;
+  int32 brightness = 3;
+  int32 color_temp_k = 4;
+}
+
+message CircadianSchedule {
+  string id = 1;
+  string group = 2;
+  double latitude = 3;
+  double longitude = 4;
+  repeated CircadianKeyframe keyframes = 5;
+  optional int32 current_brightness = 6;
+  optional int32 current_color_temp_k = 7;
+  string validation_error = 8;
+  google.protobuf.Timestamp last_synced = 9;
+}
+
+message ListCircadianSchedulesRequest {}
+
+message ListCircadianSchedulesResponse {
+  repeated CircadianSchedule circadian_schedules = 1;
+}
+
+service CircadianScheduleService {
+  rpc ListCircadianSchedules(ListCircadianSchedulesRequest) returns (ListCircadianSchedulesResponse);
+}

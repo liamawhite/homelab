@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum ActiveSceneKind {
+  ACTIVE_SCENE_KIND_UNSPECIFIED = 0;
+  ACTIVE_SCENE_KIND_SCENE = 1;
+  ACTIVE_SCENE_KIND_CIRCADIAN_SCHEDULE = 2;
+  ACTIVE_SCENE_KIND_OFF = 3;
+  ACTIVE_SCENE_KIND_REACTIVE = 4;
+}
+
+message ActiveSceneRef {
+  ActiveSceneKind kind = 1;
+  string name = 2;
+}
+
+message Group {
+  string id = 1;
+  repeated string lights = 2;
+  ActiveSceneRef active_scene = 3;
+  repeated string missing_lights = 4;
+  int32 light_count = 5;
+  string active_scene_error = 6;
+  google.protobuf.Timestamp last_synced = 7;
+}
+
+message ListGroupsRequest {}
+
+message ListGroupsResponse {
+  repeated Group groups = 1;
+}
+
+service GroupService {
+  rpc ListGroups(ListGroupsRequest) returns (ListGroupsResponse);
+}

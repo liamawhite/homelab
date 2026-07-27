@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package lumenetes.v1;
+
+option go_package = "github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1";
+
+import "google/protobuf/timestamp.proto";
+
+message SwitchAction {
+  repeated string target_lights = 1;
+  optional bool on = 2;
+  bool toggle = 3;
+  optional int32 brightness = 4;
+  optional int32 brightness_delta = 5;
+  optional string color = 6;
+  optional int32 color_temp_k = 7;
+}
+
+message SwitchBinding {
+  string event = 1;
+  SwitchAction action = 2;
+}
+
+message Switch {
+  string id = 1;
+  string name = 2;
+  string bridge_id = 3;
+  int32 control_id = 4;
+  string last_event = 5;
+  google.protobuf.Timestamp last_event_time = 6;
+  int32 battery = 7;
+  string product = 8;
+  string model = 9;
+  bool reachable = 10;
+  google.protobuf.Timestamp last_synced = 11;
+  repeated SwitchBinding bindings = 12;
+}
+
+message ListSwitchesRequest {}
+
+message ListSwitchesResponse {
+  repeated Switch switches = 1;
+}
+
+service SwitchService {
+  rpc ListSwitches(ListSwitchesRequest) returns (ListSwitchesResponse);
+}

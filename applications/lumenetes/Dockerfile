@@ -14,12 +14,28 @@
 # registry bookkeeping (including GHCR's per-package visibility setting)
 # for no benefit, since what actually separates the two at runtime is the
 # Deployment (ServiceAccount, RBAC, hostNetwork, command:), not the image.
+#
+# lumenetes-controller also serves the read-only web UI itself (see
+# internal/server, internal/webui, cmd/lumenetes-controller/main.go) rather
+# than that being a separate binary/image/Deployment - it already holds the
+# Kubernetes client and RBAC the UI's Connect API needs to read
+# Light/Switch/Group/Scene/CircadianSchedule/HueBridge, so a second
+# container would only duplicate that for no benefit. The web-builder stage
+# below produces the built frontend that gets embedded into it.
+FROM node:22-alpine AS web-builder
+WORKDIR /app/web
+COPY applications/lumenetes/web/package.json applications/lumenetes/web/package-lock.json ./
+RUN npm ci
+COPY applications/lumenetes/web/ .
+RUN npm run build
+
 FROM golang:1.25-alpine AS builder
 
 RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 COPY . .
+COPY --from=web-builder /app/web/dist /app/applications/lumenetes/internal/webui/dist
 
 WORKDIR /app/applications/lumenetes
 ENV CGO_ENABLED=0
