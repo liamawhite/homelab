@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/liamawhite/workouts/internal/cycleservice"
 	"github.com/liamawhite/workouts/internal/exerciseservice"
 	"github.com/liamawhite/workouts/internal/server"
 	"github.com/liamawhite/workouts/internal/storage"
@@ -41,12 +42,17 @@ func run() error {
 	users := storage.NewUsers(db)
 	exercises := storage.NewExercises(db)
 	trainingMaxes := storage.NewTrainingMaxes(db)
+	cycles := storage.NewCycles(db)
+	blocks := storage.NewBlocks(db)
+	cycleExercises := storage.NewCycleExercises(db)
+	exerciseSets := storage.NewExerciseSets(db)
 
 	userSvc := userservice.New(users)
 	exerciseSvc := exerciseservice.New(exercises)
 	trainingMaxSvc := trainingmaxservice.New(trainingMaxes, users, exercises)
+	cycleSvc := cycleservice.New(cycles, blocks, cycleExercises, exerciseSets, users, exercises)
 
-	handler, err := server.New(userSvc, exerciseSvc, trainingMaxSvc)
+	handler, err := server.New(userSvc, exerciseSvc, trainingMaxSvc, cycleSvc)
 	if err != nil {
 		return err
 	}

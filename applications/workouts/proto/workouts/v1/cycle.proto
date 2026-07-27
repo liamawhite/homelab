@@ -1,0 +1,191 @@
+syntax = "proto3";
+
+package workouts.v1;
+
+option go_package = "github.com/liamawhite/workouts/gen/workouts/v1;workoutsv1";
+
+import "google/protobuf/timestamp.proto";
+import "workouts/v1/exercise.proto";
+
+enum MoveDirection {
+  MOVE_DIRECTION_UNSPECIFIED = 0;
+  MOVE_DIRECTION_UP = 1;
+  MOVE_DIRECTION_DOWN = 2;
+}
+
+// Cycle is the top-level, single-user training program: an ordered list of
+// Blocks and a shared, ordered list of exercises (CycleExercise) common to
+// every block. GetCycle populates blocks/cycle_exercises/exercise_sets as
+// flat sibling lists (NOT nested) - the frontend reassembles the grid by
+// joining on cycle_exercise_id/block_id client-side. ListCycles leaves
+// those three fields empty (summary only).
+message Cycle {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  google.protobuf.Timestamp created_at = 4;
+  repeated Block blocks = 5;
+  repeated CycleExercise cycle_exercises = 6;
+  repeated ExerciseSet exercise_sets = 7;
+}
+
+// Block is one time period within a Cycle (the user's replacement term for
+// "week" - not necessarily 7 days). Append-only, ordered by position; no
+// move RPC exists for blocks.
+message Block {
+  string id = 1;
+  string cycle_id = 2;
+  string name = 3;
+  int64 position = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// CycleExercise is one entry in a Cycle's shared, ordered exercise lineup -
+// every Block implicitly has this exercise available. exercise_name/
+// exercise_category/exercise_equipment are denormalized from the
+// referenced Exercise (same pattern as TrainingMax.exercise_name) so the
+// frontend never needs a second lookup. position is a single cycle-scoped
+// ordering int; MoveCycleExercise swaps it with the nearest same-category
+// neighbor so category-grouped display stays consistent cycle-wide.
+message CycleExercise {
+  string id = 1;
+  string cycle_id = 2;
+  string exercise_id = 3;
+  string exercise_name = 4;
+  ExerciseCategory exercise_category = 5;
+  ExerciseEquipment exercise_equipment = 6;
+  int64 position = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+// ExerciseSet is one prescribed set for a (cycle_exercise, block) pair -
+// the "cell" in a grid of rows=cycle_exercises (grouped by category),
+// columns=blocks. reps is always required; percentage_of_tm is optional
+// so bodyweight/accessory work can be reps-only.
+message ExerciseSet {
+  string id = 1;
+  string cycle_exercise_id = 2;
+  string block_id = 3;
+  int64 position = 4;
+  int64 reps = 5;
+  optional double percentage_of_tm = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message ListCyclesRequest {
+  string user_id = 1;
+}
+message ListCyclesResponse {
+  repeated Cycle cycles = 1;
+}
+
+message GetCycleRequest {
+  string id = 1;
+}
+message GetCycleResponse {
+  Cycle cycle = 1;
+}
+
+message CreateCycleRequest {
+  string user_id = 1;
+  string name = 2;
+}
+message CreateCycleResponse {
+  Cycle cycle = 1;
+}
+
+message DeleteCycleRequest {
+  string id = 1;
+}
+message DeleteCycleResponse {}
+
+// DuplicateCycle deep-copies another cycle's blocks, shared exercise
+// lineup, and every prescribed set into a brand new cycle for the same
+// user - a starting point for a new training program based on one that
+// already worked, without recreating everything by hand.
+message DuplicateCycleRequest {
+  string source_cycle_id = 1;
+  string name = 2;
+}
+message DuplicateCycleResponse {
+  Cycle cycle = 1;
+}
+
+message CreateBlockRequest {
+  string cycle_id = 1;
+  string name = 2;
+}
+message CreateBlockResponse {
+  Block block = 1;
+}
+
+message DeleteBlockRequest {
+  string id = 1;
+}
+message DeleteBlockResponse {}
+
+message AddCycleExerciseRequest {
+  string cycle_id = 1;
+  string exercise_id = 2;
+}
+message AddCycleExerciseResponse {
+  CycleExercise cycle_exercise = 1;
+}
+
+message RemoveCycleExerciseRequest {
+  string id = 1;
+}
+message RemoveCycleExerciseResponse {}
+
+message MoveCycleExerciseRequest {
+  string id = 1;
+  MoveDirection direction = 2;
+}
+message MoveCycleExerciseResponse {}
+
+message AddSetRequest {
+  string cycle_exercise_id = 1;
+  string block_id = 2;
+  int64 reps = 3;
+  optional double percentage_of_tm = 4;
+}
+message AddSetResponse {
+  ExerciseSet exercise_set = 1;
+}
+
+message UpdateSetRequest {
+  string id = 1;
+  int64 reps = 2;
+  optional double percentage_of_tm = 3;
+}
+message UpdateSetResponse {
+  ExerciseSet exercise_set = 1;
+}
+
+message RemoveSetRequest {
+  string id = 1;
+}
+message RemoveSetResponse {}
+
+message MoveSetRequest {
+  string id = 1;
+  MoveDirection direction = 2;
+}
+message MoveSetResponse {}
+
+service CycleService {
+  rpc ListCycles(ListCyclesRequest) returns (ListCyclesResponse);
+  rpc GetCycle(GetCycleRequest) returns (GetCycleResponse);
+  rpc CreateCycle(CreateCycleRequest) returns (CreateCycleResponse);
+  rpc DeleteCycle(DeleteCycleRequest) returns (DeleteCycleResponse);
+  rpc DuplicateCycle(DuplicateCycleRequest) returns (DuplicateCycleResponse);
+  rpc CreateBlock(CreateBlockRequest) returns (CreateBlockResponse);
+  rpc DeleteBlock(DeleteBlockRequest) returns (DeleteBlockResponse);
+  rpc AddCycleExercise(AddCycleExerciseRequest) returns (AddCycleExerciseResponse);
+  rpc RemoveCycleExercise(RemoveCycleExerciseRequest) returns (RemoveCycleExerciseResponse);
+  rpc MoveCycleExercise(MoveCycleExerciseRequest) returns (MoveCycleExerciseResponse);
+  rpc AddSet(AddSetRequest) returns (AddSetResponse);
+  rpc UpdateSet(UpdateSetRequest) returns (UpdateSetResponse);
+  rpc RemoveSet(RemoveSetRequest) returns (RemoveSetResponse);
+  rpc MoveSet(MoveSetRequest) returns (MoveSetResponse);
+}

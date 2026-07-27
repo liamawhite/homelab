@@ -7,6 +7,7 @@ package sqlcgen
 
 import (
 	"context"
+	"database/sql"
 )
 
 const archiveExercise = `-- name: ArchiveExercise :execrows
@@ -19,6 +20,99 @@ func (q *Queries) ArchiveExercise(ctx context.Context, id string) (int64, error)
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+const createBlock = `-- name: CreateBlock :one
+INSERT INTO blocks (id, cycle_id, name, position, created_at) VALUES (?, ?, ?, ?, ?)
+RETURNING id, cycle_id, name, position, created_at
+`
+
+type CreateBlockParams struct {
+	ID        string
+	CycleID   string
+	Name      string
+	Position  int64
+	CreatedAt string
+}
+
+func (q *Queries) CreateBlock(ctx context.Context, arg CreateBlockParams) (Block, error) {
+	row := q.db.QueryRowContext(ctx, createBlock,
+		arg.ID,
+		arg.CycleID,
+		arg.Name,
+		arg.Position,
+		arg.CreatedAt,
+	)
+	var i Block
+	err := row.Scan(
+		&i.ID,
+		&i.CycleID,
+		&i.Name,
+		&i.Position,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createCycle = `-- name: CreateCycle :one
+INSERT INTO cycles (id, user_id, name, created_at) VALUES (?, ?, ?, ?)
+RETURNING id, user_id, name, created_at
+`
+
+type CreateCycleParams struct {
+	ID        string
+	UserID    string
+	Name      string
+	CreatedAt string
+}
+
+func (q *Queries) CreateCycle(ctx context.Context, arg CreateCycleParams) (Cycle, error) {
+	row := q.db.QueryRowContext(ctx, createCycle,
+		arg.ID,
+		arg.UserID,
+		arg.Name,
+		arg.CreatedAt,
+	)
+	var i Cycle
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createCycleExercise = `-- name: CreateCycleExercise :one
+INSERT INTO cycle_exercises (id, cycle_id, exercise_id, position, created_at) VALUES (?, ?, ?, ?, ?)
+RETURNING id, cycle_id, exercise_id, position, created_at
+`
+
+type CreateCycleExerciseParams struct {
+	ID         string
+	CycleID    string
+	ExerciseID string
+	Position   int64
+	CreatedAt  string
+}
+
+func (q *Queries) CreateCycleExercise(ctx context.Context, arg CreateCycleExerciseParams) (CycleExercise, error) {
+	row := q.db.QueryRowContext(ctx, createCycleExercise,
+		arg.ID,
+		arg.CycleID,
+		arg.ExerciseID,
+		arg.Position,
+		arg.CreatedAt,
+	)
+	var i CycleExercise
+	err := row.Scan(
+		&i.ID,
+		&i.CycleID,
+		&i.ExerciseID,
+		&i.Position,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const createExercise = `-- name: CreateExercise :one
@@ -58,6 +152,45 @@ func (q *Queries) CreateExercise(ctx context.Context, arg CreateExerciseParams) 
 		&i.Category,
 		&i.Equipment,
 		&i.Archived,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const createExerciseSet = `-- name: CreateExerciseSet :one
+INSERT INTO exercise_sets (id, cycle_exercise_id, block_id, position, reps, percentage_of_tm, created_at)
+VALUES (?, ?, ?, ?, ?, ?, ?)
+RETURNING id, cycle_exercise_id, block_id, position, reps, percentage_of_tm, created_at
+`
+
+type CreateExerciseSetParams struct {
+	ID              string
+	CycleExerciseID string
+	BlockID         string
+	Position        int64
+	Reps            int64
+	PercentageOfTm  sql.NullFloat64
+	CreatedAt       string
+}
+
+func (q *Queries) CreateExerciseSet(ctx context.Context, arg CreateExerciseSetParams) (ExerciseSet, error) {
+	row := q.db.QueryRowContext(ctx, createExerciseSet,
+		arg.ID,
+		arg.CycleExerciseID,
+		arg.BlockID,
+		arg.Position,
+		arg.Reps,
+		arg.PercentageOfTm,
+		arg.CreatedAt,
+	)
+	var i ExerciseSet
+	err := row.Scan(
+		&i.ID,
+		&i.CycleExerciseID,
+		&i.BlockID,
+		&i.Position,
+		&i.Reps,
+		&i.PercentageOfTm,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -119,6 +252,54 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deleteBlock = `-- name: DeleteBlock :execrows
+DELETE FROM blocks WHERE id = ?
+`
+
+func (q *Queries) DeleteBlock(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteBlock, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const deleteCycle = `-- name: DeleteCycle :execrows
+DELETE FROM cycles WHERE id = ?
+`
+
+func (q *Queries) DeleteCycle(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteCycle, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const deleteCycleExercise = `-- name: DeleteCycleExercise :execrows
+DELETE FROM cycle_exercises WHERE id = ?
+`
+
+func (q *Queries) DeleteCycleExercise(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteCycleExercise, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const deleteExerciseSet = `-- name: DeleteExerciseSet :execrows
+DELETE FROM exercise_sets WHERE id = ?
+`
+
+func (q *Queries) DeleteExerciseSet(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteExerciseSet, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const deleteUser = `-- name: DeleteUser :execrows
 DELETE FROM users WHERE id = ?
 `
@@ -129,6 +310,179 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (int64, error) {
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+const findCycleExerciseAbove = `-- name: FindCycleExerciseAbove :one
+SELECT ce.id, ce.position
+FROM cycle_exercises ce
+JOIN exercises ex ON ex.id = ce.exercise_id
+WHERE ce.cycle_id = ? AND ex.category = ? AND ce.position < ?
+ORDER BY ce.position DESC
+LIMIT 1
+`
+
+type FindCycleExerciseAboveParams struct {
+	CycleID  string
+	Category string
+	Position int64
+}
+
+type FindCycleExerciseAboveRow struct {
+	ID       string
+	Position int64
+}
+
+// Nearest same-category neighbor with a smaller position - MoveCycleExercise's "up" swap.
+func (q *Queries) FindCycleExerciseAbove(ctx context.Context, arg FindCycleExerciseAboveParams) (FindCycleExerciseAboveRow, error) {
+	row := q.db.QueryRowContext(ctx, findCycleExerciseAbove, arg.CycleID, arg.Category, arg.Position)
+	var i FindCycleExerciseAboveRow
+	err := row.Scan(&i.ID, &i.Position)
+	return i, err
+}
+
+const findCycleExerciseBelow = `-- name: FindCycleExerciseBelow :one
+SELECT ce.id, ce.position
+FROM cycle_exercises ce
+JOIN exercises ex ON ex.id = ce.exercise_id
+WHERE ce.cycle_id = ? AND ex.category = ? AND ce.position > ?
+ORDER BY ce.position ASC
+LIMIT 1
+`
+
+type FindCycleExerciseBelowParams struct {
+	CycleID  string
+	Category string
+	Position int64
+}
+
+type FindCycleExerciseBelowRow struct {
+	ID       string
+	Position int64
+}
+
+func (q *Queries) FindCycleExerciseBelow(ctx context.Context, arg FindCycleExerciseBelowParams) (FindCycleExerciseBelowRow, error) {
+	row := q.db.QueryRowContext(ctx, findCycleExerciseBelow, arg.CycleID, arg.Category, arg.Position)
+	var i FindCycleExerciseBelowRow
+	err := row.Scan(&i.ID, &i.Position)
+	return i, err
+}
+
+const findExerciseSetAbove = `-- name: FindExerciseSetAbove :one
+SELECT id, position FROM exercise_sets
+WHERE cycle_exercise_id = ? AND block_id = ? AND position < ?
+ORDER BY position DESC
+LIMIT 1
+`
+
+type FindExerciseSetAboveParams struct {
+	CycleExerciseID string
+	BlockID         string
+	Position        int64
+}
+
+type FindExerciseSetAboveRow struct {
+	ID       string
+	Position int64
+}
+
+func (q *Queries) FindExerciseSetAbove(ctx context.Context, arg FindExerciseSetAboveParams) (FindExerciseSetAboveRow, error) {
+	row := q.db.QueryRowContext(ctx, findExerciseSetAbove, arg.CycleExerciseID, arg.BlockID, arg.Position)
+	var i FindExerciseSetAboveRow
+	err := row.Scan(&i.ID, &i.Position)
+	return i, err
+}
+
+const findExerciseSetBelow = `-- name: FindExerciseSetBelow :one
+SELECT id, position FROM exercise_sets
+WHERE cycle_exercise_id = ? AND block_id = ? AND position > ?
+ORDER BY position ASC
+LIMIT 1
+`
+
+type FindExerciseSetBelowParams struct {
+	CycleExerciseID string
+	BlockID         string
+	Position        int64
+}
+
+type FindExerciseSetBelowRow struct {
+	ID       string
+	Position int64
+}
+
+func (q *Queries) FindExerciseSetBelow(ctx context.Context, arg FindExerciseSetBelowParams) (FindExerciseSetBelowRow, error) {
+	row := q.db.QueryRowContext(ctx, findExerciseSetBelow, arg.CycleExerciseID, arg.BlockID, arg.Position)
+	var i FindExerciseSetBelowRow
+	err := row.Scan(&i.ID, &i.Position)
+	return i, err
+}
+
+const getBlock = `-- name: GetBlock :one
+SELECT id, cycle_id, name, position, created_at FROM blocks WHERE id = ?
+`
+
+func (q *Queries) GetBlock(ctx context.Context, id string) (Block, error) {
+	row := q.db.QueryRowContext(ctx, getBlock, id)
+	var i Block
+	err := row.Scan(
+		&i.ID,
+		&i.CycleID,
+		&i.Name,
+		&i.Position,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getCycle = `-- name: GetCycle :one
+SELECT id, user_id, name, created_at FROM cycles WHERE id = ?
+`
+
+func (q *Queries) GetCycle(ctx context.Context, id string) (Cycle, error) {
+	row := q.db.QueryRowContext(ctx, getCycle, id)
+	var i Cycle
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getCycleExercise = `-- name: GetCycleExercise :one
+SELECT ce.id, ce.cycle_id, ce.exercise_id, ce.position, ce.created_at,
+       ex.name AS exercise_name, ex.category AS exercise_category, ex.equipment AS exercise_equipment
+FROM cycle_exercises ce
+JOIN exercises ex ON ex.id = ce.exercise_id
+WHERE ce.id = ?
+`
+
+type GetCycleExerciseRow struct {
+	ID                string
+	CycleID           string
+	ExerciseID        string
+	Position          int64
+	CreatedAt         string
+	ExerciseName      string
+	ExerciseCategory  string
+	ExerciseEquipment string
+}
+
+func (q *Queries) GetCycleExercise(ctx context.Context, id string) (GetCycleExerciseRow, error) {
+	row := q.db.QueryRowContext(ctx, getCycleExercise, id)
+	var i GetCycleExerciseRow
+	err := row.Scan(
+		&i.ID,
+		&i.CycleID,
+		&i.ExerciseID,
+		&i.Position,
+		&i.CreatedAt,
+		&i.ExerciseName,
+		&i.ExerciseCategory,
+		&i.ExerciseEquipment,
+	)
+	return i, err
 }
 
 const getExercise = `-- name: GetExercise :one
@@ -158,6 +512,25 @@ func (q *Queries) GetExercise(ctx context.Context, id string) (GetExerciseRow, e
 	return i, err
 }
 
+const getExerciseSet = `-- name: GetExerciseSet :one
+SELECT id, cycle_exercise_id, block_id, position, reps, percentage_of_tm, created_at FROM exercise_sets WHERE id = ?
+`
+
+func (q *Queries) GetExerciseSet(ctx context.Context, id string) (ExerciseSet, error) {
+	row := q.db.QueryRowContext(ctx, getExerciseSet, id)
+	var i ExerciseSet
+	err := row.Scan(
+		&i.ID,
+		&i.CycleExerciseID,
+		&i.BlockID,
+		&i.Position,
+		&i.Reps,
+		&i.PercentageOfTm,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, name, created_at FROM users WHERE id = ?
 `
@@ -167,6 +540,41 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 	var i User
 	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
 	return i, err
+}
+
+const listBlocksByCycle = `-- name: ListBlocksByCycle :many
+
+SELECT id, cycle_id, name, position, created_at FROM blocks WHERE cycle_id = ? ORDER BY position ASC
+`
+
+// Blocks
+func (q *Queries) ListBlocksByCycle(ctx context.Context, cycleID string) ([]Block, error) {
+	rows, err := q.db.QueryContext(ctx, listBlocksByCycle, cycleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Block
+	for rows.Next() {
+		var i Block
+		if err := rows.Scan(
+			&i.ID,
+			&i.CycleID,
+			&i.Name,
+			&i.Position,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listCurrentTrainingMaxes = `-- name: ListCurrentTrainingMaxes :many
@@ -215,6 +623,137 @@ func (q *Queries) ListCurrentTrainingMaxes(ctx context.Context, userID string) (
 			&i.EffectiveAt,
 			&i.CreatedAt,
 			&i.ExerciseName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCycleExercisesByCycle = `-- name: ListCycleExercisesByCycle :many
+
+SELECT ce.id, ce.cycle_id, ce.exercise_id, ce.position, ce.created_at,
+       ex.name AS exercise_name, ex.category AS exercise_category, ex.equipment AS exercise_equipment
+FROM cycle_exercises ce
+JOIN exercises ex ON ex.id = ce.exercise_id
+WHERE ce.cycle_id = ?
+ORDER BY ce.position ASC
+`
+
+type ListCycleExercisesByCycleRow struct {
+	ID                string
+	CycleID           string
+	ExerciseID        string
+	Position          int64
+	CreatedAt         string
+	ExerciseName      string
+	ExerciseCategory  string
+	ExerciseEquipment string
+}
+
+// Cycle exercises
+// Joined with exercises to denormalize name/category/equipment (see
+// v1.CycleExercise), ordered by the cycle-wide position.
+func (q *Queries) ListCycleExercisesByCycle(ctx context.Context, cycleID string) ([]ListCycleExercisesByCycleRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCycleExercisesByCycle, cycleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCycleExercisesByCycleRow
+	for rows.Next() {
+		var i ListCycleExercisesByCycleRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CycleID,
+			&i.ExerciseID,
+			&i.Position,
+			&i.CreatedAt,
+			&i.ExerciseName,
+			&i.ExerciseCategory,
+			&i.ExerciseEquipment,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCyclesByUser = `-- name: ListCyclesByUser :many
+
+SELECT id, user_id, name, created_at FROM cycles WHERE user_id = ? ORDER BY created_at ASC
+`
+
+// Cycles
+func (q *Queries) ListCyclesByUser(ctx context.Context, userID string) ([]Cycle, error) {
+	rows, err := q.db.QueryContext(ctx, listCyclesByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Cycle
+	for rows.Next() {
+		var i Cycle
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listExerciseSetsByCycle = `-- name: ListExerciseSetsByCycle :many
+
+SELECT es.id, es.cycle_exercise_id, es.block_id, es.position, es.reps, es.percentage_of_tm, es.created_at
+FROM exercise_sets es
+JOIN cycle_exercises ce ON ce.id = es.cycle_exercise_id
+WHERE ce.cycle_id = ?
+ORDER BY es.cycle_exercise_id ASC, es.block_id ASC, es.position ASC
+`
+
+// Exercise sets
+func (q *Queries) ListExerciseSetsByCycle(ctx context.Context, cycleID string) ([]ExerciseSet, error) {
+	rows, err := q.db.QueryContext(ctx, listExerciseSetsByCycle, cycleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ExerciseSet
+	for rows.Next() {
+		var i ExerciseSet
+		if err := rows.Scan(
+			&i.ID,
+			&i.CycleExerciseID,
+			&i.BlockID,
+			&i.Position,
+			&i.Reps,
+			&i.PercentageOfTm,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -355,6 +894,44 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const maxBlockPosition = `-- name: MaxBlockPosition :one
+SELECT COALESCE(MAX(position), -1) FROM blocks WHERE cycle_id = ?
+`
+
+func (q *Queries) MaxBlockPosition(ctx context.Context, cycleID string) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, maxBlockPosition, cycleID)
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
+}
+
+const maxCycleExercisePosition = `-- name: MaxCycleExercisePosition :one
+SELECT COALESCE(MAX(position), -1) FROM cycle_exercises WHERE cycle_id = ?
+`
+
+func (q *Queries) MaxCycleExercisePosition(ctx context.Context, cycleID string) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, maxCycleExercisePosition, cycleID)
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
+}
+
+const maxExerciseSetPosition = `-- name: MaxExerciseSetPosition :one
+SELECT COALESCE(MAX(position), -1) FROM exercise_sets WHERE cycle_exercise_id = ? AND block_id = ?
+`
+
+type MaxExerciseSetPositionParams struct {
+	CycleExerciseID string
+	BlockID         string
+}
+
+func (q *Queries) MaxExerciseSetPosition(ctx context.Context, arg MaxExerciseSetPositionParams) (interface{}, error) {
+	row := q.db.QueryRowContext(ctx, maxExerciseSetPosition, arg.CycleExerciseID, arg.BlockID)
+	var coalesce interface{}
+	err := row.Scan(&coalesce)
+	return coalesce, err
+}
+
 const restoreExercise = `-- name: RestoreExercise :execrows
 UPDATE exercises SET archived = 0 WHERE id = ?
 `
@@ -365,4 +942,58 @@ func (q *Queries) RestoreExercise(ctx context.Context, id string) (int64, error)
 		return 0, err
 	}
 	return result.RowsAffected()
+}
+
+const setCycleExercisePosition = `-- name: SetCycleExercisePosition :exec
+UPDATE cycle_exercises SET position = ? WHERE id = ?
+`
+
+type SetCycleExercisePositionParams struct {
+	Position int64
+	ID       string
+}
+
+func (q *Queries) SetCycleExercisePosition(ctx context.Context, arg SetCycleExercisePositionParams) error {
+	_, err := q.db.ExecContext(ctx, setCycleExercisePosition, arg.Position, arg.ID)
+	return err
+}
+
+const setExerciseSetPosition = `-- name: SetExerciseSetPosition :exec
+UPDATE exercise_sets SET position = ? WHERE id = ?
+`
+
+type SetExerciseSetPositionParams struct {
+	Position int64
+	ID       string
+}
+
+func (q *Queries) SetExerciseSetPosition(ctx context.Context, arg SetExerciseSetPositionParams) error {
+	_, err := q.db.ExecContext(ctx, setExerciseSetPosition, arg.Position, arg.ID)
+	return err
+}
+
+const updateExerciseSet = `-- name: UpdateExerciseSet :one
+UPDATE exercise_sets SET reps = ?, percentage_of_tm = ? WHERE id = ?
+RETURNING id, cycle_exercise_id, block_id, position, reps, percentage_of_tm, created_at
+`
+
+type UpdateExerciseSetParams struct {
+	Reps           int64
+	PercentageOfTm sql.NullFloat64
+	ID             string
+}
+
+func (q *Queries) UpdateExerciseSet(ctx context.Context, arg UpdateExerciseSetParams) (ExerciseSet, error) {
+	row := q.db.QueryRowContext(ctx, updateExerciseSet, arg.Reps, arg.PercentageOfTm, arg.ID)
+	var i ExerciseSet
+	err := row.Scan(
+		&i.ID,
+		&i.CycleExerciseID,
+		&i.BlockID,
+		&i.Position,
+		&i.Reps,
+		&i.PercentageOfTm,
+		&i.CreatedAt,
+	)
+	return i, err
 }

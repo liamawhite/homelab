@@ -4,6 +4,33 @@
 
 package sqlcgen
 
+import (
+	"database/sql"
+)
+
+type Block struct {
+	ID        string
+	CycleID   string
+	Name      string
+	Position  int64
+	CreatedAt string
+}
+
+type Cycle struct {
+	ID        string
+	UserID    string
+	Name      string
+	CreatedAt string
+}
+
+type CycleExercise struct {
+	ID         string
+	CycleID    string
+	ExerciseID string
+	Position   int64
+	CreatedAt  string
+}
+
 type Exercise struct {
 	ID        string
 	Name      string
@@ -11,6 +38,16 @@ type Exercise struct {
 	Archived  int64
 	CreatedAt string
 	Equipment string
+}
+
+type ExerciseSet struct {
+	ID              string
+	CycleExerciseID string
+	BlockID         string
+	Position        int64
+	Reps            int64
+	PercentageOfTm  sql.NullFloat64
+	CreatedAt       string
 }
 
 type TrainingMax struct {

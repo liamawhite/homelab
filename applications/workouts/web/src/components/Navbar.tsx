@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Dumbbell, TrendingUp } from "lucide-react";
+import { CalendarRange, Dumbbell, TrendingUp } from "lucide-react";
 
 import type { User } from "@/gen/workouts/v1/user_pb";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -17,6 +17,11 @@ export function Navbar({ users, activeUserId, onSelectUser }: NavbarProps) {
     <header className="flex items-center justify-between border-b px-4 py-3">
       <span className="text-sm font-semibold">Workouts</span>
       <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" aria-label="Cycles" asChild>
+          <Link to="/cycles">
+            <CalendarRange />
+          </Link>
+        </Button>
         <Button variant="ghost" size="icon" aria-label="Training maxes" asChild>
           <Link to="/training-maxes">
             <TrendingUp />

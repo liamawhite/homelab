@@ -10,20 +10,53 @@ import (
 
 type Querier interface {
 	ArchiveExercise(ctx context.Context, id string) (int64, error)
+	CreateBlock(ctx context.Context, arg CreateBlockParams) (Block, error)
+	CreateCycle(ctx context.Context, arg CreateCycleParams) (Cycle, error)
+	CreateCycleExercise(ctx context.Context, arg CreateCycleExerciseParams) (CycleExercise, error)
 	CreateExercise(ctx context.Context, arg CreateExerciseParams) (CreateExerciseRow, error)
+	CreateExerciseSet(ctx context.Context, arg CreateExerciseSetParams) (ExerciseSet, error)
 	CreateTrainingMax(ctx context.Context, arg CreateTrainingMaxParams) (TrainingMax, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteBlock(ctx context.Context, id string) (int64, error)
+	DeleteCycle(ctx context.Context, id string) (int64, error)
+	DeleteCycleExercise(ctx context.Context, id string) (int64, error)
+	DeleteExerciseSet(ctx context.Context, id string) (int64, error)
 	DeleteUser(ctx context.Context, id string) (int64, error)
+	// Nearest same-category neighbor with a smaller position - MoveCycleExercise's "up" swap.
+	FindCycleExerciseAbove(ctx context.Context, arg FindCycleExerciseAboveParams) (FindCycleExerciseAboveRow, error)
+	FindCycleExerciseBelow(ctx context.Context, arg FindCycleExerciseBelowParams) (FindCycleExerciseBelowRow, error)
+	FindExerciseSetAbove(ctx context.Context, arg FindExerciseSetAboveParams) (FindExerciseSetAboveRow, error)
+	FindExerciseSetBelow(ctx context.Context, arg FindExerciseSetBelowParams) (FindExerciseSetBelowRow, error)
+	GetBlock(ctx context.Context, id string) (Block, error)
+	GetCycle(ctx context.Context, id string) (Cycle, error)
+	GetCycleExercise(ctx context.Context, id string) (GetCycleExerciseRow, error)
 	GetExercise(ctx context.Context, id string) (GetExerciseRow, error)
+	GetExerciseSet(ctx context.Context, id string) (ExerciseSet, error)
 	GetUser(ctx context.Context, id string) (User, error)
+	// Blocks
+	ListBlocksByCycle(ctx context.Context, cycleID string) ([]Block, error)
 	// One row per exercise: whichever training_maxes row for (user_id,
 	// exercise_id) has the latest effective_at, ties broken by rowid (i.e.
 	// most-recently-inserted wins) - see 0003_create_training_maxes.sql.
 	ListCurrentTrainingMaxes(ctx context.Context, userID string) ([]ListCurrentTrainingMaxesRow, error)
+	// Cycle exercises
+	// Joined with exercises to denormalize name/category/equipment (see
+	// v1.CycleExercise), ordered by the cycle-wide position.
+	ListCycleExercisesByCycle(ctx context.Context, cycleID string) ([]ListCycleExercisesByCycleRow, error)
+	// Cycles
+	ListCyclesByUser(ctx context.Context, userID string) ([]Cycle, error)
+	// Exercise sets
+	ListExerciseSetsByCycle(ctx context.Context, cycleID string) ([]ExerciseSet, error)
 	ListExercises(ctx context.Context) ([]ListExercisesRow, error)
 	ListTrainingMaxHistory(ctx context.Context, arg ListTrainingMaxHistoryParams) ([]ListTrainingMaxHistoryRow, error)
 	ListUsers(ctx context.Context) ([]User, error)
+	MaxBlockPosition(ctx context.Context, cycleID string) (interface{}, error)
+	MaxCycleExercisePosition(ctx context.Context, cycleID string) (interface{}, error)
+	MaxExerciseSetPosition(ctx context.Context, arg MaxExerciseSetPositionParams) (interface{}, error)
 	RestoreExercise(ctx context.Context, id string) (int64, error)
+	SetCycleExercisePosition(ctx context.Context, arg SetCycleExercisePositionParams) error
+	SetExerciseSetPosition(ctx context.Context, arg SetExerciseSetPositionParams) error
+	UpdateExerciseSet(ctx context.Context, arg UpdateExerciseSetParams) (ExerciseSet, error)
 }
 
 var _ Querier = (*Queries)(nil)

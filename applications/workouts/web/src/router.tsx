@@ -5,6 +5,8 @@ import { HomePage } from "@/routes/HomePage";
 import { UsersPage } from "@/routes/UsersPage";
 import { ExercisesPage } from "@/routes/ExercisesPage";
 import { TrainingMaxesPage } from "@/routes/TrainingMaxesPage";
+import { CyclesPage } from "@/routes/CyclesPage";
+import { CycleDetailPage } from "@/routes/CycleDetailPage";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -34,7 +36,29 @@ const trainingMaxesRoute = createRoute({
   component: TrainingMaxesPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, usersRoute, exercisesRoute, trainingMaxesRoute]);
+const cyclesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cycles",
+  component: CyclesPage,
+});
+
+const cycleDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/cycles/$cycleId",
+  validateSearch: (search: Record<string, unknown>): { blockId?: string } => ({
+    blockId: typeof search.blockId === "string" ? search.blockId : undefined,
+  }),
+  component: CycleDetailPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  usersRoute,
+  exercisesRoute,
+  trainingMaxesRoute,
+  cyclesRoute,
+  cycleDetailRoute,
+]);
 
 export const router = createRouter({ routeTree });
 
