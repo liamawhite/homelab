@@ -7,10 +7,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 
 import { type Item, ItemStatus } from "@/gen/shopping/v1/item_pb";
-import { useItems, useDeleteItem, useUpdateItemStatus } from "@/lib/items";
+import { useItems, useCreateItem, useDeleteItem, useUpdateItemStatus } from "@/lib/items";
 import { useLabels } from "@/lib/labels";
 import { contrastTextColor } from "@/lib/color";
 import { relativeTime } from "@/lib/time";
@@ -48,6 +48,7 @@ function ShoppingListPage() {
   const { data: labels } = useLabels();
   const deleteItem = useDeleteItem();
   const updateStatus = useUpdateItemStatus();
+  const createItem = useCreateItem();
   const { label } = Route.useSearch();
   const selectedTab = label ?? ALL_TAB;
   const navigate = Route.useNavigate();
@@ -120,22 +121,41 @@ function ShoppingListPage() {
       }),
       columnHelper.display({
         id: "actions",
-        cell: (info) => (
-          <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Delete ${info.row.original.name}`}
-              disabled={deleteItem.isPending}
-              onClick={() => deleteItem.mutate(info.row.original.id)}
-            >
-              <Trash2 />
-            </Button>
-          </div>
-        ),
+        cell: (info) => {
+          const done = info.row.original.status === ItemStatus.DONE;
+          return (
+            <div className="flex justify-end">
+              {done && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Recreate ${info.row.original.name}`}
+                  disabled={createItem.isPending}
+                  onClick={() =>
+                    createItem.mutate({
+                      name: info.row.original.name,
+                      labelId: info.row.original.labelId,
+                    })
+                  }
+                >
+                  <RotateCcw />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Delete ${info.row.original.name}`}
+                disabled={deleteItem.isPending}
+                onClick={() => deleteItem.mutate(info.row.original.id)}
+              >
+                <Trash2 />
+              </Button>
+            </div>
+          );
+        },
       }),
     ],
-    [selectedTab, deleteItem, updateStatus, labelColorById],
+    [selectedTab, deleteItem, updateStatus, createItem, labelColorById],
   );
 
   const table = useReactTable({
@@ -211,6 +231,9 @@ function ShoppingListPage() {
             )}
             {updateStatus.isError && (
               <p className="text-sm text-destructive">{updateStatus.error.message}</p>
+            )}
+            {createItem.isError && (
+              <p className="text-sm text-destructive">{createItem.error.message}</p>
             )}
           </CardContent>
         </Card>
