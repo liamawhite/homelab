@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package trips.v1;
+
+option go_package = "github.com/liamawhite/trips/gen/trips/v1;tripsv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum FlightStatus {
+  FLIGHT_STATUS_UNSPECIFIED = 0;
+  FLIGHT_STATUS_SCHEDULED = 1;
+  FLIGHT_STATUS_ACTIVE = 2;
+  FLIGHT_STATUS_LANDED = 3;
+  FLIGHT_STATUS_CANCELLED = 4;
+  FLIGHT_STATUS_DIVERTED = 5;
+  // No successful sync yet, or the last sync attempt failed.
+  FLIGHT_STATUS_UNKNOWN = 6;
+}
+
+message Flight {
+  string id = 1;
+  string trip_id = 2;
+  string flight_number = 3;
+  // The date the user searched, YYYY-MM-DD.
+  string date = 4;
+  string departure_airport = 5;
+  string arrival_airport = 6;
+  // IANA zone names (e.g. "America/Los_Angeles") for the departure/arrival
+  // airports - lets the UI render each leg in its own local time rather
+  // than UTC or the viewer's browser zone. Empty until the first
+  // successful sync.
+  string departure_timezone = 15;
+  string arrival_timezone = 16;
+  google.protobuf.Timestamp scheduled_departure = 7;
+  google.protobuf.Timestamp scheduled_arrival = 8;
+  google.protobuf.Timestamp actual_departure = 9;
+  google.protobuf.Timestamp actual_arrival = 10;
+  FlightStatus status = 11;
+  google.protobuf.Timestamp last_synced_at = 12;
+  // Non-empty if the most recent sync attempt failed - previously-fetched
+  // fields above are left untouched when this happens.
+  string sync_error = 13;
+  google.protobuf.Timestamp created_at = 14;
+}
+
+message ListFlightsRequest {
+  string trip_id = 1;
+}
+
+message ListFlightsResponse {
+  repeated Flight flights = 1;
+}
+
+message AddFlightRequest {
+  string trip_id = 1;
+  string flight_number = 2;
+  string date = 3;
+}
+
+message AddFlightResponse {
+  Flight flight = 1;
+}
+
+message DeleteFlightRequest {
+  string id = 1;
+}
+
+message DeleteFlightResponse {}
+
+message SyncFlightRequest {
+  string id = 1;
+}
+
+message SyncFlightResponse {
+  Flight flight = 1;
+}
+
+service FlightService {
+  rpc ListFlights(ListFlightsRequest) returns (ListFlightsResponse);
+  rpc AddFlight(AddFlightRequest) returns (AddFlightResponse);
+  rpc DeleteFlight(DeleteFlightRequest) returns (DeleteFlightResponse);
+  rpc SyncFlight(SyncFlightRequest) returns (SyncFlightResponse);
+}

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package trips.v1;
+
+option go_package = "github.com/liamawhite/trips/gen/trips/v1;tripsv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Accommodation {
+  string id = 1;
+  string trip_id = 2;
+  string name = 3;
+  string location = 4;
+  // YYYY-MM-DD.
+  string check_in = 5;
+  // YYYY-MM-DD.
+  string check_out = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message ListAccommodationsRequest {
+  string trip_id = 1;
+}
+
+message ListAccommodationsResponse {
+  repeated Accommodation accommodations = 1;
+}
+
+message AddAccommodationRequest {
+  string trip_id = 1;
+  string name = 2;
+  string location = 3;
+  string check_in = 4;
+  string check_out = 5;
+}
+
+message AddAccommodationResponse {
+  Accommodation accommodation = 1;
+}
+
+message DeleteAccommodationRequest {
+  string id = 1;
+}
+
+message DeleteAccommodationResponse {}
+
+service AccommodationService {
+  rpc ListAccommodations(ListAccommodationsRequest) returns (ListAccommodationsResponse);
+  rpc AddAccommodation(AddAccommodationRequest) returns (AddAccommodationResponse);
+  rpc DeleteAccommodation(DeleteAccommodationRequest) returns (DeleteAccommodationResponse);
+}

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package trips.v1;
+
+option go_package = "github.com/liamawhite/trips/gen/trips/v1;tripsv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Trip {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message ListTripsRequest {}
+
+message ListTripsResponse {
+  repeated Trip trips = 1;
+}
+
+message CreateTripRequest {
+  string name = 1;
+}
+
+message CreateTripResponse {
+  Trip trip = 1;
+}
+
+message DeleteTripRequest {
+  string id = 1;
+}
+
+message DeleteTripResponse {}
+
+service TripService {
+  rpc ListTrips(ListTripsRequest) returns (ListTripsResponse);
+  rpc CreateTrip(CreateTripRequest) returns (CreateTripResponse);
+  rpc DeleteTrip(DeleteTripRequest) returns (DeleteTripResponse);
+}
