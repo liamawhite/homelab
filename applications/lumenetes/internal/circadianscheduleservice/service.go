@@ -51,6 +51,7 @@ func toProto(schedule lumenetesv1alpha1.CircadianSchedule) *v1.CircadianSchedule
 			OffsetMinutes: kf.OffsetMinutes,
 			Brightness:    kf.Brightness,
 			ColorTempK:    kf.ColorTempK,
+			On:            toProtoOnState(kf.On),
 		})
 	}
 
@@ -79,5 +80,16 @@ func toProtoAnchor(anchor lumenetesv1alpha1.CircadianAnchor) v1.CircadianAnchor 
 		return v1.CircadianAnchor_CIRCADIAN_ANCHOR_SOLAR_MIDNIGHT
 	default:
 		return v1.CircadianAnchor_CIRCADIAN_ANCHOR_UNSPECIFIED
+	}
+}
+
+func toProtoOnState(on lumenetesv1alpha1.CircadianOnState) v1.CircadianOnState {
+	switch on {
+	case lumenetesv1alpha1.CircadianOnStateOn:
+		return v1.CircadianOnState_CIRCADIAN_ON_STATE_ON
+	case lumenetesv1alpha1.CircadianOnStateOff:
+		return v1.CircadianOnState_CIRCADIAN_ON_STATE_OFF
+	default:
+		return v1.CircadianOnState_CIRCADIAN_ON_STATE_UNCHANGED
 	}
 }

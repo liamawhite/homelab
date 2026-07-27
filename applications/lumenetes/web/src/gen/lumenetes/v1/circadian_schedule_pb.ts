@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file lumenetes/v1/circadian_schedule.proto.
  */
 export const file_lumenetes_v1_circadian_schedule: GenFile = /*@__PURE__*/
-  fileDesc("CiVsdW1lbmV0ZXMvdjEvY2lyY2FkaWFuX3NjaGVkdWxlLnByb3RvEgxsdW1lbmV0ZXMudjEihAEKEUNpcmNhZGlhbktleWZyYW1lEi0KBmFuY2hvchgBIAEoDjIdLmx1bWVuZXRlcy52MS5DaXJjYWRpYW5BbmNob3ISFgoOb2Zmc2V0X21pbnV0ZXMYAiABKAUSEgoKYnJpZ2h0bmVzcxgDIAEoBRIUCgxjb2xvcl90ZW1wX2sYBCABKAUixgIKEUNpcmNhZGlhblNjaGVkdWxlEgoKAmlkGAEgASgJEg0KBWdyb3VwGAIgASgJEhAKCGxhdGl0dWRlGAMgASgBEhEKCWxvbmdpdHVkZRgEIAEoARIyCglrZXlmcmFtZXMYBSADKAsyHy5sdW1lbmV0ZXMudjEuQ2lyY2FkaWFuS2V5ZnJhbWUSHwoSY3VycmVudF9icmlnaHRuZXNzGAYgASgFSACIAQESIQoUY3VycmVudF9jb2xvcl90ZW1wX2sYByABKAVIAYgBARIYChB2YWxpZGF0aW9uX2Vycm9yGAggASgJEi8KC2xhc3Rfc3luY2VkGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIVChNfY3VycmVudF9icmlnaHRuZXNzQhcKFV9jdXJyZW50X2NvbG9yX3RlbXBfayIfCh1MaXN0Q2lyY2FkaWFuU2NoZWR1bGVzUmVxdWVzdCJeCh5MaXN0Q2lyY2FkaWFuU2NoZWR1bGVzUmVzcG9uc2USPAoTY2lyY2FkaWFuX3NjaGVkdWxlcxgBIAMoCzIfLmx1bWVuZXRlcy52MS5DaXJjYWRpYW5TY2hlZHVsZSq0AQoPQ2lyY2FkaWFuQW5jaG9yEiAKHENJUkNBRElBTl9BTkNIT1JfVU5TUEVDSUZJRUQQABIcChhDSVJDQURJQU5fQU5DSE9SX1NVTlJJU0UQARIfChtDSVJDQURJQU5fQU5DSE9SX1NPTEFSX05PT04QAhIbChdDSVJDQURJQU5fQU5DSE9SX1NVTlNFVBADEiMKH0NJUkNBRElBTl9BTkNIT1JfU09MQVJfTUlETklHSFQQBDKPAQoYQ2lyY2FkaWFuU2NoZWR1bGVTZXJ2aWNlEnMKFkxpc3RDaXJjYWRpYW5TY2hlZHVsZXMSKy5sdW1lbmV0ZXMudjEuTGlzdENpcmNhZGlhblNjaGVkdWxlc1JlcXVlc3QaLC5sdW1lbmV0ZXMudjEuTGlzdENpcmNhZGlhblNjaGVkdWxlc1Jlc3BvbnNlQj5aPGdpdGh1Yi5jb20vbGlhbWF3aGl0ZS9sdW1lbmV0ZXMvZ2VuL2x1bWVuZXRlcy92MTtsdW1lbmV0ZXN2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("CiVsdW1lbmV0ZXMvdjEvY2lyY2FkaWFuX3NjaGVkdWxlLnByb3RvEgxsdW1lbmV0ZXMudjEisAEKEUNpcmNhZGlhbktleWZyYW1lEi0KBmFuY2hvchgBIAEoDjIdLmx1bWVuZXRlcy52MS5DaXJjYWRpYW5BbmNob3ISFgoOb2Zmc2V0X21pbnV0ZXMYAiABKAUSEgoKYnJpZ2h0bmVzcxgDIAEoBRIUCgxjb2xvcl90ZW1wX2sYBCABKAUSKgoCb24YBSABKA4yHi5sdW1lbmV0ZXMudjEuQ2lyY2FkaWFuT25TdGF0ZSLGAgoRQ2lyY2FkaWFuU2NoZWR1bGUSCgoCaWQYASABKAkSDQoFZ3JvdXAYAiABKAkSEAoIbGF0aXR1ZGUYAyABKAESEQoJbG9uZ2l0dWRlGAQgASgBEjIKCWtleWZyYW1lcxgFIAMoCzIfLmx1bWVuZXRlcy52MS5DaXJjYWRpYW5LZXlmcmFtZRIfChJjdXJyZW50X2JyaWdodG5lc3MYBiABKAVIAIgBARIhChRjdXJyZW50X2NvbG9yX3RlbXBfaxgHIAEoBUgBiAEBEhgKEHZhbGlkYXRpb25fZXJyb3IYCCABKAkSLwoLbGFzdF9zeW5jZWQYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQhUKE19jdXJyZW50X2JyaWdodG5lc3NCFwoVX2N1cnJlbnRfY29sb3JfdGVtcF9rIh8KHUxpc3RDaXJjYWRpYW5TY2hlZHVsZXNSZXF1ZXN0Il4KHkxpc3RDaXJjYWRpYW5TY2hlZHVsZXNSZXNwb25zZRI8ChNjaXJjYWRpYW5fc2NoZWR1bGVzGAEgAygLMh8ubHVtZW5ldGVzLnYxLkNpcmNhZGlhblNjaGVkdWxlKrQBCg9DaXJjYWRpYW5BbmNob3ISIAocQ0lSQ0FESUFOX0FOQ0hPUl9VTlNQRUNJRklFRBAAEhwKGENJUkNBRElBTl9BTkNIT1JfU1VOUklTRRABEh8KG0NJUkNBRElBTl9BTkNIT1JfU09MQVJfTk9PThACEhsKF0NJUkNBRElBTl9BTkNIT1JfU1VOU0VUEAMSIwofQ0lSQ0FESUFOX0FOQ0hPUl9TT0xBUl9NSUROSUdIVBAEKmsKEENpcmNhZGlhbk9uU3RhdGUSIAocQ0lSQ0FESUFOX09OX1NUQVRFX1VOQ0hBTkdFRBAAEhkKFUNJUkNBRElBTl9PTl9TVEFURV9PThABEhoKFkNJUkNBRElBTl9PTl9TVEFURV9PRkYQAjKPAQoYQ2lyY2FkaWFuU2NoZWR1bGVTZXJ2aWNlEnMKFkxpc3RDaXJjYWRpYW5TY2hlZHVsZXMSKy5sdW1lbmV0ZXMudjEuTGlzdENpcmNhZGlhblNjaGVkdWxlc1JlcXVlc3QaLC5sdW1lbmV0ZXMudjEuTGlzdENpcmNhZGlhblNjaGVkdWxlc1Jlc3BvbnNlQj5aPGdpdGh1Yi5jb20vbGlhbWF3aGl0ZS9sdW1lbmV0ZXMvZ2VuL2x1bWVuZXRlcy92MTtsdW1lbmV0ZXN2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message lumenetes.v1.CircadianKeyframe
@@ -37,6 +37,11 @@ export type CircadianKeyframe = Message<"lumenetes.v1.CircadianKeyframe"> & {
    * @generated from field: int32 color_temp_k = 4;
    */
   colorTempK: number;
+
+  /**
+   * @generated from field: lumenetes.v1.CircadianOnState on = 5;
+   */
+  on: CircadianOnState;
 };
 
 /**
@@ -168,6 +173,32 @@ export enum CircadianAnchor {
  */
 export const CircadianAnchorSchema: GenEnum<CircadianAnchor> = /*@__PURE__*/
   enumDesc(file_lumenetes_v1_circadian_schedule, 0);
+
+/**
+ * @generated from enum lumenetes.v1.CircadianOnState
+ */
+export enum CircadianOnState {
+  /**
+   * @generated from enum value: CIRCADIAN_ON_STATE_UNCHANGED = 0;
+   */
+  UNCHANGED = 0,
+
+  /**
+   * @generated from enum value: CIRCADIAN_ON_STATE_ON = 1;
+   */
+  ON = 1,
+
+  /**
+   * @generated from enum value: CIRCADIAN_ON_STATE_OFF = 2;
+   */
+  OFF = 2,
+}
+
+/**
+ * Describes the enum lumenetes.v1.CircadianOnState.
+ */
+export const CircadianOnStateSchema: GenEnum<CircadianOnState> = /*@__PURE__*/
+  enumDesc(file_lumenetes_v1_circadian_schedule, 1);
 
 /**
  * @generated from service lumenetes.v1.CircadianScheduleService

@@ -88,12 +88,18 @@ spec:
               color:
                 description: |-
                   Color is the desired approximate "#rrggbb" swatch, or "" if the
-                  light doesn't support color.
+                  light doesn't support color (or isn't currently color-managed - see
+                  internal/lightscontroller.diffLight's doc comment). Mutually
+                  exclusive with ColorTempK - a Hue light has one active color mode
+                  (xy vs. mirek) at a time; setting both is rejected at admission by
+                  internal/lightwebhook.Validator, not just papered over at
+                  enactment time.
                 type: string
               colorTempK:
                 description: |-
                   ColorTempK is the desired color temperature in Kelvin, or 0 if the
-                  light doesn't support color temperature.
+                  light doesn't support color temperature. Mutually exclusive with
+                  Color - see that field's doc comment.
                 format: int32
                 type: integer
               name:

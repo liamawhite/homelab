@@ -623,6 +623,16 @@ type CircadianScheduleSpecKeyframes struct {
 	// Bounded to +/-12h so internal/circadian.Interpolate's search window
 	// (the day before/of/after "now") is always sufficient to resolve it.
 	OffsetMinutes *int `pulumi:"offsetMinutes"`
+	// On explicitly turns the group's lights on or off at this keyframe, or
+	// leaves on/off state unchanged (the default) - unlike Brightness/
+	// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+	// override, not a required per-keyframe value. internal/
+	// circadian.Interpolate resolves the effective value for "now" as the
+	// nearest keyframe at-or-before now (searching backward, wrapping
+	// across days) whose On isn't "unchanged" - a step function, not
+	// interpolated/blended between two keyframes the way Brightness/
+	// ColorTempK are.
+	On *string `pulumi:"on"`
 }
 
 // CircadianScheduleSpecKeyframesInput is an input type that accepts CircadianScheduleSpecKeyframesArgs and CircadianScheduleSpecKeyframesOutput values.
@@ -654,6 +664,16 @@ type CircadianScheduleSpecKeyframesArgs struct {
 	// Bounded to +/-12h so internal/circadian.Interpolate's search window
 	// (the day before/of/after "now") is always sufficient to resolve it.
 	OffsetMinutes pulumi.IntPtrInput `pulumi:"offsetMinutes"`
+	// On explicitly turns the group's lights on or off at this keyframe, or
+	// leaves on/off state unchanged (the default) - unlike Brightness/
+	// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+	// override, not a required per-keyframe value. internal/
+	// circadian.Interpolate resolves the effective value for "now" as the
+	// nearest keyframe at-or-before now (searching backward, wrapping
+	// across days) whose On isn't "unchanged" - a step function, not
+	// interpolated/blended between two keyframes the way Brightness/
+	// ColorTempK are.
+	On pulumi.StringPtrInput `pulumi:"on"`
 }
 
 func (CircadianScheduleSpecKeyframesArgs) ElementType() reflect.Type {
@@ -736,6 +756,19 @@ func (o CircadianScheduleSpecKeyframesOutput) OffsetMinutes() pulumi.IntPtrOutpu
 	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *int { return v.OffsetMinutes }).(pulumi.IntPtrOutput)
 }
 
+// On explicitly turns the group's lights on or off at this keyframe, or
+// leaves on/off state unchanged (the default) - unlike Brightness/
+// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+// override, not a required per-keyframe value. internal/
+// circadian.Interpolate resolves the effective value for "now" as the
+// nearest keyframe at-or-before now (searching backward, wrapping
+// across days) whose On isn't "unchanged" - a step function, not
+// interpolated/blended between two keyframes the way Brightness/
+// ColorTempK are.
+func (o CircadianScheduleSpecKeyframesOutput) On() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframes) *string { return v.On }).(pulumi.StringPtrOutput)
+}
+
 type CircadianScheduleSpecKeyframesArrayOutput struct{ *pulumi.OutputState }
 
 func (CircadianScheduleSpecKeyframesArrayOutput) ElementType() reflect.Type {
@@ -774,6 +807,16 @@ type CircadianScheduleSpecKeyframesPatch struct {
 	// Bounded to +/-12h so internal/circadian.Interpolate's search window
 	// (the day before/of/after "now") is always sufficient to resolve it.
 	OffsetMinutes *int `pulumi:"offsetMinutes"`
+	// On explicitly turns the group's lights on or off at this keyframe, or
+	// leaves on/off state unchanged (the default) - unlike Brightness/
+	// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+	// override, not a required per-keyframe value. internal/
+	// circadian.Interpolate resolves the effective value for "now" as the
+	// nearest keyframe at-or-before now (searching backward, wrapping
+	// across days) whose On isn't "unchanged" - a step function, not
+	// interpolated/blended between two keyframes the way Brightness/
+	// ColorTempK are.
+	On *string `pulumi:"on"`
 }
 
 // CircadianScheduleSpecKeyframesPatchInput is an input type that accepts CircadianScheduleSpecKeyframesPatchArgs and CircadianScheduleSpecKeyframesPatchOutput values.
@@ -805,6 +848,16 @@ type CircadianScheduleSpecKeyframesPatchArgs struct {
 	// Bounded to +/-12h so internal/circadian.Interpolate's search window
 	// (the day before/of/after "now") is always sufficient to resolve it.
 	OffsetMinutes pulumi.IntPtrInput `pulumi:"offsetMinutes"`
+	// On explicitly turns the group's lights on or off at this keyframe, or
+	// leaves on/off state unchanged (the default) - unlike Brightness/
+	// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+	// override, not a required per-keyframe value. internal/
+	// circadian.Interpolate resolves the effective value for "now" as the
+	// nearest keyframe at-or-before now (searching backward, wrapping
+	// across days) whose On isn't "unchanged" - a step function, not
+	// interpolated/blended between two keyframes the way Brightness/
+	// ColorTempK are.
+	On pulumi.StringPtrInput `pulumi:"on"`
 }
 
 func (CircadianScheduleSpecKeyframesPatchArgs) ElementType() reflect.Type {
@@ -885,6 +938,19 @@ func (o CircadianScheduleSpecKeyframesPatchOutput) ColorTempK() pulumi.IntPtrOut
 // (the day before/of/after "now") is always sufficient to resolve it.
 func (o CircadianScheduleSpecKeyframesPatchOutput) OffsetMinutes() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *int { return v.OffsetMinutes }).(pulumi.IntPtrOutput)
+}
+
+// On explicitly turns the group's lights on or off at this keyframe, or
+// leaves on/off state unchanged (the default) - unlike Brightness/
+// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+// override, not a required per-keyframe value. internal/
+// circadian.Interpolate resolves the effective value for "now" as the
+// nearest keyframe at-or-before now (searching backward, wrapping
+// across days) whose On isn't "unchanged" - a step function, not
+// interpolated/blended between two keyframes the way Brightness/
+// ColorTempK are.
+func (o CircadianScheduleSpecKeyframesPatchOutput) On() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v CircadianScheduleSpecKeyframesPatch) *string { return v.On }).(pulumi.StringPtrOutput)
 }
 
 type CircadianScheduleSpecKeyframesPatchArrayOutput struct{ *pulumi.OutputState }
@@ -4451,10 +4517,16 @@ type LightSpec struct {
 	// LightStatus.Brightness.
 	Brightness *int `pulumi:"brightness"`
 	// Color is the desired approximate "#rrggbb" swatch, or "" if the
-	// light doesn't support color.
+	// light doesn't support color (or isn't currently color-managed - see
+	// internal/lightscontroller.diffLight's doc comment). Mutually
+	// exclusive with ColorTempK - a Hue light has one active color mode
+	// (xy vs. mirek) at a time; setting both is rejected at admission by
+	// internal/lightwebhook.Validator, not just papered over at
+	// enactment time.
 	Color *string `pulumi:"color"`
 	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
-	// light doesn't support color temperature.
+	// light doesn't support color temperature. Mutually exclusive with
+	// Color - see that field's doc comment.
 	ColorTempK *int `pulumi:"colorTempK"`
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
@@ -4506,10 +4578,16 @@ type LightSpecArgs struct {
 	// LightStatus.Brightness.
 	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
 	// Color is the desired approximate "#rrggbb" swatch, or "" if the
-	// light doesn't support color.
+	// light doesn't support color (or isn't currently color-managed - see
+	// internal/lightscontroller.diffLight's doc comment). Mutually
+	// exclusive with ColorTempK - a Hue light has one active color mode
+	// (xy vs. mirek) at a time; setting both is rejected at admission by
+	// internal/lightwebhook.Validator, not just papered over at
+	// enactment time.
 	Color pulumi.StringPtrInput `pulumi:"color"`
 	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
-	// light doesn't support color temperature.
+	// light doesn't support color temperature. Mutually exclusive with
+	// Color - see that field's doc comment.
 	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
@@ -4629,13 +4707,19 @@ func (o LightSpecOutput) Brightness() pulumi.IntPtrOutput {
 }
 
 // Color is the desired approximate "#rrggbb" swatch, or "" if the
-// light doesn't support color.
+// light doesn't support color (or isn't currently color-managed - see
+// internal/lightscontroller.diffLight's doc comment). Mutually
+// exclusive with ColorTempK - a Hue light has one active color mode
+// (xy vs. mirek) at a time; setting both is rejected at admission by
+// internal/lightwebhook.Validator, not just papered over at
+// enactment time.
 func (o LightSpecOutput) Color() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightSpec) *string { return v.Color }).(pulumi.StringPtrOutput)
 }
 
 // ColorTempK is the desired color temperature in Kelvin, or 0 if the
-// light doesn't support color temperature.
+// light doesn't support color temperature. Mutually exclusive with
+// Color - see that field's doc comment.
 func (o LightSpecOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v LightSpec) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
 }
@@ -4708,7 +4792,12 @@ func (o LightSpecPtrOutput) Brightness() pulumi.IntPtrOutput {
 }
 
 // Color is the desired approximate "#rrggbb" swatch, or "" if the
-// light doesn't support color.
+// light doesn't support color (or isn't currently color-managed - see
+// internal/lightscontroller.diffLight's doc comment). Mutually
+// exclusive with ColorTempK - a Hue light has one active color mode
+// (xy vs. mirek) at a time; setting both is rejected at admission by
+// internal/lightwebhook.Validator, not just papered over at
+// enactment time.
 func (o LightSpecPtrOutput) Color() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightSpec) *string {
 		if v == nil {
@@ -4719,7 +4808,8 @@ func (o LightSpecPtrOutput) Color() pulumi.StringPtrOutput {
 }
 
 // ColorTempK is the desired color temperature in Kelvin, or 0 if the
-// light doesn't support color temperature.
+// light doesn't support color temperature. Mutually exclusive with
+// Color - see that field's doc comment.
 func (o LightSpecPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *LightSpec) *int {
 		if v == nil {
@@ -4790,10 +4880,16 @@ type LightSpecPatch struct {
 	// LightStatus.Brightness.
 	Brightness *int `pulumi:"brightness"`
 	// Color is the desired approximate "#rrggbb" swatch, or "" if the
-	// light doesn't support color.
+	// light doesn't support color (or isn't currently color-managed - see
+	// internal/lightscontroller.diffLight's doc comment). Mutually
+	// exclusive with ColorTempK - a Hue light has one active color mode
+	// (xy vs. mirek) at a time; setting both is rejected at admission by
+	// internal/lightwebhook.Validator, not just papered over at
+	// enactment time.
 	Color *string `pulumi:"color"`
 	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
-	// light doesn't support color temperature.
+	// light doesn't support color temperature. Mutually exclusive with
+	// Color - see that field's doc comment.
 	ColorTempK *int `pulumi:"colorTempK"`
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
@@ -4845,10 +4941,16 @@ type LightSpecPatchArgs struct {
 	// LightStatus.Brightness.
 	Brightness pulumi.IntPtrInput `pulumi:"brightness"`
 	// Color is the desired approximate "#rrggbb" swatch, or "" if the
-	// light doesn't support color.
+	// light doesn't support color (or isn't currently color-managed - see
+	// internal/lightscontroller.diffLight's doc comment). Mutually
+	// exclusive with ColorTempK - a Hue light has one active color mode
+	// (xy vs. mirek) at a time; setting both is rejected at admission by
+	// internal/lightwebhook.Validator, not just papered over at
+	// enactment time.
 	Color pulumi.StringPtrInput `pulumi:"color"`
 	// ColorTempK is the desired color temperature in Kelvin, or 0 if the
-	// light doesn't support color temperature.
+	// light doesn't support color temperature. Mutually exclusive with
+	// Color - see that field's doc comment.
 	ColorTempK pulumi.IntPtrInput `pulumi:"colorTempK"`
 	// Name is the desired human-readable Hue name. NOTE: actually renaming
 	// a Hue light requires a PUT to the owning *device* resource, not this
@@ -4968,13 +5070,19 @@ func (o LightSpecPatchOutput) Brightness() pulumi.IntPtrOutput {
 }
 
 // Color is the desired approximate "#rrggbb" swatch, or "" if the
-// light doesn't support color.
+// light doesn't support color (or isn't currently color-managed - see
+// internal/lightscontroller.diffLight's doc comment). Mutually
+// exclusive with ColorTempK - a Hue light has one active color mode
+// (xy vs. mirek) at a time; setting both is rejected at admission by
+// internal/lightwebhook.Validator, not just papered over at
+// enactment time.
 func (o LightSpecPatchOutput) Color() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v LightSpecPatch) *string { return v.Color }).(pulumi.StringPtrOutput)
 }
 
 // ColorTempK is the desired color temperature in Kelvin, or 0 if the
-// light doesn't support color temperature.
+// light doesn't support color temperature. Mutually exclusive with
+// Color - see that field's doc comment.
 func (o LightSpecPatchOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v LightSpecPatch) *int { return v.ColorTempK }).(pulumi.IntPtrOutput)
 }
@@ -5047,7 +5155,12 @@ func (o LightSpecPatchPtrOutput) Brightness() pulumi.IntPtrOutput {
 }
 
 // Color is the desired approximate "#rrggbb" swatch, or "" if the
-// light doesn't support color.
+// light doesn't support color (or isn't currently color-managed - see
+// internal/lightscontroller.diffLight's doc comment). Mutually
+// exclusive with ColorTempK - a Hue light has one active color mode
+// (xy vs. mirek) at a time; setting both is rejected at admission by
+// internal/lightwebhook.Validator, not just papered over at
+// enactment time.
 func (o LightSpecPatchPtrOutput) Color() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *LightSpecPatch) *string {
 		if v == nil {
@@ -5058,7 +5171,8 @@ func (o LightSpecPatchPtrOutput) Color() pulumi.StringPtrOutput {
 }
 
 // ColorTempK is the desired color temperature in Kelvin, or 0 if the
-// light doesn't support color temperature.
+// light doesn't support color temperature. Mutually exclusive with
+// Color - see that field's doc comment.
 func (o LightSpecPatchPtrOutput) ColorTempK() pulumi.IntPtrOutput {
 	return o.ApplyT(func(v *LightSpecPatch) *int {
 		if v == nil {

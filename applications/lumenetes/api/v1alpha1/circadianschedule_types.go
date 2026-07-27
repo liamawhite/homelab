@@ -16,6 +16,23 @@ const (
 	CircadianAnchorSolarMidnight CircadianAnchor = "solarMidnight"
 )
 
+// CircadianOnState is a CircadianKeyframe's tri-state on/off directive -
+// explicitly "on", explicitly "off", or "unchanged" (this keyframe doesn't
+// affect on/off state at all). A plain *bool could only distinguish two of
+// these three (nil for unchanged, true/false for on/off), which is enough
+// for SceneLightState's one-shot apply, but internal/circadian.Interpolate
+// needs "unchanged" to be a real, explicit value it can search past to find
+// the nearest keyframe that actually does set on/off - an enum makes that a
+// named state instead of relying on nil-pointer plumbing to mean the same
+// thing.
+type CircadianOnState string
+
+const (
+	CircadianOnStateUnchanged CircadianOnState = "unchanged"
+	CircadianOnStateOn        CircadianOnState = "on"
+	CircadianOnStateOff       CircadianOnState = "off"
+)
+
 // +kubebuilder:object:generate=true
 
 // CircadianKeyframe pins an absolute (Brightness, ColorTempK) pair to a
@@ -43,6 +60,18 @@ type CircadianKeyframe struct {
 	// +kubebuilder:validation:Minimum=1000
 	// +kubebuilder:validation:Maximum=10000
 	ColorTempK int32 `json:"colorTempK"`
+	// On explicitly turns the group's lights on or off at this keyframe, or
+	// leaves on/off state unchanged (the default) - unlike Brightness/
+	// ColorTempK, on/off isn't a continuous curve, so this is a sparse
+	// override, not a required per-keyframe value. internal/
+	// circadian.Interpolate resolves the effective value for "now" as the
+	// nearest keyframe at-or-before now (searching backward, wrapping
+	// across days) whose On isn't "unchanged" - a step function, not
+	// interpolated/blended between two keyframes the way Brightness/
+	// ColorTempK are.
+	// +kubebuilder:validation:Enum=unchanged;on;off
+	// +kubebuilder:default=unchanged
+	On CircadianOnState `json:"on,omitempty"`
 }
 
 // +kubebuilder:object:generate=true

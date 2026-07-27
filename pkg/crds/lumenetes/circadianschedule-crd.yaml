@@ -123,6 +123,23 @@ spec:
                       maximum: 720
                       minimum: -720
                       type: integer
+                    "on":
+                      default: unchanged
+                      description: |-
+                        On explicitly turns the group's lights on or off at this keyframe, or
+                        leaves on/off state unchanged (the default) - unlike Brightness/
+                        ColorTempK, on/off isn't a continuous curve, so this is a sparse
+                        override, not a required per-keyframe value. internal/
+                        circadian.Interpolate resolves the effective value for "now" as the
+                        nearest keyframe at-or-before now (searching backward, wrapping
+                        across days) whose On isn't "unchanged" - a step function, not
+                        interpolated/blended between two keyframes the way Brightness/
+                        ColorTempK are.
+                      enum:
+                      - unchanged
+                      - "on"
+                      - "off"
+                      type: string
                   required:
                   - anchor
                   - brightness

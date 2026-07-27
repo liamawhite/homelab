@@ -86,7 +86,7 @@ func (r *Reconciler) evaluate(schedule *lumenetesv1alpha1.CircadianSchedule) (br
 		return nil, nil, "spec.group is required"
 	}
 	coords := sun.Coordinates{Latitude: schedule.Spec.Latitude, Longitude: schedule.Spec.Longitude}
-	b, c, err := circadian.Interpolate(schedule.Spec.Keyframes, coords, r.now())
+	b, c, _, err := circadian.Interpolate(schedule.Spec.Keyframes, coords, r.now())
 	if err != nil {
 		return nil, nil, err.Error()
 	}

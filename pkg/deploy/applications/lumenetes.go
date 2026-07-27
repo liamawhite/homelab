@@ -8,8 +8,10 @@ import (
 
 	"github.com/liamawhite/homelab/pkg/components/hubcontroller"
 	"github.com/liamawhite/homelab/pkg/components/lumenetescontroller"
+	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
 	"github.com/liamawhite/homelab/pkg/config"
 	lumenetesv1alpha1 "github.com/liamawhite/homelab/pkg/crds/lumenetes/crds/kubernetes/lumenetes/v1alpha1"
+	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	"github.com/pulumi/pulumi-docker-build/sdk/go/dockerbuild"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -71,7 +73,8 @@ var defaultGroups = []struct {
 		},
 	},
 	{
-		Name: "external-office",
+		Name:        "external-office",
+		ActiveScene: &lumenetesv1alpha1.GroupSpecActiveSceneArgs{Kind: pulumi.String("CircadianSchedule"), Name: pulumi.String("external-office-circadian")},
 		Lights: []string{
 			"0af7838d-8570-44f1-a744-7ef5030334ae", // Pendant Light
 			"9fa61050-79bc-4b1e-aa5a-81b85f45458b", // Ceiling Main
@@ -122,12 +125,12 @@ var defaultCircadianSchedules = []struct {
 		Keyframes: []lumenetesv1alpha1.CircadianScheduleSpecKeyframesArgs{
 			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(-60), Brightness: pulumi.Int(15), ColorTempK: pulumi.Int(2200)},
 			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(60), ColorTempK: pulumi.Int(3000)},
-			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(60), Brightness: pulumi.Int(80), ColorTempK: pulumi.Int(3800)},
-			{Anchor: pulumi.String("solarNoon"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(6500)},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(60), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(4000)},
+			{Anchor: pulumi.String("solarNoon"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5000)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-120), Brightness: pulumi.Int(85), ColorTempK: pulumi.Int(4000)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-60), Brightness: pulumi.Int(70), ColorTempK: pulumi.Int(2700)},
-			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(60), Brightness: pulumi.Int(30), ColorTempK: pulumi.Int(2000)},
-			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(5), ColorTempK: pulumi.Int(2000)},
+			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(60), Brightness: pulumi.Int(30), ColorTempK: pulumi.Int(1700)},
+			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(5), ColorTempK: pulumi.Int(1700)},
 		},
 	},
 	{
@@ -138,11 +141,12 @@ var defaultCircadianSchedules = []struct {
 			// rather than peaking briefly at solar noon, since desk work
 			// hours don't track the sun the way a living space's usage
 			// does.
-			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(40), ColorTempK: pulumi.Int(3000)},
-			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(90), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5500)},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(-30), Brightness: pulumi.Int(0), ColorTempK: pulumi.Int(2200)},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(40), ColorTempK: pulumi.Int(3000), On: pulumi.String("on")},
+			{Anchor: pulumi.String("sunrise"), OffsetMinutes: pulumi.Int(60), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5500)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(-90), Brightness: pulumi.Int(100), ColorTempK: pulumi.Int(5500)},
 			{Anchor: pulumi.String("sunset"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(50), ColorTempK: pulumi.Int(3000)},
-			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(10), ColorTempK: pulumi.Int(2200)},
+			{Anchor: pulumi.String("solarMidnight"), OffsetMinutes: pulumi.Int(0), Brightness: pulumi.Int(0), ColorTempK: pulumi.Int(2200), On: pulumi.String("off")},
 		},
 	},
 }
@@ -274,6 +278,16 @@ type LumenetesArgs struct {
 	// for its own metrics scraping (HostNetwork, outside Cilium's policy
 	// baseline entirely).
 	PrometheusNamespace pulumi.StringInput
+	// TailscaleOperatorNamespace/TailscaleMagicDNSSuffix/CloudflareZoneID/
+	// CloudflareBaseDomain/CloudflareProvider are threaded straight through
+	// to lumenetescontroller's own UI exposure (see that package's ui.go) -
+	// see PrivateArgs' doc comments for each. Not needed by hub-controller,
+	// which serves no UI of its own.
+	TailscaleOperatorNamespace pulumi.StringInput
+	TailscaleMagicDNSSuffix    pulumi.StringInput
+	CloudflareZoneID           pulumi.StringInput
+	CloudflareBaseDomain       pulumi.StringInput
+	CloudflareProvider         *cloudflare.Provider
 }
 
 // Lumenetes groups the Hue-specific deploy-time wiring: building the one
@@ -287,6 +301,13 @@ type LumenetesArgs struct {
 type Lumenetes struct {
 	HubController       *hubcontroller.HubController
 	LumenetesController *lumenetescontroller.LumenetesController
+}
+
+// TailscaleRedirect returns the embedded read-only web UI's
+// Cloudflare-redirect data - see Private.TailscaleRedirect's doc comment for
+// why this only hands back data rather than applying anything itself.
+func (l *Lumenetes) TailscaleRedirect() ingress.RedirectRoute {
+	return l.LumenetesController.TailscaleRedirect()
 }
 
 // NewLumenetes builds the shared lumenetes-controller/hub-controller image
@@ -314,12 +335,17 @@ func NewLumenetes(ctx *pulumi.Context, args *LumenetesArgs, opts ...pulumi.Resou
 	}
 
 	lc, err := lumenetescontroller.NewLumenetesController(ctx, "lumenetes-controller", &lumenetescontroller.LumenetesControllerArgs{
-		Namespace:           args.Namespace,
-		Bridges:             args.Bridges,
-		PollInterval:        args.LightsPollInterval,
-		DryRun:              args.DryRun,
-		Image:               image.Ref,
-		PrometheusNamespace: args.PrometheusNamespace,
+		Namespace:                  args.Namespace,
+		Bridges:                    args.Bridges,
+		PollInterval:               args.LightsPollInterval,
+		DryRun:                     args.DryRun,
+		Image:                      image.Ref,
+		PrometheusNamespace:        args.PrometheusNamespace,
+		TailscaleOperatorNamespace: args.TailscaleOperatorNamespace,
+		TailscaleMagicDNSSuffix:    args.TailscaleMagicDNSSuffix,
+		CloudflareZoneID:           args.CloudflareZoneID,
+		CloudflareBaseDomain:       args.CloudflareBaseDomain,
+		CloudflareProvider:         args.CloudflareProvider,
 	}, imageOpts...)
 	if err != nil {
 		return nil, err

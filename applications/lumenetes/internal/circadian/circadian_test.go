@@ -20,12 +20,12 @@ func fourKeyframes() []lumenetesv1alpha1.CircadianKeyframe {
 }
 
 func TestInterpolate_TooFewKeyframes(t *testing.T) {
-	_, _, err := Interpolate(nil, equator, time.Now())
+	_, _, _, err := Interpolate(nil, equator, time.Now())
 	if err == nil {
 		t.Fatal("expected error for 0 keyframes")
 	}
 	one := []lumenetesv1alpha1.CircadianKeyframe{{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 10, ColorTempK: 2000}}
-	if _, _, err := Interpolate(one, equator, time.Now()); err == nil {
+	if _, _, _, err := Interpolate(one, equator, time.Now()); err == nil {
 		t.Fatal("expected error for 1 keyframe")
 	}
 }
@@ -35,7 +35,7 @@ func TestInterpolate_UnknownAnchor(t *testing.T) {
 		{Anchor: "bogus", Brightness: 10, ColorTempK: 2000},
 		{Anchor: lumenetesv1alpha1.CircadianAnchorSunset, Brightness: 90, ColorTempK: 5000},
 	}
-	if _, _, err := Interpolate(kfs, equator, time.Now()); err == nil {
+	if _, _, _, err := Interpolate(kfs, equator, time.Now()); err == nil {
 		t.Fatal("expected error for unknown anchor")
 	}
 }
@@ -48,7 +48,7 @@ func TestInterpolate_ExactlyAtKeyframeInstant(t *testing.T) {
 	}
 	kfs := fourKeyframes()
 
-	b, c, err := Interpolate(kfs, equator, times.Sunrise)
+	b, c, _, err := Interpolate(kfs, equator, times.Sunrise)
 	if err != nil {
 		t.Fatalf("Interpolate at sunrise: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestInterpolate_ExactlyAtKeyframeInstant(t *testing.T) {
 		t.Errorf("Interpolate at exact sunrise = (%d, %d), want (15, 2200)", b, c)
 	}
 
-	b, c, err = Interpolate(kfs, equator, times.SolarNoon)
+	b, c, _, err = Interpolate(kfs, equator, times.SolarNoon)
 	if err != nil {
 		t.Fatalf("Interpolate at solar noon: %v", err)
 	}
@@ -74,7 +74,7 @@ func TestInterpolate_MidpointBetweenKeyframes(t *testing.T) {
 	kfs := fourKeyframes()
 
 	midpoint := times.Sunrise.Add(times.SolarNoon.Sub(times.Sunrise) / 2)
-	b, c, err := Interpolate(kfs, equator, midpoint)
+	b, c, _, err := Interpolate(kfs, equator, midpoint)
 	if err != nil {
 		t.Fatalf("Interpolate at midpoint: %v", err)
 	}
@@ -101,7 +101,7 @@ func TestInterpolate_MidnightWrapBeforeDawn(t *testing.T) {
 	kfs := fourKeyframes()
 
 	before := times.Sunrise.Add(-2 * time.Hour)
-	b, _, err := Interpolate(kfs, equator, before)
+	b, _, _, err := Interpolate(kfs, equator, before)
 	if err != nil {
 		t.Fatalf("Interpolate before dawn: %v", err)
 	}
@@ -122,7 +122,7 @@ func TestInterpolate_MidnightWrapAfterDusk(t *testing.T) {
 	kfs := fourKeyframes()
 
 	after := times.Sunset.Add(2 * time.Hour)
-	b, _, err := Interpolate(kfs, equator, after)
+	b, _, _, err := Interpolate(kfs, equator, after)
 	if err != nil {
 		t.Fatalf("Interpolate after dusk: %v", err)
 	}
@@ -151,7 +151,7 @@ func TestInterpolate_CrossMidnightSpan(t *testing.T) {
 	}
 
 	midnight := yesterday.Sunset.Add(today.Sunrise.Sub(yesterday.Sunset) / 2)
-	b, c, err := Interpolate(kfs, equator, midnight)
+	b, c, _, err := Interpolate(kfs, equator, midnight)
 	if err != nil {
 		t.Fatalf("Interpolate at cross-midnight midpoint: %v", err)
 	}
@@ -177,11 +177,11 @@ func TestInterpolate_OutOfOrderKeyframesStillWork(t *testing.T) {
 	}
 
 	midpoint := times.Sunrise.Add(times.SolarNoon.Sub(times.Sunrise) / 2)
-	bOrdered, cOrdered, err := Interpolate(inOrder, equator, midpoint)
+	bOrdered, cOrdered, _, err := Interpolate(inOrder, equator, midpoint)
 	if err != nil {
 		t.Fatalf("Interpolate (in-order): %v", err)
 	}
-	bReversed, cReversed, err := Interpolate(reversed, equator, midpoint)
+	bReversed, cReversed, _, err := Interpolate(reversed, equator, midpoint)
 	if err != nil {
 		t.Fatalf("Interpolate (reversed): %v", err)
 	}
@@ -205,7 +205,7 @@ func TestInterpolate_DuplicateKeyframesDontBreakInterpolation(t *testing.T) {
 		{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 10, ColorTempK: 2000},
 		{Anchor: lumenetesv1alpha1.CircadianAnchorSunset, Brightness: 100, ColorTempK: 6000},
 	}
-	b, c, err := Interpolate(kfs, equator, times.Sunrise)
+	b, c, _, err := Interpolate(kfs, equator, times.Sunrise)
 	if err != nil {
 		t.Fatalf("Interpolate with duplicate keyframes: %v", err)
 	}
@@ -226,8 +226,65 @@ func TestInterpolate_MaxOffsetKeyframesStillBracket(t *testing.T) {
 	if err != nil {
 		t.Fatalf("sun.Compute: %v", err)
 	}
-	if _, _, err := Interpolate(kfs, equator, times.SolarNoon); err != nil {
+	if _, _, _, err := Interpolate(kfs, equator, times.SolarNoon); err != nil {
 		t.Fatalf("Interpolate with max-offset keyframes: %v", err)
+	}
+}
+
+func TestInterpolate_OnDefaultsToUnchanged(t *testing.T) {
+	// None of fourKeyframes() sets On, so the schedule doesn't manage
+	// on/off at all - the resolved value should be Unchanged, not On/Off.
+	date := time.Date(2026, time.March, 20, 0, 0, 0, 0, time.UTC)
+	times, err := sun.Compute(equator, date)
+	if err != nil {
+		t.Fatalf("sun.Compute: %v", err)
+	}
+	_, _, on, err := Interpolate(fourKeyframes(), equator, times.SolarNoon)
+	if err != nil {
+		t.Fatalf("Interpolate: %v", err)
+	}
+	if on != lumenetesv1alpha1.CircadianOnStateUnchanged {
+		t.Errorf("On = %q, want %q", on, lumenetesv1alpha1.CircadianOnStateUnchanged)
+	}
+}
+
+func TestInterpolate_OnStepFunction(t *testing.T) {
+	// On is a step function, not a curve: it should hold Off from solar
+	// midnight right up to (and including) sunrise, then flip to On -
+	// never some blended in-between value.
+	date := time.Date(2026, time.March, 20, 0, 0, 0, 0, time.UTC)
+	times, err := sun.Compute(equator, date)
+	if err != nil {
+		t.Fatalf("sun.Compute: %v", err)
+	}
+	kfs := []lumenetesv1alpha1.CircadianKeyframe{
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSolarMidnight, Brightness: 0, ColorTempK: 2200, On: lumenetesv1alpha1.CircadianOnStateOff},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 40, ColorTempK: 3000, On: lumenetesv1alpha1.CircadianOnStateOn},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunset, Brightness: 50, ColorTempK: 3000},
+	}
+
+	_, _, on, err := Interpolate(kfs, equator, times.Sunrise.Add(-2*time.Hour))
+	if err != nil {
+		t.Fatalf("Interpolate before sunrise: %v", err)
+	}
+	if on != lumenetesv1alpha1.CircadianOnStateOff {
+		t.Errorf("On 2h before sunrise = %q, want %q", on, lumenetesv1alpha1.CircadianOnStateOff)
+	}
+
+	_, _, on, err = Interpolate(kfs, equator, times.Sunrise)
+	if err != nil {
+		t.Fatalf("Interpolate at sunrise: %v", err)
+	}
+	if on != lumenetesv1alpha1.CircadianOnStateOn {
+		t.Errorf("On at sunrise = %q, want %q", on, lumenetesv1alpha1.CircadianOnStateOn)
+	}
+
+	_, _, on, err = Interpolate(kfs, equator, times.Sunset.Add(2*time.Hour))
+	if err != nil {
+		t.Fatalf("Interpolate after sunset: %v", err)
+	}
+	if on != lumenetesv1alpha1.CircadianOnStateOn {
+		t.Errorf("On 2h after sunset = %q, want %q (holds until next day's midnight Off)", on, lumenetesv1alpha1.CircadianOnStateOn)
 	}
 }
 

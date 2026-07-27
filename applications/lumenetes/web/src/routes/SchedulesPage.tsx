@@ -1,6 +1,6 @@
 import { useSchedules } from "@/lib/schedules";
 import { formatBrightness, formatColorTempK } from "@/lib/format";
-import { CircadianAnchor } from "@/gen/lumenetes/v1/circadian_schedule_pb";
+import { CircadianAnchor, CircadianOnState } from "@/gen/lumenetes/v1/circadian_schedule_pb";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
@@ -23,6 +23,17 @@ function offsetLabel(minutes: number): string {
   if (minutes === 0) return "";
   const sign = minutes > 0 ? "+" : "-";
   return ` ${sign}${Math.abs(minutes)}m`;
+}
+
+function onLabel(on: CircadianOnState): string {
+  switch (on) {
+    case CircadianOnState.ON:
+      return ", on";
+    case CircadianOnState.OFF:
+      return ", off";
+    default:
+      return "";
+  }
 }
 
 export function SchedulesPage() {
@@ -58,6 +69,7 @@ export function SchedulesPage() {
                   <li key={i}>
                     {anchorLabel(kf.anchor)}
                     {offsetLabel(kf.offsetMinutes)}: {formatBrightness(kf.brightness)}, {formatColorTempK(kf.colorTempK)}
+                    {onLabel(kf.on)}
                   </li>
                 ))}
               </ul>

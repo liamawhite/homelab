@@ -14,11 +14,18 @@ enum CircadianAnchor {
   CIRCADIAN_ANCHOR_SOLAR_MIDNIGHT = 4;
 }
 
+enum CircadianOnState {
+  CIRCADIAN_ON_STATE_UNCHANGED = 0;
+  CIRCADIAN_ON_STATE_ON = 1;
+  CIRCADIAN_ON_STATE_OFF = 2;
+}
+
 message CircadianKeyframe {
   CircadianAnchor anchor = 1;
   int32 offset_minutes = 2;
   int32 brightness = 3;
   int32 color_temp_k = 4;
+  CircadianOnState on = 5;
 }
 
 message CircadianSchedule {

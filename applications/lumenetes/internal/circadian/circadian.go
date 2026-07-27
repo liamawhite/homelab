@@ -21,6 +21,7 @@ type resolvedInstant struct {
 	at         time.Time
 	brightness int32
 	colorTempK int32
+	on         lumenetesv1alpha1.CircadianOnState
 }
 
 // Interpolate returns the brightness/colorTempK keyframes interpolates to
@@ -34,15 +35,25 @@ type resolvedInstant struct {
 // nearest it (one at-or-before, one strictly after) and linearly
 // interpolated between them.
 //
+// On is resolved separately from Brightness/ColorTempK: it's a step
+// function, not a curve, so the effective value at now is whatever the
+// nearest at-or-before keyframe last explicitly set it to (searching
+// backward from "before", skipping any keyframe left at
+// CircadianOnStateUnchanged), not an interpolation between before and
+// after. Returns CircadianOnStateUnchanged if no keyframe in the resolved
+// three-day window ever sets it - i.e. this schedule doesn't manage on/off
+// at all.
+//
 // Errors (never a silently wrong value) if: fewer than 2 keyframes are
 // given, an anchor doesn't resolve (an unknown CircadianAnchor, or
 // sun.Compute failing - e.g. polar day/night on one of the three days
 // searched), or now can't be bracketed within the resolved window (should
 // be unreachable given CircadianKeyframe.OffsetMinutes' +/-12h bound, but
 // checked defensively rather than trusted).
-func Interpolate(keyframes []lumenetesv1alpha1.CircadianKeyframe, coords sun.Coordinates, now time.Time) (brightness, colorTempK int32, err error) {
+func Interpolate(keyframes []lumenetesv1alpha1.CircadianKeyframe, coords sun.Coordinates, now time.Time) (brightness, colorTempK int32, on lumenetesv1alpha1.CircadianOnState, err error) {
+	unchanged := lumenetesv1alpha1.CircadianOnStateUnchanged
 	if len(keyframes) < 2 {
-		return 0, 0, fmt.Errorf("circadian: need at least 2 keyframes, got %d", len(keyframes))
+		return 0, 0, unchanged, fmt.Errorf("circadian: need at least 2 keyframes, got %d", len(keyframes))
 	}
 
 	day := now.UTC().Truncate(24 * time.Hour)
@@ -50,17 +61,22 @@ func Interpolate(keyframes []lumenetesv1alpha1.CircadianKeyframe, coords sun.Coo
 	for _, dayOffset := range []int{-1, 0, 1} {
 		times, err := sun.Compute(coords, day.AddDate(0, 0, dayOffset))
 		if err != nil {
-			return 0, 0, fmt.Errorf("circadian: %w", err)
+			return 0, 0, unchanged, fmt.Errorf("circadian: %w", err)
 		}
 		for _, kf := range keyframes {
 			anchor, err := anchorTime(times, kf.Anchor)
 			if err != nil {
-				return 0, 0, err
+				return 0, 0, unchanged, err
+			}
+			on := kf.On
+			if on == "" {
+				on = unchanged
 			}
 			resolved = append(resolved, resolvedInstant{
 				at:         anchor.Add(time.Duration(kf.OffsetMinutes) * time.Minute),
 				brightness: kf.Brightness,
 				colorTempK: kf.ColorTempK,
+				on:         on,
 			})
 		}
 	}
@@ -68,16 +84,18 @@ func Interpolate(keyframes []lumenetesv1alpha1.CircadianKeyframe, coords sun.Coo
 	sort.Slice(resolved, func(i, j int) bool { return resolved[i].at.Before(resolved[j].at) })
 
 	var before, after *resolvedInstant
+	var beforeIdx int
 	for i := range resolved {
 		if !resolved[i].at.After(now) {
 			before = &resolved[i]
+			beforeIdx = i
 			continue
 		}
 		after = &resolved[i]
 		break
 	}
 	if before == nil || after == nil {
-		return 0, 0, fmt.Errorf("circadian: could not bracket %s within the resolved keyframe window - check OffsetMinutes stay within +/-12h", now)
+		return 0, 0, unchanged, fmt.Errorf("circadian: could not bracket %s within the resolved keyframe window - check OffsetMinutes stay within +/-12h", now)
 	}
 
 	span := after.at.Sub(before.at)
@@ -86,11 +104,19 @@ func Interpolate(keyframes []lumenetesv1alpha1.CircadianKeyframe, coords sun.Coo
 		// is at-or-before now, but a wrong value here would write straight
 		// to a real Light's Spec - fail closed instead of dividing by zero
 		// or a negative span.
-		return 0, 0, fmt.Errorf("circadian: degenerate keyframe interval between %s and %s", before.at, after.at)
+		return 0, 0, unchanged, fmt.Errorf("circadian: degenerate keyframe interval between %s and %s", before.at, after.at)
 	}
 	frac := float64(now.Sub(before.at)) / float64(span)
 
-	return lerp(before.brightness, after.brightness, frac), lerp(before.colorTempK, after.colorTempK, frac), nil
+	resolvedOn := unchanged
+	for i := beforeIdx; i >= 0; i-- {
+		if resolved[i].on != unchanged {
+			resolvedOn = resolved[i].on
+			break
+		}
+	}
+
+	return lerp(before.brightness, after.brightness, frac), lerp(before.colorTempK, after.colorTempK, frac), resolvedOn, nil
 }
 
 func anchorTime(times sun.Times, anchor lumenetesv1alpha1.CircadianAnchor) (time.Time, error) {

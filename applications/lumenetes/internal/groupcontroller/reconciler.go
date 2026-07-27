@@ -328,15 +328,25 @@ func (r *Reconciler) enactCircadianSchedule(ctx context.Context, logger logr.Log
 	}
 
 	coords := sun.Coordinates{Latitude: schedule.Spec.Latitude, Longitude: schedule.Spec.Longitude}
-	brightness, colorTempK, err := circadian.Interpolate(schedule.Spec.Keyframes, coords, r.now())
+	brightness, colorTempK, onState, err := circadian.Interpolate(schedule.Spec.Keyframes, coords, r.now())
 	if err != nil {
 		return fmt.Sprintf("circadian schedule %q: %v", schedule.Name, err), nil
+	}
+
+	var on *bool
+	switch onState {
+	case lumenetesv1alpha1.CircadianOnStateOn:
+		onVal := true
+		on = &onVal
+	case lumenetesv1alpha1.CircadianOnStateOff:
+		onVal := false
+		on = &onVal
 	}
 
 	relinquishColor := ""
 	var g errgroup.Group
 	for _, lightName := range group.Spec.Lights {
-		state := lumenetesv1alpha1.SceneLightState{Name: lightName, Brightness: &brightness, ColorTempK: &colorTempK, Color: &relinquishColor}
+		state := lumenetesv1alpha1.SceneLightState{Name: lightName, On: on, Brightness: &brightness, ColorTempK: &colorTempK, Color: &relinquishColor}
 		g.Go(func() error {
 			if err := r.applySceneLightState(ctx, state); err != nil {
 				logger.Error(err, "failed to apply circadian schedule state", "group", group.Name, "circadianSchedule", schedule.Name, "light", lightName)

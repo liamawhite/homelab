@@ -117,7 +117,7 @@ func TestReconcile_ValidScheduleComputesCurrentValues(t *testing.T) {
 		t.Fatalf("sun.Compute: %v", err)
 	}
 	now := times.SolarNoon
-	wantB, wantC, err := circadian.Interpolate(fourKeyframes(), equator, now)
+	wantB, wantC, _, err := circadian.Interpolate(fourKeyframes(), equator, now)
 	if err != nil {
 		t.Fatalf("circadian.Interpolate: %v", err)
 	}
@@ -162,7 +162,7 @@ func TestReconcile_UnchangedValuesSkipStatusUpdate(t *testing.T) {
 		t.Fatalf("sun.Compute: %v", err)
 	}
 	now := times.SolarNoon
-	wantB, wantC, err := circadian.Interpolate(fourKeyframes(), equator, now)
+	wantB, wantC, _, err := circadian.Interpolate(fourKeyframes(), equator, now)
 	if err != nil {
 		t.Fatalf("circadian.Interpolate: %v", err)
 	}

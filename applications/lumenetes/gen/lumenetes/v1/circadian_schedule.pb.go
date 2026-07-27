@@ -77,12 +77,62 @@ func (CircadianAnchor) EnumDescriptor() ([]byte, []int) {
 	return file_lumenetes_v1_circadian_schedule_proto_rawDescGZIP(), []int{0}
 }
 
+type CircadianOnState int32
+
+const (
+	CircadianOnState_CIRCADIAN_ON_STATE_UNCHANGED CircadianOnState = 0
+	CircadianOnState_CIRCADIAN_ON_STATE_ON        CircadianOnState = 1
+	CircadianOnState_CIRCADIAN_ON_STATE_OFF       CircadianOnState = 2
+)
+
+// Enum value maps for CircadianOnState.
+var (
+	CircadianOnState_name = map[int32]string{
+		0: "CIRCADIAN_ON_STATE_UNCHANGED",
+		1: "CIRCADIAN_ON_STATE_ON",
+		2: "CIRCADIAN_ON_STATE_OFF",
+	}
+	CircadianOnState_value = map[string]int32{
+		"CIRCADIAN_ON_STATE_UNCHANGED": 0,
+		"CIRCADIAN_ON_STATE_ON":        1,
+		"CIRCADIAN_ON_STATE_OFF":       2,
+	}
+)
+
+func (x CircadianOnState) Enum() *CircadianOnState {
+	p := new(CircadianOnState)
+	*p = x
+	return p
+}
+
+func (x CircadianOnState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CircadianOnState) Descriptor() protoreflect.EnumDescriptor {
+	return file_lumenetes_v1_circadian_schedule_proto_enumTypes[1].Descriptor()
+}
+
+func (CircadianOnState) Type() protoreflect.EnumType {
+	return &file_lumenetes_v1_circadian_schedule_proto_enumTypes[1]
+}
+
+func (x CircadianOnState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CircadianOnState.Descriptor instead.
+func (CircadianOnState) EnumDescriptor() ([]byte, []int) {
+	return file_lumenetes_v1_circadian_schedule_proto_rawDescGZIP(), []int{1}
+}
+
 type CircadianKeyframe struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Anchor        CircadianAnchor        `protobuf:"varint,1,opt,name=anchor,proto3,enum=lumenetes.v1.CircadianAnchor" json:"anchor,omitempty"`
 	OffsetMinutes int32                  `protobuf:"varint,2,opt,name=offset_minutes,json=offsetMinutes,proto3" json:"offset_minutes,omitempty"`
 	Brightness    int32                  `protobuf:"varint,3,opt,name=brightness,proto3" json:"brightness,omitempty"`
 	ColorTempK    int32                  `protobuf:"varint,4,opt,name=color_temp_k,json=colorTempK,proto3" json:"color_temp_k,omitempty"`
+	On            CircadianOnState       `protobuf:"varint,5,opt,name=on,proto3,enum=lumenetes.v1.CircadianOnState" json:"on,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -143,6 +193,13 @@ func (x *CircadianKeyframe) GetColorTempK() int32 {
 		return x.ColorTempK
 	}
 	return 0
+}
+
+func (x *CircadianKeyframe) GetOn() CircadianOnState {
+	if x != nil {
+		return x.On
+	}
+	return CircadianOnState_CIRCADIAN_ON_STATE_UNCHANGED
 }
 
 type CircadianSchedule struct {
@@ -337,7 +394,7 @@ var File_lumenetes_v1_circadian_schedule_proto protoreflect.FileDescriptor
 
 const file_lumenetes_v1_circadian_schedule_proto_rawDesc = "" +
 	"\n" +
-	"%lumenetes/v1/circadian_schedule.proto\x12\flumenetes.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb3\x01\n" +
+	"%lumenetes/v1/circadian_schedule.proto\x12\flumenetes.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe3\x01\n" +
 	"\x11CircadianKeyframe\x125\n" +
 	"\x06anchor\x18\x01 \x01(\x0e2\x1d.lumenetes.v1.CircadianAnchorR\x06anchor\x12%\n" +
 	"\x0eoffset_minutes\x18\x02 \x01(\x05R\roffsetMinutes\x12\x1e\n" +
@@ -345,7 +402,8 @@ const file_lumenetes_v1_circadian_schedule_proto_rawDesc = "" +
 	"brightness\x18\x03 \x01(\x05R\n" +
 	"brightness\x12 \n" +
 	"\fcolor_temp_k\x18\x04 \x01(\x05R\n" +
-	"colorTempK\"\xb4\x03\n" +
+	"colorTempK\x12.\n" +
+	"\x02on\x18\x05 \x01(\x0e2\x1e.lumenetes.v1.CircadianOnStateR\x02on\"\xb4\x03\n" +
 	"\x11CircadianSchedule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05group\x18\x02 \x01(\tR\x05group\x12\x1a\n" +
@@ -367,7 +425,11 @@ const file_lumenetes_v1_circadian_schedule_proto_rawDesc = "" +
 	"\x18CIRCADIAN_ANCHOR_SUNRISE\x10\x01\x12\x1f\n" +
 	"\x1bCIRCADIAN_ANCHOR_SOLAR_NOON\x10\x02\x12\x1b\n" +
 	"\x17CIRCADIAN_ANCHOR_SUNSET\x10\x03\x12#\n" +
-	"\x1fCIRCADIAN_ANCHOR_SOLAR_MIDNIGHT\x10\x042\x8f\x01\n" +
+	"\x1fCIRCADIAN_ANCHOR_SOLAR_MIDNIGHT\x10\x04*k\n" +
+	"\x10CircadianOnState\x12 \n" +
+	"\x1cCIRCADIAN_ON_STATE_UNCHANGED\x10\x00\x12\x19\n" +
+	"\x15CIRCADIAN_ON_STATE_ON\x10\x01\x12\x1a\n" +
+	"\x16CIRCADIAN_ON_STATE_OFF\x10\x022\x8f\x01\n" +
 	"\x18CircadianScheduleService\x12s\n" +
 	"\x16ListCircadianSchedules\x12+.lumenetes.v1.ListCircadianSchedulesRequest\x1a,.lumenetes.v1.ListCircadianSchedulesResponseB>Z<github.com/liamawhite/lumenetes/gen/lumenetes/v1;lumenetesv1b\x06proto3"
 
@@ -383,28 +445,30 @@ func file_lumenetes_v1_circadian_schedule_proto_rawDescGZIP() []byte {
 	return file_lumenetes_v1_circadian_schedule_proto_rawDescData
 }
 
-var file_lumenetes_v1_circadian_schedule_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_lumenetes_v1_circadian_schedule_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_lumenetes_v1_circadian_schedule_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_lumenetes_v1_circadian_schedule_proto_goTypes = []any{
 	(CircadianAnchor)(0),                   // 0: lumenetes.v1.CircadianAnchor
-	(*CircadianKeyframe)(nil),              // 1: lumenetes.v1.CircadianKeyframe
-	(*CircadianSchedule)(nil),              // 2: lumenetes.v1.CircadianSchedule
-	(*ListCircadianSchedulesRequest)(nil),  // 3: lumenetes.v1.ListCircadianSchedulesRequest
-	(*ListCircadianSchedulesResponse)(nil), // 4: lumenetes.v1.ListCircadianSchedulesResponse
-	(*timestamppb.Timestamp)(nil),          // 5: google.protobuf.Timestamp
+	(CircadianOnState)(0),                  // 1: lumenetes.v1.CircadianOnState
+	(*CircadianKeyframe)(nil),              // 2: lumenetes.v1.CircadianKeyframe
+	(*CircadianSchedule)(nil),              // 3: lumenetes.v1.CircadianSchedule
+	(*ListCircadianSchedulesRequest)(nil),  // 4: lumenetes.v1.ListCircadianSchedulesRequest
+	(*ListCircadianSchedulesResponse)(nil), // 5: lumenetes.v1.ListCircadianSchedulesResponse
+	(*timestamppb.Timestamp)(nil),          // 6: google.protobuf.Timestamp
 }
 var file_lumenetes_v1_circadian_schedule_proto_depIdxs = []int32{
 	0, // 0: lumenetes.v1.CircadianKeyframe.anchor:type_name -> lumenetes.v1.CircadianAnchor
-	1, // 1: lumenetes.v1.CircadianSchedule.keyframes:type_name -> lumenetes.v1.CircadianKeyframe
-	5, // 2: lumenetes.v1.CircadianSchedule.last_synced:type_name -> google.protobuf.Timestamp
-	2, // 3: lumenetes.v1.ListCircadianSchedulesResponse.circadian_schedules:type_name -> lumenetes.v1.CircadianSchedule
-	3, // 4: lumenetes.v1.CircadianScheduleService.ListCircadianSchedules:input_type -> lumenetes.v1.ListCircadianSchedulesRequest
-	4, // 5: lumenetes.v1.CircadianScheduleService.ListCircadianSchedules:output_type -> lumenetes.v1.ListCircadianSchedulesResponse
-	5, // [5:6] is the sub-list for method output_type
-	4, // [4:5] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1, // 1: lumenetes.v1.CircadianKeyframe.on:type_name -> lumenetes.v1.CircadianOnState
+	2, // 2: lumenetes.v1.CircadianSchedule.keyframes:type_name -> lumenetes.v1.CircadianKeyframe
+	6, // 3: lumenetes.v1.CircadianSchedule.last_synced:type_name -> google.protobuf.Timestamp
+	3, // 4: lumenetes.v1.ListCircadianSchedulesResponse.circadian_schedules:type_name -> lumenetes.v1.CircadianSchedule
+	4, // 5: lumenetes.v1.CircadianScheduleService.ListCircadianSchedules:input_type -> lumenetes.v1.ListCircadianSchedulesRequest
+	5, // 6: lumenetes.v1.CircadianScheduleService.ListCircadianSchedules:output_type -> lumenetes.v1.ListCircadianSchedulesResponse
+	6, // [6:7] is the sub-list for method output_type
+	5, // [5:6] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_lumenetes_v1_circadian_schedule_proto_init() }
@@ -418,7 +482,7 @@ func file_lumenetes_v1_circadian_schedule_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lumenetes_v1_circadian_schedule_proto_rawDesc), len(file_lumenetes_v1_circadian_schedule_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,

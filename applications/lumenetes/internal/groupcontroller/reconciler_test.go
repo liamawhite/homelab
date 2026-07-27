@@ -502,7 +502,7 @@ func TestReconcile_ActiveCircadianScheduleValid(t *testing.T) {
 		t.Fatalf("sun.Compute: %v", err)
 	}
 	now := sunTimes.SolarNoon
-	wantBrightness, wantColorTempK, err := circadian.Interpolate(fourKeyframes(), equator, now)
+	wantBrightness, wantColorTempK, _, err := circadian.Interpolate(fourKeyframes(), equator, now)
 	if err != nil {
 		t.Fatalf("circadian.Interpolate: %v", err)
 	}
@@ -549,6 +549,9 @@ func TestReconcile_ActiveCircadianScheduleValid(t *testing.T) {
 	if afterA.Spec.Color != "" {
 		t.Errorf("light a Spec.Color = %q, want relinquished (\"\") - a circadian curve never manages Color", afterA.Spec.Color)
 	}
+	if !afterA.Spec.On {
+		t.Errorf("light a Spec.On = false, want untouched (true) - fourKeyframes() never sets On")
+	}
 
 	afterB := getLight(t, c, "b")
 	if afterB.Spec.Brightness != wantBrightness {
@@ -556,6 +559,49 @@ func TestReconcile_ActiveCircadianScheduleValid(t *testing.T) {
 	}
 	if afterB.Spec.ColorTempK != 0 {
 		t.Errorf("light b Spec.ColorTempK = %d, want untouched (0, colorTempK unsupported)", afterB.Spec.ColorTempK)
+	}
+}
+
+func TestReconcile_ActiveCircadianScheduleSetsOn(t *testing.T) {
+	// A schedule whose current keyframe explicitly sets On must flip every
+	// target light's Spec.On accordingly - unlike Brightness/ColorTempK,
+	// this isn't gated by any per-light capability sentinel.
+	date := time.Date(2026, time.March, 20, 0, 0, 0, 0, time.UTC)
+	sunTimes, err := sun.Compute(equator, date)
+	if err != nil {
+		t.Fatalf("sun.Compute: %v", err)
+	}
+	keyframes := []lumenetesv1alpha1.CircadianKeyframe{
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSolarMidnight, Brightness: 0, ColorTempK: 2200, On: lumenetesv1alpha1.CircadianOnStateOff},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 40, ColorTempK: 3000, On: lumenetesv1alpha1.CircadianOnStateOn},
+	}
+
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "external-office"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: circadianRef("external-office-circadian")},
+	}
+	schedule := &lumenetesv1alpha1.CircadianSchedule{
+		ObjectMeta: metav1.ObjectMeta{Name: "external-office-circadian"},
+		Spec:       lumenetesv1alpha1.CircadianScheduleSpec{Group: "external-office", Keyframes: keyframes},
+	}
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 100, ColorTempK: 1}}
+	c := newFakeClient(t, group, schedule, lightA)
+
+	beforeSunrise := sunTimes.Sunrise.Add(-2 * time.Hour)
+	r := &Reconciler{Client: c, Now: func() time.Time { return beforeSunrise }}
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "external-office"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v", err)
+	}
+	if got := getLight(t, c, "a"); got.Spec.On {
+		t.Errorf("light a Spec.On = true 2h before sunrise, want false")
+	}
+
+	r.Now = func() time.Time { return sunTimes.Sunrise }
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "external-office"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v", err)
+	}
+	if got := getLight(t, c, "a"); !got.Spec.On {
+		t.Errorf("light a Spec.On = false at sunrise, want true")
 	}
 }
 
