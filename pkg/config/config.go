@@ -19,6 +19,17 @@ type InfraConfig struct {
 	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
 	Lumenetes  LumenetesConfig  `yaml:"lumenetes" mapstructure:"lumenetes"`
 	GHCR       GHCRConfig       `yaml:"ghcr" mapstructure:"ghcr"`
+	FlightData FlightDataConfig `yaml:"flightData" mapstructure:"flightData"`
+}
+
+// FlightDataConfig holds the AeroDataBox (via RapidAPI) API key the trips
+// app uses to sync flight status. Consumed by
+// pkg/deploy/applications/trips.go, which mounts it into the trips pod as a
+// Secret-backed file (see that file's Secret step) rather than a plain env
+// var. Optional - if empty, trips still runs, just without flight sync
+// (applications/trips/cmd/trips/main.go degrades gracefully).
+type FlightDataConfig struct {
+	APIKey string `yaml:"apiKey" mapstructure:"apiKey"`
 }
 
 // GHCRConfig holds credentials for pushing images to GitHub Container

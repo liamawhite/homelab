@@ -87,6 +87,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		monitoringNS := namespaces.Get(MonitoringNamespace)
 		workoutsNS := namespaces.Get(WorkoutsNamespace)
 		shoppingNS := namespaces.Get(ShoppingNamespace)
+		tripsNS := namespaces.Get(TripsNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -290,6 +291,27 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
+		// Trips: same shape as Workouts/Shopping - SQLite-backed app on a
+		// Longhorn PVC, Tailscale-only - needs storage.DefaultStorageClass,
+		// so has to come after Longhorn.
+		trips, err := applications.NewTrips(ctx, "trips", &applications.TripsArgs{
+			Namespace:                  tripsNS.Metadata.Name().Elem(),
+			StorageClassName:           storage.DefaultStorageClass,
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+			FlightAPIKey:               pulumi.String(infraCfg.FlightData.APIKey),
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, tripsNS, tsOperator, storage}),
+		)
+		if err != nil {
+			return err
+		}
+
 		// Metrics-collection plane: prometheus-operator, the Prometheus CR,
 		// and its exporters (node-exporter, kube-state-metrics, cadvisor's
 		// ServiceMonitor) - hand-rolled Go resources rather than a Helm
@@ -351,7 +373,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// HostNetwork: true and why there's no DependsOn between the two
 		// components - they only interact at runtime via the Kubernetes
 		// API, not at deploy time).
-		_, err = applications.NewLumenetes(ctx, &applications.LumenetesArgs{
+		lumenetes, err := applications.NewLumenetes(ctx, &applications.LumenetesArgs{
 			Namespace:       lumenetesNS.Metadata.Name().Elem(),
 			Bridges:         infraCfg.Lumenetes.Hue.Bridges,
 			Location:        infraCfg.Lumenetes.Location,
@@ -368,13 +390,20 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			// living-space's circadian schedule and every other group's
 			// Reactive mode are both live and expected to actually reach
 			// the bridge.
-			DryRun:              pulumi.Bool(false),
-			PrometheusNamespace: monitoringNS.Metadata.Name().Elem(),
+			DryRun:                     pulumi.Bool(false),
+			PrometheusNamespace:        monitoringNS.Metadata.Name().Elem(),
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes),
 			// crds.Prometheus/monitoringNS: lumenetescontroller's own
 			// PodMonitor+CCNP metrics wiring needs both - same reasoning as
 			// mesh's (istio.NewIstio) identical DependsOn addition above.
-			pulumi.DependsOn([]pulumi.Resource{crds.Lumenetes, crds.Prometheus, lumenetesNS, monitoringNS, ciliumComp, apiserverComp}),
+			// tsOperator: its embedded web UI's Tailscale ingress needs the
+			// operator installed - same reasoning as workouts/shopping.
+			pulumi.DependsOn([]pulumi.Resource{crds.Lumenetes, crds.Prometheus, lumenetesNS, monitoringNS, ciliumComp, apiserverComp, tsOperator}),
 		)
 		if err != nil {
 			return err
@@ -388,10 +417,10 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
 			providers.Cloudflare,
 			append(
-				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect(), workouts.TailscaleRedirect(), shopping.TailscaleRedirect()},
+				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect(), workouts.TailscaleRedirect(), shopping.TailscaleRedirect(), trips.TailscaleRedirect(), lumenetes.TailscaleRedirect()},
 				monitoring.TailscaleRedirects()...,
 			),
-			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring, workouts, shopping}),
+			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring, workouts, shopping, trips}),
 		)
 		if err != nil {
 			return err
