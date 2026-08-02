@@ -81,10 +81,34 @@ func createDaemonSet(ctx *pulumi.Context, name string, args *KubeVipArgs, namesp
 									Name:  pulumi.String("port"),
 									Value: pulumi.String("6443"),
 								},
-								// Network interface (hardcoded to eth0)
+								// Network interface deliberately left empty (not
+								// omitted - see below) so kube-vip auto-detects the
+								// correct interface via the default route. It used to
+								// be hardcoded to "eth0" (the Pi nodes' interface
+								// name), which broke the moment a node with a
+								// differently named NIC (e.g. "eno1" on an x86
+								// desktop) joined - this DaemonSet runs on every
+								// control-plane node, so a single hardcoded name
+								// can't work across heterogeneous hardware.
+								//
+								// Kept as an explicit empty-string entry rather than
+								// removed entirely: Kubernetes strategic-merge-patch
+								// (which this DaemonSet's updates go through - it has
+								// no managedFields, so it isn't using server-side
+								// apply) merges Env list entries by their "name" key,
+								// but can't delete an entry just because it's absent
+								// from the patch - omitting it here produced a patch
+								// that Kubernetes silently merged as a no-op, so
+								// `kubectl get ds kube-vip -o yaml` kept showing
+								// vip_interface=eth0 with no bump to .metadata.
+								// generation no matter how many times `up` ran and
+								// reported success. Changing an existing entry's
+								// *value* merges correctly; removing the entry
+								// doesn't. An empty string is functionally identical
+								// to unset for kube-vip's own auto-detection.
 								&corev1.EnvVarArgs{
 									Name:  pulumi.String("vip_interface"),
-									Value: pulumi.String("eth0"),
+									Value: pulumi.String(""),
 								},
 								// CIDR for single IP
 								&corev1.EnvVarArgs{
