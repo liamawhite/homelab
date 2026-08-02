@@ -88,6 +88,9 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		workoutsNS := namespaces.Get(WorkoutsNamespace)
 		shoppingNS := namespaces.Get(ShoppingNamespace)
 		tripsNS := namespaces.Get(TripsNamespace)
+		remindersNS := namespaces.Get(RemindersNamespace)
+		financesNS := namespaces.Get(FinancesNamespace)
+		homeNS := namespaces.Get(HomeNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
 			pulumi.Provider(providers.Kubernetes),
@@ -219,7 +222,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 
 		// Tailscale-only counterpart to Public - fully independent of
 		// tunnel/public, no ordering relationship between them.
-		private, err := applications.NewPrivate(ctx, "private", &applications.PrivateArgs{
+		_, err = applications.NewPrivate(ctx, "private", &applications.PrivateArgs{
 			Namespace:                  healthNS.Metadata.Name().Elem(),
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
 			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
@@ -228,6 +231,26 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			CloudflareProvider:         providers.Cloudflare,
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, healthNS, tsOperator}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Home: static React frontend, no API, no storage - just cards
+		// linking out to every other app in this repo. Tailscale-only, same
+		// exposure pattern as Private, placed here since (like Private) it
+		// needs no storage and can go up independently of Longhorn.
+		home, err := applications.NewHome(ctx, "home", &applications.HomeArgs{
+			Namespace:                  homeNS.Metadata.Name().Elem(),
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, homeNS, tsOperator}),
 		)
 		if err != nil {
 			return err
@@ -254,7 +277,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 
 		// Workouts: SQLite-backed app on a Longhorn PVC, Tailscale-only -
 		// needs storage.DefaultStorageClass, so has to come after Longhorn.
-		workouts, err := applications.NewWorkouts(ctx, "workouts", &applications.WorkoutsArgs{
+		_, err = applications.NewWorkouts(ctx, "workouts", &applications.WorkoutsArgs{
 			Namespace:                  workoutsNS.Metadata.Name().Elem(),
 			StorageClassName:           storage.DefaultStorageClass,
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
@@ -274,7 +297,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// Shopping: same shape as Workouts - SQLite-backed app on a Longhorn
 		// PVC, Tailscale-only - needs storage.DefaultStorageClass, so has to
 		// come after Longhorn.
-		shopping, err := applications.NewShopping(ctx, "shopping", &applications.ShoppingArgs{
+		_, err = applications.NewShopping(ctx, "shopping", &applications.ShoppingArgs{
 			Namespace:                  shoppingNS.Metadata.Name().Elem(),
 			StorageClassName:           storage.DefaultStorageClass,
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
@@ -294,7 +317,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// Trips: same shape as Workouts/Shopping - SQLite-backed app on a
 		// Longhorn PVC, Tailscale-only - needs storage.DefaultStorageClass,
 		// so has to come after Longhorn.
-		trips, err := applications.NewTrips(ctx, "trips", &applications.TripsArgs{
+		_, err = applications.NewTrips(ctx, "trips", &applications.TripsArgs{
 			Namespace:                  tripsNS.Metadata.Name().Elem(),
 			StorageClassName:           storage.DefaultStorageClass,
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
@@ -307,6 +330,46 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			FlightAPIKey:               pulumi.String(infraCfg.FlightData.APIKey),
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, tripsNS, tsOperator, storage}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Reminders: same shape as Workouts/Shopping/Trips - SQLite-backed
+		// app on a Longhorn PVC, Tailscale-only - needs
+		// storage.DefaultStorageClass, so has to come after Longhorn.
+		_, err = applications.NewReminders(ctx, "reminders", &applications.RemindersArgs{
+			Namespace:                  remindersNS.Metadata.Name().Elem(),
+			StorageClassName:           storage.DefaultStorageClass,
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, remindersNS, tsOperator, storage}),
+		)
+		if err != nil {
+			return err
+		}
+
+		// Finances: same shape as Workouts/Shopping/Trips/Reminders -
+		// SQLite-backed app on a Longhorn PVC, Tailscale-only - needs
+		// storage.DefaultStorageClass, so has to come after Longhorn.
+		_, err = applications.NewFinances(ctx, "finances", &applications.FinancesArgs{
+			Namespace:                  financesNS.Metadata.Name().Elem(),
+			StorageClassName:           storage.DefaultStorageClass,
+			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
+			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
+			CloudflareZoneID:           zoneID,
+			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
+			CloudflareProvider:         providers.Cloudflare,
+			GHCRUsername:               infraCfg.GHCR.Username,
+			GHCRToken:                  infraCfg.GHCR.Token,
+		}, pulumi.Provider(providers.Kubernetes),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, financesNS, tsOperator, storage}),
 		)
 		if err != nil {
 			return err
@@ -350,7 +413,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 
 		// Tailscale-exposed Grafana UI, wired to the Prometheus Service
 		// above - same exposure pattern as Longhorn's UI and Private.
-		graf, err := grafana.NewGrafana(ctx, "grafana", &grafana.GrafanaArgs{
+		_, err = grafana.NewGrafana(ctx, "grafana", &grafana.GrafanaArgs{
 			Version:                    versions.Grafana,
 			Namespace:                  monitoringNS.Metadata.Name().Elem(),
 			PrometheusServiceName:      pulumi.String(prometheus.ServiceName),
@@ -373,7 +436,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		// HostNetwork: true and why there's no DependsOn between the two
 		// components - they only interact at runtime via the Kubernetes
 		// API, not at deploy time).
-		lumenetes, err := applications.NewLumenetes(ctx, &applications.LumenetesArgs{
+		_, err = applications.NewLumenetes(ctx, &applications.LumenetesArgs{
 			Namespace:       lumenetesNS.Metadata.Name().Elem(),
 			Bridges:         infraCfg.Lumenetes.Hue.Bridges,
 			Location:        infraCfg.Lumenetes.Location,
@@ -386,11 +449,8 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			// Dry-run: the reconciler only logs Light.Spec drift instead of
 			// pushing it to the physical bridge. Scoped entirely to
 			// lumenetescontroller.Reconciler - doesn't affect hub-controller,
-			// Switch, or Group at all. Flipped to real enactment now that
-			// living-space's circadian schedule and every other group's
-			// Reactive mode are both live and expected to actually reach
-			// the bridge.
-			DryRun:                     pulumi.Bool(false),
+			// Switch, or Group at all.
+			DryRun:                     pulumi.Bool(true),
 			PrometheusNamespace:        monitoringNS.Metadata.Name().Elem(),
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
 			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
@@ -409,18 +469,19 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		// Cloudflare-side redirect bookmarks for every Tailscale-fronted
-		// app - see pkg/deploy/redirects.go for why this has to be
-		// collected centrally rather than each app creating its own.
+		// Cloudflare-side redirect bookmark - deliberately only home.
+		// liamwhite.fyi -> home.<tailnet>: the zone's plan caps the
+		// http_request_dynamic_redirect phase at 10 rules, and we were
+		// sitting right at that cap with one rule per Tailscale-fronted
+		// app. Every other app (including prom/alerts, which were never
+		// in this list) stays reachable via its own Tailscale MagicDNS
+		// hostname instead of a liamwhite.fyi bookmark.
 		_, err = createTailscaleRedirects(ctx,
 			zoneID,
 			pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
 			providers.Cloudflare,
-			append(
-				[]tsingress.RedirectRoute{private.TailscaleRedirect(), storage.TailscaleRedirect(), graf.TailscaleRedirect(), workouts.TailscaleRedirect(), shopping.TailscaleRedirect(), trips.TailscaleRedirect(), lumenetes.TailscaleRedirect()},
-				monitoring.TailscaleRedirects()...,
-			),
-			pulumi.DependsOn([]pulumi.Resource{private, storage, graf, monitoring, workouts, shopping, trips}),
+			[]tsingress.RedirectRoute{home.TailscaleRedirect()},
+			pulumi.DependsOn([]pulumi.Resource{home}),
 		)
 		if err != nil {
 			return err
