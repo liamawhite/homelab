@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package reminders.v1;
+
+option go_package = "github.com/liamawhite/reminders/gen/reminders/v1;remindersv1";
+
+import "google/protobuf/timestamp.proto";
+
+message OneOffItem {
+  string id = 1;
+  string title = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+message ListOneOffItemsRequest {}
+
+message ListOneOffItemsResponse {
+  repeated OneOffItem items = 1;
+}
+
+message CreateOneOffItemRequest {
+  string title = 1;
+}
+
+message CreateOneOffItemResponse {
+  OneOffItem item = 1;
+}
+
+message DeleteOneOffItemRequest {
+  string id = 1;
+}
+
+message DeleteOneOffItemResponse {}
+
+service OneOffItemService {
+  rpc ListOneOffItems(ListOneOffItemsRequest) returns (ListOneOffItemsResponse);
+  rpc CreateOneOffItem(CreateOneOffItemRequest) returns (CreateOneOffItemResponse);
+  rpc DeleteOneOffItem(DeleteOneOffItemRequest) returns (DeleteOneOffItemResponse);
+}
