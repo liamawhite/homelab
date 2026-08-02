@@ -79,12 +79,47 @@ func NewCilium(ctx *pulumi.Context, name string, args *CiliumArgs, opts ...pulum
 			},
 			// Both required for correctly chaining with istio-cni, per
 			// Cilium's own Istio integration docs.
+			//
+			// confPath/binPath: without these, Cilium's chart defaults to
+			// the upstream-standard /etc/cni/net.d and /opt/cni/bin - but
+			// k3s uses its own non-standard paths
+			// (/var/lib/rancher/k3s/agent/etc/cni/net.d and
+			// /var/lib/rancher/k3s/data/cni), which is exactly what
+			// istio-cni's own DaemonSet is already correctly configured
+			// with. Cilium was silently writing its 05-cilium.conflist to
+			// the wrong directory on every node in this cluster - masked
+			// on the Pi nodes only because a stale 10-flannel.conflist
+			// (left over from before this cluster migrated off Flannel via
+			// --flannel-backend=none) happened to already exist in the
+			// correct k3s-specific directory, giving istio-cni *something*
+			// to chain onto even though it was never Cilium's own config.
+			// A genuinely fresh node with no Flannel history (the first
+			// being nix-gpu-3070-1) has nothing there at all, so istio-cni
+			// hangs forever waiting for a CNI conf file that never arrives
+			// - see os/README.md / CLAUDE.md for that node's history.
 			"cni": pulumi.Map{
 				"exclusive": pulumi.Bool(false),
+				"confPath":  pulumi.String("/var/lib/rancher/k3s/agent/etc/cni/net.d"),
+				"binPath":   pulumi.String("/var/lib/rancher/k3s/data/cni"),
 			},
 			"socketLB": pulumi.Map{
 				"hostNamespaceOnly": pulumi.Bool(true),
 			},
+			// Without these, Cilium falls back to auto-detecting the API
+			// server address from the KUBERNETES_SERVICE_HOST/_PORT env vars
+			// kubelet injects into every pod - which point at the Service
+			// ClusterIP (10.43.0.1), not a real routable address. That's a
+			// cold-start deadlock with kubeProxyReplacement: Cilium is the
+			// only thing that makes ClusterIPs routable, so a brand-new
+			// node's cilium-agent can never reach the apiserver to finish
+			// bootstrapping. Existing nodes don't hit this because their
+			// kernel-level Cilium datapath, programmed before this
+			// migration, persists across agent restarts - but it left this
+			// latent until the first genuinely new node join surfaced it.
+			// Point at the VIP (kube-vip, pkg/components/kubevip) rather
+			// than any single node so this survives that node's loss.
+			"k8sServiceHost": pulumi.String("192.168.1.50"),
+			"k8sServicePort": pulumi.String("6443"),
 			// K3s embeds its own kube-proxy and keeps running it regardless
 			// of CNI choice unless told otherwise - live nftables evidence
 			// (non-zero KUBE-SERVICES/KUBE-PROXY-FIREWALL/KUBE-PROXY-CANARY
