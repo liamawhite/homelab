@@ -27,6 +27,9 @@ const (
 	WorkoutsNamespace       = "workouts"
 	ShoppingNamespace       = "shopping"
 	TripsNamespace          = "trips"
+	RemindersNamespace      = "reminders"
+	FinancesNamespace       = "finances"
+	HomeNamespace           = "home"
 )
 
 // namespaceSpec describes one namespace createNamespaces should create.
@@ -113,6 +116,15 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 		{name: TripsNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		{name: RemindersNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		{name: FinancesNamespace, labels: pulumi.StringMap{
+			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
+		}},
+		{name: HomeNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 	}
