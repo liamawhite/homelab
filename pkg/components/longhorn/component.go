@@ -103,6 +103,7 @@ type LonghornArgs struct {
 	// CloudflareProvider is the Cloudflare provider to create the redirect
 	// DNS record with.
 	CloudflareProvider *cloudflare.Provider
+
 }
 
 // NewLonghorn creates a new Longhorn component with distributed storage
@@ -134,7 +135,23 @@ func NewLonghorn(
 		return nil, err
 	}
 
-	// 1. Deploy Longhorn Helm chart with default values
+	// PERMISSIVE mTLS override for the admission webhook port - see
+	// network.go's newPeerAuthentication doc comment. Without this,
+	// kube-apiserver can't complete mTLS to longhorn-manager's webhook at
+	// all (mesh-wide STRICT), which breaks every admission-webhook call,
+	// not just Pulumi-issued ones.
+	if err := newPeerAuthentication(ctx, name, args.Namespace, localOpts...); err != nil {
+		return nil, err
+	}
+
+	// 1. Deploy Longhorn Helm chart. defaultSettings.createDefaultDiskLabeledNodes
+	// is the only override - required for os/modules/longhorn.nix's
+	// node.longhorn.io/create-default-disk label + default-disks-config
+	// annotation mechanism to have any effect; without it,
+	// longhorn-manager's KubernetesNodeController.syncDefaultDisks
+	// unconditionally skips reading either (confirmed live against v1.9.1 -
+	// a fresh Node object still only got the single auto-created default
+	// disk with this off). Everything else is chart defaults.
 	chart, err := helmv4.NewChart(ctx, fmt.Sprintf("%s-chart", name), &helmv4.ChartArgs{
 		Namespace: args.Namespace,
 		Chart:     pulumi.String("longhorn"),
@@ -142,7 +159,11 @@ func NewLonghorn(
 		RepositoryOpts: &helmv4.RepositoryOptsArgs{
 			Repo: pulumi.String(helmRepository),
 		},
-		Values: pulumi.Map{}, // No custom values - all defaults
+		Values: pulumi.Map{
+			"defaultSettings": pulumi.Map{
+				"createDefaultDiskLabeledNodes": pulumi.Bool(true),
+			},
+		},
 	}, localOpts...)
 	if err != nil {
 		return nil, err
