@@ -1,9 +1,25 @@
-# applications/lumenetes/Dockerfile builds with the repo root as
-# its context (needed for its go.mod's local "replace" directive to see
-# the root module's source) - these aren't needed for that build and would
-# otherwise bloat the context upload.
-_migrateme/
-.git/
-.pulumi-state/
-cli/
-bin/
+# applications/lumenetes/Dockerfile is the only build that uses the repo
+# root as its context (needed to see the root module's pkg/ source,
+# resolved locally via the repo-root go.work workspace rather than a
+# go.mod "replace" directive) - every other app's image is scoped to its
+# own applications/<name>/ subdirectory and never sees this file.
+#
+# Allow-list, not deny-list: this Dockerfile's `go build` only ever needs
+# the root module's go.mod/go.sum, go.work/go.work.sum (workspace-mode
+# resolution - go build finds go.work by walking up from the current
+# directory, same as go.mod, so it must be present in the build context
+# too), pkg/ (the actual root-module source it imports), and
+# applications/lumenetes/ itself. Everything else in this monorepo -
+# other apps, os/, cli/, docs, etc. - is irrelevant to this build but was
+# previously NOT excluded (the old version of this file was a short
+# deny-list covering only a few known-large dirs), so literally any change
+# anywhere in the repo busted this image's build-cache and triggered a
+# full rebuild+push on every `homelab up`. Denying everything by default
+# and re-allowing only what's actually needed fixes that at the root.
+*
+!go.mod
+!go.sum
+!go.work
+!go.work.sum
+!pkg/
+!applications/lumenetes/

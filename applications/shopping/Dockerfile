@@ -15,6 +15,8 @@ COPY web/ .
 RUN npm run build
 
 FROM golang:1.25-alpine AS builder
+ARG TARGETOS
+ARG TARGETARCH
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY go.mod go.sum ./
@@ -23,8 +25,8 @@ COPY . .
 COPY --from=web-builder /app/web/dist ./internal/webui/dist
 
 ENV CGO_ENABLED=0
-ENV GOOS=linux
-ENV GOARCH=arm64
+ENV GOOS=$TARGETOS
+ENV GOARCH=$TARGETARCH
 RUN go build -a -ldflags '-s -w' -o /shopping ./cmd/shopping
 
 FROM scratch

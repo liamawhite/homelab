@@ -71,6 +71,7 @@ func BuildShoppingImage(ctx *pulumi.Context, name, ghcrUsername, ghcrToken strin
 		},
 		Platforms: dockerbuild.PlatformArray{
 			dockerbuild.Platform_Linux_arm64,
+			dockerbuild.Platform_Linux_amd64,
 		},
 		Push: pulumi.Bool(true),
 		Registries: dockerbuild.RegistryArray{
