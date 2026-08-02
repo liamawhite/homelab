@@ -297,10 +297,10 @@ func (r *Reconciler) enactScene(ctx context.Context, logger logr.Logger, group *
 // enactCircadianSchedule resolves name as a CircadianSchedule, validates it
 // targets this group, interpolates its current output for r.now(), and
 // applies that (brightness, colorTempK) pair uniformly to every light in
-// group.Spec.Lights - reusing applySceneLightState/applySceneStateToSpec
-// unchanged via a synthetic SceneLightState per light, so the existing
-// per-light capability-sentinel skip (Brightness==-1, ColorTempK==0)
-// applies here for free. Never touches CircadianSchedule.Status - that's
+// group.Spec.Lights via applyCircadianLightState - a per-light variant of
+// applySceneLightState/applySceneStateToSpec (see that function's doc
+// comment for why On needs different handling here than a plain Scene's).
+// Never touches CircadianSchedule.Status - that's
 // internal/circadianschedulecontroller's job, keeping "a reconciler only
 // writes its own resource's Status" consistent.
 //
@@ -333,22 +333,11 @@ func (r *Reconciler) enactCircadianSchedule(ctx context.Context, logger logr.Log
 		return fmt.Sprintf("circadian schedule %q: %v", schedule.Name, err), nil
 	}
 
-	var on *bool
-	switch onState {
-	case lumenetesv1alpha1.CircadianOnStateOn:
-		onVal := true
-		on = &onVal
-	case lumenetesv1alpha1.CircadianOnStateOff:
-		onVal := false
-		on = &onVal
-	}
-
 	relinquishColor := ""
 	var g errgroup.Group
 	for _, lightName := range group.Spec.Lights {
-		state := lumenetesv1alpha1.SceneLightState{Name: lightName, On: on, Brightness: &brightness, ColorTempK: &colorTempK, Color: &relinquishColor}
 		g.Go(func() error {
-			if err := r.applySceneLightState(ctx, state); err != nil {
+			if err := r.applyCircadianLightState(ctx, lightName, onState, brightness, colorTempK, relinquishColor); err != nil {
 				logger.Error(err, "failed to apply circadian schedule state", "group", group.Name, "circadianSchedule", schedule.Name, "light", lightName)
 				return err
 			}
@@ -356,6 +345,52 @@ func (r *Reconciler) enactCircadianSchedule(ctx context.Context, logger logr.Log
 		})
 	}
 	return "", g.Wait()
+}
+
+// applyCircadianLightState applies one light's circadian-resolved state -
+// like applySceneLightState, but On is only included in the write if it
+// disagrees with the light's own last-observed Status.On, instead of being
+// pushed unconditionally like Brightness/ColorTempK/Color. This is
+// deliberately asymmetric: Interpolate's on-state is a step function that
+// holds the same level for the entire span between two on/off-setting
+// keyframes (see that function's doc comment), so pushing it every
+// reconcile within that span - the same "continuous reassertion" that's
+// correct for a smoothly-changing brightness/colorTempK curve - would
+// fight a manual on/off override (kubectl edit or a physical toggle) for
+// however long the span lasts. Gating on Status.On instead means On is
+// only (re)asserted when it's actually out of sync with the light's real
+// state - once right after a genuine keyframe crossing, or once to correct
+// drift - and otherwise left alone.
+func (r *Reconciler) applyCircadianLightState(ctx context.Context, lightName string, onState lumenetesv1alpha1.CircadianOnState, brightness, colorTempK int32, relinquishColor string) error {
+	var light lumenetesv1alpha1.Light
+	if err := r.Client.Get(ctx, client.ObjectKey{Name: lightName}, &light); err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil
+		}
+		return err
+	}
+
+	var on *bool
+	switch onState {
+	case lumenetesv1alpha1.CircadianOnStateOn:
+		if !light.Status.On {
+			onVal := true
+			on = &onVal
+		}
+	case lumenetesv1alpha1.CircadianOnStateOff:
+		if light.Status.On {
+			onVal := false
+			on = &onVal
+		}
+	}
+
+	state := lumenetesv1alpha1.SceneLightState{Name: lightName, On: on, Brightness: &brightness, ColorTempK: &colorTempK, Color: &relinquishColor}
+	next := applySceneStateToSpec(light.Spec, state)
+	if next == light.Spec {
+		return nil
+	}
+	light.Spec = next
+	return r.Client.Update(ctx, &light)
 }
 
 // applySceneLightState applies state to the named Light's Spec - a plain

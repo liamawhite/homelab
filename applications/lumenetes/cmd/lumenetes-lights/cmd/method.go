@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/liamawhite/homelab/pkg/lumenetes/hue"
+	"github.com/liamawhite/lumenetes/internal/hue"
 	"github.com/spf13/cobra"
 )
 

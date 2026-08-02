@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	lighthue "github.com/liamawhite/homelab/pkg/lumenetes/hue"
+	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

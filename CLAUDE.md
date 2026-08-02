@@ -8,9 +8,11 @@ The project uses Nix for development environment management, Go for CLI/infrastr
 
 **Go CLI Commands:**
 
-The Go CLI is split into two binaries: `cli/infra/` for cluster/node/Pulumi
-concerns, and `cli/lights/` for Hue bridge/light/switch concerns. They share
-the same `infra.yaml` config file and the root Go module.
+The Go CLI is split into two binaries: `cli/infra/` (root module) for
+cluster/node/Pulumi concerns, and `applications/lumenetes/cmd/lumenetes-lights/`
+(its own module, `github.com/liamawhite/lumenetes` - see "Go workspaces" below)
+for Hue bridge/light/switch concerns. They share the same `infra.yaml` config
+file.
 
 - `go run cli/infra/main.go bootstrap --node <name>` - Bootstrap a Raspberry Pi node
 - `go run cli/infra/main.go k3s --node <name> --cluster-init` - Initialize K3s cluster
@@ -22,10 +24,10 @@ the same `infra.yaml` config file and the root Go module.
 
 There is no `pulumi/` project directory and no raw `pulumi` CLI workflow - `up`/`preview` define the project, backend, and program entirely in Go and run fully inline via the Automation API (see below). There's no `destroy` command yet; since there's no on-disk Pulumi.yaml anymore, doing it via the raw `pulumi` CLI would need a throwaway project file pointed at `.pulumi-state/` - add a `homelab destroy` command (mirroring `cli/infra/cmd/pulumi/up.go`) if/when that's needed.
 
-- `go run cli/lights/main.go hub ls` - Discover Hue bridges on the network
-- `go run cli/lights/main.go hub pair` - Pair with a bridge, saving its ID/app key to infra.yaml
-- `go run cli/lights/main.go ls` - List lights across all paired bridges
-- `go run cli/lights/main.go switches ls` - List physical Hue switches (dimmer, tap, wall switches)
+- `go run ./applications/lumenetes/cmd/lumenetes-lights hub ls` - Discover Hue bridges on the network
+- `go run ./applications/lumenetes/cmd/lumenetes-lights hub pair` - Pair with a bridge, saving its ID/app key to infra.yaml
+- `go run ./applications/lumenetes/cmd/lumenetes-lights ls` - List lights across all paired bridges
+- `go run ./applications/lumenetes/cmd/lumenetes-lights switches ls` - List physical Hue switches (dimmer, tap, wall switches)
 
 **TypeScript Development Commands:**
 - `nix develop` - Enter the development shell with all required tools
@@ -45,19 +47,21 @@ All commands should be run within the Nix development shell (`nix develop`) whic
 ## Project Architecture
 
 This is a hybrid Infrastructure as Code project that deploys a complete homelab on Raspberry Pi hardware using:
-- **Go CLI** (`cli/infra/`, `cli/lights/`) - Two binaries: `cli/infra/` bootstraps infrastructure (Raspberry Pi provisioning, K3s installation) and deploys Pulumi-managed components (kube-vip for control plane HA), fully inline via the Automation API; `cli/lights/` discovers/pairs Hue bridges and lists lights/switches
+- **Go CLI** (`cli/infra/`, `applications/lumenetes/cmd/lumenetes-lights/`) - Two binaries: `cli/infra/` bootstraps infrastructure (Raspberry Pi provisioning, K3s installation) and deploys Pulumi-managed components (kube-vip for control plane HA), fully inline via the Automation API; `lumenetes-lights` discovers/pairs Hue bridges and lists lights/switches
 - **Pulumi TypeScript** (root/`project/`) - Legacy deployment for applications (being gradually migrated to Go)
 
 ### Go CLI and Infrastructure (`cli/`, `pkg/`)
 
-`cli/infra/` and `cli/lights/` each only hold Cobra command wiring for their own binary - no business logic lives there, it's all in `pkg/`. `pkg/` splits three ways:
+`cli/infra/` only holds Cobra command wiring for its own binary - no business logic lives there, it's all in `pkg/`. `pkg/` splits three ways:
+
+**Go workspaces**: this repo is two Go modules - the root module (everything above) and `applications/lumenetes` (`github.com/liamawhite/lumenetes`, which also carries `applications/lumenetes/cmd/lumenetes-lights`), kept separate deliberately so the root module's `go.sum` doesn't pick up `applications/lumenetes`'s heavy K8s-controller dependencies (`controller-runtime`, `client-go`, `apimachinery`). A root-level `go.work` (listing both modules) resolves the cross-module imports between them without a `replace` directive in either go.mod - but `go build ./...`/`go vet ./...` still only cover the module you run them from; use `go build all` / `go vet all` from the repo root to cover both.
 - **`pkg/*`** (root) - cross-cutting utilities: `config`, `kubeconfig`, `versions`, `k3s`, `ssh`, `probe`, `raspberry`, and the orchestrator `deploy`.
 - **`pkg/crds/*`** - generated CRD types + the raw manifest + `InstallCRDs` helpers, one subdirectory per upstream CRD source (`istio`, `gatewayapi`). These don't register as Pulumi `ComponentResource`s - `InstallCRDs` just applies an embedded manifest and returns a `*yamlv2.ConfigGroup` directly - so they aren't "components" in the same sense as the next bucket.
 - **`pkg/components/*`** - actual `ComponentResource`-registering code that deploys real workloads (`kubevip`, `longhorn`, `cloudflare/{tunnel,auth}`, `istio` + `istio/gateway` + `istio/route`).
 
 **Namespace convention**: components never create their own namespace. Every namespace is created once, centrally, by `pkg/deploy/namespaces.go`; components that need one take a `Namespace pulumi.StringInput` arg instead. This exists because `pkg/crds/istio.InstallCRDs` and `pkg/components/istio.NewIstio` used to each create their own `istio-system` `Namespace` object - two Pulumi resources owning one physical namespace, which conflicts the moment both are wired in. Follow this pattern for any new component that needs a namespace: add/uncomment its entry in `namespaces.go`, thread the name through as an arg, and pass `pulumi.DependsOn` on the actual namespace resource at the call site (Helm chart resources don't always reliably propagate implicit Output-based dependencies).
 
-1. **CLI Tools** (`cli/infra/`, `cli/lights/`):
+1. **CLI Tools** (`cli/infra/`, `applications/lumenetes/cmd/lumenetes-lights/`):
    - `cli/infra/cmd/bootstrap.go` - Raspberry Pi provisioning (SSH keys, system updates)
    - `cli/infra/cmd/k3s.go` - K3s installation (cluster init or join; auto-fetches and saves the cluster token to infra.yaml if unset)
    - `cli/infra/cmd/kubeconfig.go` - Kubeconfig extraction (merges into your default kubeconfig by default; connects via the VIP if --node omitted)
@@ -65,7 +69,7 @@ This is a hybrid Infrastructure as Code project that deploys a complete homelab 
    - `cli/infra/cmd/pulumi/` - The `up`/`preview` commands (still top-level: `homelab up`, `homelab preview`), in their own subpackage:
      - `pulumi.go` - Shared setup: resolves a reachable cluster endpoint, extracts a kubeconfig from it, and builds a fully inline Automation API stack from `pkg/deploy.Program` - project name, Go runtime, and the `.pulumi-state/` backend URL are all defined in Go here, no Pulumi.yaml involved
      - `up.go`, `preview.go` - Run `pulumi up`/`pulumi preview` in-process via the Automation API
-   - `cli/lights/cmd/` - `hub`/`hub_ls`/`hub_pair` (bridge discovery and pairing), `ls` (list lights), `switches`/`switches_ls` (list switches/buttons) - all flat, top-level commands on the `homelab-lights` binary, built on `pkg/lumenetes/hue` and the same `pkg/config` infra.yaml loader
+   - `applications/lumenetes/cmd/lumenetes-lights/cmd/` - `hub`/`hub_ls`/`hub_pair` (bridge discovery and pairing), `ls` (list lights), `switches`/`switches_ls` (list switches/buttons) - all flat, top-level commands on the `lumenetes-lights` binary, built on `applications/lumenetes/internal/hue` (moved out of the root module's `pkg/` - it was only ever used by this CLI and the lumenetes-controller, see "Go workspaces" below) and the root module's `pkg/config` infra.yaml loader, reached via a Go workspace (`go.work`) rather than a `replace` directive
 
 2. **Root `pkg/` utilities**:
    - `config/config.go` - Shared `infra.yaml` loader (VIP, nodes, SSH, cluster token, Cloudflare account/token/tunnel domain/Access allowed emails); precedence: CLI flags > infra.yaml > env vars > defaults
@@ -117,9 +121,9 @@ go run cli/infra/main.go kubeconfig
 go run cli/infra/main.go bootstrap --node pi-1
 go run cli/infra/main.go k3s --node pi-1 --server https://192.168.1.50:6443
 
-# 5. Pair a Hue bridge and check what it sees (separate homelab-lights binary)
-go run cli/lights/main.go hub pair
-go run cli/lights/main.go ls
+# 5. Pair a Hue bridge and check what it sees (separate lumenetes-lights binary)
+go run ./applications/lumenetes/cmd/lumenetes-lights hub pair
+go run ./applications/lumenetes/cmd/lumenetes-lights ls
 ```
 
 ### Legacy TypeScript Infrastructure Stack (being migrated)
@@ -199,7 +203,7 @@ The project follows a modular component architecture where each service is self-
 
 **Go Infrastructure:**
 - **Kube-vip Configuration**: Control plane HA only (`svc_enable=false`), MetalLB handles LoadBalancer services
-- **Network Interface**: Hardcoded to `eth0` (Raspberry Pi default)
+- **Network Interface**: Auto-detected via the default route (`vip_interface` left unset) - it used to be hardcoded to `eth0` (the Pi nodes' interface name), which broke the moment a control-plane node with a differently-named NIC (e.g. `eno1`) joined, since this DaemonSet runs on every control-plane node regardless of hardware
 - **VIP Address**: 192.168.1.50 (configured in `infra.yaml`)
 - **Leader Election**: Uses Kubernetes leases for automatic failover
 - **Node Affinity**: Only runs on control plane nodes (`node-role.kubernetes.io/control-plane=true`)
@@ -223,7 +227,7 @@ kubectl get pods -n kube-system -l app.kubernetes.io/name=kube-vip
 kubectl logs -n kube-system -l app.kubernetes.io/name=kube-vip
 ```
 Common issues:
-- Interface not found: Verify `eth0` exists on your Raspberry Pi
+- Interface not found: kube-vip auto-detects the interface via the default route (`vip_interface` is unset) - check that the node actually has a default route
 - VIP already in use: Ensure 192.168.1.50 is not assigned to another device
 - No control plane nodes: Requires nodes with `node-role.kubernetes.io/control-plane=true`
 

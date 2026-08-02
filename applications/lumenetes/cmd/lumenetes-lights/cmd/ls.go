@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/liamawhite/homelab/pkg/config"
-	"github.com/liamawhite/homelab/pkg/lumenetes/hue"
+	"github.com/liamawhite/lumenetes/internal/hue"
 	"github.com/spf13/cobra"
 )
 

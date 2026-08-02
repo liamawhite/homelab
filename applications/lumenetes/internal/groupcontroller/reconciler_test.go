@@ -584,7 +584,10 @@ func TestReconcile_ActiveCircadianScheduleSetsOn(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "external-office-circadian"},
 		Spec:       lumenetesv1alpha1.CircadianScheduleSpec{Group: "external-office", Keyframes: keyframes},
 	}
-	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 100, ColorTempK: 1}}
+	// Status.On starts true (matching Spec) - applyCircadianLightState
+	// gates On on the light's own last-observed Status.On, not its Spec,
+	// so the fixture must say what's really "on" right now.
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 100, ColorTempK: 1}, Status: lumenetesv1alpha1.LightStatus{On: true}}
 	c := newFakeClient(t, group, schedule, lightA)
 
 	beforeSunrise := sunTimes.Sunrise.Add(-2 * time.Hour)
@@ -592,8 +595,18 @@ func TestReconcile_ActiveCircadianScheduleSetsOn(t *testing.T) {
 	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "external-office"}}); err != nil {
 		t.Fatalf("Reconcile() error = %v", err)
 	}
-	if got := getLight(t, c, "a"); got.Spec.On {
+	got := getLight(t, c, "a")
+	if got.Spec.On {
 		t.Errorf("light a Spec.On = true 2h before sunrise, want false")
+	}
+
+	// Simulate lightscontroller pushing that Spec.On=false to the bridge
+	// and the poller reading it back into Status - the real-world
+	// convergence applyCircadianLightState's Status.On gate relies on to
+	// ever notice the next actual crossing.
+	got.Status.On = got.Spec.On
+	if err := c.Status().Update(t.Context(), &got); err != nil {
+		t.Fatalf("update light status: %v", err)
 	}
 
 	r.Now = func() time.Time { return sunTimes.Sunrise }
@@ -602,6 +615,58 @@ func TestReconcile_ActiveCircadianScheduleSetsOn(t *testing.T) {
 	}
 	if got := getLight(t, c, "a"); !got.Spec.On {
 		t.Errorf("light a Spec.On = false at sunrise, want true")
+	}
+}
+
+func TestReconcile_ActiveCircadianScheduleOnLeavesManualOverride(t *testing.T) {
+	// A manual Spec.On override (e.g. kubectl patch) mid-span, with no
+	// keyframe crossing since the light's Status last converged, must
+	// stick - applyCircadianLightState only (re)pushes On when it
+	// disagrees with the light's own Status.On, not merely whenever the
+	// schedule reconciles, or the override would get fought back on the
+	// very next resync even though the schedule's resolved level hasn't
+	// actually changed.
+	date := time.Date(2026, time.March, 20, 0, 0, 0, 0, time.UTC)
+	sunTimes, err := sun.Compute(equator, date)
+	if err != nil {
+		t.Fatalf("sun.Compute: %v", err)
+	}
+	keyframes := []lumenetesv1alpha1.CircadianKeyframe{
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSolarMidnight, Brightness: 0, ColorTempK: 2200, On: lumenetesv1alpha1.CircadianOnStateOff},
+		{Anchor: lumenetesv1alpha1.CircadianAnchorSunrise, Brightness: 40, ColorTempK: 3000, On: lumenetesv1alpha1.CircadianOnStateOn},
+	}
+	group := &lumenetesv1alpha1.Group{
+		ObjectMeta: metav1.ObjectMeta{Name: "external-office"},
+		Spec:       lumenetesv1alpha1.GroupSpec{Lights: []string{"a"}, ActiveScene: circadianRef("external-office-circadian")},
+	}
+	schedule := &lumenetesv1alpha1.CircadianSchedule{
+		ObjectMeta: metav1.ObjectMeta{Name: "external-office-circadian"},
+		Spec:       lumenetesv1alpha1.CircadianScheduleSpec{Group: "external-office", Keyframes: keyframes},
+	}
+	// Mid-day steady state: the schedule resolves "on", and the light
+	// really is on (Status.On true) - as if the sunrise transition was
+	// already enacted and converged some time ago.
+	lightA := &lumenetesv1alpha1.Light{ObjectMeta: metav1.ObjectMeta{Name: "a"}, Spec: lumenetesv1alpha1.LightSpec{On: true, Brightness: 100, ColorTempK: 1}, Status: lumenetesv1alpha1.LightStatus{On: true}}
+	c := newFakeClient(t, group, schedule, lightA)
+
+	midDay := sunTimes.Sunrise.Add(2 * time.Hour)
+	r := &Reconciler{Client: c, Now: func() time.Time { return midDay }}
+
+	// A user manually turns the light off - Status.On hasn't caught up
+	// yet (no poller in this test), matching the real-world moment right
+	// after the edit lands and before lightscontroller/the poller
+	// round-trip it back into Status.
+	light := getLight(t, c, "a")
+	light.Spec.On = false
+	if err := c.Update(t.Context(), &light); err != nil {
+		t.Fatalf("update light: %v", err)
+	}
+
+	if _, err := r.Reconcile(t.Context(), ctrl.Request{NamespacedName: client.ObjectKey{Name: "external-office"}}); err != nil {
+		t.Fatalf("Reconcile() error = %v", err)
+	}
+	if got := getLight(t, c, "a"); got.Spec.On {
+		t.Errorf("light a Spec.On = true after reconcile, want the manual override (false) to stick since Status.On still agrees with the schedule's resolved level")
 	}
 }
 

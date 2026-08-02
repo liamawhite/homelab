@@ -29,10 +29,10 @@ const lumenetesControllerImageName = "ghcr.io/liamawhite/lumenetes"
 //
 // ActiveScene is optional and nil for most groups - see
 // createDefaultGroups' doc comment for what nil vs. set means. living-space
-// is Pulumi-declared to the circadian schedule seeded below, as the
-// deliberate exception: once a group's ActiveScene is meant to be
-// permanently driven by code rather than toggled live, declaring it here
-// is what makes `up` keep re-asserting it.
+// and external-office are Pulumi-declared to their circadian schedules
+// seeded below, as the deliberate exception: once a group's ActiveScene is
+// meant to be permanently driven by code rather than toggled live,
+// declaring it here is what makes `up` keep re-asserting it.
 var defaultGroups = []struct {
 	Name        string
 	Lights      []string
@@ -212,13 +212,14 @@ func BuildLumenetesControllerImage(ctx *pulumi.Context, name, ghcrUsername, ghcr
 
 	return dockerbuild.NewImage(ctx, name, &dockerbuild.ImageArgs{
 		Context: &dockerbuild.BuildContextArgs{
-			Location: pulumi.String(repoRoot),
+			Location: pulumi.String(filepath.Join(repoRoot, "applications/lumenetes")),
 		},
 		Dockerfile: &dockerbuild.DockerfileArgs{
 			Location: pulumi.String(filepath.Join(repoRoot, "applications/lumenetes/Dockerfile")),
 		},
 		Platforms: dockerbuild.PlatformArray{
 			dockerbuild.Platform_Linux_arm64,
+			dockerbuild.Platform_Linux_amd64,
 		},
 		Push: pulumi.Bool(true),
 		Registries: dockerbuild.RegistryArray{

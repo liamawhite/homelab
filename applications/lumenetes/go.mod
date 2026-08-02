@@ -5,7 +5,7 @@ go 1.25.8
 require (
 	connectrpc.com/connect v1.20.0
 	github.com/go-logr/logr v1.4.3
-	github.com/liamawhite/homelab v0.0.0-00010101000000-000000000000
+	github.com/liamawhite/homelab v0.0.0-20260727215214-817151c93d29
 	github.com/prometheus/client_golang v1.22.0
 	golang.org/x/sync v0.21.0
 	google.golang.org/protobuf v1.36.11
@@ -66,8 +66,6 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.6.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
-
-replace github.com/liamawhite/homelab => ../../
 
 tool (
 	connectrpc.com/connect/cmd/protoc-gen-connect-go

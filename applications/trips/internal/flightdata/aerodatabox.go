@@ -17,8 +17,8 @@ import (
 const defaultBaseURL = "https://aerodatabox.p.rapidapi.com"
 
 // httpClient is reused across calls, same convention as
-// pkg/lumenetes/hue's package-level client. Cancellation/timeout is left to
-// the caller's context rather than a client-wide timeout.
+// applications/lumenetes/internal/hue's package-level client. Cancellation/
+// timeout is left to the caller's context rather than a client-wide timeout.
 var httpClient = &http.Client{}
 
 // Client fetches flight status from AeroDataBox using an API key issued via
