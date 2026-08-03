@@ -5,6 +5,20 @@
 // 10-rule zone cap), so every other app's card has to point straight at its
 // tailnet address. Hardcoded here rather than threaded through config - same
 // as every other app's index.html hardcoding its own title and theme color.
+import {
+  AlertTriangle,
+  BarChart3,
+  Dumbbell,
+  Flame,
+  HardDrive,
+  Lightbulb,
+  ListChecks,
+  Plane,
+  ShoppingCart,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
+
 export const BASE_DOMAIN = "tailcaa52.ts.net";
 
 export type Group = "apps" | "infra";
@@ -13,7 +27,7 @@ export interface AppLink {
   name: string;
   description: string;
   subdomain: string;
-  icon: string;
+  icon: LucideIcon;
   group: Group;
 }
 
@@ -27,70 +41,70 @@ export const APPS: AppLink[] = [
     name: "Workouts",
     description: "Training cycles, blocks, and exercise sets",
     subdomain: "workouts",
-    icon: "🏋️",
+    icon: Dumbbell,
     group: "apps",
   },
   {
     name: "Shopping",
     description: "Shared shopping list",
     subdomain: "shopping",
-    icon: "🛒",
+    icon: ShoppingCart,
     group: "apps",
   },
   {
     name: "Trips",
     description: "Travel planning and flight tracking",
     subdomain: "trips",
-    icon: "✈️",
+    icon: Plane,
     group: "apps",
   },
   {
     name: "Reminders",
     description: "One-off reminders",
     subdomain: "reminders",
-    icon: "✔️",
+    icon: ListChecks,
     group: "apps",
   },
   {
     name: "Finances",
     description: "Budget and spending tracking",
     subdomain: "finances",
-    icon: "💰",
+    icon: Wallet,
     group: "apps",
   },
   {
     name: "Lights",
     description: "Hue lighting control (lumenetes)",
     subdomain: "lights",
-    icon: "💡",
+    icon: Lightbulb,
     group: "apps",
   },
   {
     name: "Grafana",
     description: "Dashboards",
     subdomain: "grafana",
-    icon: "📊",
+    icon: BarChart3,
     group: "infra",
   },
   {
     name: "Storage",
     description: "Longhorn volumes",
     subdomain: "storage",
-    icon: "💾",
+    icon: HardDrive,
     group: "infra",
   },
   {
     name: "Prometheus",
     description: "Metrics",
     subdomain: "prom",
-    icon: "🔥",
+    icon: Flame,
     group: "infra",
   },
   {
     name: "Alertmanager",
     description: "Alerts",
     subdomain: "alerts",
-    icon: "🚨",
+    icon: AlertTriangle,
     group: "infra",
   },
 ];

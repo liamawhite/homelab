@@ -75,12 +75,13 @@ export function App() {
               </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {appsInGroup.map((app) => {
+                  const Icon = app.icon;
                   return (
                     <a key={app.subdomain} href={appHref(app)} className="block">
                       <Card className="h-full transition-colors hover:bg-muted/50">
                         <CardContent className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-lg">
-                            {app.icon}
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+                            <Icon className="size-4.5" />
                           </div>
                           <div className="min-w-0">
                             <div className="font-medium">{app.name}</div>
