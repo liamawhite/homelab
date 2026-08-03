@@ -135,7 +135,6 @@ func newNodeExporter(ctx *pulumi.Context, name string, namespace pulumi.StringIn
 								pulumi.String("--path.procfs=/host/root/proc"),
 								pulumi.String("--path.udev.data=/host/root/run/udev/data"),
 								pulumi.String("--no-collector.wifi"),
-								pulumi.String("--no-collector.hwmon"),
 								pulumi.String("--no-collector.btrfs"),
 								pulumi.String("--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/containerd/.+|var/lib/kubelet/pods/.+)($|/)"),
 								pulumi.String("--collector.netclass.ignored-devices=^(veth.*|[a-f0-9]{15})$"),

@@ -224,6 +224,7 @@ datasources:
 		Data: pulumi.StringMap{
 			"node-metrics.json":                  pulumi.String(nodeMetricsDashboard),
 			"pod-metrics.json":                   pulumi.String(podMetricsDashboard),
+			"network-metrics.json":               pulumi.String(networkMetricsDashboard),
 			"istio-control-plane-dashboard.json": pulumi.String(istioControlPlaneDashboard),
 			"istio-mesh-dashboard.json":          pulumi.String(istioMeshDashboard),
 			"istio-service-dashboard.json":       pulumi.String(istioServiceDashboard),

@@ -21,6 +21,24 @@ var nodeMetricsDashboard string
 //go:embed pod-metrics.json
 var podMetricsDashboard string
 
+// networkMetricsDashboard is hand-authored (unlike node/pod-metrics above,
+// there's no upstream dashboard being ported here), covering L3/network
+// visibility from metrics already scraped elsewhere in this stack rather
+// than Cilium's own cilium_*/hubble_* metrics (not enabled/scraped anywhere
+// in this repo - see pkg/components/cilium): node-exporter's node_network_*
+// netdev counters (per-node throughput/errors/drops), cadvisor's
+// container_network_* counters (per-pod throughput/errors/drops, same
+// interface="eth0" convention podMetricsDashboard's own network panel
+// already uses), and one aggregate panel over ztunnel's
+// istio_dns_requests_total for mesh-wide DNS query rate - deliberately just
+// a single summary series here, since istioZtunnelDashboard already covers
+// the per-pod DNS breakdown. Same hardcoded
+// {"type": "prometheus", "uid": "prometheus"} datasource convention as
+// every other dashboard here.
+//
+//go:embed network-metrics.json
+var networkMetricsDashboard string
+
 // The five Istio dashboards below are ported from istio/istio's
 // manifests/addons/dashboards (master branch), with one deliberate edit:
 // upstream has every panel/target resolve its datasource through a
