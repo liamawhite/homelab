@@ -53,6 +53,8 @@ func (s *Service) AddAccommodation(ctx context.Context, req *connect.Request[v1.
 	location := strings.TrimSpace(req.Msg.GetLocation())
 	checkIn := strings.TrimSpace(req.Msg.GetCheckIn())
 	checkOut := strings.TrimSpace(req.Msg.GetCheckOut())
+	confirmationLink := strings.TrimSpace(req.Msg.GetConfirmationLink())
+	bookingNumber := strings.TrimSpace(req.Msg.GetBookingNumber())
 
 	if tripID == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("trip_id must not be empty"))
@@ -70,7 +72,7 @@ func (s *Service) AddAccommodation(ctx context.Context, req *connect.Request[v1.
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("check_out must not be before check_in"))
 	}
 
-	accommodation, err := s.accommodations.Create(ctx, tripID, name, location, checkIn, checkOut)
+	accommodation, err := s.accommodations.Create(ctx, tripID, name, location, checkIn, checkOut, confirmationLink, bookingNumber)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -95,14 +97,35 @@ func (s *Service) DeleteAccommodation(ctx context.Context, req *connect.Request[
 	return connect.NewResponse(&v1.DeleteAccommodationResponse{}), nil
 }
 
+// UpdateAccommodationConfirmation sets or clears an accommodation's booking
+// link/number - the only fields editable after creation.
+func (s *Service) UpdateAccommodationConfirmation(ctx context.Context, req *connect.Request[v1.UpdateAccommodationConfirmationRequest]) (*connect.Response[v1.UpdateAccommodationConfirmationResponse], error) {
+	id := strings.TrimSpace(req.Msg.GetId())
+	if id == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id must not be empty"))
+	}
+
+	accommodation, err := s.accommodations.UpdateConfirmation(ctx, id, strings.TrimSpace(req.Msg.GetConfirmationLink()), strings.TrimSpace(req.Msg.GetBookingNumber()))
+	if err != nil {
+		if errors.Is(err, storage.ErrAccommodationNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&v1.UpdateAccommodationConfirmationResponse{Accommodation: toProto(accommodation)}), nil
+}
+
 func toProto(accommodation storage.Accommodation) *v1.Accommodation {
 	return &v1.Accommodation{
-		Id:        accommodation.ID,
-		TripId:    accommodation.TripID,
-		Name:      accommodation.Name,
-		Location:  accommodation.Location,
-		CheckIn:   accommodation.CheckIn,
-		CheckOut:  accommodation.CheckOut,
-		CreatedAt: timestamppb.New(accommodation.CreatedAt),
+		Id:               accommodation.ID,
+		TripId:           accommodation.TripID,
+		Name:             accommodation.Name,
+		Location:         accommodation.Location,
+		CheckIn:          accommodation.CheckIn,
+		CheckOut:         accommodation.CheckOut,
+		CreatedAt:        timestamppb.New(accommodation.CreatedAt),
+		ConfirmationLink: accommodation.ConfirmationLink,
+		BookingNumber:    accommodation.BookingNumber,
 	}
 }

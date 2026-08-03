@@ -2,8 +2,16 @@
 // @generated from file trips/v1/accommodation.proto (package trips.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -11,8 +19,12 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file trips/v1/accommodation.proto.
  */
-export const file_trips_v1_accommodation: GenFile = /*@__PURE__*/
-  fileDesc("Chx0cmlwcy92MS9hY2NvbW1vZGF0aW9uLnByb3RvEgh0cmlwcy52MSKhAQoNQWNjb21tb2RhdGlvbhIKCgJpZBgBIAEoCRIPCgd0cmlwX2lkGAIgASgJEgwKBG5hbWUYAyABKAkSEAoIbG9jYXRpb24YBCABKAkSEAoIY2hlY2tfaW4YBSABKAkSEQoJY2hlY2tfb3V0GAYgASgJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIiwKGUxpc3RBY2NvbW1vZGF0aW9uc1JlcXVlc3QSDwoHdHJpcF9pZBgBIAEoCSJNChpMaXN0QWNjb21tb2RhdGlvbnNSZXNwb25zZRIvCg5hY2NvbW1vZGF0aW9ucxgBIAMoCzIXLnRyaXBzLnYxLkFjY29tbW9kYXRpb24ibwoXQWRkQWNjb21tb2RhdGlvblJlcXVlc3QSDwoHdHJpcF9pZBgBIAEoCRIMCgRuYW1lGAIgASgJEhAKCGxvY2F0aW9uGAMgASgJEhAKCGNoZWNrX2luGAQgASgJEhEKCWNoZWNrX291dBgFIAEoCSJKChhBZGRBY2NvbW1vZGF0aW9uUmVzcG9uc2USLgoNYWNjb21tb2RhdGlvbhgBIAEoCzIXLnRyaXBzLnYxLkFjY29tbW9kYXRpb24iKAoaRGVsZXRlQWNjb21tb2RhdGlvblJlcXVlc3QSCgoCaWQYASABKAkiHQobRGVsZXRlQWNjb21tb2RhdGlvblJlc3BvbnNlMrYCChRBY2NvbW1vZGF0aW9uU2VydmljZRJfChJMaXN0QWNjb21tb2RhdGlvbnMSIy50cmlwcy52MS5MaXN0QWNjb21tb2RhdGlvbnNSZXF1ZXN0GiQudHJpcHMudjEuTGlzdEFjY29tbW9kYXRpb25zUmVzcG9uc2USWQoQQWRkQWNjb21tb2RhdGlvbhIhLnRyaXBzLnYxLkFkZEFjY29tbW9kYXRpb25SZXF1ZXN0GiIudHJpcHMudjEuQWRkQWNjb21tb2RhdGlvblJlc3BvbnNlEmIKE0RlbGV0ZUFjY29tbW9kYXRpb24SJC50cmlwcy52MS5EZWxldGVBY2NvbW1vZGF0aW9uUmVxdWVzdBolLnRyaXBzLnYxLkRlbGV0ZUFjY29tbW9kYXRpb25SZXNwb25zZUIyWjBnaXRodWIuY29tL2xpYW1hd2hpdGUvdHJpcHMvZ2VuL3RyaXBzL3YxO3RyaXBzdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+export const file_trips_v1_accommodation: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "Chx0cmlwcy92MS9hY2NvbW1vZGF0aW9uLnByb3RvEgh0cmlwcy52MSLUAQoNQWNjb21tb2RhdGlvbhIKCgJpZBgBIAEoCRIPCgd0cmlwX2lkGAIgASgJEgwKBG5hbWUYAyABKAkSEAoIbG9jYXRpb24YBCABKAkSEAoIY2hlY2tfaW4YBSABKAkSEQoJY2hlY2tfb3V0GAYgASgJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhkKEWNvbmZpcm1hdGlvbl9saW5rGAggASgJEhYKDmJvb2tpbmdfbnVtYmVyGAkgASgJIiwKGUxpc3RBY2NvbW1vZGF0aW9uc1JlcXVlc3QSDwoHdHJpcF9pZBgBIAEoCSJNChpMaXN0QWNjb21tb2RhdGlvbnNSZXNwb25zZRIvCg5hY2NvbW1vZGF0aW9ucxgBIAMoCzIXLnRyaXBzLnYxLkFjY29tbW9kYXRpb24iogEKF0FkZEFjY29tbW9kYXRpb25SZXF1ZXN0Eg8KB3RyaXBfaWQYASABKAkSDAoEbmFtZRgCIAEoCRIQCghsb2NhdGlvbhgDIAEoCRIQCghjaGVja19pbhgEIAEoCRIRCgljaGVja19vdXQYBSABKAkSGQoRY29uZmlybWF0aW9uX2xpbmsYBiABKAkSFgoOYm9va2luZ19udW1iZXIYByABKAkiSgoYQWRkQWNjb21tb2RhdGlvblJlc3BvbnNlEi4KDWFjY29tbW9kYXRpb24YASABKAsyFy50cmlwcy52MS5BY2NvbW1vZGF0aW9uIigKGkRlbGV0ZUFjY29tbW9kYXRpb25SZXF1ZXN0EgoKAmlkGAEgASgJIh0KG0RlbGV0ZUFjY29tbW9kYXRpb25SZXNwb25zZSJnCiZVcGRhdGVBY2NvbW1vZGF0aW9uQ29uZmlybWF0aW9uUmVxdWVzdBIKCgJpZBgBIAEoCRIZChFjb25maXJtYXRpb25fbGluaxgCIAEoCRIWCg5ib29raW5nX251bWJlchgDIAEoCSJZCidVcGRhdGVBY2NvbW1vZGF0aW9uQ29uZmlybWF0aW9uUmVzcG9uc2USLgoNYWNjb21tb2RhdGlvbhgBIAEoCzIXLnRyaXBzLnYxLkFjY29tbW9kYXRpb24yvwMKFEFjY29tbW9kYXRpb25TZXJ2aWNlEl8KEkxpc3RBY2NvbW1vZGF0aW9ucxIjLnRyaXBzLnYxLkxpc3RBY2NvbW1vZGF0aW9uc1JlcXVlc3QaJC50cmlwcy52MS5MaXN0QWNjb21tb2RhdGlvbnNSZXNwb25zZRJZChBBZGRBY2NvbW1vZGF0aW9uEiEudHJpcHMudjEuQWRkQWNjb21tb2RhdGlvblJlcXVlc3QaIi50cmlwcy52MS5BZGRBY2NvbW1vZGF0aW9uUmVzcG9uc2USYgoTRGVsZXRlQWNjb21tb2RhdGlvbhIkLnRyaXBzLnYxLkRlbGV0ZUFjY29tbW9kYXRpb25SZXF1ZXN0GiUudHJpcHMudjEuRGVsZXRlQWNjb21tb2RhdGlvblJlc3BvbnNlEoYBCh9VcGRhdGVBY2NvbW1vZGF0aW9uQ29uZmlybWF0aW9uEjAudHJpcHMudjEuVXBkYXRlQWNjb21tb2RhdGlvbkNvbmZpcm1hdGlvblJlcXVlc3QaMS50cmlwcy52MS5VcGRhdGVBY2NvbW1vZGF0aW9uQ29uZmlybWF0aW9uUmVzcG9uc2VCMlowZ2l0aHViLmNvbS9saWFtYXdoaXRlL3RyaXBzL2dlbi90cmlwcy92MTt0cmlwc3YxYgZwcm90bzM",
+    [file_google_protobuf_timestamp],
+  );
 
 /**
  * @generated from message trips.v1.Accommodation
@@ -56,132 +68,219 @@ export type Accommodation = Message<"trips.v1.Accommodation"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 7;
    */
   createdAt?: Timestamp | undefined;
+
+  /**
+   * Optional link to the booking (e.g. the hotel's confirmation/manage-
+   * booking page).
+   *
+   * @generated from field: string confirmation_link = 8;
+   */
+  confirmationLink: string;
+
+  /**
+   * Optional booking/confirmation code.
+   *
+   * @generated from field: string booking_number = 9;
+   */
+  bookingNumber: string;
 };
 
 /**
  * Describes the message trips.v1.Accommodation.
  * Use `create(AccommodationSchema)` to create a new message.
  */
-export const AccommodationSchema: GenMessage<Accommodation> = /*@__PURE__*/
+export const AccommodationSchema: GenMessage<Accommodation> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 0);
 
 /**
  * @generated from message trips.v1.ListAccommodationsRequest
  */
-export type ListAccommodationsRequest = Message<"trips.v1.ListAccommodationsRequest"> & {
-  /**
-   * @generated from field: string trip_id = 1;
-   */
-  tripId: string;
-};
+export type ListAccommodationsRequest =
+  Message<"trips.v1.ListAccommodationsRequest"> & {
+    /**
+     * @generated from field: string trip_id = 1;
+     */
+    tripId: string;
+  };
 
 /**
  * Describes the message trips.v1.ListAccommodationsRequest.
  * Use `create(ListAccommodationsRequestSchema)` to create a new message.
  */
-export const ListAccommodationsRequestSchema: GenMessage<ListAccommodationsRequest> = /*@__PURE__*/
+export const ListAccommodationsRequestSchema: GenMessage<ListAccommodationsRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 1);
 
 /**
  * @generated from message trips.v1.ListAccommodationsResponse
  */
-export type ListAccommodationsResponse = Message<"trips.v1.ListAccommodationsResponse"> & {
-  /**
-   * @generated from field: repeated trips.v1.Accommodation accommodations = 1;
-   */
-  accommodations: Accommodation[];
-};
+export type ListAccommodationsResponse =
+  Message<"trips.v1.ListAccommodationsResponse"> & {
+    /**
+     * @generated from field: repeated trips.v1.Accommodation accommodations = 1;
+     */
+    accommodations: Accommodation[];
+  };
 
 /**
  * Describes the message trips.v1.ListAccommodationsResponse.
  * Use `create(ListAccommodationsResponseSchema)` to create a new message.
  */
-export const ListAccommodationsResponseSchema: GenMessage<ListAccommodationsResponse> = /*@__PURE__*/
+export const ListAccommodationsResponseSchema: GenMessage<ListAccommodationsResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 2);
 
 /**
  * @generated from message trips.v1.AddAccommodationRequest
  */
-export type AddAccommodationRequest = Message<"trips.v1.AddAccommodationRequest"> & {
-  /**
-   * @generated from field: string trip_id = 1;
-   */
-  tripId: string;
+export type AddAccommodationRequest =
+  Message<"trips.v1.AddAccommodationRequest"> & {
+    /**
+     * @generated from field: string trip_id = 1;
+     */
+    tripId: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+    /**
+     * @generated from field: string name = 2;
+     */
+    name: string;
 
-  /**
-   * @generated from field: string location = 3;
-   */
-  location: string;
+    /**
+     * @generated from field: string location = 3;
+     */
+    location: string;
 
-  /**
-   * @generated from field: string check_in = 4;
-   */
-  checkIn: string;
+    /**
+     * @generated from field: string check_in = 4;
+     */
+    checkIn: string;
 
-  /**
-   * @generated from field: string check_out = 5;
-   */
-  checkOut: string;
-};
+    /**
+     * @generated from field: string check_out = 5;
+     */
+    checkOut: string;
+
+    /**
+     * Optional - see Accommodation.confirmation_link/booking_number.
+     *
+     * @generated from field: string confirmation_link = 6;
+     */
+    confirmationLink: string;
+
+    /**
+     * @generated from field: string booking_number = 7;
+     */
+    bookingNumber: string;
+  };
 
 /**
  * Describes the message trips.v1.AddAccommodationRequest.
  * Use `create(AddAccommodationRequestSchema)` to create a new message.
  */
-export const AddAccommodationRequestSchema: GenMessage<AddAccommodationRequest> = /*@__PURE__*/
+export const AddAccommodationRequestSchema: GenMessage<AddAccommodationRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 3);
 
 /**
  * @generated from message trips.v1.AddAccommodationResponse
  */
-export type AddAccommodationResponse = Message<"trips.v1.AddAccommodationResponse"> & {
-  /**
-   * @generated from field: trips.v1.Accommodation accommodation = 1;
-   */
-  accommodation?: Accommodation | undefined;
-};
+export type AddAccommodationResponse =
+  Message<"trips.v1.AddAccommodationResponse"> & {
+    /**
+     * @generated from field: trips.v1.Accommodation accommodation = 1;
+     */
+    accommodation?: Accommodation | undefined;
+  };
 
 /**
  * Describes the message trips.v1.AddAccommodationResponse.
  * Use `create(AddAccommodationResponseSchema)` to create a new message.
  */
-export const AddAccommodationResponseSchema: GenMessage<AddAccommodationResponse> = /*@__PURE__*/
+export const AddAccommodationResponseSchema: GenMessage<AddAccommodationResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 4);
 
 /**
  * @generated from message trips.v1.DeleteAccommodationRequest
  */
-export type DeleteAccommodationRequest = Message<"trips.v1.DeleteAccommodationRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
-};
+export type DeleteAccommodationRequest =
+  Message<"trips.v1.DeleteAccommodationRequest"> & {
+    /**
+     * @generated from field: string id = 1;
+     */
+    id: string;
+  };
 
 /**
  * Describes the message trips.v1.DeleteAccommodationRequest.
  * Use `create(DeleteAccommodationRequestSchema)` to create a new message.
  */
-export const DeleteAccommodationRequestSchema: GenMessage<DeleteAccommodationRequest> = /*@__PURE__*/
+export const DeleteAccommodationRequestSchema: GenMessage<DeleteAccommodationRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 5);
 
 /**
  * @generated from message trips.v1.DeleteAccommodationResponse
  */
-export type DeleteAccommodationResponse = Message<"trips.v1.DeleteAccommodationResponse"> & {
-};
+export type DeleteAccommodationResponse =
+  Message<"trips.v1.DeleteAccommodationResponse"> & {};
 
 /**
  * Describes the message trips.v1.DeleteAccommodationResponse.
  * Use `create(DeleteAccommodationResponseSchema)` to create a new message.
  */
-export const DeleteAccommodationResponseSchema: GenMessage<DeleteAccommodationResponse> = /*@__PURE__*/
+export const DeleteAccommodationResponseSchema: GenMessage<DeleteAccommodationResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_accommodation, 6);
+
+/**
+ * @generated from message trips.v1.UpdateAccommodationConfirmationRequest
+ */
+export type UpdateAccommodationConfirmationRequest =
+  Message<"trips.v1.UpdateAccommodationConfirmationRequest"> & {
+    /**
+     * @generated from field: string id = 1;
+     */
+    id: string;
+
+    /**
+     * @generated from field: string confirmation_link = 2;
+     */
+    confirmationLink: string;
+
+    /**
+     * @generated from field: string booking_number = 3;
+     */
+    bookingNumber: string;
+  };
+
+/**
+ * Describes the message trips.v1.UpdateAccommodationConfirmationRequest.
+ * Use `create(UpdateAccommodationConfirmationRequestSchema)` to create a new message.
+ */
+export const UpdateAccommodationConfirmationRequestSchema: GenMessage<UpdateAccommodationConfirmationRequest> =
+  /*@__PURE__*/
+  messageDesc(file_trips_v1_accommodation, 7);
+
+/**
+ * @generated from message trips.v1.UpdateAccommodationConfirmationResponse
+ */
+export type UpdateAccommodationConfirmationResponse =
+  Message<"trips.v1.UpdateAccommodationConfirmationResponse"> & {
+    /**
+     * @generated from field: trips.v1.Accommodation accommodation = 1;
+     */
+    accommodation?: Accommodation | undefined;
+  };
+
+/**
+ * Describes the message trips.v1.UpdateAccommodationConfirmationResponse.
+ * Use `create(UpdateAccommodationConfirmationResponseSchema)` to create a new message.
+ */
+export const UpdateAccommodationConfirmationResponseSchema: GenMessage<UpdateAccommodationConfirmationResponse> =
+  /*@__PURE__*/
+  messageDesc(file_trips_v1_accommodation, 8);
 
 /**
  * @generated from service trips.v1.AccommodationService
@@ -194,7 +293,7 @@ export const AccommodationService: GenService<{
     methodKind: "unary";
     input: typeof ListAccommodationsRequestSchema;
     output: typeof ListAccommodationsResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.AccommodationService.AddAccommodation
    */
@@ -202,7 +301,7 @@ export const AccommodationService: GenService<{
     methodKind: "unary";
     input: typeof AddAccommodationRequestSchema;
     output: typeof AddAccommodationResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.AccommodationService.DeleteAccommodation
    */
@@ -210,7 +309,13 @@ export const AccommodationService: GenService<{
     methodKind: "unary";
     input: typeof DeleteAccommodationRequestSchema;
     output: typeof DeleteAccommodationResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_trips_v1_accommodation, 0);
-
+  };
+  /**
+   * @generated from rpc trips.v1.AccommodationService.UpdateAccommodationConfirmation
+   */
+  updateAccommodationConfirmation: {
+    methodKind: "unary";
+    input: typeof UpdateAccommodationConfirmationRequestSchema;
+    output: typeof UpdateAccommodationConfirmationResponseSchema;
+  };
+}> = /*@__PURE__*/ serviceDesc(file_trips_v1_accommodation, 0);

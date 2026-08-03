@@ -9,13 +9,15 @@ import (
 )
 
 type Accommodation struct {
-	ID        string
-	TripID    string
-	Name      string
-	Location  string
-	CheckIn   string
-	CheckOut  string
-	CreatedAt string
+	ID               string
+	TripID           string
+	Name             string
+	Location         string
+	CheckIn          string
+	CheckOut         string
+	CreatedAt        string
+	ConfirmationLink string
+	BookingNumber    string
 }
 
 type Flight struct {
@@ -35,6 +37,25 @@ type Flight struct {
 	CreatedAt          string
 	DepartureTimezone  string
 	ArrivalTimezone    string
+	ConfirmationLink   string
+	BookingNumber      string
+}
+
+type ItineraryItem struct {
+	ID          string
+	TripID      string
+	Title       string
+	Location    string
+	Latitude    float64
+	Longitude   float64
+	PlaceID     string
+	State       string
+	Date        string
+	StartMinute int64
+	EndMinute   int64
+	CreatedAt   string
+	Timezone    string
+	EndDate     string
 }
 
 type Trip struct {

@@ -107,8 +107,15 @@ type Flight struct {
 	LastSyncedAt       *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=last_synced_at,json=lastSyncedAt,proto3" json:"last_synced_at,omitempty"`
 	// Non-empty if the most recent sync attempt failed - previously-fetched
 	// fields above are left untouched when this happens.
-	SyncError     string                 `protobuf:"bytes,13,opt,name=sync_error,json=syncError,proto3" json:"sync_error,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	SyncError string                 `protobuf:"bytes,13,opt,name=sync_error,json=syncError,proto3" json:"sync_error,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Optional link to the booking (e.g. the airline's confirmation/manage-
+	// booking page). Not fetched from AeroDataBox - set by the user via
+	// AddFlight or UpdateFlightConfirmation.
+	ConfirmationLink string `protobuf:"bytes,17,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	// Optional booking/confirmation (PNR) code, e.g. "ABC123". Also set by
+	// the user, not fetched from AeroDataBox.
+	BookingNumber string `protobuf:"bytes,18,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -255,6 +262,20 @@ func (x *Flight) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Flight) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *Flight) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
+	}
+	return ""
+}
+
 type ListFlightsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
@@ -344,12 +365,15 @@ func (x *ListFlightsResponse) GetFlights() []*Flight {
 }
 
 type AddFlightRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
-	FlightNumber  string                 `protobuf:"bytes,2,opt,name=flight_number,json=flightNumber,proto3" json:"flight_number,omitempty"`
-	Date          string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	TripId       string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
+	FlightNumber string                 `protobuf:"bytes,2,opt,name=flight_number,json=flightNumber,proto3" json:"flight_number,omitempty"`
+	Date         string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
+	// Optional - see Flight.confirmation_link/booking_number.
+	ConfirmationLink string `protobuf:"bytes,4,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	BookingNumber    string `protobuf:"bytes,5,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *AddFlightRequest) Reset() {
@@ -399,6 +423,20 @@ func (x *AddFlightRequest) GetFlightNumber() string {
 func (x *AddFlightRequest) GetDate() string {
 	if x != nil {
 		return x.Date
+	}
+	return ""
+}
+
+func (x *AddFlightRequest) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *AddFlightRequest) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
 	}
 	return ""
 }
@@ -615,11 +653,115 @@ func (x *SyncFlightResponse) GetFlight() *Flight {
 	return nil
 }
 
+type UpdateFlightConfirmationRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConfirmationLink string                 `protobuf:"bytes,2,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	BookingNumber    string                 `protobuf:"bytes,3,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UpdateFlightConfirmationRequest) Reset() {
+	*x = UpdateFlightConfirmationRequest{}
+	mi := &file_trips_v1_flight_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFlightConfirmationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFlightConfirmationRequest) ProtoMessage() {}
+
+func (x *UpdateFlightConfirmationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_trips_v1_flight_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFlightConfirmationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateFlightConfirmationRequest) Descriptor() ([]byte, []int) {
+	return file_trips_v1_flight_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdateFlightConfirmationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateFlightConfirmationRequest) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *UpdateFlightConfirmationRequest) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
+	}
+	return ""
+}
+
+type UpdateFlightConfirmationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Flight        *Flight                `protobuf:"bytes,1,opt,name=flight,proto3" json:"flight,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFlightConfirmationResponse) Reset() {
+	*x = UpdateFlightConfirmationResponse{}
+	mi := &file_trips_v1_flight_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFlightConfirmationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFlightConfirmationResponse) ProtoMessage() {}
+
+func (x *UpdateFlightConfirmationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_trips_v1_flight_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFlightConfirmationResponse.ProtoReflect.Descriptor instead.
+func (*UpdateFlightConfirmationResponse) Descriptor() ([]byte, []int) {
+	return file_trips_v1_flight_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UpdateFlightConfirmationResponse) GetFlight() *Flight {
+	if x != nil {
+		return x.Flight
+	}
+	return nil
+}
+
 var File_trips_v1_flight_proto protoreflect.FileDescriptor
 
 const file_trips_v1_flight_proto_rawDesc = "" +
 	"\n" +
-	"\x15trips/v1/flight.proto\x12\btrips.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x86\x06\n" +
+	"\x15trips/v1/flight.proto\x12\btrips.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xda\x06\n" +
 	"\x06Flight\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\atrip_id\x18\x02 \x01(\tR\x06tripId\x12#\n" +
@@ -639,15 +781,19 @@ const file_trips_v1_flight_proto_rawDesc = "" +
 	"\n" +
 	"sync_error\x18\r \x01(\tR\tsyncError\x129\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"-\n" +
+	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12+\n" +
+	"\x11confirmation_link\x18\x11 \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\x12 \x01(\tR\rbookingNumber\"-\n" +
 	"\x12ListFlightsRequest\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\"A\n" +
 	"\x13ListFlightsResponse\x12*\n" +
-	"\aflights\x18\x01 \x03(\v2\x10.trips.v1.FlightR\aflights\"d\n" +
+	"\aflights\x18\x01 \x03(\v2\x10.trips.v1.FlightR\aflights\"\xb8\x01\n" +
 	"\x10AddFlightRequest\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12#\n" +
 	"\rflight_number\x18\x02 \x01(\tR\fflightNumber\x12\x12\n" +
-	"\x04date\x18\x03 \x01(\tR\x04date\"=\n" +
+	"\x04date\x18\x03 \x01(\tR\x04date\x12+\n" +
+	"\x11confirmation_link\x18\x04 \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\x05 \x01(\tR\rbookingNumber\"=\n" +
 	"\x11AddFlightResponse\x12(\n" +
 	"\x06flight\x18\x01 \x01(\v2\x10.trips.v1.FlightR\x06flight\"%\n" +
 	"\x13DeleteFlightRequest\x12\x0e\n" +
@@ -656,6 +802,12 @@ const file_trips_v1_flight_proto_rawDesc = "" +
 	"\x11SyncFlightRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\">\n" +
 	"\x12SyncFlightResponse\x12(\n" +
+	"\x06flight\x18\x01 \x01(\v2\x10.trips.v1.FlightR\x06flight\"\x85\x01\n" +
+	"\x1fUpdateFlightConfirmationRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12+\n" +
+	"\x11confirmation_link\x18\x02 \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\x03 \x01(\tR\rbookingNumber\"L\n" +
+	" UpdateFlightConfirmationResponse\x12(\n" +
 	"\x06flight\x18\x01 \x01(\v2\x10.trips.v1.FlightR\x06flight*\xd2\x01\n" +
 	"\fFlightStatus\x12\x1d\n" +
 	"\x19FLIGHT_STATUS_UNSPECIFIED\x10\x00\x12\x1b\n" +
@@ -664,13 +816,14 @@ const file_trips_v1_flight_proto_rawDesc = "" +
 	"\x14FLIGHT_STATUS_LANDED\x10\x03\x12\x1b\n" +
 	"\x17FLIGHT_STATUS_CANCELLED\x10\x04\x12\x1a\n" +
 	"\x16FLIGHT_STATUS_DIVERTED\x10\x05\x12\x19\n" +
-	"\x15FLIGHT_STATUS_UNKNOWN\x10\x062\xb9\x02\n" +
+	"\x15FLIGHT_STATUS_UNKNOWN\x10\x062\xac\x03\n" +
 	"\rFlightService\x12J\n" +
 	"\vListFlights\x12\x1c.trips.v1.ListFlightsRequest\x1a\x1d.trips.v1.ListFlightsResponse\x12D\n" +
 	"\tAddFlight\x12\x1a.trips.v1.AddFlightRequest\x1a\x1b.trips.v1.AddFlightResponse\x12M\n" +
 	"\fDeleteFlight\x12\x1d.trips.v1.DeleteFlightRequest\x1a\x1e.trips.v1.DeleteFlightResponse\x12G\n" +
 	"\n" +
-	"SyncFlight\x12\x1b.trips.v1.SyncFlightRequest\x1a\x1c.trips.v1.SyncFlightResponseB2Z0github.com/liamawhite/trips/gen/trips/v1;tripsv1b\x06proto3"
+	"SyncFlight\x12\x1b.trips.v1.SyncFlightRequest\x1a\x1c.trips.v1.SyncFlightResponse\x12q\n" +
+	"\x18UpdateFlightConfirmation\x12).trips.v1.UpdateFlightConfirmationRequest\x1a*.trips.v1.UpdateFlightConfirmationResponseB2Z0github.com/liamawhite/trips/gen/trips/v1;tripsv1b\x06proto3"
 
 var (
 	file_trips_v1_flight_proto_rawDescOnce sync.Once
@@ -685,44 +838,49 @@ func file_trips_v1_flight_proto_rawDescGZIP() []byte {
 }
 
 var file_trips_v1_flight_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_trips_v1_flight_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_trips_v1_flight_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_trips_v1_flight_proto_goTypes = []any{
-	(FlightStatus)(0),             // 0: trips.v1.FlightStatus
-	(*Flight)(nil),                // 1: trips.v1.Flight
-	(*ListFlightsRequest)(nil),    // 2: trips.v1.ListFlightsRequest
-	(*ListFlightsResponse)(nil),   // 3: trips.v1.ListFlightsResponse
-	(*AddFlightRequest)(nil),      // 4: trips.v1.AddFlightRequest
-	(*AddFlightResponse)(nil),     // 5: trips.v1.AddFlightResponse
-	(*DeleteFlightRequest)(nil),   // 6: trips.v1.DeleteFlightRequest
-	(*DeleteFlightResponse)(nil),  // 7: trips.v1.DeleteFlightResponse
-	(*SyncFlightRequest)(nil),     // 8: trips.v1.SyncFlightRequest
-	(*SyncFlightResponse)(nil),    // 9: trips.v1.SyncFlightResponse
-	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
+	(FlightStatus)(0),                        // 0: trips.v1.FlightStatus
+	(*Flight)(nil),                           // 1: trips.v1.Flight
+	(*ListFlightsRequest)(nil),               // 2: trips.v1.ListFlightsRequest
+	(*ListFlightsResponse)(nil),              // 3: trips.v1.ListFlightsResponse
+	(*AddFlightRequest)(nil),                 // 4: trips.v1.AddFlightRequest
+	(*AddFlightResponse)(nil),                // 5: trips.v1.AddFlightResponse
+	(*DeleteFlightRequest)(nil),              // 6: trips.v1.DeleteFlightRequest
+	(*DeleteFlightResponse)(nil),             // 7: trips.v1.DeleteFlightResponse
+	(*SyncFlightRequest)(nil),                // 8: trips.v1.SyncFlightRequest
+	(*SyncFlightResponse)(nil),               // 9: trips.v1.SyncFlightResponse
+	(*UpdateFlightConfirmationRequest)(nil),  // 10: trips.v1.UpdateFlightConfirmationRequest
+	(*UpdateFlightConfirmationResponse)(nil), // 11: trips.v1.UpdateFlightConfirmationResponse
+	(*timestamppb.Timestamp)(nil),            // 12: google.protobuf.Timestamp
 }
 var file_trips_v1_flight_proto_depIdxs = []int32{
-	10, // 0: trips.v1.Flight.scheduled_departure:type_name -> google.protobuf.Timestamp
-	10, // 1: trips.v1.Flight.scheduled_arrival:type_name -> google.protobuf.Timestamp
-	10, // 2: trips.v1.Flight.actual_departure:type_name -> google.protobuf.Timestamp
-	10, // 3: trips.v1.Flight.actual_arrival:type_name -> google.protobuf.Timestamp
+	12, // 0: trips.v1.Flight.scheduled_departure:type_name -> google.protobuf.Timestamp
+	12, // 1: trips.v1.Flight.scheduled_arrival:type_name -> google.protobuf.Timestamp
+	12, // 2: trips.v1.Flight.actual_departure:type_name -> google.protobuf.Timestamp
+	12, // 3: trips.v1.Flight.actual_arrival:type_name -> google.protobuf.Timestamp
 	0,  // 4: trips.v1.Flight.status:type_name -> trips.v1.FlightStatus
-	10, // 5: trips.v1.Flight.last_synced_at:type_name -> google.protobuf.Timestamp
-	10, // 6: trips.v1.Flight.created_at:type_name -> google.protobuf.Timestamp
+	12, // 5: trips.v1.Flight.last_synced_at:type_name -> google.protobuf.Timestamp
+	12, // 6: trips.v1.Flight.created_at:type_name -> google.protobuf.Timestamp
 	1,  // 7: trips.v1.ListFlightsResponse.flights:type_name -> trips.v1.Flight
 	1,  // 8: trips.v1.AddFlightResponse.flight:type_name -> trips.v1.Flight
 	1,  // 9: trips.v1.SyncFlightResponse.flight:type_name -> trips.v1.Flight
-	2,  // 10: trips.v1.FlightService.ListFlights:input_type -> trips.v1.ListFlightsRequest
-	4,  // 11: trips.v1.FlightService.AddFlight:input_type -> trips.v1.AddFlightRequest
-	6,  // 12: trips.v1.FlightService.DeleteFlight:input_type -> trips.v1.DeleteFlightRequest
-	8,  // 13: trips.v1.FlightService.SyncFlight:input_type -> trips.v1.SyncFlightRequest
-	3,  // 14: trips.v1.FlightService.ListFlights:output_type -> trips.v1.ListFlightsResponse
-	5,  // 15: trips.v1.FlightService.AddFlight:output_type -> trips.v1.AddFlightResponse
-	7,  // 16: trips.v1.FlightService.DeleteFlight:output_type -> trips.v1.DeleteFlightResponse
-	9,  // 17: trips.v1.FlightService.SyncFlight:output_type -> trips.v1.SyncFlightResponse
-	14, // [14:18] is the sub-list for method output_type
-	10, // [10:14] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	1,  // 10: trips.v1.UpdateFlightConfirmationResponse.flight:type_name -> trips.v1.Flight
+	2,  // 11: trips.v1.FlightService.ListFlights:input_type -> trips.v1.ListFlightsRequest
+	4,  // 12: trips.v1.FlightService.AddFlight:input_type -> trips.v1.AddFlightRequest
+	6,  // 13: trips.v1.FlightService.DeleteFlight:input_type -> trips.v1.DeleteFlightRequest
+	8,  // 14: trips.v1.FlightService.SyncFlight:input_type -> trips.v1.SyncFlightRequest
+	10, // 15: trips.v1.FlightService.UpdateFlightConfirmation:input_type -> trips.v1.UpdateFlightConfirmationRequest
+	3,  // 16: trips.v1.FlightService.ListFlights:output_type -> trips.v1.ListFlightsResponse
+	5,  // 17: trips.v1.FlightService.AddFlight:output_type -> trips.v1.AddFlightResponse
+	7,  // 18: trips.v1.FlightService.DeleteFlight:output_type -> trips.v1.DeleteFlightResponse
+	9,  // 19: trips.v1.FlightService.SyncFlight:output_type -> trips.v1.SyncFlightResponse
+	11, // 20: trips.v1.FlightService.UpdateFlightConfirmation:output_type -> trips.v1.UpdateFlightConfirmationResponse
+	16, // [16:21] is the sub-list for method output_type
+	11, // [11:16] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_trips_v1_flight_proto_init() }
@@ -736,7 +894,7 @@ func file_trips_v1_flight_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_trips_v1_flight_proto_rawDesc), len(file_trips_v1_flight_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

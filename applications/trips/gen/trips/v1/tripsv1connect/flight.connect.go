@@ -44,6 +44,9 @@ const (
 	// FlightServiceSyncFlightProcedure is the fully-qualified name of the FlightService's SyncFlight
 	// RPC.
 	FlightServiceSyncFlightProcedure = "/trips.v1.FlightService/SyncFlight"
+	// FlightServiceUpdateFlightConfirmationProcedure is the fully-qualified name of the FlightService's
+	// UpdateFlightConfirmation RPC.
+	FlightServiceUpdateFlightConfirmationProcedure = "/trips.v1.FlightService/UpdateFlightConfirmation"
 )
 
 // FlightServiceClient is a client for the trips.v1.FlightService service.
@@ -52,6 +55,7 @@ type FlightServiceClient interface {
 	AddFlight(context.Context, *connect.Request[v1.AddFlightRequest]) (*connect.Response[v1.AddFlightResponse], error)
 	DeleteFlight(context.Context, *connect.Request[v1.DeleteFlightRequest]) (*connect.Response[v1.DeleteFlightResponse], error)
 	SyncFlight(context.Context, *connect.Request[v1.SyncFlightRequest]) (*connect.Response[v1.SyncFlightResponse], error)
+	UpdateFlightConfirmation(context.Context, *connect.Request[v1.UpdateFlightConfirmationRequest]) (*connect.Response[v1.UpdateFlightConfirmationResponse], error)
 }
 
 // NewFlightServiceClient constructs a client for the trips.v1.FlightService service. By default, it
@@ -89,15 +93,22 @@ func NewFlightServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(flightServiceMethods.ByName("SyncFlight")),
 			connect.WithClientOptions(opts...),
 		),
+		updateFlightConfirmation: connect.NewClient[v1.UpdateFlightConfirmationRequest, v1.UpdateFlightConfirmationResponse](
+			httpClient,
+			baseURL+FlightServiceUpdateFlightConfirmationProcedure,
+			connect.WithSchema(flightServiceMethods.ByName("UpdateFlightConfirmation")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // flightServiceClient implements FlightServiceClient.
 type flightServiceClient struct {
-	listFlights  *connect.Client[v1.ListFlightsRequest, v1.ListFlightsResponse]
-	addFlight    *connect.Client[v1.AddFlightRequest, v1.AddFlightResponse]
-	deleteFlight *connect.Client[v1.DeleteFlightRequest, v1.DeleteFlightResponse]
-	syncFlight   *connect.Client[v1.SyncFlightRequest, v1.SyncFlightResponse]
+	listFlights              *connect.Client[v1.ListFlightsRequest, v1.ListFlightsResponse]
+	addFlight                *connect.Client[v1.AddFlightRequest, v1.AddFlightResponse]
+	deleteFlight             *connect.Client[v1.DeleteFlightRequest, v1.DeleteFlightResponse]
+	syncFlight               *connect.Client[v1.SyncFlightRequest, v1.SyncFlightResponse]
+	updateFlightConfirmation *connect.Client[v1.UpdateFlightConfirmationRequest, v1.UpdateFlightConfirmationResponse]
 }
 
 // ListFlights calls trips.v1.FlightService.ListFlights.
@@ -120,12 +131,18 @@ func (c *flightServiceClient) SyncFlight(ctx context.Context, req *connect.Reque
 	return c.syncFlight.CallUnary(ctx, req)
 }
 
+// UpdateFlightConfirmation calls trips.v1.FlightService.UpdateFlightConfirmation.
+func (c *flightServiceClient) UpdateFlightConfirmation(ctx context.Context, req *connect.Request[v1.UpdateFlightConfirmationRequest]) (*connect.Response[v1.UpdateFlightConfirmationResponse], error) {
+	return c.updateFlightConfirmation.CallUnary(ctx, req)
+}
+
 // FlightServiceHandler is an implementation of the trips.v1.FlightService service.
 type FlightServiceHandler interface {
 	ListFlights(context.Context, *connect.Request[v1.ListFlightsRequest]) (*connect.Response[v1.ListFlightsResponse], error)
 	AddFlight(context.Context, *connect.Request[v1.AddFlightRequest]) (*connect.Response[v1.AddFlightResponse], error)
 	DeleteFlight(context.Context, *connect.Request[v1.DeleteFlightRequest]) (*connect.Response[v1.DeleteFlightResponse], error)
 	SyncFlight(context.Context, *connect.Request[v1.SyncFlightRequest]) (*connect.Response[v1.SyncFlightResponse], error)
+	UpdateFlightConfirmation(context.Context, *connect.Request[v1.UpdateFlightConfirmationRequest]) (*connect.Response[v1.UpdateFlightConfirmationResponse], error)
 }
 
 // NewFlightServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -159,6 +176,12 @@ func NewFlightServiceHandler(svc FlightServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(flightServiceMethods.ByName("SyncFlight")),
 		connect.WithHandlerOptions(opts...),
 	)
+	flightServiceUpdateFlightConfirmationHandler := connect.NewUnaryHandler(
+		FlightServiceUpdateFlightConfirmationProcedure,
+		svc.UpdateFlightConfirmation,
+		connect.WithSchema(flightServiceMethods.ByName("UpdateFlightConfirmation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/trips.v1.FlightService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case FlightServiceListFlightsProcedure:
@@ -169,6 +192,8 @@ func NewFlightServiceHandler(svc FlightServiceHandler, opts ...connect.HandlerOp
 			flightServiceDeleteFlightHandler.ServeHTTP(w, r)
 		case FlightServiceSyncFlightProcedure:
 			flightServiceSyncFlightHandler.ServeHTTP(w, r)
+		case FlightServiceUpdateFlightConfirmationProcedure:
+			flightServiceUpdateFlightConfirmationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -192,4 +217,8 @@ func (UnimplementedFlightServiceHandler) DeleteFlight(context.Context, *connect.
 
 func (UnimplementedFlightServiceHandler) SyncFlight(context.Context, *connect.Request[v1.SyncFlightRequest]) (*connect.Response[v1.SyncFlightResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("trips.v1.FlightService.SyncFlight is not implemented"))
+}
+
+func (UnimplementedFlightServiceHandler) UpdateFlightConfirmation(context.Context, *connect.Request[v1.UpdateFlightConfirmationRequest]) (*connect.Response[v1.UpdateFlightConfirmationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("trips.v1.FlightService.UpdateFlightConfirmation is not implemented"))
 }

@@ -16,10 +16,57 @@ export function useAddFlight(tripId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ flightNumber, date }: { flightNumber: string; date: string }) => {
-      const res = await flightClient.addFlight({ tripId, flightNumber, date });
+    mutationFn: async ({
+      flightNumber,
+      date,
+      confirmationLink,
+      bookingNumber,
+    }: {
+      flightNumber: string;
+      date: string;
+      confirmationLink?: string;
+      bookingNumber?: string;
+    }) => {
+      const res = await flightClient.addFlight({
+        tripId,
+        flightNumber,
+        date,
+        confirmationLink,
+        bookingNumber,
+      });
       if (!res.flight) {
         throw new Error("AddFlight response did not include a flight");
+      }
+      return res.flight;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: flightsQueryKey(tripId) });
+    },
+  });
+}
+
+export function useUpdateFlightConfirmation(tripId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      confirmationLink,
+      bookingNumber,
+    }: {
+      id: string;
+      confirmationLink: string;
+      bookingNumber: string;
+    }) => {
+      const res = await flightClient.updateFlightConfirmation({
+        id,
+        confirmationLink,
+        bookingNumber,
+      });
+      if (!res.flight) {
+        throw new Error(
+          "UpdateFlightConfirmation response did not include a flight",
+        );
       }
       return res.flight;
     },

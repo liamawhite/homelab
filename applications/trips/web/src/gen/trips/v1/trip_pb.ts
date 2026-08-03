@@ -2,8 +2,16 @@
 // @generated from file trips/v1/trip.proto (package trips.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -11,8 +19,12 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file trips/v1/trip.proto.
  */
-export const file_trips_v1_trip: GenFile = /*@__PURE__*/
-  fileDesc("ChN0cmlwcy92MS90cmlwLnByb3RvEgh0cmlwcy52MSJQCgRUcmlwEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiEgoQTGlzdFRyaXBzUmVxdWVzdCIyChFMaXN0VHJpcHNSZXNwb25zZRIdCgV0cmlwcxgBIAMoCzIOLnRyaXBzLnYxLlRyaXAiIQoRQ3JlYXRlVHJpcFJlcXVlc3QSDAoEbmFtZRgBIAEoCSIyChJDcmVhdGVUcmlwUmVzcG9uc2USHAoEdHJpcBgBIAEoCzIOLnRyaXBzLnYxLlRyaXAiHwoRRGVsZXRlVHJpcFJlcXVlc3QSCgoCaWQYASABKAkiFAoSRGVsZXRlVHJpcFJlc3BvbnNlMuUBCgtUcmlwU2VydmljZRJECglMaXN0VHJpcHMSGi50cmlwcy52MS5MaXN0VHJpcHNSZXF1ZXN0GhsudHJpcHMudjEuTGlzdFRyaXBzUmVzcG9uc2USRwoKQ3JlYXRlVHJpcBIbLnRyaXBzLnYxLkNyZWF0ZVRyaXBSZXF1ZXN0GhwudHJpcHMudjEuQ3JlYXRlVHJpcFJlc3BvbnNlEkcKCkRlbGV0ZVRyaXASGy50cmlwcy52MS5EZWxldGVUcmlwUmVxdWVzdBocLnRyaXBzLnYxLkRlbGV0ZVRyaXBSZXNwb25zZUIyWjBnaXRodWIuY29tL2xpYW1hd2hpdGUvdHJpcHMvZ2VuL3RyaXBzL3YxO3RyaXBzdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+export const file_trips_v1_trip: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "ChN0cmlwcy92MS90cmlwLnByb3RvEgh0cmlwcy52MSJQCgRUcmlwEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiEgoQTGlzdFRyaXBzUmVxdWVzdCIyChFMaXN0VHJpcHNSZXNwb25zZRIdCgV0cmlwcxgBIAMoCzIOLnRyaXBzLnYxLlRyaXAiIQoRQ3JlYXRlVHJpcFJlcXVlc3QSDAoEbmFtZRgBIAEoCSIyChJDcmVhdGVUcmlwUmVzcG9uc2USHAoEdHJpcBgBIAEoCzIOLnRyaXBzLnYxLlRyaXAiHwoRRGVsZXRlVHJpcFJlcXVlc3QSCgoCaWQYASABKAkiFAoSRGVsZXRlVHJpcFJlc3BvbnNlMuUBCgtUcmlwU2VydmljZRJECglMaXN0VHJpcHMSGi50cmlwcy52MS5MaXN0VHJpcHNSZXF1ZXN0GhsudHJpcHMudjEuTGlzdFRyaXBzUmVzcG9uc2USRwoKQ3JlYXRlVHJpcBIbLnRyaXBzLnYxLkNyZWF0ZVRyaXBSZXF1ZXN0GhwudHJpcHMudjEuQ3JlYXRlVHJpcFJlc3BvbnNlEkcKCkRlbGV0ZVRyaXASGy50cmlwcy52MS5EZWxldGVUcmlwUmVxdWVzdBocLnRyaXBzLnYxLkRlbGV0ZVRyaXBSZXNwb25zZUIyWjBnaXRodWIuY29tL2xpYW1hd2hpdGUvdHJpcHMvZ2VuL3RyaXBzL3YxO3RyaXBzdjFiBnByb3RvMw",
+    [file_google_protobuf_timestamp],
+  );
 
 /**
  * @generated from message trips.v1.Trip
@@ -38,20 +50,21 @@ export type Trip = Message<"trips.v1.Trip"> & {
  * Describes the message trips.v1.Trip.
  * Use `create(TripSchema)` to create a new message.
  */
-export const TripSchema: GenMessage<Trip> = /*@__PURE__*/
+export const TripSchema: GenMessage<Trip> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 0);
 
 /**
  * @generated from message trips.v1.ListTripsRequest
  */
-export type ListTripsRequest = Message<"trips.v1.ListTripsRequest"> & {
-};
+export type ListTripsRequest = Message<"trips.v1.ListTripsRequest"> & {};
 
 /**
  * Describes the message trips.v1.ListTripsRequest.
  * Use `create(ListTripsRequestSchema)` to create a new message.
  */
-export const ListTripsRequestSchema: GenMessage<ListTripsRequest> = /*@__PURE__*/
+export const ListTripsRequestSchema: GenMessage<ListTripsRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 1);
 
 /**
@@ -68,7 +81,8 @@ export type ListTripsResponse = Message<"trips.v1.ListTripsResponse"> & {
  * Describes the message trips.v1.ListTripsResponse.
  * Use `create(ListTripsResponseSchema)` to create a new message.
  */
-export const ListTripsResponseSchema: GenMessage<ListTripsResponse> = /*@__PURE__*/
+export const ListTripsResponseSchema: GenMessage<ListTripsResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 2);
 
 /**
@@ -85,7 +99,8 @@ export type CreateTripRequest = Message<"trips.v1.CreateTripRequest"> & {
  * Describes the message trips.v1.CreateTripRequest.
  * Use `create(CreateTripRequestSchema)` to create a new message.
  */
-export const CreateTripRequestSchema: GenMessage<CreateTripRequest> = /*@__PURE__*/
+export const CreateTripRequestSchema: GenMessage<CreateTripRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 3);
 
 /**
@@ -102,7 +117,8 @@ export type CreateTripResponse = Message<"trips.v1.CreateTripResponse"> & {
  * Describes the message trips.v1.CreateTripResponse.
  * Use `create(CreateTripResponseSchema)` to create a new message.
  */
-export const CreateTripResponseSchema: GenMessage<CreateTripResponse> = /*@__PURE__*/
+export const CreateTripResponseSchema: GenMessage<CreateTripResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 4);
 
 /**
@@ -119,20 +135,21 @@ export type DeleteTripRequest = Message<"trips.v1.DeleteTripRequest"> & {
  * Describes the message trips.v1.DeleteTripRequest.
  * Use `create(DeleteTripRequestSchema)` to create a new message.
  */
-export const DeleteTripRequestSchema: GenMessage<DeleteTripRequest> = /*@__PURE__*/
+export const DeleteTripRequestSchema: GenMessage<DeleteTripRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 5);
 
 /**
  * @generated from message trips.v1.DeleteTripResponse
  */
-export type DeleteTripResponse = Message<"trips.v1.DeleteTripResponse"> & {
-};
+export type DeleteTripResponse = Message<"trips.v1.DeleteTripResponse"> & {};
 
 /**
  * Describes the message trips.v1.DeleteTripResponse.
  * Use `create(DeleteTripResponseSchema)` to create a new message.
  */
-export const DeleteTripResponseSchema: GenMessage<DeleteTripResponse> = /*@__PURE__*/
+export const DeleteTripResponseSchema: GenMessage<DeleteTripResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_trip, 6);
 
 /**
@@ -146,7 +163,7 @@ export const TripService: GenService<{
     methodKind: "unary";
     input: typeof ListTripsRequestSchema;
     output: typeof ListTripsResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.TripService.CreateTrip
    */
@@ -154,7 +171,7 @@ export const TripService: GenService<{
     methodKind: "unary";
     input: typeof CreateTripRequestSchema;
     output: typeof CreateTripResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.TripService.DeleteTrip
    */
@@ -162,7 +179,5 @@ export const TripService: GenService<{
     methodKind: "unary";
     input: typeof DeleteTripRequestSchema;
     output: typeof DeleteTripResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_trips_v1_trip, 0);
-
+  };
+}> = /*@__PURE__*/ serviceDesc(file_trips_v1_trip, 0);

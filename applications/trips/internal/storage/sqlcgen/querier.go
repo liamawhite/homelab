@@ -11,9 +11,11 @@ import (
 type Querier interface {
 	CreateAccommodation(ctx context.Context, arg CreateAccommodationParams) (Accommodation, error)
 	CreateFlight(ctx context.Context, arg CreateFlightParams) (Flight, error)
+	CreateItineraryItem(ctx context.Context, arg CreateItineraryItemParams) (ItineraryItem, error)
 	CreateTrip(ctx context.Context, arg CreateTripParams) (Trip, error)
 	DeleteAccommodation(ctx context.Context, id string) (int64, error)
 	DeleteFlight(ctx context.Context, id string) (int64, error)
+	DeleteItineraryItem(ctx context.Context, id string) (int64, error)
 	DeleteTrip(ctx context.Context, id string) (int64, error)
 	GetFlight(ctx context.Context, id string) (Flight, error)
 	ListAccommodationsByTrip(ctx context.Context, tripID string) ([]Accommodation, error)
@@ -23,7 +25,14 @@ type Querier interface {
 	// and storage/flights.go converts those to sqlcgen.Flight via a plain Go
 	// struct conversion, which requires matching field order.
 	ListFlightsByTrip(ctx context.Context, tripID string) ([]Flight, error)
+	// Column order in every SELECT/RETURNING list below matches the
+	// itinerary_items table's physical column order (i.e. sqlcgen.ItineraryItem's
+	// field order) - see the note above the flights queries for why.
+	ListItineraryItemsByTrip(ctx context.Context, tripID string) ([]ItineraryItem, error)
 	ListTrips(ctx context.Context) ([]Trip, error)
+	ScheduleItineraryItem(ctx context.Context, arg ScheduleItineraryItemParams) (ItineraryItem, error)
+	UpdateAccommodationConfirmation(ctx context.Context, arg UpdateAccommodationConfirmationParams) (Accommodation, error)
+	UpdateFlightConfirmation(ctx context.Context, arg UpdateFlightConfirmationParams) (Flight, error)
 	UpdateFlightSyncError(ctx context.Context, arg UpdateFlightSyncErrorParams) (Flight, error)
 	UpdateFlightSyncResult(ctx context.Context, arg UpdateFlightSyncResultParams) (Flight, error)
 }

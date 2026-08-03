@@ -137,6 +137,11 @@ type TripsArgs struct {
 	// empty value just means cmd/trips/main.go's own empty-check disables
 	// sync at runtime rather than this component skipping any resources.
 	FlightAPIKey pulumi.StringInput
+
+	// GooglePlacesAPIKey is infraCfg.GooglePlaces.APIKey - the Google
+	// Places API (New) key trips uses to resolve itinerary item locations.
+	// Same "always wired, may be empty" convention as FlightAPIKey.
+	GooglePlacesAPIKey pulumi.StringInput
 }
 
 // NewTrips builds the trips image, provisions its PVC, and deploys it behind
@@ -212,9 +217,29 @@ func NewTrips(ctx *pulumi.Context, name string, args *TripsArgs, opts ...pulumi.
 		return nil, err
 	}
 
+	// 3b. Secret carrying the Google Places API key, same shape/rationale
+	// as the flight-api Secret above - it needs its own mount path since a
+	// second Secret volume can't share the flight-api Secret's mount
+	// directory.
+	googlePlacesAPISecret, err := corev1.NewSecret(ctx, fmt.Sprintf("%s-places-api-secret", name), &corev1.SecretArgs{
+		Metadata: &metav1.ObjectMetaArgs{
+			Name:      pulumi.String("google-places-api-credentials"),
+			Namespace: args.Namespace,
+		},
+		Type: pulumi.String("Opaque"),
+		StringData: pulumi.StringMap{
+			"api-key": args.GooglePlacesAPIKey,
+		},
+	}, localOpts...)
+	if err != nil {
+		return nil, err
+	}
+
 	const dataVolumeName = "data"
 	const flightAPIVolumeName = "flight-api-key"
 	const flightAPIMountPath = "/etc/trips"
+	const googlePlacesAPIVolumeName = "google-places-api-key"
+	const googlePlacesAPIMountPath = "/etc/trips/places"
 
 	// 4. Deploy the backend. Strategy is Recreate, not the default
 	// RollingUpdate: with a single-replica ReadWriteOnce PVC, RollingUpdate
@@ -254,6 +279,10 @@ func NewTrips(ctx *pulumi.Context, name string, args *TripsArgs, opts ...pulumi.
 									Name:  pulumi.String("FLIGHT_API_KEY_FILE"),
 									Value: pulumi.String(flightAPIMountPath + "/api-key"),
 								},
+								&corev1.EnvVarArgs{
+									Name:  pulumi.String("GOOGLE_PLACES_API_KEY_FILE"),
+									Value: pulumi.String(googlePlacesAPIMountPath + "/api-key"),
+								},
 							},
 							Ports: corev1.ContainerPortArray{
 								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(tripsPort)},
@@ -266,6 +295,11 @@ func NewTrips(ctx *pulumi.Context, name string, args *TripsArgs, opts ...pulumi.
 								&corev1.VolumeMountArgs{
 									Name:      pulumi.String(flightAPIVolumeName),
 									MountPath: pulumi.String(flightAPIMountPath),
+									ReadOnly:  pulumi.Bool(true),
+								},
+								&corev1.VolumeMountArgs{
+									Name:      pulumi.String(googlePlacesAPIVolumeName),
+									MountPath: pulumi.String(googlePlacesAPIMountPath),
 									ReadOnly:  pulumi.Bool(true),
 								},
 							},
@@ -294,11 +328,17 @@ func NewTrips(ctx *pulumi.Context, name string, args *TripsArgs, opts ...pulumi.
 								SecretName: flightAPISecret.Metadata.Name().Elem(),
 							},
 						},
+						&corev1.VolumeArgs{
+							Name: pulumi.String(googlePlacesAPIVolumeName),
+							Secret: &corev1.SecretVolumeSourceArgs{
+								SecretName: googlePlacesAPISecret.Metadata.Name().Elem(),
+							},
+						},
 					},
 				},
 			},
 		},
-	}, append(append([]pulumi.ResourceOption{}, imageOpts...), pulumi.DependsOn([]pulumi.Resource{pvc, flightAPISecret}))...)
+	}, append(append([]pulumi.ResourceOption{}, imageOpts...), pulumi.DependsOn([]pulumi.Resource{pvc, flightAPISecret, googlePlacesAPISecret}))...)
 	if err != nil {
 		return nil, err
 	}

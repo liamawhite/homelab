@@ -27,6 +27,10 @@ type Accommodation struct {
 	CheckIn   string
 	CheckOut  string
 	CreatedAt time.Time
+	// ConfirmationLink/BookingNumber are optional booking details set by
+	// the user.
+	ConfirmationLink string
+	BookingNumber    string
 }
 
 // Accommodations is the repository for the accommodations table, backed by
@@ -66,18 +70,40 @@ func (a *Accommodations) ByTrip(ctx context.Context, tripID string) ([]Accommoda
 }
 
 // Create inserts a new accommodation with a generated ID and returns it.
-func (a *Accommodations) Create(ctx context.Context, tripID, name, location, checkIn, checkOut string) (Accommodation, error) {
+// confirmationLink/bookingNumber may be empty - see UpdateConfirmation to
+// set them later.
+func (a *Accommodations) Create(ctx context.Context, tripID, name, location, checkIn, checkOut, confirmationLink, bookingNumber string) (Accommodation, error) {
 	row, err := a.q.CreateAccommodation(ctx, sqlcgen.CreateAccommodationParams{
-		ID:        uuid.NewString(),
-		TripID:    tripID,
-		Name:      name,
-		Location:  location,
-		CheckIn:   checkIn,
-		CheckOut:  checkOut,
-		CreatedAt: time.Now().UTC().Format(time.RFC3339Nano),
+		ID:               uuid.NewString(),
+		TripID:           tripID,
+		Name:             name,
+		Location:         location,
+		CheckIn:          checkIn,
+		CheckOut:         checkOut,
+		CreatedAt:        time.Now().UTC().Format(time.RFC3339Nano),
+		ConfirmationLink: confirmationLink,
+		BookingNumber:    bookingNumber,
 	})
 	if err != nil {
 		return Accommodation{}, fmt.Errorf("creating accommodation: %w", err)
+	}
+
+	return accommodationFromRow(sqlcgen.Accommodation(row))
+}
+
+// UpdateConfirmation sets the booking link/number on an existing
+// accommodation.
+func (a *Accommodations) UpdateConfirmation(ctx context.Context, id, confirmationLink, bookingNumber string) (Accommodation, error) {
+	row, err := a.q.UpdateAccommodationConfirmation(ctx, sqlcgen.UpdateAccommodationConfirmationParams{
+		ConfirmationLink: confirmationLink,
+		BookingNumber:    bookingNumber,
+		ID:               id,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Accommodation{}, ErrAccommodationNotFound
+		}
+		return Accommodation{}, fmt.Errorf("updating accommodation confirmation: %w", err)
 	}
 
 	return accommodationFromRow(sqlcgen.Accommodation(row))
@@ -104,12 +130,14 @@ func accommodationFromRow(row sqlcgen.Accommodation) (Accommodation, error) {
 	}
 
 	return Accommodation{
-		ID:        row.ID,
-		TripID:    row.TripID,
-		Name:      row.Name,
-		Location:  row.Location,
-		CheckIn:   row.CheckIn,
-		CheckOut:  row.CheckOut,
-		CreatedAt: createdAt,
+		ID:               row.ID,
+		TripID:           row.TripID,
+		Name:             row.Name,
+		Location:         row.Location,
+		CheckIn:          row.CheckIn,
+		CheckOut:         row.CheckOut,
+		CreatedAt:        createdAt,
+		ConfirmationLink: row.ConfirmationLink,
+		BookingNumber:    row.BookingNumber,
 	}, nil
 }

@@ -10,7 +10,10 @@ const tripsQueryKey = ["trips"];
 // no particular order (see queries.sql's ListTrips). Most recently created
 // trip first.
 function compareTrips(a: Trip, b: Trip): number {
-  return (b.createdAt ? timestampMs(b.createdAt) : 0) - (a.createdAt ? timestampMs(a.createdAt) : 0);
+  return (
+    (b.createdAt ? timestampMs(b.createdAt) : 0) -
+    (a.createdAt ? timestampMs(a.createdAt) : 0)
+  );
 }
 
 export function useTrips() {

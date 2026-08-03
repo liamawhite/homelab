@@ -328,6 +328,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			GHCRUsername:               infraCfg.GHCR.Username,
 			GHCRToken:                  infraCfg.GHCR.Token,
 			FlightAPIKey:               pulumi.String(infraCfg.FlightData.APIKey),
+			GooglePlacesAPIKey:         pulumi.String(infraCfg.GooglePlaces.APIKey),
 		}, pulumi.Provider(providers.Kubernetes),
 			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, tripsNS, tsOperator, storage}),
 		)

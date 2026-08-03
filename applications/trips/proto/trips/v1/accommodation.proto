@@ -16,6 +16,11 @@ message Accommodation {
   // YYYY-MM-DD.
   string check_out = 6;
   google.protobuf.Timestamp created_at = 7;
+  // Optional link to the booking (e.g. the hotel's confirmation/manage-
+  // booking page).
+  string confirmation_link = 8;
+  // Optional booking/confirmation code.
+  string booking_number = 9;
 }
 
 message ListAccommodationsRequest {
@@ -32,6 +37,9 @@ message AddAccommodationRequest {
   string location = 3;
   string check_in = 4;
   string check_out = 5;
+  // Optional - see Accommodation.confirmation_link/booking_number.
+  string confirmation_link = 6;
+  string booking_number = 7;
 }
 
 message AddAccommodationResponse {
@@ -44,8 +52,19 @@ message DeleteAccommodationRequest {
 
 message DeleteAccommodationResponse {}
 
+message UpdateAccommodationConfirmationRequest {
+  string id = 1;
+  string confirmation_link = 2;
+  string booking_number = 3;
+}
+
+message UpdateAccommodationConfirmationResponse {
+  Accommodation accommodation = 1;
+}
+
 service AccommodationService {
   rpc ListAccommodations(ListAccommodationsRequest) returns (ListAccommodationsResponse);
   rpc AddAccommodation(AddAccommodationRequest) returns (AddAccommodationResponse);
   rpc DeleteAccommodation(DeleteAccommodationRequest) returns (DeleteAccommodationResponse);
+  rpc UpdateAccommodationConfirmation(UpdateAccommodationConfirmationRequest) returns (UpdateAccommodationConfirmationResponse);
 }

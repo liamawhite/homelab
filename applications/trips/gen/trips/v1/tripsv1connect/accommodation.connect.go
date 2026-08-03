@@ -42,6 +42,9 @@ const (
 	// AccommodationServiceDeleteAccommodationProcedure is the fully-qualified name of the
 	// AccommodationService's DeleteAccommodation RPC.
 	AccommodationServiceDeleteAccommodationProcedure = "/trips.v1.AccommodationService/DeleteAccommodation"
+	// AccommodationServiceUpdateAccommodationConfirmationProcedure is the fully-qualified name of the
+	// AccommodationService's UpdateAccommodationConfirmation RPC.
+	AccommodationServiceUpdateAccommodationConfirmationProcedure = "/trips.v1.AccommodationService/UpdateAccommodationConfirmation"
 )
 
 // AccommodationServiceClient is a client for the trips.v1.AccommodationService service.
@@ -49,6 +52,7 @@ type AccommodationServiceClient interface {
 	ListAccommodations(context.Context, *connect.Request[v1.ListAccommodationsRequest]) (*connect.Response[v1.ListAccommodationsResponse], error)
 	AddAccommodation(context.Context, *connect.Request[v1.AddAccommodationRequest]) (*connect.Response[v1.AddAccommodationResponse], error)
 	DeleteAccommodation(context.Context, *connect.Request[v1.DeleteAccommodationRequest]) (*connect.Response[v1.DeleteAccommodationResponse], error)
+	UpdateAccommodationConfirmation(context.Context, *connect.Request[v1.UpdateAccommodationConfirmationRequest]) (*connect.Response[v1.UpdateAccommodationConfirmationResponse], error)
 }
 
 // NewAccommodationServiceClient constructs a client for the trips.v1.AccommodationService service.
@@ -80,14 +84,21 @@ func NewAccommodationServiceClient(httpClient connect.HTTPClient, baseURL string
 			connect.WithSchema(accommodationServiceMethods.ByName("DeleteAccommodation")),
 			connect.WithClientOptions(opts...),
 		),
+		updateAccommodationConfirmation: connect.NewClient[v1.UpdateAccommodationConfirmationRequest, v1.UpdateAccommodationConfirmationResponse](
+			httpClient,
+			baseURL+AccommodationServiceUpdateAccommodationConfirmationProcedure,
+			connect.WithSchema(accommodationServiceMethods.ByName("UpdateAccommodationConfirmation")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // accommodationServiceClient implements AccommodationServiceClient.
 type accommodationServiceClient struct {
-	listAccommodations  *connect.Client[v1.ListAccommodationsRequest, v1.ListAccommodationsResponse]
-	addAccommodation    *connect.Client[v1.AddAccommodationRequest, v1.AddAccommodationResponse]
-	deleteAccommodation *connect.Client[v1.DeleteAccommodationRequest, v1.DeleteAccommodationResponse]
+	listAccommodations              *connect.Client[v1.ListAccommodationsRequest, v1.ListAccommodationsResponse]
+	addAccommodation                *connect.Client[v1.AddAccommodationRequest, v1.AddAccommodationResponse]
+	deleteAccommodation             *connect.Client[v1.DeleteAccommodationRequest, v1.DeleteAccommodationResponse]
+	updateAccommodationConfirmation *connect.Client[v1.UpdateAccommodationConfirmationRequest, v1.UpdateAccommodationConfirmationResponse]
 }
 
 // ListAccommodations calls trips.v1.AccommodationService.ListAccommodations.
@@ -105,11 +116,18 @@ func (c *accommodationServiceClient) DeleteAccommodation(ctx context.Context, re
 	return c.deleteAccommodation.CallUnary(ctx, req)
 }
 
+// UpdateAccommodationConfirmation calls
+// trips.v1.AccommodationService.UpdateAccommodationConfirmation.
+func (c *accommodationServiceClient) UpdateAccommodationConfirmation(ctx context.Context, req *connect.Request[v1.UpdateAccommodationConfirmationRequest]) (*connect.Response[v1.UpdateAccommodationConfirmationResponse], error) {
+	return c.updateAccommodationConfirmation.CallUnary(ctx, req)
+}
+
 // AccommodationServiceHandler is an implementation of the trips.v1.AccommodationService service.
 type AccommodationServiceHandler interface {
 	ListAccommodations(context.Context, *connect.Request[v1.ListAccommodationsRequest]) (*connect.Response[v1.ListAccommodationsResponse], error)
 	AddAccommodation(context.Context, *connect.Request[v1.AddAccommodationRequest]) (*connect.Response[v1.AddAccommodationResponse], error)
 	DeleteAccommodation(context.Context, *connect.Request[v1.DeleteAccommodationRequest]) (*connect.Response[v1.DeleteAccommodationResponse], error)
+	UpdateAccommodationConfirmation(context.Context, *connect.Request[v1.UpdateAccommodationConfirmationRequest]) (*connect.Response[v1.UpdateAccommodationConfirmationResponse], error)
 }
 
 // NewAccommodationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -137,6 +155,12 @@ func NewAccommodationServiceHandler(svc AccommodationServiceHandler, opts ...con
 		connect.WithSchema(accommodationServiceMethods.ByName("DeleteAccommodation")),
 		connect.WithHandlerOptions(opts...),
 	)
+	accommodationServiceUpdateAccommodationConfirmationHandler := connect.NewUnaryHandler(
+		AccommodationServiceUpdateAccommodationConfirmationProcedure,
+		svc.UpdateAccommodationConfirmation,
+		connect.WithSchema(accommodationServiceMethods.ByName("UpdateAccommodationConfirmation")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/trips.v1.AccommodationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AccommodationServiceListAccommodationsProcedure:
@@ -145,6 +169,8 @@ func NewAccommodationServiceHandler(svc AccommodationServiceHandler, opts ...con
 			accommodationServiceAddAccommodationHandler.ServeHTTP(w, r)
 		case AccommodationServiceDeleteAccommodationProcedure:
 			accommodationServiceDeleteAccommodationHandler.ServeHTTP(w, r)
+		case AccommodationServiceUpdateAccommodationConfirmationProcedure:
+			accommodationServiceUpdateAccommodationConfirmationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -164,4 +190,8 @@ func (UnimplementedAccommodationServiceHandler) AddAccommodation(context.Context
 
 func (UnimplementedAccommodationServiceHandler) DeleteAccommodation(context.Context, *connect.Request[v1.DeleteAccommodationRequest]) (*connect.Response[v1.DeleteAccommodationResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("trips.v1.AccommodationService.DeleteAccommodation is not implemented"))
+}
+
+func (UnimplementedAccommodationServiceHandler) UpdateAccommodationConfirmation(context.Context, *connect.Request[v1.UpdateAccommodationConfirmationRequest]) (*connect.Response[v1.UpdateAccommodationConfirmationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("trips.v1.AccommodationService.UpdateAccommodationConfirmation is not implemented"))
 }

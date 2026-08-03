@@ -4,16 +4,26 @@ import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { ArrowLeft, RefreshCw, Trash2 } from "lucide-react";
 
 import { useTrips, useDeleteTrip } from "@/lib/trips";
-import { useFlights, useAddFlight, useDeleteFlight, useSyncFlight } from "@/lib/flights";
+import {
+  useFlights,
+  useAddFlight,
+  useDeleteFlight,
+  useSyncFlight,
+  useUpdateFlightConfirmation,
+} from "@/lib/flights";
 import {
   useAccommodations,
   useAddAccommodation,
   useDeleteAccommodation,
+  useUpdateAccommodationConfirmation,
 } from "@/lib/accommodations";
 import { FlightStatus, type Flight } from "@/gen/trips/v1/flight_pb";
-import { relativeTime } from "@/lib/time";
+import { relativeTime, formatDate } from "@/lib/time";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmationCell } from "@/components/ConfirmationCell";
+import { MapsLink } from "@/components/MapsLink";
+import { ItinerarySection } from "@/components/itinerary/ItinerarySection";
 import {
   Table,
   TableBody,
@@ -51,30 +61,22 @@ function formatTime(ts?: Timestamp, timeZone?: string) {
   });
 }
 
-// dateStr is a plain YYYY-MM-DD calendar date (no time/zone) - parsed via
-// explicit local-Date components rather than `new Date(dateStr)` (which
-// parses as UTC midnight and can display as the previous day in negative
-// UTC-offset zones).
-function formatDate(dateStr: string) {
-  if (!dateStr) return "—";
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 export function TripDetailPage() {
   const { tripId } = useParams({ from: "/trips/$tripId" });
   const { data: trips, isLoading } = useTrips();
   const deleteTrip = useDeleteTrip();
   const navigate = useNavigate();
 
-  const { data: flights, isLoading: flightsLoading, isError: flightsError, error: flightsErrorObj } = useFlights(tripId);
+  const {
+    data: flights,
+    isLoading: flightsLoading,
+    isError: flightsError,
+    error: flightsErrorObj,
+  } = useFlights(tripId);
   const addFlight = useAddFlight(tripId);
   const deleteFlight = useDeleteFlight(tripId);
   const syncFlight = useSyncFlight(tripId);
+  const updateFlightConfirmation = useUpdateFlightConfirmation(tripId);
   const [flightNumber, setFlightNumber] = useState("");
   const [flightDate, setFlightDate] = useState("");
 
@@ -86,6 +88,8 @@ export function TripDetailPage() {
   } = useAccommodations(tripId);
   const addAccommodation = useAddAccommodation(tripId);
   const deleteAccommodation = useDeleteAccommodation(tripId);
+  const updateAccommodationConfirmation =
+    useUpdateAccommodationConfirmation(tripId);
   const [accommodationName, setAccommodationName] = useState("");
   const [accommodationLocation, setAccommodationLocation] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -119,7 +123,12 @@ export function TripDetailPage() {
     const trimmedName = accommodationName.trim();
     if (!trimmedName || !checkIn || !checkOut) return;
     addAccommodation.mutate(
-      { name: trimmedName, location: accommodationLocation.trim(), checkIn, checkOut },
+      {
+        name: trimmedName,
+        location: accommodationLocation.trim(),
+        checkIn,
+        checkOut,
+      },
       {
         onSuccess: () => {
           setAccommodationName("");
@@ -140,7 +149,9 @@ export function TripDetailPage() {
       </Link>
 
       {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-      {!isLoading && !trip && <p className="text-sm text-muted-foreground">Trip not found.</p>}
+      {!isLoading && !trip && (
+        <p className="text-sm text-muted-foreground">Trip not found.</p>
+      )}
 
       {trip && (
         <div className="flex flex-col gap-6">
@@ -158,10 +169,15 @@ export function TripDetailPage() {
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Created {trip.createdAt ? relativeTime(timestampDate(trip.createdAt)) : "unknown"}
+              Created{" "}
+              {trip.createdAt
+                ? relativeTime(timestampDate(trip.createdAt))
+                : "unknown"}
             </p>
             {deleteTrip.isError && (
-              <p className="text-sm text-destructive">{deleteTrip.error.message}</p>
+              <p className="text-sm text-destructive">
+                {deleteTrip.error.message}
+              </p>
             )}
           </div>
 
@@ -185,15 +201,21 @@ export function TripDetailPage() {
               />
               <Button
                 onClick={handleAddFlight}
-                disabled={addFlight.isPending || !flightNumber.trim() || !flightDate}
+                disabled={
+                  addFlight.isPending || !flightNumber.trim() || !flightDate
+                }
               >
                 Add flight
               </Button>
             </div>
 
-            {flightsLoading && <p className="text-sm text-muted-foreground">Loading flights…</p>}
+            {flightsLoading && (
+              <p className="text-sm text-muted-foreground">Loading flights…</p>
+            )}
             {flightsError && (
-              <p className="text-sm text-destructive">{flightsErrorObj.message}</p>
+              <p className="text-sm text-destructive">
+                {flightsErrorObj.message}
+              </p>
             )}
 
             {flights && flights.length > 0 && (
@@ -205,17 +227,34 @@ export function TripDetailPage() {
                     <TableHead>Departs</TableHead>
                     <TableHead>Arrives</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Confirmation</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {flights.map((flight) => (
                     <TableRow key={flight.id}>
-                      <TableCell className="font-medium">{flight.flightNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {flight.flightNumber}
+                      </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {flight.departureAirport && flight.arrivalAirport
-                          ? `${flight.departureAirport} → ${flight.arrivalAirport}`
-                          : "—"}
+                        {flight.departureAirport && flight.arrivalAirport ? (
+                          <div className="flex items-center gap-1">
+                            <span>{flight.departureAirport}</span>
+                            <MapsLink
+                              query={`${flight.departureAirport} Airport`}
+                              label=""
+                            />
+                            <span>→</span>
+                            <span>{flight.arrivalAirport}</span>
+                            <MapsLink
+                              query={`${flight.arrivalAirport} Airport`}
+                              label=""
+                            />
+                          </div>
+                        ) : (
+                          "—"
+                        )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {formatTime(
@@ -240,6 +279,20 @@ export function TripDetailPage() {
                         >
                           {syncedSubtext(flight)}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        <ConfirmationCell
+                          confirmationLink={flight.confirmationLink}
+                          bookingNumber={flight.bookingNumber}
+                          isSaving={updateFlightConfirmation.isPending}
+                          onSave={(confirmationLink, bookingNumber) =>
+                            updateFlightConfirmation.mutate({
+                              id: flight.id,
+                              confirmationLink,
+                              bookingNumber,
+                            })
+                          }
+                        />
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -270,13 +323,19 @@ export function TripDetailPage() {
               <p className="text-sm text-muted-foreground">No flights yet.</p>
             )}
             {addFlight.isError && (
-              <p className="text-sm text-destructive">{addFlight.error.message}</p>
+              <p className="text-sm text-destructive">
+                {addFlight.error.message}
+              </p>
             )}
             {deleteFlight.isError && (
-              <p className="text-sm text-destructive">{deleteFlight.error.message}</p>
+              <p className="text-sm text-destructive">
+                {deleteFlight.error.message}
+              </p>
             )}
             {syncFlight.isError && (
-              <p className="text-sm text-destructive">{syncFlight.error.message}</p>
+              <p className="text-sm text-destructive">
+                {syncFlight.error.message}
+              </p>
             )}
           </div>
 
@@ -328,10 +387,14 @@ export function TripDetailPage() {
             </div>
 
             {accommodationsLoading && (
-              <p className="text-sm text-muted-foreground">Loading accommodation…</p>
+              <p className="text-sm text-muted-foreground">
+                Loading accommodation…
+              </p>
             )}
             {accommodationsError && (
-              <p className="text-sm text-destructive">{accommodationsErrorObj.message}</p>
+              <p className="text-sm text-destructive">
+                {accommodationsErrorObj.message}
+              </p>
             )}
 
             {accommodations && accommodations.length > 0 && (
@@ -342,13 +405,16 @@ export function TripDetailPage() {
                     <TableHead>Location</TableHead>
                     <TableHead>Check-in</TableHead>
                     <TableHead>Check-out</TableHead>
+                    <TableHead>Confirmation</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {accommodations.map((accommodation) => (
                     <TableRow key={accommodation.id}>
-                      <TableCell className="font-medium">{accommodation.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {accommodation.name}
+                      </TableCell>
                       <TableCell className="text-muted-foreground">
                         {accommodation.location || "—"}
                       </TableCell>
@@ -358,13 +424,29 @@ export function TripDetailPage() {
                       <TableCell className="text-muted-foreground">
                         {formatDate(accommodation.checkOut)}
                       </TableCell>
+                      <TableCell>
+                        <ConfirmationCell
+                          confirmationLink={accommodation.confirmationLink}
+                          bookingNumber={accommodation.bookingNumber}
+                          isSaving={updateAccommodationConfirmation.isPending}
+                          onSave={(confirmationLink, bookingNumber) =>
+                            updateAccommodationConfirmation.mutate({
+                              id: accommodation.id,
+                              confirmationLink,
+                              bookingNumber,
+                            })
+                          }
+                        />
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           aria-label={`Delete ${accommodation.name}`}
                           disabled={deleteAccommodation.isPending}
-                          onClick={() => deleteAccommodation.mutate(accommodation.id)}
+                          onClick={() =>
+                            deleteAccommodation.mutate(accommodation.id)
+                          }
                         >
                           <Trash2 />
                         </Button>
@@ -374,15 +456,32 @@ export function TripDetailPage() {
                 </TableBody>
               </Table>
             )}
-            {!accommodationsLoading && accommodations && accommodations.length === 0 && (
-              <p className="text-sm text-muted-foreground">No accommodation yet.</p>
-            )}
+            {!accommodationsLoading &&
+              accommodations &&
+              accommodations.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No accommodation yet.
+                </p>
+              )}
             {addAccommodation.isError && (
-              <p className="text-sm text-destructive">{addAccommodation.error.message}</p>
+              <p className="text-sm text-destructive">
+                {addAccommodation.error.message}
+              </p>
             )}
             {deleteAccommodation.isError && (
-              <p className="text-sm text-destructive">{deleteAccommodation.error.message}</p>
+              <p className="text-sm text-destructive">
+                {deleteAccommodation.error.message}
+              </p>
             )}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h2 className="text-sm font-semibold">Itinerary</h2>
+            <ItinerarySection
+              tripId={tripId}
+              flights={flights ?? []}
+              accommodations={accommodations ?? []}
+            />
           </div>
         </div>
       )}

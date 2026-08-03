@@ -40,12 +40,17 @@ export function TripsPage() {
             if (e.key === "Enter") handleCreate();
           }}
         />
-        <Button onClick={handleCreate} disabled={createTrip.isPending || !name.trim()}>
+        <Button
+          onClick={handleCreate}
+          disabled={createTrip.isPending || !name.trim()}
+        >
           Add trip
         </Button>
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading trips…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading trips…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
 
       {trips && trips.length > 0 && (
@@ -62,11 +67,18 @@ export function TripsPage() {
               <TableRow
                 key={trip.id}
                 className="cursor-pointer"
-                onClick={() => navigate({ to: "/trips/$tripId", params: { tripId: trip.id } })}
+                onClick={() =>
+                  navigate({
+                    to: "/trips/$tripId",
+                    params: { tripId: trip.id },
+                  })
+                }
               >
                 <TableCell className="font-medium">{trip.name}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {trip.createdAt ? relativeTime(timestampDate(trip.createdAt)) : null}
+                  {trip.createdAt
+                    ? relativeTime(timestampDate(trip.createdAt))
+                    : null}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button

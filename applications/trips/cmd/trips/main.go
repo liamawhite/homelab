@@ -15,6 +15,8 @@ import (
 	"github.com/liamawhite/trips/internal/accommodationservice"
 	"github.com/liamawhite/trips/internal/flightdata"
 	"github.com/liamawhite/trips/internal/flightservice"
+	"github.com/liamawhite/trips/internal/itineraryservice"
+	"github.com/liamawhite/trips/internal/placesdata"
 	"github.com/liamawhite/trips/internal/server"
 	"github.com/liamawhite/trips/internal/storage"
 	"github.com/liamawhite/trips/internal/tripservice"
@@ -50,7 +52,13 @@ func run() error {
 
 	accommodations := accommodationservice.New(storage.NewAccommodations(db))
 
-	handler, err := server.New(trips, flights, accommodations)
+	placesClient, err := newPlacesClient()
+	if err != nil {
+		return err
+	}
+	itinerary := itineraryservice.New(storage.NewItineraryItems(db), placesClient)
+
+	handler, err := server.New(trips, flights, accommodations, itinerary)
 	if err != nil {
 		return err
 	}
@@ -125,4 +133,29 @@ func newFlightDataClient() (*flightdata.Client, error) {
 	}
 
 	return flightdata.NewClient(trimmed), nil
+}
+
+// newPlacesClient reads the Google Places API key from the path in
+// GOOGLE_PLACES_API_KEY_FILE (mounted from a Kubernetes Secret - see
+// pkg/deploy/applications/trips.go). Same "not an error, just disables the
+// feature" posture as newFlightDataClient - itinerary location search is
+// optional.
+func newPlacesClient() (*placesdata.Client, error) {
+	path := os.Getenv("GOOGLE_PLACES_API_KEY_FILE")
+	if path == "" {
+		log.Print("GOOGLE_PLACES_API_KEY_FILE not set, itinerary location search disabled")
+		return nil, nil
+	}
+
+	key, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	trimmed := strings.TrimSpace(string(key))
+	if trimmed == "" {
+		log.Print("Google Places API key file is empty, itinerary location search disabled")
+		return nil, nil
+	}
+
+	return placesdata.NewClient(trimmed), nil
 }

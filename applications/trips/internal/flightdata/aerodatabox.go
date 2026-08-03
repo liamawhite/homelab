@@ -105,7 +105,14 @@ type flightResult struct {
 // result is used, matching the common case of a single physical flight per
 // number per day.
 func (c *Client) FetchFlight(ctx context.Context, flightNumber, date string) (FlightData, error) {
-	url := fmt.Sprintf("%s/flights/number/%s/%s", c.baseURL, strings.TrimSpace(flightNumber), date)
+	// dateLocalRole=Departure pins date to the flight's local departure
+	// date at the origin airport. Without it, AeroDataBox defaults to
+	// "Both" (matches on either departure or arrival local date), which
+	// for an overnight flight can silently return the adjacent day's
+	// instance - e.g. querying the date the user means as "departs this
+	// evening" can instead return the instance that departed the evening
+	// before, landing on the queried date.
+	url := fmt.Sprintf("%s/flights/number/%s/%s?dateLocalRole=Departure", c.baseURL, strings.TrimSpace(flightNumber), date)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {

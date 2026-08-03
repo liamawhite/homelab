@@ -11,19 +11,21 @@ import (
 )
 
 const createAccommodation = `-- name: CreateAccommodation :one
-INSERT INTO accommodations (id, trip_id, name, location, check_in, check_out, created_at)
-VALUES (?, ?, ?, ?, ?, ?, ?)
-RETURNING id, trip_id, name, location, check_in, check_out, created_at
+INSERT INTO accommodations (id, trip_id, name, location, check_in, check_out, created_at, confirmation_link, booking_number)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id, trip_id, name, location, check_in, check_out, created_at, confirmation_link, booking_number
 `
 
 type CreateAccommodationParams struct {
-	ID        string
-	TripID    string
-	Name      string
-	Location  string
-	CheckIn   string
-	CheckOut  string
-	CreatedAt string
+	ID               string
+	TripID           string
+	Name             string
+	Location         string
+	CheckIn          string
+	CheckOut         string
+	CreatedAt        string
+	ConfirmationLink string
+	BookingNumber    string
 }
 
 func (q *Queries) CreateAccommodation(ctx context.Context, arg CreateAccommodationParams) (Accommodation, error) {
@@ -35,6 +37,8 @@ func (q *Queries) CreateAccommodation(ctx context.Context, arg CreateAccommodati
 		arg.CheckIn,
 		arg.CheckOut,
 		arg.CreatedAt,
+		arg.ConfirmationLink,
+		arg.BookingNumber,
 	)
 	var i Accommodation
 	err := row.Scan(
@@ -45,24 +49,29 @@ func (q *Queries) CreateAccommodation(ctx context.Context, arg CreateAccommodati
 		&i.CheckIn,
 		&i.CheckOut,
 		&i.CreatedAt,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
 	)
 	return i, err
 }
 
 const createFlight = `-- name: CreateFlight :one
-INSERT INTO flights (id, trip_id, flight_number, flight_date, created_at)
-VALUES (?, ?, ?, ?, ?)
+INSERT INTO flights (id, trip_id, flight_number, flight_date, created_at, confirmation_link, booking_number)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 RETURNING id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
           scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
-          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone
+          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+          confirmation_link, booking_number
 `
 
 type CreateFlightParams struct {
-	ID           string
-	TripID       string
-	FlightNumber string
-	FlightDate   string
-	CreatedAt    string
+	ID               string
+	TripID           string
+	FlightNumber     string
+	FlightDate       string
+	CreatedAt        string
+	ConfirmationLink string
+	BookingNumber    string
 }
 
 func (q *Queries) CreateFlight(ctx context.Context, arg CreateFlightParams) (Flight, error) {
@@ -72,6 +81,8 @@ func (q *Queries) CreateFlight(ctx context.Context, arg CreateFlightParams) (Fli
 		arg.FlightNumber,
 		arg.FlightDate,
 		arg.CreatedAt,
+		arg.ConfirmationLink,
+		arg.BookingNumber,
 	)
 	var i Flight
 	err := row.Scan(
@@ -91,6 +102,68 @@ func (q *Queries) CreateFlight(ctx context.Context, arg CreateFlightParams) (Fli
 		&i.CreatedAt,
 		&i.DepartureTimezone,
 		&i.ArrivalTimezone,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
+	)
+	return i, err
+}
+
+const createItineraryItem = `-- name: CreateItineraryItem :one
+INSERT INTO itinerary_items (id, trip_id, title, location, latitude, longitude, place_id, state, date, start_minute, end_minute, created_at, timezone, end_date)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id, trip_id, title, location, latitude, longitude, place_id, state, date, start_minute, end_minute, created_at, timezone, end_date
+`
+
+type CreateItineraryItemParams struct {
+	ID          string
+	TripID      string
+	Title       string
+	Location    string
+	Latitude    float64
+	Longitude   float64
+	PlaceID     string
+	State       string
+	Date        string
+	StartMinute int64
+	EndMinute   int64
+	CreatedAt   string
+	Timezone    string
+	EndDate     string
+}
+
+func (q *Queries) CreateItineraryItem(ctx context.Context, arg CreateItineraryItemParams) (ItineraryItem, error) {
+	row := q.db.QueryRowContext(ctx, createItineraryItem,
+		arg.ID,
+		arg.TripID,
+		arg.Title,
+		arg.Location,
+		arg.Latitude,
+		arg.Longitude,
+		arg.PlaceID,
+		arg.State,
+		arg.Date,
+		arg.StartMinute,
+		arg.EndMinute,
+		arg.CreatedAt,
+		arg.Timezone,
+		arg.EndDate,
+	)
+	var i ItineraryItem
+	err := row.Scan(
+		&i.ID,
+		&i.TripID,
+		&i.Title,
+		&i.Location,
+		&i.Latitude,
+		&i.Longitude,
+		&i.PlaceID,
+		&i.State,
+		&i.Date,
+		&i.StartMinute,
+		&i.EndMinute,
+		&i.CreatedAt,
+		&i.Timezone,
+		&i.EndDate,
 	)
 	return i, err
 }
@@ -136,6 +209,18 @@ func (q *Queries) DeleteFlight(ctx context.Context, id string) (int64, error) {
 	return result.RowsAffected()
 }
 
+const deleteItineraryItem = `-- name: DeleteItineraryItem :execrows
+DELETE FROM itinerary_items WHERE id = ?
+`
+
+func (q *Queries) DeleteItineraryItem(ctx context.Context, id string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteItineraryItem, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const deleteTrip = `-- name: DeleteTrip :execrows
 DELETE FROM trips WHERE id = ?
 `
@@ -151,7 +236,8 @@ func (q *Queries) DeleteTrip(ctx context.Context, id string) (int64, error) {
 const getFlight = `-- name: GetFlight :one
 SELECT id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
        scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
-       status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone
+       status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+       confirmation_link, booking_number
 FROM flights
 WHERE id = ?
 `
@@ -176,12 +262,14 @@ func (q *Queries) GetFlight(ctx context.Context, id string) (Flight, error) {
 		&i.CreatedAt,
 		&i.DepartureTimezone,
 		&i.ArrivalTimezone,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
 	)
 	return i, err
 }
 
 const listAccommodationsByTrip = `-- name: ListAccommodationsByTrip :many
-SELECT id, trip_id, name, location, check_in, check_out, created_at
+SELECT id, trip_id, name, location, check_in, check_out, created_at, confirmation_link, booking_number
 FROM accommodations
 WHERE trip_id = ?
 ORDER BY check_in ASC, created_at ASC
@@ -204,6 +292,8 @@ func (q *Queries) ListAccommodationsByTrip(ctx context.Context, tripID string) (
 			&i.CheckIn,
 			&i.CheckOut,
 			&i.CreatedAt,
+			&i.ConfirmationLink,
+			&i.BookingNumber,
 		); err != nil {
 			return nil, err
 		}
@@ -222,7 +312,8 @@ const listFlightsByTrip = `-- name: ListFlightsByTrip :many
 
 SELECT id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
        scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
-       status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone
+       status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+       confirmation_link, booking_number
 FROM flights
 WHERE trip_id = ?
 ORDER BY flight_date ASC, created_at ASC
@@ -259,6 +350,57 @@ func (q *Queries) ListFlightsByTrip(ctx context.Context, tripID string) ([]Fligh
 			&i.CreatedAt,
 			&i.DepartureTimezone,
 			&i.ArrivalTimezone,
+			&i.ConfirmationLink,
+			&i.BookingNumber,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listItineraryItemsByTrip = `-- name: ListItineraryItemsByTrip :many
+
+SELECT id, trip_id, title, location, latitude, longitude, place_id, state, date, start_minute, end_minute, created_at, timezone, end_date
+FROM itinerary_items
+WHERE trip_id = ?
+ORDER BY created_at ASC
+`
+
+// Column order in every SELECT/RETURNING list below matches the
+// itinerary_items table's physical column order (i.e. sqlcgen.ItineraryItem's
+// field order) - see the note above the flights queries for why.
+func (q *Queries) ListItineraryItemsByTrip(ctx context.Context, tripID string) ([]ItineraryItem, error) {
+	rows, err := q.db.QueryContext(ctx, listItineraryItemsByTrip, tripID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ItineraryItem
+	for rows.Next() {
+		var i ItineraryItem
+		if err := rows.Scan(
+			&i.ID,
+			&i.TripID,
+			&i.Title,
+			&i.Location,
+			&i.Latitude,
+			&i.Longitude,
+			&i.PlaceID,
+			&i.State,
+			&i.Date,
+			&i.StartMinute,
+			&i.EndMinute,
+			&i.CreatedAt,
+			&i.Timezone,
+			&i.EndDate,
 		); err != nil {
 			return nil, err
 		}
@@ -300,6 +442,132 @@ func (q *Queries) ListTrips(ctx context.Context) ([]Trip, error) {
 	return items, nil
 }
 
+const scheduleItineraryItem = `-- name: ScheduleItineraryItem :one
+UPDATE itinerary_items
+SET state        = ?,
+    date         = ?,
+    start_minute = ?,
+    end_minute   = ?,
+    timezone     = ?,
+    end_date     = ?
+WHERE id = ?
+RETURNING id, trip_id, title, location, latitude, longitude, place_id, state, date, start_minute, end_minute, created_at, timezone, end_date
+`
+
+type ScheduleItineraryItemParams struct {
+	State       string
+	Date        string
+	StartMinute int64
+	EndMinute   int64
+	Timezone    string
+	EndDate     string
+	ID          string
+}
+
+func (q *Queries) ScheduleItineraryItem(ctx context.Context, arg ScheduleItineraryItemParams) (ItineraryItem, error) {
+	row := q.db.QueryRowContext(ctx, scheduleItineraryItem,
+		arg.State,
+		arg.Date,
+		arg.StartMinute,
+		arg.EndMinute,
+		arg.Timezone,
+		arg.EndDate,
+		arg.ID,
+	)
+	var i ItineraryItem
+	err := row.Scan(
+		&i.ID,
+		&i.TripID,
+		&i.Title,
+		&i.Location,
+		&i.Latitude,
+		&i.Longitude,
+		&i.PlaceID,
+		&i.State,
+		&i.Date,
+		&i.StartMinute,
+		&i.EndMinute,
+		&i.CreatedAt,
+		&i.Timezone,
+		&i.EndDate,
+	)
+	return i, err
+}
+
+const updateAccommodationConfirmation = `-- name: UpdateAccommodationConfirmation :one
+UPDATE accommodations
+SET confirmation_link = ?,
+    booking_number     = ?
+WHERE id = ?
+RETURNING id, trip_id, name, location, check_in, check_out, created_at, confirmation_link, booking_number
+`
+
+type UpdateAccommodationConfirmationParams struct {
+	ConfirmationLink string
+	BookingNumber    string
+	ID               string
+}
+
+func (q *Queries) UpdateAccommodationConfirmation(ctx context.Context, arg UpdateAccommodationConfirmationParams) (Accommodation, error) {
+	row := q.db.QueryRowContext(ctx, updateAccommodationConfirmation, arg.ConfirmationLink, arg.BookingNumber, arg.ID)
+	var i Accommodation
+	err := row.Scan(
+		&i.ID,
+		&i.TripID,
+		&i.Name,
+		&i.Location,
+		&i.CheckIn,
+		&i.CheckOut,
+		&i.CreatedAt,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
+	)
+	return i, err
+}
+
+const updateFlightConfirmation = `-- name: UpdateFlightConfirmation :one
+UPDATE flights
+SET confirmation_link = ?,
+    booking_number     = ?
+WHERE id = ?
+RETURNING id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
+          scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
+          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+          confirmation_link, booking_number
+`
+
+type UpdateFlightConfirmationParams struct {
+	ConfirmationLink string
+	BookingNumber    string
+	ID               string
+}
+
+func (q *Queries) UpdateFlightConfirmation(ctx context.Context, arg UpdateFlightConfirmationParams) (Flight, error) {
+	row := q.db.QueryRowContext(ctx, updateFlightConfirmation, arg.ConfirmationLink, arg.BookingNumber, arg.ID)
+	var i Flight
+	err := row.Scan(
+		&i.ID,
+		&i.TripID,
+		&i.FlightNumber,
+		&i.FlightDate,
+		&i.DepartureAirport,
+		&i.ArrivalAirport,
+		&i.ScheduledDeparture,
+		&i.ScheduledArrival,
+		&i.ActualDeparture,
+		&i.ActualArrival,
+		&i.Status,
+		&i.LastSyncedAt,
+		&i.SyncError,
+		&i.CreatedAt,
+		&i.DepartureTimezone,
+		&i.ArrivalTimezone,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
+	)
+	return i, err
+}
+
 const updateFlightSyncError = `-- name: UpdateFlightSyncError :one
 UPDATE flights
 SET last_synced_at = ?,
@@ -307,7 +575,8 @@ SET last_synced_at = ?,
 WHERE id = ?
 RETURNING id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
           scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
-          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone
+          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+          confirmation_link, booking_number
 `
 
 type UpdateFlightSyncErrorParams struct {
@@ -336,6 +605,8 @@ func (q *Queries) UpdateFlightSyncError(ctx context.Context, arg UpdateFlightSyn
 		&i.CreatedAt,
 		&i.DepartureTimezone,
 		&i.ArrivalTimezone,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
 	)
 	return i, err
 }
@@ -356,7 +627,8 @@ SET departure_airport   = ?,
 WHERE id = ?
 RETURNING id, trip_id, flight_number, flight_date, departure_airport, arrival_airport,
           scheduled_departure, scheduled_arrival, actual_departure, actual_arrival,
-          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone
+          status, last_synced_at, sync_error, created_at, departure_timezone, arrival_timezone,
+          confirmation_link, booking_number
 `
 
 type UpdateFlightSyncResultParams struct {
@@ -407,6 +679,8 @@ func (q *Queries) UpdateFlightSyncResult(ctx context.Context, arg UpdateFlightSy
 		&i.CreatedAt,
 		&i.DepartureTimezone,
 		&i.ArrivalTimezone,
+		&i.ConfirmationLink,
+		&i.BookingNumber,
 	)
 	return i, err
 }

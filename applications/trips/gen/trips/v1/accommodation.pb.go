@@ -31,8 +31,13 @@ type Accommodation struct {
 	// YYYY-MM-DD.
 	CheckIn string `protobuf:"bytes,5,opt,name=check_in,json=checkIn,proto3" json:"check_in,omitempty"`
 	// YYYY-MM-DD.
-	CheckOut      string                 `protobuf:"bytes,6,opt,name=check_out,json=checkOut,proto3" json:"check_out,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CheckOut  string                 `protobuf:"bytes,6,opt,name=check_out,json=checkOut,proto3" json:"check_out,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// Optional link to the booking (e.g. the hotel's confirmation/manage-
+	// booking page).
+	ConfirmationLink string `protobuf:"bytes,8,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	// Optional booking/confirmation code.
+	BookingNumber string `protobuf:"bytes,9,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -114,6 +119,20 @@ func (x *Accommodation) GetCreatedAt() *timestamppb.Timestamp {
 		return x.CreatedAt
 	}
 	return nil
+}
+
+func (x *Accommodation) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *Accommodation) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
+	}
+	return ""
 }
 
 type ListAccommodationsRequest struct {
@@ -205,14 +224,17 @@ func (x *ListAccommodationsResponse) GetAccommodations() []*Accommodation {
 }
 
 type AddAccommodationRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TripId        string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Location      string                 `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
-	CheckIn       string                 `protobuf:"bytes,4,opt,name=check_in,json=checkIn,proto3" json:"check_in,omitempty"`
-	CheckOut      string                 `protobuf:"bytes,5,opt,name=check_out,json=checkOut,proto3" json:"check_out,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	TripId   string                 `protobuf:"bytes,1,opt,name=trip_id,json=tripId,proto3" json:"trip_id,omitempty"`
+	Name     string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Location string                 `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
+	CheckIn  string                 `protobuf:"bytes,4,opt,name=check_in,json=checkIn,proto3" json:"check_in,omitempty"`
+	CheckOut string                 `protobuf:"bytes,5,opt,name=check_out,json=checkOut,proto3" json:"check_out,omitempty"`
+	// Optional - see Accommodation.confirmation_link/booking_number.
+	ConfirmationLink string `protobuf:"bytes,6,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	BookingNumber    string `protobuf:"bytes,7,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *AddAccommodationRequest) Reset() {
@@ -276,6 +298,20 @@ func (x *AddAccommodationRequest) GetCheckIn() string {
 func (x *AddAccommodationRequest) GetCheckOut() string {
 	if x != nil {
 		return x.CheckOut
+	}
+	return ""
+}
+
+func (x *AddAccommodationRequest) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *AddAccommodationRequest) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
 	}
 	return ""
 }
@@ -404,11 +440,115 @@ func (*DeleteAccommodationResponse) Descriptor() ([]byte, []int) {
 	return file_trips_v1_accommodation_proto_rawDescGZIP(), []int{6}
 }
 
+type UpdateAccommodationConfirmationRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConfirmationLink string                 `protobuf:"bytes,2,opt,name=confirmation_link,json=confirmationLink,proto3" json:"confirmation_link,omitempty"`
+	BookingNumber    string                 `protobuf:"bytes,3,opt,name=booking_number,json=bookingNumber,proto3" json:"booking_number,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UpdateAccommodationConfirmationRequest) Reset() {
+	*x = UpdateAccommodationConfirmationRequest{}
+	mi := &file_trips_v1_accommodation_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAccommodationConfirmationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAccommodationConfirmationRequest) ProtoMessage() {}
+
+func (x *UpdateAccommodationConfirmationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_trips_v1_accommodation_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAccommodationConfirmationRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAccommodationConfirmationRequest) Descriptor() ([]byte, []int) {
+	return file_trips_v1_accommodation_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UpdateAccommodationConfirmationRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateAccommodationConfirmationRequest) GetConfirmationLink() string {
+	if x != nil {
+		return x.ConfirmationLink
+	}
+	return ""
+}
+
+func (x *UpdateAccommodationConfirmationRequest) GetBookingNumber() string {
+	if x != nil {
+		return x.BookingNumber
+	}
+	return ""
+}
+
+type UpdateAccommodationConfirmationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Accommodation *Accommodation         `protobuf:"bytes,1,opt,name=accommodation,proto3" json:"accommodation,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAccommodationConfirmationResponse) Reset() {
+	*x = UpdateAccommodationConfirmationResponse{}
+	mi := &file_trips_v1_accommodation_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAccommodationConfirmationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAccommodationConfirmationResponse) ProtoMessage() {}
+
+func (x *UpdateAccommodationConfirmationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_trips_v1_accommodation_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAccommodationConfirmationResponse.ProtoReflect.Descriptor instead.
+func (*UpdateAccommodationConfirmationResponse) Descriptor() ([]byte, []int) {
+	return file_trips_v1_accommodation_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateAccommodationConfirmationResponse) GetAccommodation() *Accommodation {
+	if x != nil {
+		return x.Accommodation
+	}
+	return nil
+}
+
 var File_trips_v1_accommodation_proto protoreflect.FileDescriptor
 
 const file_trips_v1_accommodation_proto_rawDesc = "" +
 	"\n" +
-	"\x1ctrips/v1/accommodation.proto\x12\btrips.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xdb\x01\n" +
+	"\x1ctrips/v1/accommodation.proto\x12\btrips.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaf\x02\n" +
 	"\rAccommodation\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\atrip_id\x18\x02 \x01(\tR\x06tripId\x12\x12\n" +
@@ -417,26 +557,37 @@ const file_trips_v1_accommodation_proto_rawDesc = "" +
 	"\bcheck_in\x18\x05 \x01(\tR\acheckIn\x12\x1b\n" +
 	"\tcheck_out\x18\x06 \x01(\tR\bcheckOut\x129\n" +
 	"\n" +
-	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"4\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12+\n" +
+	"\x11confirmation_link\x18\b \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\t \x01(\tR\rbookingNumber\"4\n" +
 	"\x19ListAccommodationsRequest\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\"]\n" +
 	"\x1aListAccommodationsResponse\x12?\n" +
-	"\x0eaccommodations\x18\x01 \x03(\v2\x17.trips.v1.AccommodationR\x0eaccommodations\"\x9a\x01\n" +
+	"\x0eaccommodations\x18\x01 \x03(\v2\x17.trips.v1.AccommodationR\x0eaccommodations\"\xee\x01\n" +
 	"\x17AddAccommodationRequest\x12\x17\n" +
 	"\atrip_id\x18\x01 \x01(\tR\x06tripId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\blocation\x18\x03 \x01(\tR\blocation\x12\x19\n" +
 	"\bcheck_in\x18\x04 \x01(\tR\acheckIn\x12\x1b\n" +
-	"\tcheck_out\x18\x05 \x01(\tR\bcheckOut\"Y\n" +
+	"\tcheck_out\x18\x05 \x01(\tR\bcheckOut\x12+\n" +
+	"\x11confirmation_link\x18\x06 \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\a \x01(\tR\rbookingNumber\"Y\n" +
 	"\x18AddAccommodationResponse\x12=\n" +
 	"\raccommodation\x18\x01 \x01(\v2\x17.trips.v1.AccommodationR\raccommodation\",\n" +
 	"\x1aDeleteAccommodationRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x1d\n" +
-	"\x1bDeleteAccommodationResponse2\xb6\x02\n" +
+	"\x1bDeleteAccommodationResponse\"\x8c\x01\n" +
+	"&UpdateAccommodationConfirmationRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12+\n" +
+	"\x11confirmation_link\x18\x02 \x01(\tR\x10confirmationLink\x12%\n" +
+	"\x0ebooking_number\x18\x03 \x01(\tR\rbookingNumber\"h\n" +
+	"'UpdateAccommodationConfirmationResponse\x12=\n" +
+	"\raccommodation\x18\x01 \x01(\v2\x17.trips.v1.AccommodationR\raccommodation2\xbf\x03\n" +
 	"\x14AccommodationService\x12_\n" +
 	"\x12ListAccommodations\x12#.trips.v1.ListAccommodationsRequest\x1a$.trips.v1.ListAccommodationsResponse\x12Y\n" +
 	"\x10AddAccommodation\x12!.trips.v1.AddAccommodationRequest\x1a\".trips.v1.AddAccommodationResponse\x12b\n" +
-	"\x13DeleteAccommodation\x12$.trips.v1.DeleteAccommodationRequest\x1a%.trips.v1.DeleteAccommodationResponseB2Z0github.com/liamawhite/trips/gen/trips/v1;tripsv1b\x06proto3"
+	"\x13DeleteAccommodation\x12$.trips.v1.DeleteAccommodationRequest\x1a%.trips.v1.DeleteAccommodationResponse\x12\x86\x01\n" +
+	"\x1fUpdateAccommodationConfirmation\x120.trips.v1.UpdateAccommodationConfirmationRequest\x1a1.trips.v1.UpdateAccommodationConfirmationResponseB2Z0github.com/liamawhite/trips/gen/trips/v1;tripsv1b\x06proto3"
 
 var (
 	file_trips_v1_accommodation_proto_rawDescOnce sync.Once
@@ -450,32 +601,37 @@ func file_trips_v1_accommodation_proto_rawDescGZIP() []byte {
 	return file_trips_v1_accommodation_proto_rawDescData
 }
 
-var file_trips_v1_accommodation_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_trips_v1_accommodation_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_trips_v1_accommodation_proto_goTypes = []any{
-	(*Accommodation)(nil),               // 0: trips.v1.Accommodation
-	(*ListAccommodationsRequest)(nil),   // 1: trips.v1.ListAccommodationsRequest
-	(*ListAccommodationsResponse)(nil),  // 2: trips.v1.ListAccommodationsResponse
-	(*AddAccommodationRequest)(nil),     // 3: trips.v1.AddAccommodationRequest
-	(*AddAccommodationResponse)(nil),    // 4: trips.v1.AddAccommodationResponse
-	(*DeleteAccommodationRequest)(nil),  // 5: trips.v1.DeleteAccommodationRequest
-	(*DeleteAccommodationResponse)(nil), // 6: trips.v1.DeleteAccommodationResponse
-	(*timestamppb.Timestamp)(nil),       // 7: google.protobuf.Timestamp
+	(*Accommodation)(nil),                           // 0: trips.v1.Accommodation
+	(*ListAccommodationsRequest)(nil),               // 1: trips.v1.ListAccommodationsRequest
+	(*ListAccommodationsResponse)(nil),              // 2: trips.v1.ListAccommodationsResponse
+	(*AddAccommodationRequest)(nil),                 // 3: trips.v1.AddAccommodationRequest
+	(*AddAccommodationResponse)(nil),                // 4: trips.v1.AddAccommodationResponse
+	(*DeleteAccommodationRequest)(nil),              // 5: trips.v1.DeleteAccommodationRequest
+	(*DeleteAccommodationResponse)(nil),             // 6: trips.v1.DeleteAccommodationResponse
+	(*UpdateAccommodationConfirmationRequest)(nil),  // 7: trips.v1.UpdateAccommodationConfirmationRequest
+	(*UpdateAccommodationConfirmationResponse)(nil), // 8: trips.v1.UpdateAccommodationConfirmationResponse
+	(*timestamppb.Timestamp)(nil),                   // 9: google.protobuf.Timestamp
 }
 var file_trips_v1_accommodation_proto_depIdxs = []int32{
-	7, // 0: trips.v1.Accommodation.created_at:type_name -> google.protobuf.Timestamp
+	9, // 0: trips.v1.Accommodation.created_at:type_name -> google.protobuf.Timestamp
 	0, // 1: trips.v1.ListAccommodationsResponse.accommodations:type_name -> trips.v1.Accommodation
 	0, // 2: trips.v1.AddAccommodationResponse.accommodation:type_name -> trips.v1.Accommodation
-	1, // 3: trips.v1.AccommodationService.ListAccommodations:input_type -> trips.v1.ListAccommodationsRequest
-	3, // 4: trips.v1.AccommodationService.AddAccommodation:input_type -> trips.v1.AddAccommodationRequest
-	5, // 5: trips.v1.AccommodationService.DeleteAccommodation:input_type -> trips.v1.DeleteAccommodationRequest
-	2, // 6: trips.v1.AccommodationService.ListAccommodations:output_type -> trips.v1.ListAccommodationsResponse
-	4, // 7: trips.v1.AccommodationService.AddAccommodation:output_type -> trips.v1.AddAccommodationResponse
-	6, // 8: trips.v1.AccommodationService.DeleteAccommodation:output_type -> trips.v1.DeleteAccommodationResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	0, // 3: trips.v1.UpdateAccommodationConfirmationResponse.accommodation:type_name -> trips.v1.Accommodation
+	1, // 4: trips.v1.AccommodationService.ListAccommodations:input_type -> trips.v1.ListAccommodationsRequest
+	3, // 5: trips.v1.AccommodationService.AddAccommodation:input_type -> trips.v1.AddAccommodationRequest
+	5, // 6: trips.v1.AccommodationService.DeleteAccommodation:input_type -> trips.v1.DeleteAccommodationRequest
+	7, // 7: trips.v1.AccommodationService.UpdateAccommodationConfirmation:input_type -> trips.v1.UpdateAccommodationConfirmationRequest
+	2, // 8: trips.v1.AccommodationService.ListAccommodations:output_type -> trips.v1.ListAccommodationsResponse
+	4, // 9: trips.v1.AccommodationService.AddAccommodation:output_type -> trips.v1.AddAccommodationResponse
+	6, // 10: trips.v1.AccommodationService.DeleteAccommodation:output_type -> trips.v1.DeleteAccommodationResponse
+	8, // 11: trips.v1.AccommodationService.UpdateAccommodationConfirmation:output_type -> trips.v1.UpdateAccommodationConfirmationResponse
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_trips_v1_accommodation_proto_init() }
@@ -489,7 +645,7 @@ func file_trips_v1_accommodation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_trips_v1_accommodation_proto_rawDesc), len(file_trips_v1_accommodation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

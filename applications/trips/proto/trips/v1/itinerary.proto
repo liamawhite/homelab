@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package trips.v1;
+
+option go_package = "github.com/liamawhite/trips/gen/trips/v1;tripsv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum ItineraryItemState {
+  ITINERARY_ITEM_STATE_UNSPECIFIED = 0;
+  ITINERARY_ITEM_STATE_UNSCHEDULED = 1;
+  ITINERARY_ITEM_STATE_ALL_DAY = 2;
+  ITINERARY_ITEM_STATE_TIMED = 3;
+}
+
+message ItineraryItem {
+  string id = 1;
+  string trip_id = 2;
+  string title = 3;
+  // The four fields below are all empty/zero together when no location was
+  // set - they're resolved server-side from place_id via Google Places
+  // Details at creation time (see AddItineraryItem), never entered as raw
+  // text by the client.
+  string location = 4;
+  double latitude = 5;
+  double longitude = 6;
+  string place_id = 7;
+  ItineraryItemState state = 8;
+  // YYYY-MM-DD, empty when state == UNSCHEDULED.
+  string date = 9;
+  // Minutes since midnight (0-1439) on `date`. Only meaningful when
+  // state == TIMED.
+  int32 start_minute = 10;
+  // Minutes since midnight (0-1440) on `end_date`. Only meaningful when
+  // state == TIMED.
+  int32 end_minute = 11;
+  google.protobuf.Timestamp created_at = 12;
+  // IANA zone name (e.g. "Europe/London") - set at creation (see
+  // AddItineraryItemRequest.timezone) and editable afterwards via
+  // ScheduleItineraryItem. Rendering-only: it labels what zone
+  // date/start_minute/end_minute's wall-clock values were entered in, it
+  // never converts them - changing it relabels the item without moving it
+  // on the calendar.
+  string timezone = 13;
+  // YYYY-MM-DD, empty when state == UNSCHEDULED, otherwise always set
+  // (equal to `date` for a single-day item). Must be >= date. Lets an
+  // ALL_DAY or TIMED item span multiple calendar days, e.g. a reception
+  // that runs from 1pm one day to 1am the next.
+  string end_date = 14;
+}
+
+message ListItineraryItemsRequest {
+  string trip_id = 1;
+}
+
+message ListItineraryItemsResponse {
+  repeated ItineraryItem itinerary_items = 1;
+}
+
+message AddItineraryItemRequest {
+  string trip_id = 1;
+  string title = 2;
+  // Optional - a place_id returned by SearchLocations. If set,
+  // AddItineraryItem resolves it server-side into location/latitude/
+  // longitude via Google Places Details before storing the item.
+  string place_id = 3;
+  // Required - an IANA zone name. The client defaults this from the
+  // calendar's timezone dropdown - see ItineraryItem.timezone.
+  string timezone = 4;
+}
+
+message AddItineraryItemResponse {
+  ItineraryItem itinerary_item = 1;
+}
+
+message DeleteItineraryItemRequest {
+  string id = 1;
+}
+
+message DeleteItineraryItemResponse {}
+
+message LocationCandidate {
+  string place_id = 1;
+  // Human-readable label for the search dropdown.
+  string description = 2;
+}
+
+message SearchLocationsRequest {
+  string query = 1;
+}
+
+message SearchLocationsResponse {
+  repeated LocationCandidate candidates = 1;
+}
+
+// ScheduleItineraryItem is the single mutation for every placement change:
+// drag-onto-calendar, move, resize, and drag-back-to-backlog (unschedule).
+// One RPC because state/date/start_minute/end_minute are one cohesive
+// concern with cross-field invariants (see service.go) rather than
+// independent fields - splitting into Move/Resize/Unschedule RPCs would
+// just duplicate that validation four times.
+message ScheduleItineraryItemRequest {
+  string id = 1;
+  ItineraryItemState state = 2;
+  // Required unless state == UNSCHEDULED.
+  string date = 3;
+  // Required and only validated when state == TIMED; end_minute must be
+  // greater than start_minute when end_date == date (see
+  // ItineraryItem.end_date's doc comment for the multi-day case).
+  int32 start_minute = 4;
+  int32 end_minute = 5;
+  // Required - an IANA zone name. See ItineraryItem.timezone; unlike
+  // title/location this is editable after creation.
+  string timezone = 6;
+  // Required unless state == UNSCHEDULED; defaults to `date` (a
+  // single-day item) if left equal to date. See ItineraryItem.end_date.
+  string end_date = 7;
+}
+
+message ScheduleItineraryItemResponse {
+  ItineraryItem itinerary_item = 1;
+}
+
+service ItineraryService {
+  rpc ListItineraryItems(ListItineraryItemsRequest) returns (ListItineraryItemsResponse);
+  rpc AddItineraryItem(AddItineraryItemRequest) returns (AddItineraryItemResponse);
+  rpc ScheduleItineraryItem(ScheduleItineraryItemRequest) returns (ScheduleItineraryItemResponse);
+  rpc DeleteItineraryItem(DeleteItineraryItemRequest) returns (DeleteItineraryItemResponse);
+  rpc SearchLocations(SearchLocationsRequest) returns (SearchLocationsResponse);
+}

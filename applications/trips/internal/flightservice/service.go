@@ -66,6 +66,8 @@ func (s *Service) AddFlight(ctx context.Context, req *connect.Request[v1.AddFlig
 	tripID := strings.TrimSpace(req.Msg.GetTripId())
 	flightNumber := strings.ToUpper(strings.TrimSpace(req.Msg.GetFlightNumber()))
 	date := strings.TrimSpace(req.Msg.GetDate())
+	confirmationLink := strings.TrimSpace(req.Msg.GetConfirmationLink())
+	bookingNumber := strings.TrimSpace(req.Msg.GetBookingNumber())
 
 	if tripID == "" {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("trip_id must not be empty"))
@@ -77,7 +79,7 @@ func (s *Service) AddFlight(ctx context.Context, req *connect.Request[v1.AddFlig
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("date must not be empty"))
 	}
 
-	flight, err := s.flights.Create(ctx, tripID, flightNumber, date)
+	flight, err := s.flights.Create(ctx, tripID, flightNumber, date, confirmationLink, bookingNumber)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -150,6 +152,26 @@ func (s *Service) SyncFlight(ctx context.Context, req *connect.Request[v1.SyncFl
 	return connect.NewResponse(&v1.SyncFlightResponse{Flight: toProto(synced)}), nil
 }
 
+// UpdateFlightConfirmation sets or clears a flight's booking link/number -
+// the only fields on a flight the user can edit directly after creation
+// (everything else is either immutable or sync-derived).
+func (s *Service) UpdateFlightConfirmation(ctx context.Context, req *connect.Request[v1.UpdateFlightConfirmationRequest]) (*connect.Response[v1.UpdateFlightConfirmationResponse], error) {
+	id := strings.TrimSpace(req.Msg.GetId())
+	if id == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id must not be empty"))
+	}
+
+	flight, err := s.flights.UpdateConfirmation(ctx, id, strings.TrimSpace(req.Msg.GetConfirmationLink()), strings.TrimSpace(req.Msg.GetBookingNumber()))
+	if err != nil {
+		if errors.Is(err, storage.ErrFlightNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&v1.UpdateFlightConfirmationResponse{Flight: toProto(flight)}), nil
+}
+
 func toProto(flight storage.Flight) *v1.Flight {
 	return &v1.Flight{
 		Id:                 flight.ID,
@@ -168,6 +190,8 @@ func toProto(flight storage.Flight) *v1.Flight {
 		LastSyncedAt:       timeToProto(flight.LastSyncedAt),
 		SyncError:          flight.SyncError,
 		CreatedAt:          timestamppb.New(flight.CreatedAt),
+		ConfirmationLink:   flight.ConfirmationLink,
+		BookingNumber:      flight.BookingNumber,
 	}
 }
 

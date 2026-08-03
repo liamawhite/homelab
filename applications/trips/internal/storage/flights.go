@@ -35,6 +35,10 @@ type Flight struct {
 	LastSyncedAt       *time.Time
 	SyncError          string
 	CreatedAt          time.Time
+	// ConfirmationLink/BookingNumber are optional booking details set by
+	// the user (not fetched from AeroDataBox).
+	ConfirmationLink string
+	BookingNumber    string
 }
 
 // FlightSyncResult carries the fields a successful external fetch updates.
@@ -101,14 +105,17 @@ func (f *Flights) Get(ctx context.Context, id string) (Flight, error) {
 // Create inserts a new flight with a generated ID. Every sync-derived field
 // starts empty/unset - the caller is expected to follow up with a
 // UpdateSyncResult/UpdateSyncError call once it has (attempted to) fetch
-// live data.
-func (f *Flights) Create(ctx context.Context, tripID, flightNumber, date string) (Flight, error) {
+// live data. confirmationLink/bookingNumber may be empty - see
+// UpdateConfirmation to set them later.
+func (f *Flights) Create(ctx context.Context, tripID, flightNumber, date, confirmationLink, bookingNumber string) (Flight, error) {
 	row, err := f.q.CreateFlight(ctx, sqlcgen.CreateFlightParams{
-		ID:           uuid.NewString(),
-		TripID:       tripID,
-		FlightNumber: flightNumber,
-		FlightDate:   date,
-		CreatedAt:    time.Now().UTC().Format(time.RFC3339Nano),
+		ID:               uuid.NewString(),
+		TripID:           tripID,
+		FlightNumber:     flightNumber,
+		FlightDate:       date,
+		CreatedAt:        time.Now().UTC().Format(time.RFC3339Nano),
+		ConfirmationLink: confirmationLink,
+		BookingNumber:    bookingNumber,
 	})
 	if err != nil {
 		return Flight{}, fmt.Errorf("creating flight: %w", err)
@@ -180,6 +187,23 @@ func (f *Flights) UpdateSyncError(ctx context.Context, id, syncErr string) (Flig
 	return flightFromRow(sqlcgen.Flight(row))
 }
 
+// UpdateConfirmation sets the booking link/number on an existing flight.
+func (f *Flights) UpdateConfirmation(ctx context.Context, id, confirmationLink, bookingNumber string) (Flight, error) {
+	row, err := f.q.UpdateFlightConfirmation(ctx, sqlcgen.UpdateFlightConfirmationParams{
+		ConfirmationLink: confirmationLink,
+		BookingNumber:    bookingNumber,
+		ID:               id,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return Flight{}, ErrFlightNotFound
+		}
+		return Flight{}, fmt.Errorf("updating flight confirmation: %w", err)
+	}
+
+	return flightFromRow(sqlcgen.Flight(row))
+}
+
 func timeToNullString(t *time.Time) sql.NullString {
 	if t == nil {
 		return sql.NullString{}
@@ -242,5 +266,7 @@ func flightFromRow(row sqlcgen.Flight) (Flight, error) {
 		LastSyncedAt:       lastSyncedAt,
 		SyncError:          row.SyncError,
 		CreatedAt:          createdAt,
+		ConfirmationLink:   row.ConfirmationLink,
+		BookingNumber:      row.BookingNumber,
 	}, nil
 }

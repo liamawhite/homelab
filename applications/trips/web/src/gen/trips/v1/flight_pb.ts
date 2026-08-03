@@ -2,8 +2,18 @@
 // @generated from file trips/v1/flight.proto (package trips.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type {
+  GenEnum,
+  GenFile,
+  GenMessage,
+  GenService,
+} from "@bufbuild/protobuf/codegenv2";
+import {
+  enumDesc,
+  fileDesc,
+  messageDesc,
+  serviceDesc,
+} from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -11,8 +21,12 @@ import type { Message } from "@bufbuild/protobuf";
 /**
  * Describes the file trips/v1/flight.proto.
  */
-export const file_trips_v1_flight: GenFile = /*@__PURE__*/
-  fileDesc("ChV0cmlwcy92MS9mbGlnaHQucHJvdG8SCHRyaXBzLnYxIq4ECgZGbGlnaHQSCgoCaWQYASABKAkSDwoHdHJpcF9pZBgCIAEoCRIVCg1mbGlnaHRfbnVtYmVyGAMgASgJEgwKBGRhdGUYBCABKAkSGQoRZGVwYXJ0dXJlX2FpcnBvcnQYBSABKAkSFwoPYXJyaXZhbF9haXJwb3J0GAYgASgJEhoKEmRlcGFydHVyZV90aW1lem9uZRgPIAEoCRIYChBhcnJpdmFsX3RpbWV6b25lGBAgASgJEjcKE3NjaGVkdWxlZF9kZXBhcnR1cmUYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjUKEXNjaGVkdWxlZF9hcnJpdmFsGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI0ChBhY3R1YWxfZGVwYXJ0dXJlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIyCg5hY3R1YWxfYXJyaXZhbBgKIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJgoGc3RhdHVzGAsgASgOMhYudHJpcHMudjEuRmxpZ2h0U3RhdHVzEjIKDmxhc3Rfc3luY2VkX2F0GAwgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgpzeW5jX2Vycm9yGA0gASgJEi4KCmNyZWF0ZWRfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIiUKEkxpc3RGbGlnaHRzUmVxdWVzdBIPCgd0cmlwX2lkGAEgASgJIjgKE0xpc3RGbGlnaHRzUmVzcG9uc2USIQoHZmxpZ2h0cxgBIAMoCzIQLnRyaXBzLnYxLkZsaWdodCJIChBBZGRGbGlnaHRSZXF1ZXN0Eg8KB3RyaXBfaWQYASABKAkSFQoNZmxpZ2h0X251bWJlchgCIAEoCRIMCgRkYXRlGAMgASgJIjUKEUFkZEZsaWdodFJlc3BvbnNlEiAKBmZsaWdodBgBIAEoCzIQLnRyaXBzLnYxLkZsaWdodCIhChNEZWxldGVGbGlnaHRSZXF1ZXN0EgoKAmlkGAEgASgJIhYKFERlbGV0ZUZsaWdodFJlc3BvbnNlIh8KEVN5bmNGbGlnaHRSZXF1ZXN0EgoKAmlkGAEgASgJIjYKElN5bmNGbGlnaHRSZXNwb25zZRIgCgZmbGlnaHQYASABKAsyEC50cmlwcy52MS5GbGlnaHQq0gEKDEZsaWdodFN0YXR1cxIdChlGTElHSFRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASGwoXRkxJR0hUX1NUQVRVU19TQ0hFRFVMRUQQARIYChRGTElHSFRfU1RBVFVTX0FDVElWRRACEhgKFEZMSUdIVF9TVEFUVVNfTEFOREVEEAMSGwoXRkxJR0hUX1NUQVRVU19DQU5DRUxMRUQQBBIaChZGTElHSFRfU1RBVFVTX0RJVkVSVEVEEAUSGQoVRkxJR0hUX1NUQVRVU19VTktOT1dOEAYyuQIKDUZsaWdodFNlcnZpY2USSgoLTGlzdEZsaWdodHMSHC50cmlwcy52MS5MaXN0RmxpZ2h0c1JlcXVlc3QaHS50cmlwcy52MS5MaXN0RmxpZ2h0c1Jlc3BvbnNlEkQKCUFkZEZsaWdodBIaLnRyaXBzLnYxLkFkZEZsaWdodFJlcXVlc3QaGy50cmlwcy52MS5BZGRGbGlnaHRSZXNwb25zZRJNCgxEZWxldGVGbGlnaHQSHS50cmlwcy52MS5EZWxldGVGbGlnaHRSZXF1ZXN0Gh4udHJpcHMudjEuRGVsZXRlRmxpZ2h0UmVzcG9uc2USRwoKU3luY0ZsaWdodBIbLnRyaXBzLnYxLlN5bmNGbGlnaHRSZXF1ZXN0GhwudHJpcHMudjEuU3luY0ZsaWdodFJlc3BvbnNlQjJaMGdpdGh1Yi5jb20vbGlhbWF3aGl0ZS90cmlwcy9nZW4vdHJpcHMvdjE7dHJpcHN2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_trips_v1_flight: GenFile =
+  /*@__PURE__*/
+  fileDesc(
+    "ChV0cmlwcy92MS9mbGlnaHQucHJvdG8SCHRyaXBzLnYxIuEECgZGbGlnaHQSCgoCaWQYASABKAkSDwoHdHJpcF9pZBgCIAEoCRIVCg1mbGlnaHRfbnVtYmVyGAMgASgJEgwKBGRhdGUYBCABKAkSGQoRZGVwYXJ0dXJlX2FpcnBvcnQYBSABKAkSFwoPYXJyaXZhbF9haXJwb3J0GAYgASgJEhoKEmRlcGFydHVyZV90aW1lem9uZRgPIAEoCRIYChBhcnJpdmFsX3RpbWV6b25lGBAgASgJEjcKE3NjaGVkdWxlZF9kZXBhcnR1cmUYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjUKEXNjaGVkdWxlZF9hcnJpdmFsGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI0ChBhY3R1YWxfZGVwYXJ0dXJlGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIyCg5hY3R1YWxfYXJyaXZhbBgKIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASJgoGc3RhdHVzGAsgASgOMhYudHJpcHMudjEuRmxpZ2h0U3RhdHVzEjIKDmxhc3Rfc3luY2VkX2F0GAwgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgpzeW5jX2Vycm9yGA0gASgJEi4KCmNyZWF0ZWRfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhkKEWNvbmZpcm1hdGlvbl9saW5rGBEgASgJEhYKDmJvb2tpbmdfbnVtYmVyGBIgASgJIiUKEkxpc3RGbGlnaHRzUmVxdWVzdBIPCgd0cmlwX2lkGAEgASgJIjgKE0xpc3RGbGlnaHRzUmVzcG9uc2USIQoHZmxpZ2h0cxgBIAMoCzIQLnRyaXBzLnYxLkZsaWdodCJ7ChBBZGRGbGlnaHRSZXF1ZXN0Eg8KB3RyaXBfaWQYASABKAkSFQoNZmxpZ2h0X251bWJlchgCIAEoCRIMCgRkYXRlGAMgASgJEhkKEWNvbmZpcm1hdGlvbl9saW5rGAQgASgJEhYKDmJvb2tpbmdfbnVtYmVyGAUgASgJIjUKEUFkZEZsaWdodFJlc3BvbnNlEiAKBmZsaWdodBgBIAEoCzIQLnRyaXBzLnYxLkZsaWdodCIhChNEZWxldGVGbGlnaHRSZXF1ZXN0EgoKAmlkGAEgASgJIhYKFERlbGV0ZUZsaWdodFJlc3BvbnNlIh8KEVN5bmNGbGlnaHRSZXF1ZXN0EgoKAmlkGAEgASgJIjYKElN5bmNGbGlnaHRSZXNwb25zZRIgCgZmbGlnaHQYASABKAsyEC50cmlwcy52MS5GbGlnaHQiYAofVXBkYXRlRmxpZ2h0Q29uZmlybWF0aW9uUmVxdWVzdBIKCgJpZBgBIAEoCRIZChFjb25maXJtYXRpb25fbGluaxgCIAEoCRIWCg5ib29raW5nX251bWJlchgDIAEoCSJECiBVcGRhdGVGbGlnaHRDb25maXJtYXRpb25SZXNwb25zZRIgCgZmbGlnaHQYASABKAsyEC50cmlwcy52MS5GbGlnaHQq0gEKDEZsaWdodFN0YXR1cxIdChlGTElHSFRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASGwoXRkxJR0hUX1NUQVRVU19TQ0hFRFVMRUQQARIYChRGTElHSFRfU1RBVFVTX0FDVElWRRACEhgKFEZMSUdIVF9TVEFUVVNfTEFOREVEEAMSGwoXRkxJR0hUX1NUQVRVU19DQU5DRUxMRUQQBBIaChZGTElHSFRfU1RBVFVTX0RJVkVSVEVEEAUSGQoVRkxJR0hUX1NUQVRVU19VTktOT1dOEAYyrAMKDUZsaWdodFNlcnZpY2USSgoLTGlzdEZsaWdodHMSHC50cmlwcy52MS5MaXN0RmxpZ2h0c1JlcXVlc3QaHS50cmlwcy52MS5MaXN0RmxpZ2h0c1Jlc3BvbnNlEkQKCUFkZEZsaWdodBIaLnRyaXBzLnYxLkFkZEZsaWdodFJlcXVlc3QaGy50cmlwcy52MS5BZGRGbGlnaHRSZXNwb25zZRJNCgxEZWxldGVGbGlnaHQSHS50cmlwcy52MS5EZWxldGVGbGlnaHRSZXF1ZXN0Gh4udHJpcHMudjEuRGVsZXRlRmxpZ2h0UmVzcG9uc2USRwoKU3luY0ZsaWdodBIbLnRyaXBzLnYxLlN5bmNGbGlnaHRSZXF1ZXN0GhwudHJpcHMudjEuU3luY0ZsaWdodFJlc3BvbnNlEnEKGFVwZGF0ZUZsaWdodENvbmZpcm1hdGlvbhIpLnRyaXBzLnYxLlVwZGF0ZUZsaWdodENvbmZpcm1hdGlvblJlcXVlc3QaKi50cmlwcy52MS5VcGRhdGVGbGlnaHRDb25maXJtYXRpb25SZXNwb25zZUIyWjBnaXRodWIuY29tL2xpYW1hd2hpdGUvdHJpcHMvZ2VuL3RyaXBzL3YxO3RyaXBzdjFiBnByb3RvMw",
+    [file_google_protobuf_timestamp],
+  );
 
 /**
  * @generated from message trips.v1.Flight
@@ -107,13 +121,31 @@ export type Flight = Message<"trips.v1.Flight"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 14;
    */
   createdAt?: Timestamp | undefined;
+
+  /**
+   * Optional link to the booking (e.g. the airline's confirmation/manage-
+   * booking page). Not fetched from AeroDataBox - set by the user via
+   * AddFlight or UpdateFlightConfirmation.
+   *
+   * @generated from field: string confirmation_link = 17;
+   */
+  confirmationLink: string;
+
+  /**
+   * Optional booking/confirmation (PNR) code, e.g. "ABC123". Also set by
+   * the user, not fetched from AeroDataBox.
+   *
+   * @generated from field: string booking_number = 18;
+   */
+  bookingNumber: string;
 };
 
 /**
  * Describes the message trips.v1.Flight.
  * Use `create(FlightSchema)` to create a new message.
  */
-export const FlightSchema: GenMessage<Flight> = /*@__PURE__*/
+export const FlightSchema: GenMessage<Flight> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 0);
 
 /**
@@ -130,7 +162,8 @@ export type ListFlightsRequest = Message<"trips.v1.ListFlightsRequest"> & {
  * Describes the message trips.v1.ListFlightsRequest.
  * Use `create(ListFlightsRequestSchema)` to create a new message.
  */
-export const ListFlightsRequestSchema: GenMessage<ListFlightsRequest> = /*@__PURE__*/
+export const ListFlightsRequestSchema: GenMessage<ListFlightsRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 1);
 
 /**
@@ -147,7 +180,8 @@ export type ListFlightsResponse = Message<"trips.v1.ListFlightsResponse"> & {
  * Describes the message trips.v1.ListFlightsResponse.
  * Use `create(ListFlightsResponseSchema)` to create a new message.
  */
-export const ListFlightsResponseSchema: GenMessage<ListFlightsResponse> = /*@__PURE__*/
+export const ListFlightsResponseSchema: GenMessage<ListFlightsResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 2);
 
 /**
@@ -168,13 +202,26 @@ export type AddFlightRequest = Message<"trips.v1.AddFlightRequest"> & {
    * @generated from field: string date = 3;
    */
   date: string;
+
+  /**
+   * Optional - see Flight.confirmation_link/booking_number.
+   *
+   * @generated from field: string confirmation_link = 4;
+   */
+  confirmationLink: string;
+
+  /**
+   * @generated from field: string booking_number = 5;
+   */
+  bookingNumber: string;
 };
 
 /**
  * Describes the message trips.v1.AddFlightRequest.
  * Use `create(AddFlightRequestSchema)` to create a new message.
  */
-export const AddFlightRequestSchema: GenMessage<AddFlightRequest> = /*@__PURE__*/
+export const AddFlightRequestSchema: GenMessage<AddFlightRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 3);
 
 /**
@@ -191,7 +238,8 @@ export type AddFlightResponse = Message<"trips.v1.AddFlightResponse"> & {
  * Describes the message trips.v1.AddFlightResponse.
  * Use `create(AddFlightResponseSchema)` to create a new message.
  */
-export const AddFlightResponseSchema: GenMessage<AddFlightResponse> = /*@__PURE__*/
+export const AddFlightResponseSchema: GenMessage<AddFlightResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 4);
 
 /**
@@ -208,20 +256,22 @@ export type DeleteFlightRequest = Message<"trips.v1.DeleteFlightRequest"> & {
  * Describes the message trips.v1.DeleteFlightRequest.
  * Use `create(DeleteFlightRequestSchema)` to create a new message.
  */
-export const DeleteFlightRequestSchema: GenMessage<DeleteFlightRequest> = /*@__PURE__*/
+export const DeleteFlightRequestSchema: GenMessage<DeleteFlightRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 5);
 
 /**
  * @generated from message trips.v1.DeleteFlightResponse
  */
-export type DeleteFlightResponse = Message<"trips.v1.DeleteFlightResponse"> & {
-};
+export type DeleteFlightResponse =
+  Message<"trips.v1.DeleteFlightResponse"> & {};
 
 /**
  * Describes the message trips.v1.DeleteFlightResponse.
  * Use `create(DeleteFlightResponseSchema)` to create a new message.
  */
-export const DeleteFlightResponseSchema: GenMessage<DeleteFlightResponse> = /*@__PURE__*/
+export const DeleteFlightResponseSchema: GenMessage<DeleteFlightResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 6);
 
 /**
@@ -238,7 +288,8 @@ export type SyncFlightRequest = Message<"trips.v1.SyncFlightRequest"> & {
  * Describes the message trips.v1.SyncFlightRequest.
  * Use `create(SyncFlightRequestSchema)` to create a new message.
  */
-export const SyncFlightRequestSchema: GenMessage<SyncFlightRequest> = /*@__PURE__*/
+export const SyncFlightRequestSchema: GenMessage<SyncFlightRequest> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 7);
 
 /**
@@ -255,8 +306,57 @@ export type SyncFlightResponse = Message<"trips.v1.SyncFlightResponse"> & {
  * Describes the message trips.v1.SyncFlightResponse.
  * Use `create(SyncFlightResponseSchema)` to create a new message.
  */
-export const SyncFlightResponseSchema: GenMessage<SyncFlightResponse> = /*@__PURE__*/
+export const SyncFlightResponseSchema: GenMessage<SyncFlightResponse> =
+  /*@__PURE__*/
   messageDesc(file_trips_v1_flight, 8);
+
+/**
+ * @generated from message trips.v1.UpdateFlightConfirmationRequest
+ */
+export type UpdateFlightConfirmationRequest =
+  Message<"trips.v1.UpdateFlightConfirmationRequest"> & {
+    /**
+     * @generated from field: string id = 1;
+     */
+    id: string;
+
+    /**
+     * @generated from field: string confirmation_link = 2;
+     */
+    confirmationLink: string;
+
+    /**
+     * @generated from field: string booking_number = 3;
+     */
+    bookingNumber: string;
+  };
+
+/**
+ * Describes the message trips.v1.UpdateFlightConfirmationRequest.
+ * Use `create(UpdateFlightConfirmationRequestSchema)` to create a new message.
+ */
+export const UpdateFlightConfirmationRequestSchema: GenMessage<UpdateFlightConfirmationRequest> =
+  /*@__PURE__*/
+  messageDesc(file_trips_v1_flight, 9);
+
+/**
+ * @generated from message trips.v1.UpdateFlightConfirmationResponse
+ */
+export type UpdateFlightConfirmationResponse =
+  Message<"trips.v1.UpdateFlightConfirmationResponse"> & {
+    /**
+     * @generated from field: trips.v1.Flight flight = 1;
+     */
+    flight?: Flight | undefined;
+  };
+
+/**
+ * Describes the message trips.v1.UpdateFlightConfirmationResponse.
+ * Use `create(UpdateFlightConfirmationResponseSchema)` to create a new message.
+ */
+export const UpdateFlightConfirmationResponseSchema: GenMessage<UpdateFlightConfirmationResponse> =
+  /*@__PURE__*/
+  messageDesc(file_trips_v1_flight, 10);
 
 /**
  * @generated from enum trips.v1.FlightStatus
@@ -303,7 +403,8 @@ export enum FlightStatus {
 /**
  * Describes the enum trips.v1.FlightStatus.
  */
-export const FlightStatusSchema: GenEnum<FlightStatus> = /*@__PURE__*/
+export const FlightStatusSchema: GenEnum<FlightStatus> =
+  /*@__PURE__*/
   enumDesc(file_trips_v1_flight, 0);
 
 /**
@@ -317,7 +418,7 @@ export const FlightService: GenService<{
     methodKind: "unary";
     input: typeof ListFlightsRequestSchema;
     output: typeof ListFlightsResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.FlightService.AddFlight
    */
@@ -325,7 +426,7 @@ export const FlightService: GenService<{
     methodKind: "unary";
     input: typeof AddFlightRequestSchema;
     output: typeof AddFlightResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.FlightService.DeleteFlight
    */
@@ -333,7 +434,7 @@ export const FlightService: GenService<{
     methodKind: "unary";
     input: typeof DeleteFlightRequestSchema;
     output: typeof DeleteFlightResponseSchema;
-  },
+  };
   /**
    * @generated from rpc trips.v1.FlightService.SyncFlight
    */
@@ -341,7 +442,13 @@ export const FlightService: GenService<{
     methodKind: "unary";
     input: typeof SyncFlightRequestSchema;
     output: typeof SyncFlightResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_trips_v1_flight, 0);
-
+  };
+  /**
+   * @generated from rpc trips.v1.FlightService.UpdateFlightConfirmation
+   */
+  updateFlightConfirmation: {
+    methodKind: "unary";
+    input: typeof UpdateFlightConfirmationRequestSchema;
+    output: typeof UpdateFlightConfirmationResponseSchema;
+  };
+}> = /*@__PURE__*/ serviceDesc(file_trips_v1_flight, 0);

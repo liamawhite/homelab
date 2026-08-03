@@ -22,6 +22,7 @@ export default defineConfig({
       "/trips.v1.TripService": "http://localhost:8080",
       "/trips.v1.FlightService": "http://localhost:8080",
       "/trips.v1.AccommodationService": "http://localhost:8080",
+      "/trips.v1.ItineraryService": "http://localhost:8080",
     },
   },
 });

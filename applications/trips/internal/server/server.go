@@ -11,6 +11,7 @@ import (
 	"github.com/liamawhite/trips/gen/trips/v1/tripsv1connect"
 	"github.com/liamawhite/trips/internal/accommodationservice"
 	"github.com/liamawhite/trips/internal/flightservice"
+	"github.com/liamawhite/trips/internal/itineraryservice"
 	"github.com/liamawhite/trips/internal/tripservice"
 	"github.com/liamawhite/trips/internal/webui"
 )
@@ -21,7 +22,7 @@ import (
 // so gRPC/gRPC-Web clients need HTTP/2 over cleartext (h2c) to negotiate at
 // all; the caller enables that via http.Server's Protocols field rather than
 // wrapping the handler, since Go 1.24+ supports h2c natively.
-func New(trips *tripservice.Service, flights *flightservice.Service, accommodations *accommodationservice.Service) (http.Handler, error) {
+func New(trips *tripservice.Service, flights *flightservice.Service, accommodations *accommodationservice.Service, itinerary *itineraryservice.Service) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	tripsPath, tripsHandler := tripsv1connect.NewTripServiceHandler(trips)
@@ -32,6 +33,9 @@ func New(trips *tripservice.Service, flights *flightservice.Service, accommodati
 
 	accommodationsPath, accommodationsHandler := tripsv1connect.NewAccommodationServiceHandler(accommodations)
 	mux.Handle(accommodationsPath, accommodationsHandler)
+
+	itineraryPath, itineraryHandler := tripsv1connect.NewItineraryServiceHandler(itinerary)
+	mux.Handle(itineraryPath, itineraryHandler)
 
 	spa, err := newSPAHandler()
 	if err != nil {

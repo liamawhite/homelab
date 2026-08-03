@@ -41,6 +41,13 @@ message Flight {
   // fields above are left untouched when this happens.
   string sync_error = 13;
   google.protobuf.Timestamp created_at = 14;
+  // Optional link to the booking (e.g. the airline's confirmation/manage-
+  // booking page). Not fetched from AeroDataBox - set by the user via
+  // AddFlight or UpdateFlightConfirmation.
+  string confirmation_link = 17;
+  // Optional booking/confirmation (PNR) code, e.g. "ABC123". Also set by
+  // the user, not fetched from AeroDataBox.
+  string booking_number = 18;
 }
 
 message ListFlightsRequest {
@@ -55,6 +62,9 @@ message AddFlightRequest {
   string trip_id = 1;
   string flight_number = 2;
   string date = 3;
+  // Optional - see Flight.confirmation_link/booking_number.
+  string confirmation_link = 4;
+  string booking_number = 5;
 }
 
 message AddFlightResponse {
@@ -75,9 +85,20 @@ message SyncFlightResponse {
   Flight flight = 1;
 }
 
+message UpdateFlightConfirmationRequest {
+  string id = 1;
+  string confirmation_link = 2;
+  string booking_number = 3;
+}
+
+message UpdateFlightConfirmationResponse {
+  Flight flight = 1;
+}
+
 service FlightService {
   rpc ListFlights(ListFlightsRequest) returns (ListFlightsResponse);
   rpc AddFlight(AddFlightRequest) returns (AddFlightResponse);
   rpc DeleteFlight(DeleteFlightRequest) returns (DeleteFlightResponse);
   rpc SyncFlight(SyncFlightRequest) returns (SyncFlightResponse);
+  rpc UpdateFlightConfirmation(UpdateFlightConfirmationRequest) returns (UpdateFlightConfirmationResponse);
 }
