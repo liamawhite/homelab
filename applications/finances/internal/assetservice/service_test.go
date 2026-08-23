@@ -177,6 +177,43 @@ func TestService_UpdateAsset_ReplacesOwnersAndExposures(t *testing.T) {
 	}
 }
 
+func TestService_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
+	ctx := context.Background()
+	svc, users := newTestService(t)
+
+	req := cashCreateRequest(
+		[]*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
+		[]*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
+	)
+	req.IsLiquid = false
+	created, err := svc.CreateAsset(ctx, connect.NewRequest(req))
+	if err != nil {
+		t.Fatalf("CreateAsset() error = %v", err)
+	}
+	if created.Msg.GetAsset().GetIsLiquid() {
+		t.Fatalf("CreateAsset() is_liquid = true, want false")
+	}
+
+	updated, err := svc.UpdateAsset(ctx, connect.NewRequest(&v1.UpdateAssetRequest{
+		Id:        created.Msg.GetAsset().GetId(),
+		Category:  v1.AssetCategory_ASSET_CATEGORY_CASH,
+		Currency:  v1.Currency_CURRENCY_USD,
+		Owners:    []*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
+		Exposures: []*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
+		IsLiquid:  true,
+		Details: &v1.UpdateAssetRequest_Cash{Cash: &v1.CashDetails{
+			AccountName: "Checking",
+			Institution: "Chase",
+		}},
+	}))
+	if err != nil {
+		t.Fatalf("UpdateAsset() error = %v", err)
+	}
+	if !updated.Msg.GetAsset().GetIsLiquid() {
+		t.Fatalf("UpdateAsset() is_liquid = false, want true (override should persist)")
+	}
+}
+
 func TestService_UpdateAsset_NotFound(t *testing.T) {
 	svc, users := newTestService(t)
 

@@ -148,3 +148,73 @@ func TestMigration0003_PreservesPopulatedData(t *testing.T) {
 		t.Fatalf("inserting negative valuation after migration: %v", err)
 	}
 }
+
+// TestMigration0004_BackfillsLiquidityByCategory seeds one asset per
+// category against a database with 0001-0003 already applied (so it starts
+// with no is_liquid column at all, matching real production state), then
+// applies 0004 and asserts every row survived (plain ADD COLUMN, no rebuild)
+// and the per-category backfill matches the documented defaults:
+// retirement/real_estate/mortgage become illiquid, everything else stays
+// liquid.
+func TestMigration0004_BackfillsLiquidityByCategory(t *testing.T) {
+	db, err := Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatalf("Open() error = %v", err)
+	}
+	t.Cleanup(func() { db.Close() })
+
+	if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY)`); err != nil {
+		t.Fatalf("creating schema_migrations: %v", err)
+	}
+	for _, name := range []string{
+		"0001_init.sql",
+		"0002_create_exchange_rates.sql",
+		"0003_add_capital_balance_category.sql",
+	} {
+		if err := applyMigration(db, name); err != nil {
+			t.Fatalf("applying %s: %v", name, err)
+		}
+	}
+
+	seed := `
+		INSERT INTO assets (id, category, currency, created_at) VALUES
+			('cash1', 'cash', 'usd', '2026-01-01T00:00:00Z'),
+			('etf1', 'etf', 'usd', '2026-01-01T00:00:00Z'),
+			('stock1', 'stock_or_bond', 'usd', '2026-01-01T00:00:00Z'),
+			('loan1', 'loan', 'usd', '2026-01-01T00:00:00Z'),
+			('cap1', 'capital_balance', 'usd', '2026-01-01T00:00:00Z'),
+			('ret1', 'retirement', 'usd', '2026-01-01T00:00:00Z'),
+			('re1', 'real_estate', 'usd', '2026-01-01T00:00:00Z'),
+			('mtg1', 'mortgage', 'usd', '2026-01-01T00:00:00Z');
+	`
+	if _, err := db.Exec(seed); err != nil {
+		t.Fatalf("seeding pre-0004 data: %v", err)
+	}
+
+	if err := applyMigration(db, "0004_add_asset_liquidity.sql"); err != nil {
+		t.Fatalf("applying 0004_add_asset_liquidity.sql: %v", err)
+	}
+
+	var total int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM assets`).Scan(&total); err != nil {
+		t.Fatalf("counting assets: %v", err)
+	}
+	if total != 8 {
+		t.Fatalf("assets count = %d, want 8 (all rows must survive a plain ADD COLUMN)", total)
+	}
+
+	wantLiquid := map[string]bool{
+		"cash1": true, "etf1": true, "stock1": true, "loan1": true, "cap1": true,
+		"ret1": false, "re1": false, "mtg1": false,
+	}
+	for id, want := range wantLiquid {
+		var isLiquid int
+		if err := db.QueryRow(`SELECT is_liquid FROM assets WHERE id = ?`, id).Scan(&isLiquid); err != nil {
+			t.Fatalf("querying is_liquid for %s: %v", id, err)
+		}
+		got := isLiquid != 0
+		if got != want {
+			t.Errorf("asset %s is_liquid = %v, want %v", id, got, want)
+		}
+	}
+}

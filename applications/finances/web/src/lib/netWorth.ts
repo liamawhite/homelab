@@ -4,6 +4,8 @@ import { assetClient } from "./client";
 import { valuationsQueryKey, assetDisplayName } from "./assets";
 import { useExchangeRates, convertAmount } from "./exchangeRates";
 import { useDisplayCurrency } from "./displayCurrency";
+import { liquidityMatches } from "./liquidityFilter";
+import type { LiquidityFilter } from "./liquidityFilter";
 import type { Asset, AssetValuation } from "@/gen/finances/v1/asset_pb";
 import { AssetCategory, Currency, Region, SecurityType } from "@/gen/finances/v1/asset_pb";
 
@@ -190,6 +192,7 @@ export function computeNetWorthSeries(
   assets: Asset[],
   valuationsByAssetId: Record<string, AssetValuation[]>,
   selectedUserIds: string[],
+  liquidityFilter: LiquidityFilter,
   displayCurrency: Currency,
   ratesByDate: Record<string, number>,
 ): NetWorthSeries {
@@ -200,7 +203,10 @@ export function computeNetWorthSeries(
     // A capital-balance asset's inclusion/sign depends on which individual
     // is selected, not on percentage ownership (see the dedicated branch
     // below) - it must never be dropped here just because the currently
-    // selected person isn't its stored owner.
+    // selected person isn't its stored owner. It also always ignores the
+    // liquidity filter, same reasoning: it's a household ledger entry, not
+    // a market asset with a liquidity profile.
+    if (!isCapitalBalanceCategory(asset.category) && !liquidityMatches(asset.isLiquid, liquidityFilter)) continue;
     const share = isCapitalBalanceCategory(asset.category) ? 100 : ownedShare(asset.owners, selectedUserIds);
     if (share <= 0) continue;
 
@@ -312,7 +318,11 @@ export function computeNetWorthSeries(
 // chart updates itself after either), plus exchange rates for every date
 // involved, and computes the net worth series in the navbar's selected
 // display currency.
-export function useNetWorthSeries(assets: Asset[] | undefined, selectedUserIds: string[]) {
+export function useNetWorthSeries(
+  assets: Asset[] | undefined,
+  selectedUserIds: string[],
+  liquidityFilter: LiquidityFilter,
+) {
   const { displayCurrency } = useDisplayCurrency();
 
   const valuationQueries = useQueries({
@@ -341,6 +351,7 @@ export function useNetWorthSeries(assets: Asset[] | undefined, selectedUserIds: 
     assets,
     valuationsByAssetId,
     selectedUserIds,
+    liquidityFilter,
     displayCurrency,
     ratesByDate ?? {},
   );

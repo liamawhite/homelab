@@ -136,6 +136,7 @@ type Asset struct {
 	Category        AssetCategory
 	Currency        Currency
 	Details         AssetDetails
+	IsLiquid        bool
 	Owners          []AssetOwner
 	Exposures       []AssetExposure
 	LatestValuation *AssetValuation
@@ -195,6 +196,7 @@ func (a *Assets) Create(
 	category AssetCategory,
 	currency Currency,
 	details AssetDetails,
+	isLiquid bool,
 	owners []OwnerInput,
 	exposures []ExposureInput,
 	initialValuationDate string,
@@ -218,6 +220,7 @@ func (a *Assets) Create(
 			PlanName:          nullableString(details.PlanName),
 			PropertyName:      nullableString(details.PropertyName),
 			Notes:             nullableString(details.Notes),
+			IsLiquid:          boolToInt64(isLiquid),
 			CreatedAt:         now,
 		})
 		if err != nil {
@@ -265,6 +268,7 @@ func (a *Assets) Update(
 	category AssetCategory,
 	currency Currency,
 	details AssetDetails,
+	isLiquid bool,
 	owners []OwnerInput,
 	exposures []ExposureInput,
 ) (Asset, error) {
@@ -285,6 +289,7 @@ func (a *Assets) Update(
 			PlanName:          nullableString(details.PlanName),
 			PropertyName:      nullableString(details.PropertyName),
 			Notes:             nullableString(details.Notes),
+			IsLiquid:          boolToInt64(isLiquid),
 		})
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -511,6 +516,7 @@ func fromAssetRow(row sqlcgen.Asset) (Asset, error) {
 			PropertyName:      stringPtr(row.PropertyName),
 			Notes:             stringPtr(row.Notes),
 		},
+		IsLiquid:  row.IsLiquid != 0,
 		CreatedAt: createdAt,
 	}, nil
 }
@@ -559,6 +565,13 @@ func fromValuationRow(row sqlcgen.AssetValuation) (AssetValuation, error) {
 		Amount:    row.Amount,
 		CreatedAt: createdAt,
 	}, nil
+}
+
+func boolToInt64(b bool) int64 {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 func nullableString(s *string) sql.NullString {

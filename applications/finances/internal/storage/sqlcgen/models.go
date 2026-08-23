@@ -22,6 +22,7 @@ type Asset struct {
 	PropertyName      sql.NullString
 	Notes             sql.NullString
 	CreatedAt         string
+	IsLiquid          int64
 }
 
 type AssetExposure struct {

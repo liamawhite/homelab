@@ -6,12 +6,14 @@ import { UsersPage } from "@/routes/UsersPage";
 import { AssetsPage } from "@/routes/AssetsPage";
 
 // `users` holds the comma-separated IDs of whoever is selected in the
-// navbar's user filter (see @/lib/selectedUsers) - lives on the root route
-// so every page shares the same selection via the URL, and it survives
-// reload/sharing a link the way a client-only store wouldn't.
+// navbar's user filter (see @/lib/selectedUsers), `liquidity` holds the
+// liquid/illiquid filter (see @/lib/liquidityFilter) - both live on the
+// root route so every page shares the same selection via the URL, and it
+// survives reload/sharing a link the way a client-only store wouldn't.
 const rootRoute = createRootRoute({
-  validateSearch: (search: Record<string, unknown>): { users?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { users?: string; liquidity?: string } => ({
     users: typeof search.users === "string" ? search.users : undefined,
+    liquidity: typeof search.liquidity === "string" ? search.liquidity : undefined,
   }),
   component: RootLayout,
 });

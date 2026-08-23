@@ -15,34 +15,34 @@ SELECT id, name, created_at FROM users WHERE id = ?;
 -- name: ListAssets :many
 SELECT id, category, currency, company_or_bond_name, platform, account_name,
        institution, etf_name, security_type, plan_name, property_name, notes,
-       created_at
+       created_at, is_liquid
 FROM assets ORDER BY created_at ASC;
 
 -- name: GetAsset :one
 SELECT id, category, currency, company_or_bond_name, platform, account_name,
        institution, etf_name, security_type, plan_name, property_name, notes,
-       created_at
+       created_at, is_liquid
 FROM assets WHERE id = ?;
 
 -- name: CreateAsset :one
 INSERT INTO assets (
     id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    created_at, is_liquid
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at;
+    created_at, is_liquid;
 
 -- name: UpdateAsset :one
 UPDATE assets SET
     category = ?, currency = ?, company_or_bond_name = ?, platform = ?,
     account_name = ?, institution = ?, etf_name = ?, security_type = ?,
-    plan_name = ?, property_name = ?, notes = ?
+    plan_name = ?, property_name = ?, notes = ?, is_liquid = ?
 WHERE id = ?
 RETURNING id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at;
+    created_at, is_liquid;
 
 -- name: DeleteAsset :execrows
 DELETE FROM assets WHERE id = ?;

@@ -900,7 +900,15 @@ type Asset struct {
 	//	*Asset_Loan
 	//	*Asset_Mortgage
 	//	*Asset_CapitalBalance
-	Details       isAsset_Details `protobuf_oneof:"details"`
+	Details isAsset_Details `protobuf_oneof:"details"`
+	// Whether this asset can be readily converted to cash - an explicit,
+	// per-asset override (not derived from category) so an individual
+	// instance can differ from its category's usual default (e.g. a
+	// restricted stock grant, or a locked CD). Drives the liquid/illiquid
+	// navbar filter; ignored for ASSET_CATEGORY_CAPITAL_BALANCE, which
+	// always shows regardless of this filter (it's a household ledger entry,
+	// not a market asset).
+	IsLiquid      bool `protobuf:"varint,16,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1061,6 +1069,13 @@ func (x *Asset) GetCapitalBalance() *CapitalBalanceDetails {
 		}
 	}
 	return nil
+}
+
+func (x *Asset) GetIsLiquid() bool {
+	if x != nil {
+		return x.IsLiquid
+	}
+	return false
 }
 
 type isAsset_Details interface {
@@ -1318,6 +1333,7 @@ type CreateAssetRequest struct {
 	//	*CreateAssetRequest_Mortgage
 	//	*CreateAssetRequest_CapitalBalance
 	Details       isCreateAssetRequest_Details `protobuf_oneof:"details"`
+	IsLiquid      bool                         `protobuf:"varint,15,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1473,6 +1489,13 @@ func (x *CreateAssetRequest) GetCapitalBalance() *CapitalBalanceDetails {
 	return nil
 }
 
+func (x *CreateAssetRequest) GetIsLiquid() bool {
+	if x != nil {
+		return x.IsLiquid
+	}
+	return false
+}
+
 type isCreateAssetRequest_Details interface {
 	isCreateAssetRequest_Details()
 }
@@ -1587,6 +1610,7 @@ type UpdateAssetRequest struct {
 	//	*UpdateAssetRequest_Mortgage
 	//	*UpdateAssetRequest_CapitalBalance
 	Details       isUpdateAssetRequest_Details `protobuf_oneof:"details"`
+	IsLiquid      bool                         `protobuf:"varint,14,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1733,6 +1757,13 @@ func (x *UpdateAssetRequest) GetCapitalBalance() *CapitalBalanceDetails {
 		}
 	}
 	return nil
+}
+
+func (x *UpdateAssetRequest) GetIsLiquid() bool {
+	if x != nil {
+		return x.IsLiquid
+	}
+	return false
 }
 
 type isUpdateAssetRequest_Details interface {
@@ -2231,7 +2262,7 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12\x16\n" +
 	"\x06amount\x18\x04 \x01(\x03R\x06amount\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xdf\x06\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xfc\x06\n" +
 	"\x05Asset\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
@@ -2252,7 +2283,8 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\r \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\x0e \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\x0f \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalanceB\t\n" +
+	"\x0fcapital_balance\x18\x0f \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
+	"\tis_liquid\x18\x10 \x01(\bR\bisLiquidB\t\n" +
 	"\adetails\"E\n" +
 	"\n" +
 	"OwnerShare\x12\x17\n" +
@@ -2267,7 +2299,7 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"percentage\"\x13\n" +
 	"\x11ListAssetsRequest\"@\n" +
 	"\x12ListAssetsResponse\x12*\n" +
-	"\x06assets\x18\x01 \x03(\v2\x12.finances.v1.AssetR\x06assets\"\xc9\x06\n" +
+	"\x06assets\x18\x01 \x03(\v2\x12.finances.v1.AssetR\x06assets\"\xe6\x06\n" +
 	"\x12CreateAssetRequest\x126\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
 	"\bcurrency\x18\x02 \x01(\x0e2\x15.finances.v1.CurrencyR\bcurrency\x12/\n" +
@@ -2286,10 +2318,11 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\f \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\r \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\x0e \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalanceB\t\n" +
+	"\x0fcapital_balance\x18\x0e \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
+	"\tis_liquid\x18\x0f \x01(\bR\bisLiquidB\t\n" +
 	"\adetails\"?\n" +
 	"\x13CreateAssetResponse\x12(\n" +
-	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"\xe9\x05\n" +
+	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"\x86\x06\n" +
 	"\x12UpdateAssetRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
@@ -2307,7 +2340,8 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\v \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\f \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\r \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalanceB\t\n" +
+	"\x0fcapital_balance\x18\r \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
+	"\tis_liquid\x18\x0e \x01(\bR\bisLiquidB\t\n" +
 	"\adetails\"?\n" +
 	"\x13UpdateAssetResponse\x12(\n" +
 	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"$\n" +

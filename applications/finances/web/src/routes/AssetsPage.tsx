@@ -24,6 +24,7 @@ import {
 } from "@/lib/assets";
 import { useUsers } from "@/lib/users";
 import { formatDate } from "@/lib/dates";
+import { useLiquidityFilter, liquidityMatches } from "@/lib/liquidityFilter";
 import { useDisplayCurrency } from "@/lib/displayCurrency";
 import { useExchangeRates, convertAmount } from "@/lib/exchangeRates";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,23 @@ const CATEGORY_BADGE_LABELS: Record<AssetCategory, string> = {
 };
 
 const LIABILITY_CATEGORIES: AssetCategory[] = [AssetCategory.LOAN, AssetCategory.MORTGAGE];
+
+// The new-asset form's initial "Liquid" checkbox state, per category -
+// overridable per instance (e.g. a restricted stock grant, or a locked CD).
+// Mortgage defaults illiquid alongside Real Estate so hiding an illiquid
+// house also hides its mortgage - otherwise "liquid net worth" would
+// subtract a mortgage payment without the house value it's attached to.
+const DEFAULT_LIQUID_BY_CATEGORY: Record<AssetCategory, boolean> = {
+  [AssetCategory.UNSPECIFIED]: true,
+  [AssetCategory.STOCK_OR_BOND]: true,
+  [AssetCategory.CASH]: true,
+  [AssetCategory.ETF]: true,
+  [AssetCategory.RETIREMENT]: false,
+  [AssetCategory.REAL_ESTATE]: false,
+  [AssetCategory.LOAN]: true,
+  [AssetCategory.MORTGAGE]: false,
+  [AssetCategory.CAPITAL_BALANCE]: true,
+};
 
 function categoryBadgeLabel(asset: Asset): string {
   if (asset.details.case === "etf") {
@@ -249,6 +267,7 @@ export function AssetsPage() {
   const { data: users } = useUsers();
   const deleteAsset = useDeleteAsset();
   const { displayCurrency } = useDisplayCurrency();
+  const [liquidityFilter] = useLiquidityFilter();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
@@ -259,7 +278,11 @@ export function AssetsPage() {
     .filter((date): date is string => !!date);
   const { data: ratesByDate } = useExchangeRates(valuationDates);
 
-  const groups = useMemo(() => groupAssetsByOwner(assets ?? [], users ?? []), [assets, users]);
+  const filteredAssets = useMemo(
+    () => (assets ?? []).filter((asset) => liquidityMatches(asset.isLiquid, liquidityFilter)),
+    [assets, liquidityFilter],
+  );
+  const groups = useMemo(() => groupAssetsByOwner(filteredAssets, users ?? []), [filteredAssets, users]);
 
   function handleEdit(asset: Asset) {
     setEditingAsset(asset);
@@ -307,6 +330,9 @@ export function AssetsPage() {
       ))}
       {assets && assets.length === 0 && (
         <p className="text-sm text-muted-foreground">No assets yet.</p>
+      )}
+      {assets && assets.length > 0 && filteredAssets.length === 0 && (
+        <p className="text-sm text-muted-foreground">No {liquidityFilter} assets.</p>
       )}
       {deleteAsset.isError && <p className="text-sm text-destructive">{deleteAsset.error.message}</p>}
 
@@ -357,9 +383,12 @@ function AssetsTable({
         id: "category",
         header: "Category",
         cell: (info) => (
-          <Badge variant={LIABILITY_CATEGORIES.includes(info.row.original.category) ? "destructive" : "secondary"}>
-            {categoryBadgeLabel(info.row.original)}
-          </Badge>
+          <div className="flex flex-wrap gap-1">
+            <Badge variant={LIABILITY_CATEGORIES.includes(info.row.original.category) ? "destructive" : "secondary"}>
+              {categoryBadgeLabel(info.row.original)}
+            </Badge>
+            {!info.row.original.isLiquid && <Badge variant="outline">Illiquid</Badge>}
+          </div>
         ),
       }),
       columnHelper.display({
@@ -557,10 +586,12 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
   );
   const [initialDate, setInitialDate] = useState(todayDate());
   const [initialAmount, setInitialAmount] = useState("");
+  const [isLiquid, setIsLiquid] = useState(asset?.isLiquid ?? DEFAULT_LIQUID_BY_CATEGORY[category]);
 
   function resetTo(next: Asset | null) {
     setCategory(next?.category ?? AssetCategory.CASH);
     setCurrency(next?.currency ?? Currency.USD);
+    setIsLiquid(next?.isLiquid ?? DEFAULT_LIQUID_BY_CATEGORY[next?.category ?? AssetCategory.CASH]);
     setCompanyOrBondName(next?.details.case === "stockOrBond" ? next.details.value.companyOrBondName : "");
     setPlatform(
       next?.details.case === "stockOrBond"
@@ -720,6 +751,7 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
           currency,
           owners: buildOwners(),
           exposures: buildExposures(),
+          isLiquid,
           details: buildDetails(),
         },
         { onSuccess: () => onOpenChange(false) },
@@ -733,6 +765,7 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
           exposures: buildExposures(),
           initialValuationDate: initialDate.trim(),
           initialValuationAmount: toMinorUnits(parseFloat(initialAmount) || 0),
+          isLiquid,
           details: buildDetails(),
         },
         { onSuccess: () => onOpenChange(false) },
@@ -751,7 +784,14 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
               <Label>Category</Label>
-              <Select value={String(category)} onValueChange={(v) => setCategory(Number(v) as AssetCategory)}>
+              <Select
+                value={String(category)}
+                onValueChange={(v) => {
+                  const next = Number(v) as AssetCategory;
+                  setCategory(next);
+                  setIsLiquid(DEFAULT_LIQUID_BY_CATEGORY[next]);
+                }}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -987,6 +1027,19 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="is-liquid"
+              checked={isLiquid}
+              onChange={(e) => setIsLiquid(e.target.checked)}
+              className="size-4"
+            />
+            <Label htmlFor="is-liquid" className="font-normal">
+              Liquid
+            </Label>
           </div>
 
           {!isEditing && (

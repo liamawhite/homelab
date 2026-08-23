@@ -4,6 +4,7 @@ import type { User } from "@/gen/finances/v1/user_pb";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserFilter } from "@/components/UserFilter";
 import { DisplayCurrencyToggle } from "@/components/DisplayCurrencyToggle";
+import { LiquidityFilter } from "@/components/LiquidityFilter";
 
 interface NavbarProps {
   users: User[];
@@ -24,6 +25,7 @@ export function Navbar({ users, selectedUserIds, onToggleUser }: NavbarProps) {
       </div>
       <div className="flex items-center gap-2">
         <UserFilter users={users} selectedUserIds={selectedUserIds} onToggle={onToggleUser} />
+        <LiquidityFilter />
         <DisplayCurrencyToggle />
         <ThemeToggle />
       </div>

@@ -147,6 +147,15 @@ message Asset {
     MortgageDetails mortgage = 14;
     CapitalBalanceDetails capital_balance = 15;
   }
+
+  // Whether this asset can be readily converted to cash - an explicit,
+  // per-asset override (not derived from category) so an individual
+  // instance can differ from its category's usual default (e.g. a
+  // restricted stock grant, or a locked CD). Drives the liquid/illiquid
+  // navbar filter; ignored for ASSET_CATEGORY_CAPITAL_BALANCE, which
+  // always shows regardless of this filter (it's a household ledger entry,
+  // not a market asset).
+  bool is_liquid = 16;
 }
 
 message OwnerShare {
@@ -183,6 +192,8 @@ message CreateAssetRequest {
     MortgageDetails mortgage = 13;
     CapitalBalanceDetails capital_balance = 14;
   }
+
+  bool is_liquid = 15;
 }
 
 message CreateAssetResponse {
@@ -206,6 +217,8 @@ message UpdateAssetRequest {
     MortgageDetails mortgage = 12;
     CapitalBalanceDetails capital_balance = 13;
   }
+
+  bool is_liquid = 14;
 }
 
 message UpdateAssetResponse {

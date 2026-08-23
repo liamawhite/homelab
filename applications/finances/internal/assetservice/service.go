@@ -79,7 +79,7 @@ func (s *Service) CreateAsset(ctx context.Context, req *connect.Request[v1.Creat
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("initial_valuation_amount must not be negative"))
 	}
 
-	asset, err := s.assets.Create(ctx, category, currency, details, owners, exposures, date, amount)
+	asset, err := s.assets.Create(ctx, category, currency, details, req.Msg.GetIsLiquid(), owners, exposures, date, amount)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -119,7 +119,7 @@ func (s *Service) UpdateAsset(ctx context.Context, req *connect.Request[v1.Updat
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	asset, err := s.assets.Update(ctx, id, category, currency, details, owners, exposures)
+	asset, err := s.assets.Update(ctx, id, category, currency, details, req.Msg.GetIsLiquid(), owners, exposures)
 	if err != nil {
 		if errors.Is(err, storage.ErrAssetNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -538,6 +538,7 @@ func toProto(asset storage.Asset) *v1.Asset {
 		Currency:  toProtoCurrency(asset.Currency),
 		Owners:    make([]*v1.AssetOwner, 0, len(asset.Owners)),
 		Exposures: make([]*v1.AssetExposure, 0, len(asset.Exposures)),
+		IsLiquid:  asset.IsLiquid,
 		CreatedAt: timestamppb.New(asset.CreatedAt),
 	}
 

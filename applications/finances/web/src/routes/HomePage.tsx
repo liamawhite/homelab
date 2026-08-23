@@ -1,5 +1,6 @@
 import { useAssets } from "@/lib/assets";
 import { useSelectedUserIds } from "@/lib/selectedUsers";
+import { useLiquidityFilter } from "@/lib/liquidityFilter";
 import { useNetWorthSeries } from "@/lib/netWorth";
 import { formatDate } from "@/lib/dates";
 import { NetWorthChart } from "@/components/NetWorthChart";
@@ -10,8 +11,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export function HomePage() {
   const { data: assets, isLoading: assetsLoading, isError: assetsError } = useAssets();
   const [selectedUserIds] = useSelectedUserIds();
+  const [liquidityFilter] = useLiquidityFilter();
 
-  const { series, isLoading, isError } = useNetWorthSeries(assets, selectedUserIds);
+  const { series, isLoading, isError } = useNetWorthSeries(assets, selectedUserIds, liquidityFilter);
   const latestPoint = series && series.points.length > 0 ? series.points[series.points.length - 1] : null;
 
   return (
