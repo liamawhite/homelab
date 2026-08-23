@@ -11,6 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/liamawhite/finances/internal/assetservice"
+	"github.com/liamawhite/finances/internal/exchangerate"
+	"github.com/liamawhite/finances/internal/exchangerateservice"
 	"github.com/liamawhite/finances/internal/server"
 	"github.com/liamawhite/finances/internal/storage"
 	"github.com/liamawhite/finances/internal/userservice"
@@ -39,7 +42,13 @@ func run() error {
 	users := storage.NewUsers(db)
 	userSvc := userservice.New(users)
 
-	handler, err := server.New(userSvc)
+	assets := storage.NewAssets(db)
+	assetSvc := assetservice.New(assets)
+
+	exchangeRates := storage.NewExchangeRates(db)
+	exchangeRateSvc := exchangerateservice.New(exchangeRates)
+
+	handler, err := server.New(userSvc, assetSvc, exchangeRateSvc)
 	if err != nil {
 		return err
 	}
@@ -60,6 +69,8 @@ func run() error {
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	go exchangerate.NewRefresher(exchangeRates).Run(ctx)
 
 	errCh := make(chan error, 1)
 	go func() {

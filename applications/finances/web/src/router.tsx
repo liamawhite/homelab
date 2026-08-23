@@ -3,6 +3,7 @@ import { createRootRoute, createRoute, createRouter } from "@tanstack/react-rout
 import { RootLayout } from "@/components/RootLayout";
 import { HomePage } from "@/routes/HomePage";
 import { UsersPage } from "@/routes/UsersPage";
+import { AssetsPage } from "@/routes/AssetsPage";
 
 // `users` holds the comma-separated IDs of whoever is selected in the
 // navbar's user filter (see @/lib/selectedUsers) - lives on the root route
@@ -27,7 +28,13 @@ const usersRoute = createRoute({
   component: UsersPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, usersRoute]);
+const assetsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/assets",
+  component: AssetsPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, usersRoute, assetsRoute]);
 
 export const router = createRouter({ routeTree });
 

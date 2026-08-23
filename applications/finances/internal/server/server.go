@@ -7,15 +7,23 @@ import (
 	"strings"
 
 	"github.com/liamawhite/finances/gen/finances/v1/financesv1connect"
+	"github.com/liamawhite/finances/internal/assetservice"
+	"github.com/liamawhite/finances/internal/exchangerateservice"
 	"github.com/liamawhite/finances/internal/userservice"
 	"github.com/liamawhite/finances/internal/webui"
 )
 
-func New(userSvc *userservice.Service) (http.Handler, error) {
+func New(userSvc *userservice.Service, assetSvc *assetservice.Service, exchangeRateSvc *exchangerateservice.Service) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	userPath, userHandler := financesv1connect.NewUserServiceHandler(userSvc)
 	mux.Handle(userPath, userHandler)
+
+	assetPath, assetHandler := financesv1connect.NewAssetServiceHandler(assetSvc)
+	mux.Handle(assetPath, assetHandler)
+
+	exchangeRatePath, exchangeRateHandler := financesv1connect.NewExchangeRateServiceHandler(exchangeRateSvc)
+	mux.Handle(exchangeRatePath, exchangeRateHandler)
 
 	spa, err := newSPAHandler()
 	if err != nil {
@@ -27,7 +35,11 @@ func New(userSvc *userservice.Service) (http.Handler, error) {
 }
 
 // newSPAHandler serves the embedded frontend build, falling back to
-// index.html for any path that isn't a real file.
+// index.html for any path that isn't a real file. Directories don't count
+// as a match even when one exists on disk (e.g. the client-side route
+// "/assets" collides with Vite's own "dist/assets/" bundle directory) -
+// only client-side routes ever resolve to a bare directory path, real
+// static assets are always served by their exact file path.
 func newSPAHandler() (http.Handler, error) {
 	dist, err := fs.Sub(webui.DistFS, "dist")
 	if err != nil {
@@ -40,7 +52,8 @@ func newSPAHandler() (http.Handler, error) {
 		if name == "" {
 			name = "."
 		}
-		if _, err := fs.Stat(dist, name); err != nil {
+		stat, err := fs.Stat(dist, name)
+		if err != nil || stat.IsDir() {
 			serveIndex(w, r, dist)
 			return
 		}

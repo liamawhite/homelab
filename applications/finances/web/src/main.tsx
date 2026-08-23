@@ -6,15 +6,18 @@ import { RouterProvider } from "@tanstack/react-router";
 import "./index.css";
 import { router } from "./router";
 import { ThemeProvider } from "./lib/theme";
+import { DisplayCurrencyProvider } from "./lib/displayCurrency";
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
+      <DisplayCurrencyProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </DisplayCurrencyProvider>
     </ThemeProvider>
   </StrictMode>,
 );

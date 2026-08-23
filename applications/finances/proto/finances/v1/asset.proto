@@ -1,0 +1,253 @@
+syntax = "proto3";
+
+package finances.v1;
+
+option go_package = "github.com/liamawhite/finances/gen/finances/v1;financesv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum AssetCategory {
+  ASSET_CATEGORY_UNSPECIFIED = 0;
+  ASSET_CATEGORY_STOCK_OR_BOND = 1;
+  ASSET_CATEGORY_CASH = 2;
+  ASSET_CATEGORY_ETF = 3;
+  ASSET_CATEGORY_RETIREMENT = 4;
+  ASSET_CATEGORY_REAL_ESTATE = 5;
+  ASSET_CATEGORY_LOAN = 6;
+  ASSET_CATEGORY_MORTGAGE = 7;
+  ASSET_CATEGORY_CAPITAL_BALANCE = 8;
+}
+
+enum Currency {
+  CURRENCY_UNSPECIFIED = 0;
+  CURRENCY_USD = 1;
+  CURRENCY_GBP = 2;
+}
+
+enum Region {
+  REGION_UNSPECIFIED = 0;
+  REGION_US = 1;
+  REGION_INTERNATIONAL = 2;
+  REGION_UK = 3;
+  REGION_BONDS = 4; // asset-allocation bucket, not a geography - see AssetExposure's doc comment
+}
+
+// SecurityType is currently only used on EtfDetails (an ETF's stock-or-bond
+// sub-type) but is named generically in case StockOrBondDetails wants the
+// same distinction later.
+enum SecurityType {
+  SECURITY_TYPE_UNSPECIFIED = 0;
+  SECURITY_TYPE_STOCK = 1;
+  SECURITY_TYPE_BOND = 2;
+  SECURITY_TYPE_COMMODITY = 3;
+  SECURITY_TYPE_CRYPTO = 4;
+}
+
+message StockOrBondDetails {
+  string company_or_bond_name = 1;
+  string platform = 2;
+}
+
+message CashDetails {
+  string account_name = 1;
+  string institution = 2;
+}
+
+message EtfDetails {
+  string etf_name = 1;
+  SecurityType security_type = 2;
+  string platform = 3;
+}
+
+message RetirementDetails {
+  string plan_name = 1;
+  string platform = 2;
+}
+
+message RealEstateDetails {
+  string property_name = 1;
+  string notes = 2;
+}
+
+// LoanDetails.lender may be blank - the only detail field in this schema
+// allowed to be, since an informal/personal loan has no institution.
+message LoanDetails {
+  string name = 1;
+  string lender = 2;
+}
+
+message MortgageDetails {
+  string property_name = 1;
+  string institution = 2;
+}
+
+// CapitalBalanceDetails is a singleton concept - it tracks which of two
+// household members has contributed more toward shared capital, not a real
+// external liability. Its asset's single 100%-owner is the "reference
+// person" that valuation amounts are relative to (see AssetValuation's doc
+// comment on this category for the sign convention).
+message CapitalBalanceDetails {
+  string name = 1;
+}
+
+// AssetOwner is a share of an asset's ownership. Percentages across all of
+// an asset's owners must sum to exactly 100 - enforced in assetservice, not
+// the database (SQLite can't express a cross-row CHECK).
+message AssetOwner {
+  string user_id = 1;
+  string user_name = 2; // denormalized for display
+  int32 percentage = 3; // 1-100
+}
+
+// AssetExposure is a percentage breakdown of an asset's value - geographic
+// (US/International/UK) for most categories, but also doubles as a general
+// allocation bucket via REGION_BONDS for assets (like retirement accounts)
+// that report
+// a blended stock/bond mix. Exposures are optional - an asset may have zero
+// (e.g. commodities, crypto, and liabilities have no meaningful geography) -
+// but if any are present they must sum to exactly 100, both enforced in
+// assetservice, not the database.
+message AssetExposure {
+  Region region = 1;
+  int32 percentage = 2; // 1-100
+}
+
+// AssetValuation is a dated snapshot of an asset's value, in minor units
+// (cents/pence) of the asset's own currency - there is no per-valuation
+// currency field because an asset's currency never changes. amount must be
+// non-negative for every category except ASSET_CATEGORY_CAPITAL_BALANCE,
+// where it's signed relative to that asset's single owner: positive means
+// the owner is owed (ahead), negative means they owe (behind). Enforced in
+// assetservice, not the database (SQLite can't express a per-category
+// CHECK without joining to assets.category).
+message AssetValuation {
+  string id = 1;
+  string asset_id = 2;
+  string date = 3; // ISO 8601 date, "YYYY-MM-DD"
+  int64 amount = 4; // minor units
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message Asset {
+  string id = 1;
+  AssetCategory category = 2;
+  Currency currency = 3;
+  repeated AssetOwner owners = 4;
+  repeated AssetExposure exposures = 5;
+  AssetValuation latest_valuation = 6; // most recent by date; always set
+  google.protobuf.Timestamp created_at = 7;
+
+  oneof details {
+    StockOrBondDetails stock_or_bond = 8;
+    CashDetails cash = 9;
+    EtfDetails etf = 10;
+    RetirementDetails retirement = 11;
+    RealEstateDetails real_estate = 12;
+    LoanDetails loan = 13;
+    MortgageDetails mortgage = 14;
+    CapitalBalanceDetails capital_balance = 15;
+  }
+}
+
+message OwnerShare {
+  string user_id = 1;
+  int32 percentage = 2;
+}
+
+message ExposureShare {
+  Region region = 1;
+  int32 percentage = 2;
+}
+
+message ListAssetsRequest {}
+
+message ListAssetsResponse {
+  repeated Asset assets = 1;
+}
+
+message CreateAssetRequest {
+  AssetCategory category = 1;
+  Currency currency = 2;
+  repeated OwnerShare owners = 3;
+  repeated ExposureShare exposures = 4;
+  string initial_valuation_date = 5;
+  int64 initial_valuation_amount = 6;
+
+  oneof details {
+    StockOrBondDetails stock_or_bond = 7;
+    CashDetails cash = 8;
+    EtfDetails etf = 9;
+    RetirementDetails retirement = 10;
+    RealEstateDetails real_estate = 11;
+    LoanDetails loan = 12;
+    MortgageDetails mortgage = 13;
+    CapitalBalanceDetails capital_balance = 14;
+  }
+}
+
+message CreateAssetResponse {
+  Asset asset = 1;
+}
+
+message UpdateAssetRequest {
+  string id = 1;
+  AssetCategory category = 2;
+  Currency currency = 3;
+  repeated OwnerShare owners = 4;
+  repeated ExposureShare exposures = 5;
+
+  oneof details {
+    StockOrBondDetails stock_or_bond = 6;
+    CashDetails cash = 7;
+    EtfDetails etf = 8;
+    RetirementDetails retirement = 9;
+    RealEstateDetails real_estate = 10;
+    LoanDetails loan = 11;
+    MortgageDetails mortgage = 12;
+    CapitalBalanceDetails capital_balance = 13;
+  }
+}
+
+message UpdateAssetResponse {
+  Asset asset = 1;
+}
+
+message DeleteAssetRequest {
+  string id = 1;
+}
+
+message DeleteAssetResponse {}
+
+message ListAssetValuationsRequest {
+  string asset_id = 1;
+}
+
+message ListAssetValuationsResponse {
+  repeated AssetValuation valuations = 1; // newest first
+}
+
+message AddAssetValuationRequest {
+  string asset_id = 1;
+  string date = 2;
+  int64 amount = 3;
+}
+
+message AddAssetValuationResponse {
+  AssetValuation valuation = 1;
+}
+
+message DeleteAssetValuationRequest {
+  string valuation_id = 1;
+}
+
+message DeleteAssetValuationResponse {}
+
+service AssetService {
+  rpc ListAssets(ListAssetsRequest) returns (ListAssetsResponse);
+  rpc CreateAsset(CreateAssetRequest) returns (CreateAssetResponse);
+  rpc UpdateAsset(UpdateAssetRequest) returns (UpdateAssetResponse);
+  rpc DeleteAsset(DeleteAssetRequest) returns (DeleteAssetResponse);
+  rpc ListAssetValuations(ListAssetValuationsRequest) returns (ListAssetValuationsResponse);
+  rpc AddAssetValuation(AddAssetValuationRequest) returns (AddAssetValuationResponse);
+  rpc DeleteAssetValuation(DeleteAssetValuationRequest) returns (DeleteAssetValuationResponse);
+}
