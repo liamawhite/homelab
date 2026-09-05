@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/liamawhite/reminders/internal/oneoffitemservice"
+	"github.com/liamawhite/reminders/internal/recurringitemservice"
 	"github.com/liamawhite/reminders/internal/server"
 	"github.com/liamawhite/reminders/internal/storage"
 )
@@ -37,8 +38,9 @@ func run() error {
 	}
 
 	items := oneoffitemservice.New(storage.NewOneOffItems(db))
+	recurring := recurringitemservice.New(storage.NewRecurringItems(db))
 
-	handler, err := server.New(items)
+	handler, err := server.New(items, recurring)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,1 @@
+ALTER TABLE one_off_items ADD COLUMN notes TEXT NOT NULL DEFAULT '';

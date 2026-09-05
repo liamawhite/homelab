@@ -2,6 +2,7 @@ import { createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 
 import { OneOffItemService } from "../gen/reminders/v1/one_off_item_pb";
+import { RecurringItemService } from "../gen/reminders/v1/recurring_item_pb";
 
 // Same-origin: the Go binary serves both this app and the Connect API on
 // one port (see internal/server), so no CORS setup is needed. The Vite dev
@@ -9,3 +10,4 @@ import { OneOffItemService } from "../gen/reminders/v1/one_off_item_pb";
 const transport = createConnectTransport({ baseUrl: "/" });
 
 export const oneOffItemClient = createClient(OneOffItemService, transport);
+export const recurringItemClient = createClient(RecurringItemService, transport);

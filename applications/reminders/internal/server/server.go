@@ -10,6 +10,7 @@ import (
 
 	"github.com/liamawhite/reminders/gen/reminders/v1/remindersv1connect"
 	"github.com/liamawhite/reminders/internal/oneoffitemservice"
+	"github.com/liamawhite/reminders/internal/recurringitemservice"
 	"github.com/liamawhite/reminders/internal/webui"
 )
 
@@ -19,11 +20,14 @@ import (
 // so gRPC/gRPC-Web clients need HTTP/2 over cleartext (h2c) to negotiate at
 // all; the caller enables that via http.Server's Protocols field rather than
 // wrapping the handler, since Go 1.24+ supports h2c natively.
-func New(items *oneoffitemservice.Service) (http.Handler, error) {
+func New(items *oneoffitemservice.Service, recurring *recurringitemservice.Service) (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	itemsPath, itemsHandler := remindersv1connect.NewOneOffItemServiceHandler(items)
 	mux.Handle(itemsPath, itemsHandler)
+
+	recurringPath, recurringHandler := remindersv1connect.NewRecurringItemServiceHandler(recurring)
+	mux.Handle(recurringPath, recurringHandler)
 
 	spa, err := newSPAHandler()
 	if err != nil {

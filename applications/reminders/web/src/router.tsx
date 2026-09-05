@@ -2,6 +2,7 @@ import { createRootRoute, createRoute, createRouter } from "@tanstack/react-rout
 
 import { RootLayout } from "@/components/RootLayout";
 import { RemindersPage } from "@/routes/RemindersPage";
+import { RecurringItemsPage } from "@/routes/RecurringItemsPage";
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -13,7 +14,13 @@ const indexRoute = createRoute({
   component: RemindersPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute]);
+const recurringRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/recurring",
+  component: RecurringItemsPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, recurringRoute]);
 
 export const router = createRouter({ routeTree });
 
