@@ -38,19 +38,24 @@ func NewKubeVip(ctx *pulumi.Context, name string, args *KubeVipArgs, opts ...pul
 	// IMPORTANT: This option protects kube-vip during provider replacements.
 	//
 	// Why provider replacements happen:
-	// After kube-vip is deployed, the kubeconfig is typically updated to use the VIP
-	// (192.168.1.50) instead of a specific node IP (e.g., 192.168.1.51). This changes
-	// the kubeconfig content, which causes Pulumi to see the Kubernetes provider as
-	// "changed". When the provider changes, all resources using that provider get new
-	// URNs and Pulumi wants to replace them.
+	// The Kubernetes provider's kubeconfig content can change between runs - e.g. the
+	// kubeconfig's server address differs depending on whether the VIP or a specific
+	// node was reachable at resolve time, or the k3s admin client cert gets rotated
+	// server-side. Either changes the provider's recorded input, which Pulumi sees as
+	// the provider "changing" - and since every resource in this stack shares that one
+	// provider, a changed provider makes Pulumi want to replace (delete + recreate)
+	// everything, including kube-vip itself.
 	//
-	// DeleteBeforeReplace(false): When Pulumi needs to replace a resource, it will create
-	// the new resource first, then delete the old one. This ensures zero downtime during
-	// replacements. Without this, Pulumi would delete first, then create, causing a service
-	// outage.
+	// Protect(true): refuses to let Pulumi delete these resources at all, as part of a
+	// replace or otherwise. A provider-driven replace attempt against a protected
+	// resource errors out instead of silently deleting kube-vip - which is what actually
+	// happened once (a replace-cascade removed the DaemonSet with nothing recreating it,
+	// leaving the VIP unserved until it was manually restored). Deliberately swapped in
+	// place of the previous DeleteBeforeReplace(false) - that only reordered a replace to
+	// avoid a brief outage, it didn't stop one from happening at all.
 	resourceOpts := append(opts,
 		pulumi.Parent(kubeVip),
-		pulumi.DeleteBeforeReplace(false),
+		pulumi.Protect(true),
 	)
 
 	// Use kube-system namespace

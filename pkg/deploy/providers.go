@@ -14,10 +14,22 @@ import (
 // content resolved by the caller (see cli/pkg/k3s.ResolveClusterEndpoint)
 // rather than a fixed file path, since the right server address to embed
 // depends on whether kube-vip is up yet.
+//
+// Protect(true): this provider's kubeconfig input can legitimately differ
+// between runs - the server address depends on whether the VIP or a
+// specific node was reachable at resolve time, and the k3s admin client
+// cert rotates server-side independent of anything this program does.
+// Either change makes Pulumi see the provider as needing replacement, and
+// since every resource in the whole stack shares this one provider, that
+// cascades into wanting to replace nearly everything. Protect blocks that
+// replace outright (Pulumi errors instead of proceeding), forcing a human
+// to reconcile state manually (see .pulumi-state troubleshooting) rather
+// than letting a stale/rotated credential silently churn the entire
+// cluster.
 func NewKubernetesProvider(ctx *pulumi.Context, kubeconfig string) (*kubernetes.Provider, error) {
 	provider, err := kubernetes.NewProvider(ctx, "k8s", &kubernetes.ProviderArgs{
 		Kubeconfig: pulumi.String(kubeconfig),
-	})
+	}, pulumi.Protect(true))
 	if err != nil {
 		return nil, err
 	}
