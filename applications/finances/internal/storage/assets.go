@@ -33,6 +33,18 @@ const (
 	AssetCategoryCapitalBalance AssetCategory = "capital_balance"
 )
 
+// AssetLiquidity is an explicit, per-asset override (not derived from
+// category) of how readily an asset can be turned into spendable cash. Add
+// new values here and to 0005_change_asset_liquidity_to_enum.sql's CHECK
+// together.
+type AssetLiquidity string
+
+const (
+	AssetLiquidityLiquid   AssetLiquidity = "liquid"
+	AssetLiquidityInvested AssetLiquidity = "invested"
+	AssetLiquidityIlliquid AssetLiquidity = "illiquid"
+)
+
 // Currency is the denomination of an asset's value - fixed for the asset's
 // lifetime, not per-valuation. Add new values here and to
 // 0003_create_assets.sql's CHECK together.
@@ -136,7 +148,7 @@ type Asset struct {
 	Category        AssetCategory
 	Currency        Currency
 	Details         AssetDetails
-	IsLiquid        bool
+	Liquidity       AssetLiquidity
 	Owners          []AssetOwner
 	Exposures       []AssetExposure
 	LatestValuation *AssetValuation
@@ -196,7 +208,7 @@ func (a *Assets) Create(
 	category AssetCategory,
 	currency Currency,
 	details AssetDetails,
-	isLiquid bool,
+	liquidity AssetLiquidity,
 	owners []OwnerInput,
 	exposures []ExposureInput,
 	initialValuationDate string,
@@ -220,7 +232,7 @@ func (a *Assets) Create(
 			PlanName:          nullableString(details.PlanName),
 			PropertyName:      nullableString(details.PropertyName),
 			Notes:             nullableString(details.Notes),
-			IsLiquid:          boolToInt64(isLiquid),
+			Liquidity:         string(liquidity),
 			CreatedAt:         now,
 		})
 		if err != nil {
@@ -268,7 +280,7 @@ func (a *Assets) Update(
 	category AssetCategory,
 	currency Currency,
 	details AssetDetails,
-	isLiquid bool,
+	liquidity AssetLiquidity,
 	owners []OwnerInput,
 	exposures []ExposureInput,
 ) (Asset, error) {
@@ -289,7 +301,7 @@ func (a *Assets) Update(
 			PlanName:          nullableString(details.PlanName),
 			PropertyName:      nullableString(details.PropertyName),
 			Notes:             nullableString(details.Notes),
-			IsLiquid:          boolToInt64(isLiquid),
+			Liquidity:         string(liquidity),
 		})
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
@@ -516,7 +528,7 @@ func fromAssetRow(row sqlcgen.Asset) (Asset, error) {
 			PropertyName:      stringPtr(row.PropertyName),
 			Notes:             stringPtr(row.Notes),
 		},
-		IsLiquid:  row.IsLiquid != 0,
+		Liquidity: AssetLiquidity(row.Liquidity),
 		CreatedAt: createdAt,
 	}, nil
 }
@@ -565,13 +577,6 @@ func fromValuationRow(row sqlcgen.AssetValuation) (AssetValuation, error) {
 		Amount:    row.Amount,
 		CreatedAt: createdAt,
 	}, nil
-}
-
-func boolToInt64(b bool) int64 {
-	if b {
-		return 1
-	}
-	return 0
 }
 
 func nullableString(s *string) sql.NullString {

@@ -14,11 +14,11 @@ const createAsset = `-- name: CreateAsset :one
 INSERT INTO assets (
     id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at, is_liquid
+    created_at, liquidity
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at, is_liquid
+    created_at, liquidity
 `
 
 type CreateAssetParams struct {
@@ -35,7 +35,7 @@ type CreateAssetParams struct {
 	PropertyName      sql.NullString
 	Notes             sql.NullString
 	CreatedAt         string
-	IsLiquid          int64
+	Liquidity         string
 }
 
 func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset, error) {
@@ -53,7 +53,7 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 		arg.PropertyName,
 		arg.Notes,
 		arg.CreatedAt,
-		arg.IsLiquid,
+		arg.Liquidity,
 	)
 	var i Asset
 	err := row.Scan(
@@ -70,7 +70,7 @@ func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset
 		&i.PropertyName,
 		&i.Notes,
 		&i.CreatedAt,
-		&i.IsLiquid,
+		&i.Liquidity,
 	)
 	return i, err
 }
@@ -254,7 +254,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) (int64, error) {
 const getAsset = `-- name: GetAsset :one
 SELECT id, category, currency, company_or_bond_name, platform, account_name,
        institution, etf_name, security_type, plan_name, property_name, notes,
-       created_at, is_liquid
+       created_at, liquidity
 FROM assets WHERE id = ?
 `
 
@@ -275,7 +275,7 @@ func (q *Queries) GetAsset(ctx context.Context, id string) (Asset, error) {
 		&i.PropertyName,
 		&i.Notes,
 		&i.CreatedAt,
-		&i.IsLiquid,
+		&i.Liquidity,
 	)
 	return i, err
 }
@@ -447,7 +447,7 @@ const listAssets = `-- name: ListAssets :many
 
 SELECT id, category, currency, company_or_bond_name, platform, account_name,
        institution, etf_name, security_type, plan_name, property_name, notes,
-       created_at, is_liquid
+       created_at, liquidity
 FROM assets ORDER BY created_at ASC
 `
 
@@ -475,7 +475,7 @@ func (q *Queries) ListAssets(ctx context.Context) ([]Asset, error) {
 			&i.PropertyName,
 			&i.Notes,
 			&i.CreatedAt,
-			&i.IsLiquid,
+			&i.Liquidity,
 		); err != nil {
 			return nil, err
 		}
@@ -521,11 +521,11 @@ const updateAsset = `-- name: UpdateAsset :one
 UPDATE assets SET
     category = ?, currency = ?, company_or_bond_name = ?, platform = ?,
     account_name = ?, institution = ?, etf_name = ?, security_type = ?,
-    plan_name = ?, property_name = ?, notes = ?, is_liquid = ?
+    plan_name = ?, property_name = ?, notes = ?, liquidity = ?
 WHERE id = ?
 RETURNING id, category, currency, company_or_bond_name, platform, account_name,
     institution, etf_name, security_type, plan_name, property_name, notes,
-    created_at, is_liquid
+    created_at, liquidity
 `
 
 type UpdateAssetParams struct {
@@ -540,7 +540,7 @@ type UpdateAssetParams struct {
 	PlanName          sql.NullString
 	PropertyName      sql.NullString
 	Notes             sql.NullString
-	IsLiquid          int64
+	Liquidity         string
 	ID                string
 }
 
@@ -557,7 +557,7 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		arg.PlanName,
 		arg.PropertyName,
 		arg.Notes,
-		arg.IsLiquid,
+		arg.Liquidity,
 		arg.ID,
 	)
 	var i Asset
@@ -575,7 +575,7 @@ func (q *Queries) UpdateAsset(ctx context.Context, arg UpdateAssetParams) (Asset
 		&i.PropertyName,
 		&i.Notes,
 		&i.CreatedAt,
-		&i.IsLiquid,
+		&i.Liquidity,
 	)
 	return i, err
 }

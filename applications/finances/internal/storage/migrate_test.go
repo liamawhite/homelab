@@ -218,3 +218,83 @@ func TestMigration0004_BackfillsLiquidityByCategory(t *testing.T) {
 		}
 	}
 }
+
+// TestMigration0005_ConvertsToLiquidityEnum seeds rows against a database
+// with 0001-0004 already applied (so is_liquid exists as a plain boolean,
+// matching real production state before this migration), then applies 0005
+// and asserts every row survived (plain ADD COLUMN + DROP COLUMN, no
+// rebuild) and the is_liquid -> liquidity conversion is correct: an
+// explicit is_liquid=0 override always becomes illiquid regardless of
+// category (covers the real Tetrate stock override from production), a
+// liquid cash asset stays liquid, a liquid bond ETF (e.g. VBIL) becomes
+// liquid too (not invested), and every other liquid asset becomes invested.
+func TestMigration0005_ConvertsToLiquidityEnum(t *testing.T) {
+	db, err := Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatalf("Open() error = %v", err)
+	}
+	t.Cleanup(func() { db.Close() })
+
+	if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY)`); err != nil {
+		t.Fatalf("creating schema_migrations: %v", err)
+	}
+	for _, name := range []string{
+		"0001_init.sql",
+		"0002_create_exchange_rates.sql",
+		"0003_add_capital_balance_category.sql",
+		"0004_add_asset_liquidity.sql",
+	} {
+		if err := applyMigration(db, name); err != nil {
+			t.Fatalf("applying %s: %v", name, err)
+		}
+	}
+
+	seed := `
+		INSERT INTO assets (id, category, currency, security_type, is_liquid, created_at) VALUES
+			('cash1', 'cash', 'usd', NULL, 1, '2026-01-01T00:00:00Z'),
+			('bondetf1', 'etf', 'usd', 'bond', 1, '2026-01-01T00:00:00Z'),
+			('stocketf1', 'etf', 'usd', 'stock', 1, '2026-01-01T00:00:00Z'),
+			('stock1', 'stock_or_bond', 'usd', NULL, 0, '2026-01-01T00:00:00Z'),
+			('ret1', 'retirement', 'usd', NULL, 0, '2026-01-01T00:00:00Z');
+	`
+	if _, err := db.Exec(seed); err != nil {
+		t.Fatalf("seeding pre-0005 data: %v", err)
+	}
+
+	if err := applyMigration(db, "0005_change_asset_liquidity_to_enum.sql"); err != nil {
+		t.Fatalf("applying 0005_change_asset_liquidity_to_enum.sql: %v", err)
+	}
+
+	var total int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM assets`).Scan(&total); err != nil {
+		t.Fatalf("counting assets: %v", err)
+	}
+	if total != 5 {
+		t.Fatalf("assets count = %d, want 5 (all rows must survive ADD COLUMN + DROP COLUMN)", total)
+	}
+
+	want := map[string]string{
+		"cash1":     "liquid",
+		"bondetf1":  "liquid",
+		"stocketf1": "invested",
+		"stock1":    "illiquid", // explicit is_liquid=0 override survives regardless of category
+		"ret1":      "illiquid",
+	}
+	for id, wantLiquidity := range want {
+		var liquidity string
+		if err := db.QueryRow(`SELECT liquidity FROM assets WHERE id = ?`, id).Scan(&liquidity); err != nil {
+			t.Fatalf("querying liquidity for %s: %v", id, err)
+		}
+		if liquidity != wantLiquidity {
+			t.Errorf("asset %s liquidity = %q, want %q", id, liquidity, wantLiquidity)
+		}
+	}
+
+	var hasIsLiquidColumn int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM pragma_table_info('assets') WHERE name = 'is_liquid'`).Scan(&hasIsLiquidColumn); err != nil {
+		t.Fatalf("checking is_liquid column: %v", err)
+	}
+	if hasIsLiquidColumn != 0 {
+		t.Error("is_liquid column still exists after 0005, want it dropped")
+	}
+}

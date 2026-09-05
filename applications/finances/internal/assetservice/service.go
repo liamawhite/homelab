@@ -54,6 +54,10 @@ func (s *Service) CreateAsset(ctx context.Context, req *connect.Request[v1.Creat
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	liquidity, err := fromProtoLiquidity(req.Msg.GetLiquidity())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 
 	details, err := detailsFromCreateRequest(category, req.Msg)
 	if err != nil {
@@ -79,7 +83,7 @@ func (s *Service) CreateAsset(ctx context.Context, req *connect.Request[v1.Creat
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("initial_valuation_amount must not be negative"))
 	}
 
-	asset, err := s.assets.Create(ctx, category, currency, details, req.Msg.GetIsLiquid(), owners, exposures, date, amount)
+	asset, err := s.assets.Create(ctx, category, currency, details, liquidity, owners, exposures, date, amount)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -103,6 +107,10 @@ func (s *Service) UpdateAsset(ctx context.Context, req *connect.Request[v1.Updat
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	liquidity, err := fromProtoLiquidity(req.Msg.GetLiquidity())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 
 	details, err := detailsFromUpdateRequest(category, req.Msg)
 	if err != nil {
@@ -119,7 +127,7 @@ func (s *Service) UpdateAsset(ctx context.Context, req *connect.Request[v1.Updat
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	asset, err := s.assets.Update(ctx, id, category, currency, details, req.Msg.GetIsLiquid(), owners, exposures)
+	asset, err := s.assets.Update(ctx, id, category, currency, details, liquidity, owners, exposures)
 	if err != nil {
 		if errors.Is(err, storage.ErrAssetNotFound) {
 			return nil, connect.NewError(connect.CodeNotFound, err)
@@ -538,7 +546,7 @@ func toProto(asset storage.Asset) *v1.Asset {
 		Currency:  toProtoCurrency(asset.Currency),
 		Owners:    make([]*v1.AssetOwner, 0, len(asset.Owners)),
 		Exposures: make([]*v1.AssetExposure, 0, len(asset.Exposures)),
-		IsLiquid:  asset.IsLiquid,
+		Liquidity: toProtoLiquidity(asset.Liquidity),
 		CreatedAt: timestamppb.New(asset.CreatedAt),
 	}
 
@@ -624,6 +632,32 @@ func toProtoValuation(valuation storage.AssetValuation) *v1.AssetValuation {
 		Date:      valuation.Date,
 		Amount:    valuation.Amount,
 		CreatedAt: timestamppb.New(valuation.CreatedAt),
+	}
+}
+
+func toProtoLiquidity(liquidity storage.AssetLiquidity) v1.AssetLiquidity {
+	switch liquidity {
+	case storage.AssetLiquidityLiquid:
+		return v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID
+	case storage.AssetLiquidityInvested:
+		return v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED
+	case storage.AssetLiquidityIlliquid:
+		return v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID
+	default:
+		return v1.AssetLiquidity_ASSET_LIQUIDITY_UNSPECIFIED
+	}
+}
+
+func fromProtoLiquidity(liquidity v1.AssetLiquidity) (storage.AssetLiquidity, error) {
+	switch liquidity {
+	case v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID:
+		return storage.AssetLiquidityLiquid, nil
+	case v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED:
+		return storage.AssetLiquidityInvested, nil
+	case v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID:
+		return storage.AssetLiquidityIlliquid, nil
+	default:
+		return "", errors.New("liquidity must be LIQUID, INVESTED, or ILLIQUID")
 	}
 }
 

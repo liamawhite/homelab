@@ -251,6 +251,64 @@ func (SecurityType) EnumDescriptor() ([]byte, []int) {
 	return file_finances_v1_asset_proto_rawDescGZIP(), []int{3}
 }
 
+// AssetLiquidity is an explicit, per-asset override (not derived from
+// category) of how readily an asset can be turned into spendable cash:
+// LIQUID is cash itself, INVESTED is a liquid market position that still
+// takes a sell/transfer to spend (a brokerage ETF, an individual stock),
+// ILLIQUID is locked up (a 401k before retirement age, real estate, a
+// restricted private-company stock grant).
+type AssetLiquidity int32
+
+const (
+	AssetLiquidity_ASSET_LIQUIDITY_UNSPECIFIED AssetLiquidity = 0
+	AssetLiquidity_ASSET_LIQUIDITY_LIQUID      AssetLiquidity = 1
+	AssetLiquidity_ASSET_LIQUIDITY_INVESTED    AssetLiquidity = 2
+	AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID    AssetLiquidity = 3
+)
+
+// Enum value maps for AssetLiquidity.
+var (
+	AssetLiquidity_name = map[int32]string{
+		0: "ASSET_LIQUIDITY_UNSPECIFIED",
+		1: "ASSET_LIQUIDITY_LIQUID",
+		2: "ASSET_LIQUIDITY_INVESTED",
+		3: "ASSET_LIQUIDITY_ILLIQUID",
+	}
+	AssetLiquidity_value = map[string]int32{
+		"ASSET_LIQUIDITY_UNSPECIFIED": 0,
+		"ASSET_LIQUIDITY_LIQUID":      1,
+		"ASSET_LIQUIDITY_INVESTED":    2,
+		"ASSET_LIQUIDITY_ILLIQUID":    3,
+	}
+)
+
+func (x AssetLiquidity) Enum() *AssetLiquidity {
+	p := new(AssetLiquidity)
+	*p = x
+	return p
+}
+
+func (x AssetLiquidity) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AssetLiquidity) Descriptor() protoreflect.EnumDescriptor {
+	return file_finances_v1_asset_proto_enumTypes[4].Descriptor()
+}
+
+func (AssetLiquidity) Type() protoreflect.EnumType {
+	return &file_finances_v1_asset_proto_enumTypes[4]
+}
+
+func (x AssetLiquidity) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AssetLiquidity.Descriptor instead.
+func (AssetLiquidity) EnumDescriptor() ([]byte, []int) {
+	return file_finances_v1_asset_proto_rawDescGZIP(), []int{4}
+}
+
 type StockOrBondDetails struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	CompanyOrBondName string                 `protobuf:"bytes,1,opt,name=company_or_bond_name,json=companyOrBondName,proto3" json:"company_or_bond_name,omitempty"`
@@ -901,14 +959,14 @@ type Asset struct {
 	//	*Asset_Mortgage
 	//	*Asset_CapitalBalance
 	Details isAsset_Details `protobuf_oneof:"details"`
-	// Whether this asset can be readily converted to cash - an explicit,
+	// How readily this asset can be turned into spendable cash - an explicit,
 	// per-asset override (not derived from category) so an individual
 	// instance can differ from its category's usual default (e.g. a
-	// restricted stock grant, or a locked CD). Drives the liquid/illiquid
-	// navbar filter; ignored for ASSET_CATEGORY_CAPITAL_BALANCE, which
-	// always shows regardless of this filter (it's a household ledger entry,
-	// not a market asset).
-	IsLiquid      bool `protobuf:"varint,16,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
+	// restricted stock grant, or a locked CD). Drives the liquid/invested/
+	// illiquid navbar filter; ignored for ASSET_CATEGORY_CAPITAL_BALANCE,
+	// which always shows regardless of this filter (it's a household ledger
+	// entry, not a market asset).
+	Liquidity     AssetLiquidity `protobuf:"varint,16,opt,name=liquidity,proto3,enum=finances.v1.AssetLiquidity" json:"liquidity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1071,11 +1129,11 @@ func (x *Asset) GetCapitalBalance() *CapitalBalanceDetails {
 	return nil
 }
 
-func (x *Asset) GetIsLiquid() bool {
+func (x *Asset) GetLiquidity() AssetLiquidity {
 	if x != nil {
-		return x.IsLiquid
+		return x.Liquidity
 	}
-	return false
+	return AssetLiquidity_ASSET_LIQUIDITY_UNSPECIFIED
 }
 
 type isAsset_Details interface {
@@ -1333,7 +1391,7 @@ type CreateAssetRequest struct {
 	//	*CreateAssetRequest_Mortgage
 	//	*CreateAssetRequest_CapitalBalance
 	Details       isCreateAssetRequest_Details `protobuf_oneof:"details"`
-	IsLiquid      bool                         `protobuf:"varint,15,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
+	Liquidity     AssetLiquidity               `protobuf:"varint,15,opt,name=liquidity,proto3,enum=finances.v1.AssetLiquidity" json:"liquidity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1489,11 +1547,11 @@ func (x *CreateAssetRequest) GetCapitalBalance() *CapitalBalanceDetails {
 	return nil
 }
 
-func (x *CreateAssetRequest) GetIsLiquid() bool {
+func (x *CreateAssetRequest) GetLiquidity() AssetLiquidity {
 	if x != nil {
-		return x.IsLiquid
+		return x.Liquidity
 	}
-	return false
+	return AssetLiquidity_ASSET_LIQUIDITY_UNSPECIFIED
 }
 
 type isCreateAssetRequest_Details interface {
@@ -1610,7 +1668,7 @@ type UpdateAssetRequest struct {
 	//	*UpdateAssetRequest_Mortgage
 	//	*UpdateAssetRequest_CapitalBalance
 	Details       isUpdateAssetRequest_Details `protobuf_oneof:"details"`
-	IsLiquid      bool                         `protobuf:"varint,14,opt,name=is_liquid,json=isLiquid,proto3" json:"is_liquid,omitempty"`
+	Liquidity     AssetLiquidity               `protobuf:"varint,14,opt,name=liquidity,proto3,enum=finances.v1.AssetLiquidity" json:"liquidity,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1759,11 +1817,11 @@ func (x *UpdateAssetRequest) GetCapitalBalance() *CapitalBalanceDetails {
 	return nil
 }
 
-func (x *UpdateAssetRequest) GetIsLiquid() bool {
+func (x *UpdateAssetRequest) GetLiquidity() AssetLiquidity {
 	if x != nil {
-		return x.IsLiquid
+		return x.Liquidity
 	}
-	return false
+	return AssetLiquidity_ASSET_LIQUIDITY_UNSPECIFIED
 }
 
 type isUpdateAssetRequest_Details interface {
@@ -2262,7 +2320,7 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12\x16\n" +
 	"\x06amount\x18\x04 \x01(\x03R\x06amount\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xfc\x06\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x9a\a\n" +
 	"\x05Asset\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
@@ -2283,8 +2341,8 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\r \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\x0e \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\x0f \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
-	"\tis_liquid\x18\x10 \x01(\bR\bisLiquidB\t\n" +
+	"\x0fcapital_balance\x18\x0f \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x129\n" +
+	"\tliquidity\x18\x10 \x01(\x0e2\x1b.finances.v1.AssetLiquidityR\tliquidityB\t\n" +
 	"\adetails\"E\n" +
 	"\n" +
 	"OwnerShare\x12\x17\n" +
@@ -2299,7 +2357,7 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"percentage\"\x13\n" +
 	"\x11ListAssetsRequest\"@\n" +
 	"\x12ListAssetsResponse\x12*\n" +
-	"\x06assets\x18\x01 \x03(\v2\x12.finances.v1.AssetR\x06assets\"\xe6\x06\n" +
+	"\x06assets\x18\x01 \x03(\v2\x12.finances.v1.AssetR\x06assets\"\x84\a\n" +
 	"\x12CreateAssetRequest\x126\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
 	"\bcurrency\x18\x02 \x01(\x0e2\x15.finances.v1.CurrencyR\bcurrency\x12/\n" +
@@ -2318,11 +2376,11 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\f \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\r \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\x0e \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
-	"\tis_liquid\x18\x0f \x01(\bR\bisLiquidB\t\n" +
+	"\x0fcapital_balance\x18\x0e \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x129\n" +
+	"\tliquidity\x18\x0f \x01(\x0e2\x1b.finances.v1.AssetLiquidityR\tliquidityB\t\n" +
 	"\adetails\"?\n" +
 	"\x13CreateAssetResponse\x12(\n" +
-	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"\x86\x06\n" +
+	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"\xa4\x06\n" +
 	"\x12UpdateAssetRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.finances.v1.AssetCategoryR\bcategory\x121\n" +
@@ -2340,8 +2398,8 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"realEstate\x12.\n" +
 	"\x04loan\x18\v \x01(\v2\x18.finances.v1.LoanDetailsH\x00R\x04loan\x12:\n" +
 	"\bmortgage\x18\f \x01(\v2\x1c.finances.v1.MortgageDetailsH\x00R\bmortgage\x12M\n" +
-	"\x0fcapital_balance\x18\r \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x12\x1b\n" +
-	"\tis_liquid\x18\x0e \x01(\bR\bisLiquidB\t\n" +
+	"\x0fcapital_balance\x18\r \x01(\v2\".finances.v1.CapitalBalanceDetailsH\x00R\x0ecapitalBalance\x129\n" +
+	"\tliquidity\x18\x0e \x01(\x0e2\x1b.finances.v1.AssetLiquidityR\tliquidityB\t\n" +
 	"\adetails\"?\n" +
 	"\x13UpdateAssetResponse\x12(\n" +
 	"\x05asset\x18\x01 \x01(\v2\x12.finances.v1.AssetR\x05asset\"$\n" +
@@ -2388,7 +2446,12 @@ const file_finances_v1_asset_proto_rawDesc = "" +
 	"\x13SECURITY_TYPE_STOCK\x10\x01\x12\x16\n" +
 	"\x12SECURITY_TYPE_BOND\x10\x02\x12\x1b\n" +
 	"\x17SECURITY_TYPE_COMMODITY\x10\x03\x12\x18\n" +
-	"\x14SECURITY_TYPE_CRYPTO\x10\x042\x8e\x05\n" +
+	"\x14SECURITY_TYPE_CRYPTO\x10\x04*\x89\x01\n" +
+	"\x0eAssetLiquidity\x12\x1f\n" +
+	"\x1bASSET_LIQUIDITY_UNSPECIFIED\x10\x00\x12\x1a\n" +
+	"\x16ASSET_LIQUIDITY_LIQUID\x10\x01\x12\x1c\n" +
+	"\x18ASSET_LIQUIDITY_INVESTED\x10\x02\x12\x1c\n" +
+	"\x18ASSET_LIQUIDITY_ILLIQUID\x10\x032\x8e\x05\n" +
 	"\fAssetService\x12M\n" +
 	"\n" +
 	"ListAssets\x12\x1e.finances.v1.ListAssetsRequest\x1a\x1f.finances.v1.ListAssetsResponse\x12P\n" +
@@ -2411,110 +2474,114 @@ func file_finances_v1_asset_proto_rawDescGZIP() []byte {
 	return file_finances_v1_asset_proto_rawDescData
 }
 
-var file_finances_v1_asset_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_finances_v1_asset_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_finances_v1_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_finances_v1_asset_proto_goTypes = []any{
 	(AssetCategory)(0),                   // 0: finances.v1.AssetCategory
 	(Currency)(0),                        // 1: finances.v1.Currency
 	(Region)(0),                          // 2: finances.v1.Region
 	(SecurityType)(0),                    // 3: finances.v1.SecurityType
-	(*StockOrBondDetails)(nil),           // 4: finances.v1.StockOrBondDetails
-	(*CashDetails)(nil),                  // 5: finances.v1.CashDetails
-	(*EtfDetails)(nil),                   // 6: finances.v1.EtfDetails
-	(*RetirementDetails)(nil),            // 7: finances.v1.RetirementDetails
-	(*RealEstateDetails)(nil),            // 8: finances.v1.RealEstateDetails
-	(*LoanDetails)(nil),                  // 9: finances.v1.LoanDetails
-	(*MortgageDetails)(nil),              // 10: finances.v1.MortgageDetails
-	(*CapitalBalanceDetails)(nil),        // 11: finances.v1.CapitalBalanceDetails
-	(*AssetOwner)(nil),                   // 12: finances.v1.AssetOwner
-	(*AssetExposure)(nil),                // 13: finances.v1.AssetExposure
-	(*AssetValuation)(nil),               // 14: finances.v1.AssetValuation
-	(*Asset)(nil),                        // 15: finances.v1.Asset
-	(*OwnerShare)(nil),                   // 16: finances.v1.OwnerShare
-	(*ExposureShare)(nil),                // 17: finances.v1.ExposureShare
-	(*ListAssetsRequest)(nil),            // 18: finances.v1.ListAssetsRequest
-	(*ListAssetsResponse)(nil),           // 19: finances.v1.ListAssetsResponse
-	(*CreateAssetRequest)(nil),           // 20: finances.v1.CreateAssetRequest
-	(*CreateAssetResponse)(nil),          // 21: finances.v1.CreateAssetResponse
-	(*UpdateAssetRequest)(nil),           // 22: finances.v1.UpdateAssetRequest
-	(*UpdateAssetResponse)(nil),          // 23: finances.v1.UpdateAssetResponse
-	(*DeleteAssetRequest)(nil),           // 24: finances.v1.DeleteAssetRequest
-	(*DeleteAssetResponse)(nil),          // 25: finances.v1.DeleteAssetResponse
-	(*ListAssetValuationsRequest)(nil),   // 26: finances.v1.ListAssetValuationsRequest
-	(*ListAssetValuationsResponse)(nil),  // 27: finances.v1.ListAssetValuationsResponse
-	(*AddAssetValuationRequest)(nil),     // 28: finances.v1.AddAssetValuationRequest
-	(*AddAssetValuationResponse)(nil),    // 29: finances.v1.AddAssetValuationResponse
-	(*DeleteAssetValuationRequest)(nil),  // 30: finances.v1.DeleteAssetValuationRequest
-	(*DeleteAssetValuationResponse)(nil), // 31: finances.v1.DeleteAssetValuationResponse
-	(*timestamppb.Timestamp)(nil),        // 32: google.protobuf.Timestamp
+	(AssetLiquidity)(0),                  // 4: finances.v1.AssetLiquidity
+	(*StockOrBondDetails)(nil),           // 5: finances.v1.StockOrBondDetails
+	(*CashDetails)(nil),                  // 6: finances.v1.CashDetails
+	(*EtfDetails)(nil),                   // 7: finances.v1.EtfDetails
+	(*RetirementDetails)(nil),            // 8: finances.v1.RetirementDetails
+	(*RealEstateDetails)(nil),            // 9: finances.v1.RealEstateDetails
+	(*LoanDetails)(nil),                  // 10: finances.v1.LoanDetails
+	(*MortgageDetails)(nil),              // 11: finances.v1.MortgageDetails
+	(*CapitalBalanceDetails)(nil),        // 12: finances.v1.CapitalBalanceDetails
+	(*AssetOwner)(nil),                   // 13: finances.v1.AssetOwner
+	(*AssetExposure)(nil),                // 14: finances.v1.AssetExposure
+	(*AssetValuation)(nil),               // 15: finances.v1.AssetValuation
+	(*Asset)(nil),                        // 16: finances.v1.Asset
+	(*OwnerShare)(nil),                   // 17: finances.v1.OwnerShare
+	(*ExposureShare)(nil),                // 18: finances.v1.ExposureShare
+	(*ListAssetsRequest)(nil),            // 19: finances.v1.ListAssetsRequest
+	(*ListAssetsResponse)(nil),           // 20: finances.v1.ListAssetsResponse
+	(*CreateAssetRequest)(nil),           // 21: finances.v1.CreateAssetRequest
+	(*CreateAssetResponse)(nil),          // 22: finances.v1.CreateAssetResponse
+	(*UpdateAssetRequest)(nil),           // 23: finances.v1.UpdateAssetRequest
+	(*UpdateAssetResponse)(nil),          // 24: finances.v1.UpdateAssetResponse
+	(*DeleteAssetRequest)(nil),           // 25: finances.v1.DeleteAssetRequest
+	(*DeleteAssetResponse)(nil),          // 26: finances.v1.DeleteAssetResponse
+	(*ListAssetValuationsRequest)(nil),   // 27: finances.v1.ListAssetValuationsRequest
+	(*ListAssetValuationsResponse)(nil),  // 28: finances.v1.ListAssetValuationsResponse
+	(*AddAssetValuationRequest)(nil),     // 29: finances.v1.AddAssetValuationRequest
+	(*AddAssetValuationResponse)(nil),    // 30: finances.v1.AddAssetValuationResponse
+	(*DeleteAssetValuationRequest)(nil),  // 31: finances.v1.DeleteAssetValuationRequest
+	(*DeleteAssetValuationResponse)(nil), // 32: finances.v1.DeleteAssetValuationResponse
+	(*timestamppb.Timestamp)(nil),        // 33: google.protobuf.Timestamp
 }
 var file_finances_v1_asset_proto_depIdxs = []int32{
 	3,  // 0: finances.v1.EtfDetails.security_type:type_name -> finances.v1.SecurityType
 	2,  // 1: finances.v1.AssetExposure.region:type_name -> finances.v1.Region
-	32, // 2: finances.v1.AssetValuation.created_at:type_name -> google.protobuf.Timestamp
+	33, // 2: finances.v1.AssetValuation.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: finances.v1.Asset.category:type_name -> finances.v1.AssetCategory
 	1,  // 4: finances.v1.Asset.currency:type_name -> finances.v1.Currency
-	12, // 5: finances.v1.Asset.owners:type_name -> finances.v1.AssetOwner
-	13, // 6: finances.v1.Asset.exposures:type_name -> finances.v1.AssetExposure
-	14, // 7: finances.v1.Asset.latest_valuation:type_name -> finances.v1.AssetValuation
-	32, // 8: finances.v1.Asset.created_at:type_name -> google.protobuf.Timestamp
-	4,  // 9: finances.v1.Asset.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
-	5,  // 10: finances.v1.Asset.cash:type_name -> finances.v1.CashDetails
-	6,  // 11: finances.v1.Asset.etf:type_name -> finances.v1.EtfDetails
-	7,  // 12: finances.v1.Asset.retirement:type_name -> finances.v1.RetirementDetails
-	8,  // 13: finances.v1.Asset.real_estate:type_name -> finances.v1.RealEstateDetails
-	9,  // 14: finances.v1.Asset.loan:type_name -> finances.v1.LoanDetails
-	10, // 15: finances.v1.Asset.mortgage:type_name -> finances.v1.MortgageDetails
-	11, // 16: finances.v1.Asset.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
-	2,  // 17: finances.v1.ExposureShare.region:type_name -> finances.v1.Region
-	15, // 18: finances.v1.ListAssetsResponse.assets:type_name -> finances.v1.Asset
-	0,  // 19: finances.v1.CreateAssetRequest.category:type_name -> finances.v1.AssetCategory
-	1,  // 20: finances.v1.CreateAssetRequest.currency:type_name -> finances.v1.Currency
-	16, // 21: finances.v1.CreateAssetRequest.owners:type_name -> finances.v1.OwnerShare
-	17, // 22: finances.v1.CreateAssetRequest.exposures:type_name -> finances.v1.ExposureShare
-	4,  // 23: finances.v1.CreateAssetRequest.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
-	5,  // 24: finances.v1.CreateAssetRequest.cash:type_name -> finances.v1.CashDetails
-	6,  // 25: finances.v1.CreateAssetRequest.etf:type_name -> finances.v1.EtfDetails
-	7,  // 26: finances.v1.CreateAssetRequest.retirement:type_name -> finances.v1.RetirementDetails
-	8,  // 27: finances.v1.CreateAssetRequest.real_estate:type_name -> finances.v1.RealEstateDetails
-	9,  // 28: finances.v1.CreateAssetRequest.loan:type_name -> finances.v1.LoanDetails
-	10, // 29: finances.v1.CreateAssetRequest.mortgage:type_name -> finances.v1.MortgageDetails
-	11, // 30: finances.v1.CreateAssetRequest.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
-	15, // 31: finances.v1.CreateAssetResponse.asset:type_name -> finances.v1.Asset
-	0,  // 32: finances.v1.UpdateAssetRequest.category:type_name -> finances.v1.AssetCategory
-	1,  // 33: finances.v1.UpdateAssetRequest.currency:type_name -> finances.v1.Currency
-	16, // 34: finances.v1.UpdateAssetRequest.owners:type_name -> finances.v1.OwnerShare
-	17, // 35: finances.v1.UpdateAssetRequest.exposures:type_name -> finances.v1.ExposureShare
-	4,  // 36: finances.v1.UpdateAssetRequest.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
-	5,  // 37: finances.v1.UpdateAssetRequest.cash:type_name -> finances.v1.CashDetails
-	6,  // 38: finances.v1.UpdateAssetRequest.etf:type_name -> finances.v1.EtfDetails
-	7,  // 39: finances.v1.UpdateAssetRequest.retirement:type_name -> finances.v1.RetirementDetails
-	8,  // 40: finances.v1.UpdateAssetRequest.real_estate:type_name -> finances.v1.RealEstateDetails
-	9,  // 41: finances.v1.UpdateAssetRequest.loan:type_name -> finances.v1.LoanDetails
-	10, // 42: finances.v1.UpdateAssetRequest.mortgage:type_name -> finances.v1.MortgageDetails
-	11, // 43: finances.v1.UpdateAssetRequest.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
-	15, // 44: finances.v1.UpdateAssetResponse.asset:type_name -> finances.v1.Asset
-	14, // 45: finances.v1.ListAssetValuationsResponse.valuations:type_name -> finances.v1.AssetValuation
-	14, // 46: finances.v1.AddAssetValuationResponse.valuation:type_name -> finances.v1.AssetValuation
-	18, // 47: finances.v1.AssetService.ListAssets:input_type -> finances.v1.ListAssetsRequest
-	20, // 48: finances.v1.AssetService.CreateAsset:input_type -> finances.v1.CreateAssetRequest
-	22, // 49: finances.v1.AssetService.UpdateAsset:input_type -> finances.v1.UpdateAssetRequest
-	24, // 50: finances.v1.AssetService.DeleteAsset:input_type -> finances.v1.DeleteAssetRequest
-	26, // 51: finances.v1.AssetService.ListAssetValuations:input_type -> finances.v1.ListAssetValuationsRequest
-	28, // 52: finances.v1.AssetService.AddAssetValuation:input_type -> finances.v1.AddAssetValuationRequest
-	30, // 53: finances.v1.AssetService.DeleteAssetValuation:input_type -> finances.v1.DeleteAssetValuationRequest
-	19, // 54: finances.v1.AssetService.ListAssets:output_type -> finances.v1.ListAssetsResponse
-	21, // 55: finances.v1.AssetService.CreateAsset:output_type -> finances.v1.CreateAssetResponse
-	23, // 56: finances.v1.AssetService.UpdateAsset:output_type -> finances.v1.UpdateAssetResponse
-	25, // 57: finances.v1.AssetService.DeleteAsset:output_type -> finances.v1.DeleteAssetResponse
-	27, // 58: finances.v1.AssetService.ListAssetValuations:output_type -> finances.v1.ListAssetValuationsResponse
-	29, // 59: finances.v1.AssetService.AddAssetValuation:output_type -> finances.v1.AddAssetValuationResponse
-	31, // 60: finances.v1.AssetService.DeleteAssetValuation:output_type -> finances.v1.DeleteAssetValuationResponse
-	54, // [54:61] is the sub-list for method output_type
-	47, // [47:54] is the sub-list for method input_type
-	47, // [47:47] is the sub-list for extension type_name
-	47, // [47:47] is the sub-list for extension extendee
-	0,  // [0:47] is the sub-list for field type_name
+	13, // 5: finances.v1.Asset.owners:type_name -> finances.v1.AssetOwner
+	14, // 6: finances.v1.Asset.exposures:type_name -> finances.v1.AssetExposure
+	15, // 7: finances.v1.Asset.latest_valuation:type_name -> finances.v1.AssetValuation
+	33, // 8: finances.v1.Asset.created_at:type_name -> google.protobuf.Timestamp
+	5,  // 9: finances.v1.Asset.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
+	6,  // 10: finances.v1.Asset.cash:type_name -> finances.v1.CashDetails
+	7,  // 11: finances.v1.Asset.etf:type_name -> finances.v1.EtfDetails
+	8,  // 12: finances.v1.Asset.retirement:type_name -> finances.v1.RetirementDetails
+	9,  // 13: finances.v1.Asset.real_estate:type_name -> finances.v1.RealEstateDetails
+	10, // 14: finances.v1.Asset.loan:type_name -> finances.v1.LoanDetails
+	11, // 15: finances.v1.Asset.mortgage:type_name -> finances.v1.MortgageDetails
+	12, // 16: finances.v1.Asset.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
+	4,  // 17: finances.v1.Asset.liquidity:type_name -> finances.v1.AssetLiquidity
+	2,  // 18: finances.v1.ExposureShare.region:type_name -> finances.v1.Region
+	16, // 19: finances.v1.ListAssetsResponse.assets:type_name -> finances.v1.Asset
+	0,  // 20: finances.v1.CreateAssetRequest.category:type_name -> finances.v1.AssetCategory
+	1,  // 21: finances.v1.CreateAssetRequest.currency:type_name -> finances.v1.Currency
+	17, // 22: finances.v1.CreateAssetRequest.owners:type_name -> finances.v1.OwnerShare
+	18, // 23: finances.v1.CreateAssetRequest.exposures:type_name -> finances.v1.ExposureShare
+	5,  // 24: finances.v1.CreateAssetRequest.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
+	6,  // 25: finances.v1.CreateAssetRequest.cash:type_name -> finances.v1.CashDetails
+	7,  // 26: finances.v1.CreateAssetRequest.etf:type_name -> finances.v1.EtfDetails
+	8,  // 27: finances.v1.CreateAssetRequest.retirement:type_name -> finances.v1.RetirementDetails
+	9,  // 28: finances.v1.CreateAssetRequest.real_estate:type_name -> finances.v1.RealEstateDetails
+	10, // 29: finances.v1.CreateAssetRequest.loan:type_name -> finances.v1.LoanDetails
+	11, // 30: finances.v1.CreateAssetRequest.mortgage:type_name -> finances.v1.MortgageDetails
+	12, // 31: finances.v1.CreateAssetRequest.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
+	4,  // 32: finances.v1.CreateAssetRequest.liquidity:type_name -> finances.v1.AssetLiquidity
+	16, // 33: finances.v1.CreateAssetResponse.asset:type_name -> finances.v1.Asset
+	0,  // 34: finances.v1.UpdateAssetRequest.category:type_name -> finances.v1.AssetCategory
+	1,  // 35: finances.v1.UpdateAssetRequest.currency:type_name -> finances.v1.Currency
+	17, // 36: finances.v1.UpdateAssetRequest.owners:type_name -> finances.v1.OwnerShare
+	18, // 37: finances.v1.UpdateAssetRequest.exposures:type_name -> finances.v1.ExposureShare
+	5,  // 38: finances.v1.UpdateAssetRequest.stock_or_bond:type_name -> finances.v1.StockOrBondDetails
+	6,  // 39: finances.v1.UpdateAssetRequest.cash:type_name -> finances.v1.CashDetails
+	7,  // 40: finances.v1.UpdateAssetRequest.etf:type_name -> finances.v1.EtfDetails
+	8,  // 41: finances.v1.UpdateAssetRequest.retirement:type_name -> finances.v1.RetirementDetails
+	9,  // 42: finances.v1.UpdateAssetRequest.real_estate:type_name -> finances.v1.RealEstateDetails
+	10, // 43: finances.v1.UpdateAssetRequest.loan:type_name -> finances.v1.LoanDetails
+	11, // 44: finances.v1.UpdateAssetRequest.mortgage:type_name -> finances.v1.MortgageDetails
+	12, // 45: finances.v1.UpdateAssetRequest.capital_balance:type_name -> finances.v1.CapitalBalanceDetails
+	4,  // 46: finances.v1.UpdateAssetRequest.liquidity:type_name -> finances.v1.AssetLiquidity
+	16, // 47: finances.v1.UpdateAssetResponse.asset:type_name -> finances.v1.Asset
+	15, // 48: finances.v1.ListAssetValuationsResponse.valuations:type_name -> finances.v1.AssetValuation
+	15, // 49: finances.v1.AddAssetValuationResponse.valuation:type_name -> finances.v1.AssetValuation
+	19, // 50: finances.v1.AssetService.ListAssets:input_type -> finances.v1.ListAssetsRequest
+	21, // 51: finances.v1.AssetService.CreateAsset:input_type -> finances.v1.CreateAssetRequest
+	23, // 52: finances.v1.AssetService.UpdateAsset:input_type -> finances.v1.UpdateAssetRequest
+	25, // 53: finances.v1.AssetService.DeleteAsset:input_type -> finances.v1.DeleteAssetRequest
+	27, // 54: finances.v1.AssetService.ListAssetValuations:input_type -> finances.v1.ListAssetValuationsRequest
+	29, // 55: finances.v1.AssetService.AddAssetValuation:input_type -> finances.v1.AddAssetValuationRequest
+	31, // 56: finances.v1.AssetService.DeleteAssetValuation:input_type -> finances.v1.DeleteAssetValuationRequest
+	20, // 57: finances.v1.AssetService.ListAssets:output_type -> finances.v1.ListAssetsResponse
+	22, // 58: finances.v1.AssetService.CreateAsset:output_type -> finances.v1.CreateAssetResponse
+	24, // 59: finances.v1.AssetService.UpdateAsset:output_type -> finances.v1.UpdateAssetResponse
+	26, // 60: finances.v1.AssetService.DeleteAsset:output_type -> finances.v1.DeleteAssetResponse
+	28, // 61: finances.v1.AssetService.ListAssetValuations:output_type -> finances.v1.ListAssetValuationsResponse
+	30, // 62: finances.v1.AssetService.AddAssetValuation:output_type -> finances.v1.AddAssetValuationResponse
+	32, // 63: finances.v1.AssetService.DeleteAssetValuation:output_type -> finances.v1.DeleteAssetValuationResponse
+	57, // [57:64] is the sub-list for method output_type
+	50, // [50:57] is the sub-list for method input_type
+	50, // [50:50] is the sub-list for extension type_name
+	50, // [50:50] is the sub-list for extension extendee
+	0,  // [0:50] is the sub-list for field type_name
 }
 
 func init() { file_finances_v1_asset_proto_init() }
@@ -2557,7 +2624,7 @@ func file_finances_v1_asset_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_finances_v1_asset_proto_rawDesc), len(file_finances_v1_asset_proto_rawDesc)),
-			NumEnums:      4,
+			NumEnums:      5,
 			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,

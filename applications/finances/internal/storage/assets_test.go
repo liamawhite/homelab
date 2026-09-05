@@ -40,7 +40,7 @@ func TestAssets_CreateAndGet_StockOrBond(t *testing.T) {
 		Platform:          strPtr("Vanguard"),
 	}
 	created, err := assets.Create(ctx, AssetCategoryStockOrBond, CurrencyUSD, details,
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: owner.ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 		"2026-01-01", 10000,
@@ -100,7 +100,7 @@ func TestAssets_Create_SplitOwnership(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryCash, CurrencyGBP,
 		AssetDetails{AccountName: strPtr("Joint Savings"), Institution: strPtr("Monzo")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{
 			{UserID: userList[0].ID, Percentage: 60},
 			{UserID: userList[1].ID, Percentage: 40},
@@ -138,7 +138,7 @@ func TestAssets_Update_ReplacesOwnersAndExposures(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryEtf, CurrencyUSD,
 		AssetDetails{EtfName: strPtr("VOO"), SecurityType: securityTypePtrHelper(SecurityTypeStock), Platform: strPtr("Vanguard")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 		"2026-01-01", 10000,
@@ -149,7 +149,7 @@ func TestAssets_Update_ReplacesOwnersAndExposures(t *testing.T) {
 
 	updated, err := assets.Update(ctx, created.ID, AssetCategoryEtf, CurrencyUSD,
 		AssetDetails{EtfName: strPtr("VXUS"), SecurityType: securityTypePtrHelper(SecurityTypeStock), Platform: strPtr("Vanguard")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{
 			{UserID: userList[0].ID, Percentage: 50},
 			{UserID: userList[1].ID, Percentage: 50},
@@ -184,7 +184,7 @@ func TestAssets_Update_NotFound(t *testing.T) {
 	assets, _ := openAssetsTestDB(t)
 
 	_, err := assets.Update(ctx, "does-not-exist", AssetCategoryCash, CurrencyUSD,
-		AssetDetails{AccountName: strPtr("x"), Institution: strPtr("y")}, true, nil, nil)
+		AssetDetails{AccountName: strPtr("x"), Institution: strPtr("y")}, AssetLiquidityInvested, nil, nil)
 	if !errors.Is(err, ErrAssetNotFound) {
 		t.Fatalf("Update() error = %v, want ErrAssetNotFound", err)
 	}
@@ -201,7 +201,7 @@ func TestAssets_Delete_CascadesChildren(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryCash, CurrencyUSD,
 		AssetDetails{AccountName: strPtr("Checking"), Institution: strPtr("Chase")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 		"2026-01-01", 100000,
@@ -243,7 +243,7 @@ func TestAssets_AddValuation_ThenListValuations_NewestFirst(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryCash, CurrencyUSD,
 		AssetDetails{AccountName: strPtr("Savings"), Institution: strPtr("Chase")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 		"2026-01-01", 100000,
@@ -299,7 +299,7 @@ func TestAssets_Create_RetirementWithBondsRegion(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryRetirement, CurrencyUSD,
 		AssetDetails{PlanName: strPtr("Tetrate 401k"), Platform: strPtr("Empower")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{
 			{Region: RegionUS, Percentage: 55},
@@ -337,7 +337,7 @@ func TestAssets_Create_LoanWithNoExposures(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryLoan, CurrencyUSD,
 		AssetDetails{AccountName: strPtr("Personal Loan")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		nil,
 		"2025-12-31", 13000000,
@@ -361,7 +361,7 @@ func TestAssets_Create_RealEstateSplitOwnership(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryRealEstate, CurrencyUSD,
 		AssetDetails{PropertyName: strPtr("House"), Notes: strPtr("Adjusted for realtor fees")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{
 			{UserID: userList[0].ID, Percentage: 50},
 			{UserID: userList[1].ID, Percentage: 50},
@@ -394,7 +394,7 @@ func TestAssets_Create_MortgageWithBlankLender(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryMortgage, CurrencyUSD,
 		AssetDetails{PropertyName: strPtr("House"), Institution: strPtr("PNC")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{
 			{UserID: userList[0].ID, Percentage: 50},
 			{UserID: userList[1].ID, Percentage: 50},
@@ -424,7 +424,7 @@ func TestAssets_DeleteValuation(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryCash, CurrencyUSD,
 		AssetDetails{AccountName: strPtr("Savings"), Institution: strPtr("Chase")},
-		true,
+		AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		nil,
 		"2026-01-01", 100000,
@@ -454,7 +454,7 @@ func TestAssets_DeleteValuation(t *testing.T) {
 	}
 }
 
-func TestAssets_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
+func TestAssets_Liquidity_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 	ctx := context.Background()
 	assets, users := openAssetsTestDB(t)
 
@@ -465,7 +465,7 @@ func TestAssets_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 
 	created, err := assets.Create(ctx, AssetCategoryRealEstate, CurrencyUSD,
 		AssetDetails{PropertyName: strPtr("House"), Notes: strPtr("")},
-		false,
+		AssetLiquidityIlliquid,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 		"2026-01-01", 100000,
@@ -473,28 +473,28 @@ func TestAssets_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create() error = %v", err)
 	}
-	if created.IsLiquid {
-		t.Fatalf("Create() IsLiquid = true, want false")
+	if created.Liquidity != AssetLiquidityIlliquid {
+		t.Fatalf("Create() Liquidity = %q, want %q", created.Liquidity, AssetLiquidityIlliquid)
 	}
 
 	got, err := assets.Get(ctx, created.ID)
 	if err != nil {
 		t.Fatalf("Get() error = %v", err)
 	}
-	if got.IsLiquid {
-		t.Fatalf("Get() IsLiquid = true, want false")
+	if got.Liquidity != AssetLiquidityIlliquid {
+		t.Fatalf("Get() Liquidity = %q, want %q", got.Liquidity, AssetLiquidityIlliquid)
 	}
 
 	updated, err := assets.Update(ctx, created.ID, AssetCategoryRealEstate, CurrencyUSD,
-		AssetDetails{PropertyName: strPtr("House"), Notes: strPtr("")}, true,
+		AssetDetails{PropertyName: strPtr("House"), Notes: strPtr("")}, AssetLiquidityInvested,
 		[]OwnerInput{{UserID: userList[0].ID, Percentage: 100}},
 		[]ExposureInput{{Region: RegionUS, Percentage: 100}},
 	)
 	if err != nil {
 		t.Fatalf("Update() error = %v", err)
 	}
-	if !updated.IsLiquid {
-		t.Fatalf("Update() IsLiquid = false, want true (override should persist)")
+	if updated.Liquidity != AssetLiquidityInvested {
+		t.Fatalf("Update() Liquidity = %q, want %q (override should persist)", updated.Liquidity, AssetLiquidityInvested)
 	}
 }
 

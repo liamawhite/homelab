@@ -30,8 +30,8 @@ function ExposureTooltip({ active, payload, currency }: ExposureTooltipProps) {
         <span className="font-medium text-popover-foreground">{band}</span>
         <span className="tabular-nums font-medium text-popover-foreground">{formatCurrency(value, currency)}</span>
       </div>
-      {detail.length > 1 && (
-        <div className="grid gap-1 border-t pt-2">
+      {detail.length > 0 && (
+        <div className="grid max-h-48 gap-1 overflow-y-auto border-t pt-2">
           {detail.map((row, i) => (
             <div key={`${row.name}-${row.owner}-${i}`} className="flex items-center justify-between gap-4">
               <span className="text-foreground">

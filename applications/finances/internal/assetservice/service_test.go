@@ -43,6 +43,7 @@ func cashCreateRequest(owners []*v1.OwnerShare, exposures []*v1.ExposureShare) *
 		Exposures:              exposures,
 		InitialValuationDate:   "2026-01-01",
 		InitialValuationAmount: 100000,
+		Liquidity:              v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID,
 		Details: &v1.CreateAssetRequest_Cash{Cash: &v1.CashDetails{
 			AccountName: "Checking",
 			Institution: "Chase",
@@ -102,6 +103,7 @@ func TestService_CreateAsset_RejectsCategoryDetailsMismatch(t *testing.T) {
 		Exposures:              []*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
 		InitialValuationDate:   "2026-01-01",
 		InitialValuationAmount: 100000,
+		Liquidity:              v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID,
 		Details: &v1.CreateAssetRequest_StockOrBond{StockOrBond: &v1.StockOrBondDetails{
 			CompanyOrBondName: "Apple Inc.",
 			Platform:          "Vanguard",
@@ -161,6 +163,7 @@ func TestService_UpdateAsset_ReplacesOwnersAndExposures(t *testing.T) {
 			{UserId: users[1].ID, Percentage: 50},
 		},
 		Exposures: []*v1.ExposureShare{{Region: v1.Region_REGION_UK, Percentage: 100}},
+		Liquidity: v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID,
 		Details: &v1.UpdateAssetRequest_Cash{Cash: &v1.CashDetails{
 			AccountName: "Checking",
 			Institution: "Chase",
@@ -177,7 +180,7 @@ func TestService_UpdateAsset_ReplacesOwnersAndExposures(t *testing.T) {
 	}
 }
 
-func TestService_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
+func TestService_Liquidity_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 	ctx := context.Background()
 	svc, users := newTestService(t)
 
@@ -185,13 +188,13 @@ func TestService_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 		[]*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
 		[]*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
 	)
-	req.IsLiquid = false
+	req.Liquidity = v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID
 	created, err := svc.CreateAsset(ctx, connect.NewRequest(req))
 	if err != nil {
 		t.Fatalf("CreateAsset() error = %v", err)
 	}
-	if created.Msg.GetAsset().GetIsLiquid() {
-		t.Fatalf("CreateAsset() is_liquid = true, want false")
+	if created.Msg.GetAsset().GetLiquidity() != v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID {
+		t.Fatalf("CreateAsset() liquidity = %v, want %v", created.Msg.GetAsset().GetLiquidity(), v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID)
 	}
 
 	updated, err := svc.UpdateAsset(ctx, connect.NewRequest(&v1.UpdateAssetRequest{
@@ -200,7 +203,7 @@ func TestService_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 		Currency:  v1.Currency_CURRENCY_USD,
 		Owners:    []*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
 		Exposures: []*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
-		IsLiquid:  true,
+		Liquidity: v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED,
 		Details: &v1.UpdateAssetRequest_Cash{Cash: &v1.CashDetails{
 			AccountName: "Checking",
 			Institution: "Chase",
@@ -209,8 +212,11 @@ func TestService_IsLiquid_RoundTripsThroughCreateAndUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UpdateAsset() error = %v", err)
 	}
-	if !updated.Msg.GetAsset().GetIsLiquid() {
-		t.Fatalf("UpdateAsset() is_liquid = false, want true (override should persist)")
+	if updated.Msg.GetAsset().GetLiquidity() != v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED {
+		t.Fatalf(
+			"UpdateAsset() liquidity = %v, want %v (override should persist)",
+			updated.Msg.GetAsset().GetLiquidity(), v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED,
+		)
 	}
 }
 
@@ -223,6 +229,7 @@ func TestService_UpdateAsset_NotFound(t *testing.T) {
 		Currency:  v1.Currency_CURRENCY_USD,
 		Owners:    []*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
 		Exposures: []*v1.ExposureShare{{Region: v1.Region_REGION_US, Percentage: 100}},
+		Liquidity: v1.AssetLiquidity_ASSET_LIQUIDITY_LIQUID,
 		Details: &v1.UpdateAssetRequest_Cash{Cash: &v1.CashDetails{
 			AccountName: "Checking",
 			Institution: "Chase",
@@ -332,6 +339,7 @@ func TestService_CreateAsset_RetirementWithBondsRegion(t *testing.T) {
 		},
 		InitialValuationDate:   "2025-12-31",
 		InitialValuationAmount: 14290300,
+		Liquidity:              v1.AssetLiquidity_ASSET_LIQUIDITY_ILLIQUID,
 		Details: &v1.CreateAssetRequest_Retirement{Retirement: &v1.RetirementDetails{
 			PlanName: "Tetrate 401k",
 			Platform: "Empower",
@@ -358,6 +366,7 @@ func TestService_CreateAsset_LoanWithNoExposuresAndBlankLender(t *testing.T) {
 		Owners:                 []*v1.OwnerShare{{UserId: users[0].ID, Percentage: 100}},
 		InitialValuationDate:   "2025-12-31",
 		InitialValuationAmount: 13000000,
+		Liquidity:              v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED,
 		Details: &v1.CreateAssetRequest_Loan{Loan: &v1.LoanDetails{
 			Name:   "Personal Loan",
 			Lender: "",
@@ -464,6 +473,7 @@ func capitalBalanceCreateRequest(owners []*v1.OwnerShare, initialAmount int64) *
 		Owners:                 owners,
 		InitialValuationDate:   "2026-01-01",
 		InitialValuationAmount: initialAmount,
+		Liquidity:              v1.AssetLiquidity_ASSET_LIQUIDITY_INVESTED,
 		Details: &v1.CreateAssetRequest_CapitalBalance{CapitalBalance: &v1.CapitalBalanceDetails{
 			Name: "Shared Capital",
 		}},

@@ -9,7 +9,7 @@ import {
 import { History, Pencil, Plus, Trash2 } from "lucide-react";
 
 import type { Asset, AssetValuation } from "@/gen/finances/v1/asset_pb";
-import { AssetCategory, Currency, Region, SecurityType } from "@/gen/finances/v1/asset_pb";
+import { AssetCategory, AssetLiquidity, Currency, Region, SecurityType } from "@/gen/finances/v1/asset_pb";
 import {
   useAddAssetValuation,
   useAssets,
@@ -97,21 +97,42 @@ const CATEGORY_BADGE_LABELS: Record<AssetCategory, string> = {
 
 const LIABILITY_CATEGORIES: AssetCategory[] = [AssetCategory.LOAN, AssetCategory.MORTGAGE];
 
-// The new-asset form's initial "Liquid" checkbox state, per category -
-// overridable per instance (e.g. a restricted stock grant, or a locked CD).
-// Mortgage defaults illiquid alongside Real Estate so hiding an illiquid
-// house also hides its mortgage - otherwise "liquid net worth" would
-// subtract a mortgage payment without the house value it's attached to.
-const DEFAULT_LIQUID_BY_CATEGORY: Record<AssetCategory, boolean> = {
-  [AssetCategory.UNSPECIFIED]: true,
-  [AssetCategory.STOCK_OR_BOND]: true,
-  [AssetCategory.CASH]: true,
-  [AssetCategory.ETF]: true,
-  [AssetCategory.RETIREMENT]: false,
-  [AssetCategory.REAL_ESTATE]: false,
-  [AssetCategory.LOAN]: true,
-  [AssetCategory.MORTGAGE]: false,
-  [AssetCategory.CAPITAL_BALANCE]: true,
+// The new-asset form's initial liquidity tier, per category - overridable
+// per instance (e.g. a restricted stock grant, or a locked CD). Mortgage
+// defaults illiquid alongside Real Estate so hiding an illiquid house also
+// hides its mortgage - otherwise "liquid net worth" would subtract a
+// mortgage payment without the house value it's attached to. An ETF is
+// liquid only when it's a bond fund (a money-market/T-bill fund like
+// VBIL/SPAXX is a cash equivalent) - every other ETF, and every individual
+// stock, counts as invested: accessible, but not without tax implications.
+function defaultLiquidity(category: AssetCategory, securityType: SecurityType): AssetLiquidity {
+  if (category === AssetCategory.CASH) return AssetLiquidity.LIQUID;
+  if (category === AssetCategory.ETF && securityType === SecurityType.BOND) return AssetLiquidity.LIQUID;
+  if (
+    category === AssetCategory.RETIREMENT ||
+    category === AssetCategory.REAL_ESTATE ||
+    category === AssetCategory.MORTGAGE
+  ) {
+    return AssetLiquidity.ILLIQUID;
+  }
+  return AssetLiquidity.INVESTED;
+}
+
+const LIQUIDITY_LABELS: Record<AssetLiquidity, string> = {
+  [AssetLiquidity.UNSPECIFIED]: "Unknown",
+  [AssetLiquidity.LIQUID]: "Liquid",
+  [AssetLiquidity.INVESTED]: "Invested",
+  [AssetLiquidity.ILLIQUID]: "Illiquid",
+};
+
+// Shown as a caption under the form's Liquidity select, so the (somewhat
+// judgment-call) boundaries are explicit rather than left to guess from the
+// label alone - matches the same wording as the navbar's LiquidityFilter.
+const LIQUIDITY_DESCRIPTIONS: Record<AssetLiquidity, string> = {
+  [AssetLiquidity.UNSPECIFIED]: "",
+  [AssetLiquidity.LIQUID]: "Cash & cash-equivalents - SPAXX, bond ETFs like VBIL",
+  [AssetLiquidity.INVESTED]: "Accessible, but with tax implications - stocks, ETFs",
+  [AssetLiquidity.ILLIQUID]: "Locked up - real estate, retirement accounts",
 };
 
 function categoryBadgeLabel(asset: Asset): string {
@@ -279,7 +300,7 @@ export function AssetsPage() {
   const { data: ratesByDate } = useExchangeRates(valuationDates);
 
   const filteredAssets = useMemo(
-    () => (assets ?? []).filter((asset) => liquidityMatches(asset.isLiquid, liquidityFilter)),
+    () => (assets ?? []).filter((asset) => liquidityMatches(asset.liquidity, liquidityFilter)),
     [assets, liquidityFilter],
   );
   const groups = useMemo(() => groupAssetsByOwner(filteredAssets, users ?? []), [filteredAssets, users]);
@@ -387,7 +408,9 @@ function AssetsTable({
             <Badge variant={LIABILITY_CATEGORIES.includes(info.row.original.category) ? "destructive" : "secondary"}>
               {categoryBadgeLabel(info.row.original)}
             </Badge>
-            {!info.row.original.isLiquid && <Badge variant="outline">Illiquid</Badge>}
+            {info.row.original.liquidity === AssetLiquidity.ILLIQUID && (
+              <Badge variant="outline">Illiquid</Badge>
+            )}
           </div>
         ),
       }),
@@ -586,12 +609,14 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
   );
   const [initialDate, setInitialDate] = useState(todayDate());
   const [initialAmount, setInitialAmount] = useState("");
-  const [isLiquid, setIsLiquid] = useState(asset?.isLiquid ?? DEFAULT_LIQUID_BY_CATEGORY[category]);
+  const [liquidity, setLiquidity] = useState(asset?.liquidity ?? defaultLiquidity(category, securityType));
 
   function resetTo(next: Asset | null) {
-    setCategory(next?.category ?? AssetCategory.CASH);
+    const nextCategory = next?.category ?? AssetCategory.CASH;
+    const nextSecurityType = next?.details.case === "etf" ? next.details.value.securityType : SecurityType.STOCK;
+    setCategory(nextCategory);
     setCurrency(next?.currency ?? Currency.USD);
-    setIsLiquid(next?.isLiquid ?? DEFAULT_LIQUID_BY_CATEGORY[next?.category ?? AssetCategory.CASH]);
+    setLiquidity(next?.liquidity ?? defaultLiquidity(nextCategory, nextSecurityType));
     setCompanyOrBondName(next?.details.case === "stockOrBond" ? next.details.value.companyOrBondName : "");
     setPlatform(
       next?.details.case === "stockOrBond"
@@ -751,7 +776,7 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
           currency,
           owners: buildOwners(),
           exposures: buildExposures(),
-          isLiquid,
+          liquidity,
           details: buildDetails(),
         },
         { onSuccess: () => onOpenChange(false) },
@@ -765,7 +790,7 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
           exposures: buildExposures(),
           initialValuationDate: initialDate.trim(),
           initialValuationAmount: toMinorUnits(parseFloat(initialAmount) || 0),
-          isLiquid,
+          liquidity,
           details: buildDetails(),
         },
         { onSuccess: () => onOpenChange(false) },
@@ -789,7 +814,7 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
                 onValueChange={(v) => {
                   const next = Number(v) as AssetCategory;
                   setCategory(next);
-                  setIsLiquid(DEFAULT_LIQUID_BY_CATEGORY[next]);
+                  setLiquidity(defaultLiquidity(next, securityType));
                 }}
               >
                 <SelectTrigger className="w-full">
@@ -871,7 +896,11 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
                 <Label>Type</Label>
                 <Select
                   value={String(securityType)}
-                  onValueChange={(v) => setSecurityType(Number(v) as SecurityType)}
+                  onValueChange={(v) => {
+                    const next = Number(v) as SecurityType;
+                    setSecurityType(next);
+                    setLiquidity(defaultLiquidity(category, next));
+                  }}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue />
@@ -1029,17 +1058,23 @@ function AssetFormDialog({ open, onOpenChange, asset, users }: AssetFormDialogPr
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="is-liquid"
-              checked={isLiquid}
-              onChange={(e) => setIsLiquid(e.target.checked)}
-              className="size-4"
-            />
-            <Label htmlFor="is-liquid" className="font-normal">
-              Liquid
-            </Label>
+          <div className="grid gap-1.5">
+            <Label>Liquidity</Label>
+            <Select value={String(liquidity)} onValueChange={(v) => setLiquidity(Number(v) as AssetLiquidity)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={String(AssetLiquidity.LIQUID)}>{LIQUIDITY_LABELS[AssetLiquidity.LIQUID]}</SelectItem>
+                <SelectItem value={String(AssetLiquidity.INVESTED)}>
+                  {LIQUIDITY_LABELS[AssetLiquidity.INVESTED]}
+                </SelectItem>
+                <SelectItem value={String(AssetLiquidity.ILLIQUID)}>
+                  {LIQUIDITY_LABELS[AssetLiquidity.ILLIQUID]}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">{LIQUIDITY_DESCRIPTIONS[liquidity]}</p>
           </div>
 
           {!isEditing && (

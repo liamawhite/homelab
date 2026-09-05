@@ -184,10 +184,14 @@ function valueAsOf(valuations: AssetValuation[], date: string): bigint {
 // (see useExchangeRates) before summing - a date with no available rate
 // simply drops that asset's contribution for that point rather than
 // corrupting the total by mixing currencies. Loan and Mortgage categories
-// subtract from the total. The chart itself only plots netWorth -
-// byExposure rides along per point purely for the hover tooltip's
-// breakdown, which is exposure totals (what's the money actually invested
-// in / geographically exposed to), not asset category.
+// subtract from the total. A Mortgage nets directly against its matched
+// property's Real Estate band(s) rather than getting its own "Mortgage"
+// band, so the chart shows equity, not gross property value (see
+// realEstateByProperty below) - Loan has no such pairing and keeps its own
+// band. The chart itself only plots netWorth - byExposure rides along per
+// point purely for the hover tooltip's breakdown, which is exposure totals
+// (what's the money actually invested in / geographically exposed to), not
+// asset category.
 export function computeNetWorthSeries(
   assets: Asset[],
   valuationsByAssetId: Record<string, AssetValuation[]>,
@@ -206,7 +210,7 @@ export function computeNetWorthSeries(
     // selected person isn't its stored owner. It also always ignores the
     // liquidity filter, same reasoning: it's a household ledger entry, not
     // a market asset with a liquidity profile.
-    if (!isCapitalBalanceCategory(asset.category) && !liquidityMatches(asset.isLiquid, liquidityFilter)) continue;
+    if (!isCapitalBalanceCategory(asset.category) && !liquidityMatches(asset.liquidity, liquidityFilter)) continue;
     const share = isCapitalBalanceCategory(asset.category) ? 100 : ownedShare(asset.owners, selectedUserIds);
     if (share <= 0) continue;
 
@@ -217,6 +221,20 @@ export function computeNetWorthSeries(
 
     for (const valuation of valuations) dateSet.add(valuation.date);
     histories.push({ asset, share, valuations });
+  }
+
+  // A mortgage nets against its property's Real Estate band(s) (see the
+  // mortgage branch below) rather than getting its own "Mortgage" band -
+  // matched by property name, the only link between the two categories in
+  // this schema. A mortgage whose property name doesn't match any Real
+  // Estate asset currently in `histories` (no such property, or it got
+  // filtered out by the liquidity/user filter independently) falls back to
+  // the standalone Mortgage band so its value is never silently dropped.
+  const realEstateByProperty = new Map<string, AssetHistory>();
+  for (const history of histories) {
+    if (history.asset.category !== AssetCategory.REAL_ESTATE) continue;
+    if (history.asset.details.case !== "realEstate") continue;
+    realEstateByProperty.set(history.asset.details.value.propertyName, history);
   }
 
   const dates = Array.from(dateSet).sort();
@@ -266,6 +284,19 @@ export function computeNetWorthSeries(
 
       const name = assetDisplayName(history.asset);
       const owner = ownerLabel(history.asset.owners);
+
+      if (history.asset.category === AssetCategory.MORTGAGE) {
+        const propertyName = history.asset.details.case === "mortgage" ? history.asset.details.value.propertyName : "";
+        const matchedRealEstate = realEstateByProperty.get(propertyName);
+        if (matchedRealEstate && matchedRealEstate.asset.exposures.length > 0) {
+          for (const exposure of matchedRealEstate.asset.exposures) {
+            const label = exposureLabel(AssetCategory.REAL_ESTATE, exposure.region);
+            const portion = (signed * BigInt(exposure.percentage)) / 100n;
+            addToBand(label, `${name} mortgage`, owner, portion);
+          }
+          continue;
+        }
+      }
 
       if (isLiabilityCategory(history.asset.category)) {
         addToBand(liabilityLabel(history.asset.category), name, owner, signed);

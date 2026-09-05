@@ -18,7 +18,7 @@ export function HomePage() {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4">
-      <Card size="sm">
+      <Card size="sm" className="overflow-visible">
         <CardHeader>
           <CardTitle>Net worth</CardTitle>
         </CardHeader>
@@ -39,7 +39,7 @@ export function HomePage() {
       </Card>
 
       {latestPoint && (
-        <Card size="sm">
+        <Card size="sm" className="overflow-visible">
           <CardHeader>
             <CardTitle>Exposure</CardTitle>
             <CardDescription>As of {formatDate(latestPoint.date)}</CardDescription>
