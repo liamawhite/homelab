@@ -225,9 +225,9 @@ export function TaskEditor({
   };
 
   // Todoist-style quick entry: typing "@work" or "friday" anywhere in the
-  // title updates the area/due-date chips live and is stripped from the
-  // title on submit. Clicking a chip directly afterwards overrides it,
-  // since these effects only re-fire when the typed token itself changes.
+  // title updates the area/due-date chips live. Clicking a chip directly
+  // afterwards overrides it, since these effects only re-fire when the
+  // typed token itself changes.
   const areaToken = extractArea(title);
   const dueDateToken = extractDueDate(areaToken ? areaToken.rest : title);
 
@@ -235,13 +235,23 @@ export function TaskEditor({
     if (areaToken) setArea(areaToken.area);
   }, [areaToken?.area]);
 
+  // Once a due date is recognized, remove the matched text from the title
+  // right away (rather than waiting for submit) so the chip and the text
+  // don't both claim to represent it - dueDateToken.rest already reflects
+  // the area token being stripped too, if one was also just matched.
   const dueDateTokenMs = dueDateToken?.date.getTime();
   useEffect(() => {
-    if (dueDateToken) setDueDate(dueDateToken.date);
+    if (dueDateToken) {
+      setDueDate(dueDateToken.date);
+      setTitle(dueDateToken.rest);
+      requestAnimationFrame(() => {
+        const pos = dueDateToken.rest.length;
+        titleInputRef.current?.setSelectionRange(pos, pos);
+      });
+    }
   }, [dueDateTokenMs]);
 
-  const strippedTitle = (dueDateToken ?? areaToken ?? { rest: title }).rest;
-  const finalTitle = strippedTitle.trim();
+  const finalTitle = (dueDateToken ?? areaToken ?? { rest: title }).rest.trim();
 
   const handleSubmit = () => {
     if (!finalTitle) return;
