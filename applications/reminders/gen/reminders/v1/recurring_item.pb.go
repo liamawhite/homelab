@@ -721,6 +721,102 @@ func (x *CreateRecurringItemResponse) GetItem() *RecurringItem {
 	return nil
 }
 
+type UpdateRecurringItemTitleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRecurringItemTitleRequest) Reset() {
+	*x = UpdateRecurringItemTitleRequest{}
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRecurringItemTitleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRecurringItemTitleRequest) ProtoMessage() {}
+
+func (x *UpdateRecurringItemTitleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRecurringItemTitleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRecurringItemTitleRequest) Descriptor() ([]byte, []int) {
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UpdateRecurringItemTitleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateRecurringItemTitleRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+type UpdateRecurringItemTitleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Item          *RecurringItem         `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRecurringItemTitleResponse) Reset() {
+	*x = UpdateRecurringItemTitleResponse{}
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRecurringItemTitleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRecurringItemTitleResponse) ProtoMessage() {}
+
+func (x *UpdateRecurringItemTitleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRecurringItemTitleResponse.ProtoReflect.Descriptor instead.
+func (*UpdateRecurringItemTitleResponse) Descriptor() ([]byte, []int) {
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *UpdateRecurringItemTitleResponse) GetItem() *RecurringItem {
+	if x != nil {
+		return x.Item
+	}
+	return nil
+}
+
 type UpdateRecurringItemNotesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -731,7 +827,7 @@ type UpdateRecurringItemNotesRequest struct {
 
 func (x *UpdateRecurringItemNotesRequest) Reset() {
 	*x = UpdateRecurringItemNotesRequest{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[11]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -743,7 +839,7 @@ func (x *UpdateRecurringItemNotesRequest) String() string {
 func (*UpdateRecurringItemNotesRequest) ProtoMessage() {}
 
 func (x *UpdateRecurringItemNotesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[11]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +852,7 @@ func (x *UpdateRecurringItemNotesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemNotesRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemNotesRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{11}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateRecurringItemNotesRequest) GetId() string {
@@ -782,7 +878,7 @@ type UpdateRecurringItemNotesResponse struct {
 
 func (x *UpdateRecurringItemNotesResponse) Reset() {
 	*x = UpdateRecurringItemNotesResponse{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[12]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -794,7 +890,7 @@ func (x *UpdateRecurringItemNotesResponse) String() string {
 func (*UpdateRecurringItemNotesResponse) ProtoMessage() {}
 
 func (x *UpdateRecurringItemNotesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[12]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -807,7 +903,7 @@ func (x *UpdateRecurringItemNotesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemNotesResponse.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemNotesResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{12}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UpdateRecurringItemNotesResponse) GetItem() *RecurringItem {
@@ -828,7 +924,7 @@ type UpdateRecurringItemAreaRequest struct {
 
 func (x *UpdateRecurringItemAreaRequest) Reset() {
 	*x = UpdateRecurringItemAreaRequest{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[13]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -840,7 +936,7 @@ func (x *UpdateRecurringItemAreaRequest) String() string {
 func (*UpdateRecurringItemAreaRequest) ProtoMessage() {}
 
 func (x *UpdateRecurringItemAreaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[13]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -853,7 +949,7 @@ func (x *UpdateRecurringItemAreaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemAreaRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemAreaRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{13}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *UpdateRecurringItemAreaRequest) GetId() string {
@@ -879,7 +975,7 @@ type UpdateRecurringItemAreaResponse struct {
 
 func (x *UpdateRecurringItemAreaResponse) Reset() {
 	*x = UpdateRecurringItemAreaResponse{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[14]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -891,7 +987,7 @@ func (x *UpdateRecurringItemAreaResponse) String() string {
 func (*UpdateRecurringItemAreaResponse) ProtoMessage() {}
 
 func (x *UpdateRecurringItemAreaResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[14]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -904,7 +1000,7 @@ func (x *UpdateRecurringItemAreaResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemAreaResponse.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemAreaResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{14}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *UpdateRecurringItemAreaResponse) GetItem() *RecurringItem {
@@ -926,7 +1022,7 @@ type UpdateRecurringItemRuleRequest struct {
 
 func (x *UpdateRecurringItemRuleRequest) Reset() {
 	*x = UpdateRecurringItemRuleRequest{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[15]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -938,7 +1034,7 @@ func (x *UpdateRecurringItemRuleRequest) String() string {
 func (*UpdateRecurringItemRuleRequest) ProtoMessage() {}
 
 func (x *UpdateRecurringItemRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[15]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -951,7 +1047,7 @@ func (x *UpdateRecurringItemRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemRuleRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemRuleRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{15}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateRecurringItemRuleRequest) GetId() string {
@@ -977,7 +1073,7 @@ type UpdateRecurringItemRuleResponse struct {
 
 func (x *UpdateRecurringItemRuleResponse) Reset() {
 	*x = UpdateRecurringItemRuleResponse{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[16]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -989,7 +1085,7 @@ func (x *UpdateRecurringItemRuleResponse) String() string {
 func (*UpdateRecurringItemRuleResponse) ProtoMessage() {}
 
 func (x *UpdateRecurringItemRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[16]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1002,7 +1098,7 @@ func (x *UpdateRecurringItemRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRecurringItemRuleResponse.ProtoReflect.Descriptor instead.
 func (*UpdateRecurringItemRuleResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{16}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *UpdateRecurringItemRuleResponse) GetItem() *RecurringItem {
@@ -1021,7 +1117,7 @@ type CompleteRecurringItemRequest struct {
 
 func (x *CompleteRecurringItemRequest) Reset() {
 	*x = CompleteRecurringItemRequest{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[17]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1033,7 +1129,7 @@ func (x *CompleteRecurringItemRequest) String() string {
 func (*CompleteRecurringItemRequest) ProtoMessage() {}
 
 func (x *CompleteRecurringItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[17]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1046,7 +1142,7 @@ func (x *CompleteRecurringItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteRecurringItemRequest.ProtoReflect.Descriptor instead.
 func (*CompleteRecurringItemRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{17}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CompleteRecurringItemRequest) GetId() string {
@@ -1065,7 +1161,7 @@ type CompleteRecurringItemResponse struct {
 
 func (x *CompleteRecurringItemResponse) Reset() {
 	*x = CompleteRecurringItemResponse{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[18]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1077,7 +1173,7 @@ func (x *CompleteRecurringItemResponse) String() string {
 func (*CompleteRecurringItemResponse) ProtoMessage() {}
 
 func (x *CompleteRecurringItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[18]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1090,7 +1186,7 @@ func (x *CompleteRecurringItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteRecurringItemResponse.ProtoReflect.Descriptor instead.
 func (*CompleteRecurringItemResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{18}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CompleteRecurringItemResponse) GetItem() *RecurringItem {
@@ -1109,7 +1205,7 @@ type DeleteRecurringItemRequest struct {
 
 func (x *DeleteRecurringItemRequest) Reset() {
 	*x = DeleteRecurringItemRequest{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[19]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1121,7 +1217,7 @@ func (x *DeleteRecurringItemRequest) String() string {
 func (*DeleteRecurringItemRequest) ProtoMessage() {}
 
 func (x *DeleteRecurringItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[19]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1134,7 +1230,7 @@ func (x *DeleteRecurringItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRecurringItemRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRecurringItemRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{19}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *DeleteRecurringItemRequest) GetId() string {
@@ -1152,7 +1248,7 @@ type DeleteRecurringItemResponse struct {
 
 func (x *DeleteRecurringItemResponse) Reset() {
 	*x = DeleteRecurringItemResponse{}
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[20]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1164,7 +1260,7 @@ func (x *DeleteRecurringItemResponse) String() string {
 func (*DeleteRecurringItemResponse) ProtoMessage() {}
 
 func (x *DeleteRecurringItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_recurring_item_proto_msgTypes[20]
+	mi := &file_reminders_v1_recurring_item_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1177,7 +1273,7 @@ func (x *DeleteRecurringItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRecurringItemResponse.ProtoReflect.Descriptor instead.
 func (*DeleteRecurringItemResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{20}
+	return file_reminders_v1_recurring_item_proto_rawDescGZIP(), []int{22}
 }
 
 var File_reminders_v1_recurring_item_proto protoreflect.FileDescriptor
@@ -1224,6 +1320,11 @@ const file_reminders_v1_recurring_item_proto_rawDesc = "" +
 	"\x04rule\x18\x04 \x01(\v2\x1c.reminders.v1.RecurrenceRuleR\x04rule\"N\n" +
 	"\x1bCreateRecurringItemResponse\x12/\n" +
 	"\x04item\x18\x01 \x01(\v2\x1b.reminders.v1.RecurringItemR\x04item\"G\n" +
+	"\x1fUpdateRecurringItemTitleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\"S\n" +
+	" UpdateRecurringItemTitleResponse\x12/\n" +
+	"\x04item\x18\x01 \x01(\v2\x1b.reminders.v1.RecurringItemR\x04item\"G\n" +
 	"\x1fUpdateRecurringItemNotesRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05notes\x18\x02 \x01(\tR\x05notes\"S\n" +
@@ -1254,10 +1355,11 @@ const file_reminders_v1_recurring_item_proto_rawDesc = "" +
 	"\x11WEEKDAY_WEDNESDAY\x10\x04\x12\x14\n" +
 	"\x10WEEKDAY_THURSDAY\x10\x05\x12\x12\n" +
 	"\x0eWEEKDAY_FRIDAY\x10\x06\x12\x14\n" +
-	"\x10WEEKDAY_SATURDAY\x10\a2\xb4\x06\n" +
+	"\x10WEEKDAY_SATURDAY\x10\a2\xaf\a\n" +
 	"\x14RecurringItemService\x12g\n" +
 	"\x12ListRecurringItems\x12'.reminders.v1.ListRecurringItemsRequest\x1a(.reminders.v1.ListRecurringItemsResponse\x12j\n" +
 	"\x13CreateRecurringItem\x12(.reminders.v1.CreateRecurringItemRequest\x1a).reminders.v1.CreateRecurringItemResponse\x12y\n" +
+	"\x18UpdateRecurringItemTitle\x12-.reminders.v1.UpdateRecurringItemTitleRequest\x1a..reminders.v1.UpdateRecurringItemTitleResponse\x12y\n" +
 	"\x18UpdateRecurringItemNotes\x12-.reminders.v1.UpdateRecurringItemNotesRequest\x1a..reminders.v1.UpdateRecurringItemNotesResponse\x12v\n" +
 	"\x17UpdateRecurringItemArea\x12,.reminders.v1.UpdateRecurringItemAreaRequest\x1a-.reminders.v1.UpdateRecurringItemAreaResponse\x12v\n" +
 	"\x17UpdateRecurringItemRule\x12,.reminders.v1.UpdateRecurringItemRuleRequest\x1a-.reminders.v1.UpdateRecurringItemRuleResponse\x12p\n" +
@@ -1277,7 +1379,7 @@ func file_reminders_v1_recurring_item_proto_rawDescGZIP() []byte {
 }
 
 var file_reminders_v1_recurring_item_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_reminders_v1_recurring_item_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_reminders_v1_recurring_item_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_reminders_v1_recurring_item_proto_goTypes = []any{
 	(Weekday)(0),                             // 0: reminders.v1.Weekday
 	(*WeeklyRule)(nil),                       // 1: reminders.v1.WeeklyRule
@@ -1291,18 +1393,20 @@ var file_reminders_v1_recurring_item_proto_goTypes = []any{
 	(*ListRecurringItemsResponse)(nil),       // 9: reminders.v1.ListRecurringItemsResponse
 	(*CreateRecurringItemRequest)(nil),       // 10: reminders.v1.CreateRecurringItemRequest
 	(*CreateRecurringItemResponse)(nil),      // 11: reminders.v1.CreateRecurringItemResponse
-	(*UpdateRecurringItemNotesRequest)(nil),  // 12: reminders.v1.UpdateRecurringItemNotesRequest
-	(*UpdateRecurringItemNotesResponse)(nil), // 13: reminders.v1.UpdateRecurringItemNotesResponse
-	(*UpdateRecurringItemAreaRequest)(nil),   // 14: reminders.v1.UpdateRecurringItemAreaRequest
-	(*UpdateRecurringItemAreaResponse)(nil),  // 15: reminders.v1.UpdateRecurringItemAreaResponse
-	(*UpdateRecurringItemRuleRequest)(nil),   // 16: reminders.v1.UpdateRecurringItemRuleRequest
-	(*UpdateRecurringItemRuleResponse)(nil),  // 17: reminders.v1.UpdateRecurringItemRuleResponse
-	(*CompleteRecurringItemRequest)(nil),     // 18: reminders.v1.CompleteRecurringItemRequest
-	(*CompleteRecurringItemResponse)(nil),    // 19: reminders.v1.CompleteRecurringItemResponse
-	(*DeleteRecurringItemRequest)(nil),       // 20: reminders.v1.DeleteRecurringItemRequest
-	(*DeleteRecurringItemResponse)(nil),      // 21: reminders.v1.DeleteRecurringItemResponse
-	(*timestamppb.Timestamp)(nil),            // 22: google.protobuf.Timestamp
-	(Area)(0),                                // 23: reminders.v1.Area
+	(*UpdateRecurringItemTitleRequest)(nil),  // 12: reminders.v1.UpdateRecurringItemTitleRequest
+	(*UpdateRecurringItemTitleResponse)(nil), // 13: reminders.v1.UpdateRecurringItemTitleResponse
+	(*UpdateRecurringItemNotesRequest)(nil),  // 14: reminders.v1.UpdateRecurringItemNotesRequest
+	(*UpdateRecurringItemNotesResponse)(nil), // 15: reminders.v1.UpdateRecurringItemNotesResponse
+	(*UpdateRecurringItemAreaRequest)(nil),   // 16: reminders.v1.UpdateRecurringItemAreaRequest
+	(*UpdateRecurringItemAreaResponse)(nil),  // 17: reminders.v1.UpdateRecurringItemAreaResponse
+	(*UpdateRecurringItemRuleRequest)(nil),   // 18: reminders.v1.UpdateRecurringItemRuleRequest
+	(*UpdateRecurringItemRuleResponse)(nil),  // 19: reminders.v1.UpdateRecurringItemRuleResponse
+	(*CompleteRecurringItemRequest)(nil),     // 20: reminders.v1.CompleteRecurringItemRequest
+	(*CompleteRecurringItemResponse)(nil),    // 21: reminders.v1.CompleteRecurringItemResponse
+	(*DeleteRecurringItemRequest)(nil),       // 22: reminders.v1.DeleteRecurringItemRequest
+	(*DeleteRecurringItemResponse)(nil),      // 23: reminders.v1.DeleteRecurringItemResponse
+	(*timestamppb.Timestamp)(nil),            // 24: google.protobuf.Timestamp
+	(Area)(0),                                // 25: reminders.v1.Area
 }
 var file_reminders_v1_recurring_item_proto_depIdxs = []int32{
 	0,  // 0: reminders.v1.WeeklyRule.days_of_week:type_name -> reminders.v1.Weekday
@@ -1311,39 +1415,42 @@ var file_reminders_v1_recurring_item_proto_depIdxs = []int32{
 	2,  // 3: reminders.v1.RecurrenceRule.monthly:type_name -> reminders.v1.MonthlyRule
 	4,  // 4: reminders.v1.RecurrenceRule.yearly:type_name -> reminders.v1.YearlyRule
 	5,  // 5: reminders.v1.RecurrenceRule.interval:type_name -> reminders.v1.IntervalRule
-	22, // 6: reminders.v1.RecurringItem.created_at:type_name -> google.protobuf.Timestamp
-	22, // 7: reminders.v1.RecurringItem.next_due_date:type_name -> google.protobuf.Timestamp
-	23, // 8: reminders.v1.RecurringItem.area:type_name -> reminders.v1.Area
+	24, // 6: reminders.v1.RecurringItem.created_at:type_name -> google.protobuf.Timestamp
+	24, // 7: reminders.v1.RecurringItem.next_due_date:type_name -> google.protobuf.Timestamp
+	25, // 8: reminders.v1.RecurringItem.area:type_name -> reminders.v1.Area
 	6,  // 9: reminders.v1.RecurringItem.rule:type_name -> reminders.v1.RecurrenceRule
 	7,  // 10: reminders.v1.ListRecurringItemsResponse.items:type_name -> reminders.v1.RecurringItem
-	23, // 11: reminders.v1.CreateRecurringItemRequest.area:type_name -> reminders.v1.Area
+	25, // 11: reminders.v1.CreateRecurringItemRequest.area:type_name -> reminders.v1.Area
 	6,  // 12: reminders.v1.CreateRecurringItemRequest.rule:type_name -> reminders.v1.RecurrenceRule
 	7,  // 13: reminders.v1.CreateRecurringItemResponse.item:type_name -> reminders.v1.RecurringItem
-	7,  // 14: reminders.v1.UpdateRecurringItemNotesResponse.item:type_name -> reminders.v1.RecurringItem
-	23, // 15: reminders.v1.UpdateRecurringItemAreaRequest.area:type_name -> reminders.v1.Area
-	7,  // 16: reminders.v1.UpdateRecurringItemAreaResponse.item:type_name -> reminders.v1.RecurringItem
-	6,  // 17: reminders.v1.UpdateRecurringItemRuleRequest.rule:type_name -> reminders.v1.RecurrenceRule
-	7,  // 18: reminders.v1.UpdateRecurringItemRuleResponse.item:type_name -> reminders.v1.RecurringItem
-	7,  // 19: reminders.v1.CompleteRecurringItemResponse.item:type_name -> reminders.v1.RecurringItem
-	8,  // 20: reminders.v1.RecurringItemService.ListRecurringItems:input_type -> reminders.v1.ListRecurringItemsRequest
-	10, // 21: reminders.v1.RecurringItemService.CreateRecurringItem:input_type -> reminders.v1.CreateRecurringItemRequest
-	12, // 22: reminders.v1.RecurringItemService.UpdateRecurringItemNotes:input_type -> reminders.v1.UpdateRecurringItemNotesRequest
-	14, // 23: reminders.v1.RecurringItemService.UpdateRecurringItemArea:input_type -> reminders.v1.UpdateRecurringItemAreaRequest
-	16, // 24: reminders.v1.RecurringItemService.UpdateRecurringItemRule:input_type -> reminders.v1.UpdateRecurringItemRuleRequest
-	18, // 25: reminders.v1.RecurringItemService.CompleteRecurringItem:input_type -> reminders.v1.CompleteRecurringItemRequest
-	20, // 26: reminders.v1.RecurringItemService.DeleteRecurringItem:input_type -> reminders.v1.DeleteRecurringItemRequest
-	9,  // 27: reminders.v1.RecurringItemService.ListRecurringItems:output_type -> reminders.v1.ListRecurringItemsResponse
-	11, // 28: reminders.v1.RecurringItemService.CreateRecurringItem:output_type -> reminders.v1.CreateRecurringItemResponse
-	13, // 29: reminders.v1.RecurringItemService.UpdateRecurringItemNotes:output_type -> reminders.v1.UpdateRecurringItemNotesResponse
-	15, // 30: reminders.v1.RecurringItemService.UpdateRecurringItemArea:output_type -> reminders.v1.UpdateRecurringItemAreaResponse
-	17, // 31: reminders.v1.RecurringItemService.UpdateRecurringItemRule:output_type -> reminders.v1.UpdateRecurringItemRuleResponse
-	19, // 32: reminders.v1.RecurringItemService.CompleteRecurringItem:output_type -> reminders.v1.CompleteRecurringItemResponse
-	21, // 33: reminders.v1.RecurringItemService.DeleteRecurringItem:output_type -> reminders.v1.DeleteRecurringItemResponse
-	27, // [27:34] is the sub-list for method output_type
-	20, // [20:27] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	7,  // 14: reminders.v1.UpdateRecurringItemTitleResponse.item:type_name -> reminders.v1.RecurringItem
+	7,  // 15: reminders.v1.UpdateRecurringItemNotesResponse.item:type_name -> reminders.v1.RecurringItem
+	25, // 16: reminders.v1.UpdateRecurringItemAreaRequest.area:type_name -> reminders.v1.Area
+	7,  // 17: reminders.v1.UpdateRecurringItemAreaResponse.item:type_name -> reminders.v1.RecurringItem
+	6,  // 18: reminders.v1.UpdateRecurringItemRuleRequest.rule:type_name -> reminders.v1.RecurrenceRule
+	7,  // 19: reminders.v1.UpdateRecurringItemRuleResponse.item:type_name -> reminders.v1.RecurringItem
+	7,  // 20: reminders.v1.CompleteRecurringItemResponse.item:type_name -> reminders.v1.RecurringItem
+	8,  // 21: reminders.v1.RecurringItemService.ListRecurringItems:input_type -> reminders.v1.ListRecurringItemsRequest
+	10, // 22: reminders.v1.RecurringItemService.CreateRecurringItem:input_type -> reminders.v1.CreateRecurringItemRequest
+	12, // 23: reminders.v1.RecurringItemService.UpdateRecurringItemTitle:input_type -> reminders.v1.UpdateRecurringItemTitleRequest
+	14, // 24: reminders.v1.RecurringItemService.UpdateRecurringItemNotes:input_type -> reminders.v1.UpdateRecurringItemNotesRequest
+	16, // 25: reminders.v1.RecurringItemService.UpdateRecurringItemArea:input_type -> reminders.v1.UpdateRecurringItemAreaRequest
+	18, // 26: reminders.v1.RecurringItemService.UpdateRecurringItemRule:input_type -> reminders.v1.UpdateRecurringItemRuleRequest
+	20, // 27: reminders.v1.RecurringItemService.CompleteRecurringItem:input_type -> reminders.v1.CompleteRecurringItemRequest
+	22, // 28: reminders.v1.RecurringItemService.DeleteRecurringItem:input_type -> reminders.v1.DeleteRecurringItemRequest
+	9,  // 29: reminders.v1.RecurringItemService.ListRecurringItems:output_type -> reminders.v1.ListRecurringItemsResponse
+	11, // 30: reminders.v1.RecurringItemService.CreateRecurringItem:output_type -> reminders.v1.CreateRecurringItemResponse
+	13, // 31: reminders.v1.RecurringItemService.UpdateRecurringItemTitle:output_type -> reminders.v1.UpdateRecurringItemTitleResponse
+	15, // 32: reminders.v1.RecurringItemService.UpdateRecurringItemNotes:output_type -> reminders.v1.UpdateRecurringItemNotesResponse
+	17, // 33: reminders.v1.RecurringItemService.UpdateRecurringItemArea:output_type -> reminders.v1.UpdateRecurringItemAreaResponse
+	19, // 34: reminders.v1.RecurringItemService.UpdateRecurringItemRule:output_type -> reminders.v1.UpdateRecurringItemRuleResponse
+	21, // 35: reminders.v1.RecurringItemService.CompleteRecurringItem:output_type -> reminders.v1.CompleteRecurringItemResponse
+	23, // 36: reminders.v1.RecurringItemService.DeleteRecurringItem:output_type -> reminders.v1.DeleteRecurringItemResponse
+	29, // [29:37] is the sub-list for method output_type
+	21, // [21:29] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_reminders_v1_recurring_item_proto_init() }
@@ -1364,7 +1471,7 @@ func file_reminders_v1_recurring_item_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_reminders_v1_recurring_item_proto_rawDesc), len(file_reminders_v1_recurring_item_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   21,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

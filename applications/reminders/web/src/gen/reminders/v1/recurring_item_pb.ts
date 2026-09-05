@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file reminders/v1/recurring_item.proto.
  */
 export const file_reminders_v1_recurring_item: GenFile = /*@__PURE__*/
-  fileDesc("CiFyZW1pbmRlcnMvdjEvcmVjdXJyaW5nX2l0ZW0ucHJvdG8SDHJlbWluZGVycy52MSI5CgpXZWVrbHlSdWxlEisKDGRheXNfb2Zfd2VlaxgBIAMoDjIVLnJlbWluZGVycy52MS5XZWVrZGF5IiQKC01vbnRobHlSdWxlEhUKDWRheXNfb2ZfbW9udGgYASADKAUiJgoITW9udGhEYXkSDQoFbW9udGgYASABKAUSCwoDZGF5GAIgASgFIjMKClllYXJseVJ1bGUSJQoFZGF0ZXMYASADKAsyFi5yZW1pbmRlcnMudjEuTW9udGhEYXkiJQoMSW50ZXJ2YWxSdWxlEhUKDWludGVydmFsX2RheXMYASABKAUizgEKDlJlY3VycmVuY2VSdWxlEioKBndlZWtseRgBIAEoCzIYLnJlbWluZGVycy52MS5XZWVrbHlSdWxlSAASLAoHbW9udGhseRgCIAEoCzIZLnJlbWluZGVycy52MS5Nb250aGx5UnVsZUgAEioKBnllYXJseRgDIAEoCzIYLnJlbWluZGVycy52MS5ZZWFybHlSdWxlSAASLgoIaW50ZXJ2YWwYBCABKAsyGi5yZW1pbmRlcnMudjEuSW50ZXJ2YWxSdWxlSABCBgoEcnVsZSLqAQoNUmVjdXJyaW5nSXRlbRIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBINCgVub3RlcxgEIAEoCRIxCg1uZXh0X2R1ZV9kYXRlGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIgCgRhcmVhGAYgASgOMhIucmVtaW5kZXJzLnYxLkFyZWESKgoEcnVsZRgHIAEoCzIcLnJlbWluZGVycy52MS5SZWN1cnJlbmNlUnVsZSIbChlMaXN0UmVjdXJyaW5nSXRlbXNSZXF1ZXN0IkgKGkxpc3RSZWN1cnJpbmdJdGVtc1Jlc3BvbnNlEioKBWl0ZW1zGAEgAygLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iiAEKGkNyZWF0ZVJlY3VycmluZ0l0ZW1SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEg0KBW5vdGVzGAIgASgJEiAKBGFyZWEYAyABKA4yEi5yZW1pbmRlcnMudjEuQXJlYRIqCgRydWxlGAQgASgLMhwucmVtaW5kZXJzLnYxLlJlY3VycmVuY2VSdWxlIkgKG0NyZWF0ZVJlY3VycmluZ0l0ZW1SZXNwb25zZRIpCgRpdGVtGAEgASgLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iPAofVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzUmVxdWVzdBIKCgJpZBgBIAEoCRINCgVub3RlcxgCIAEoCSJNCiBVcGRhdGVSZWN1cnJpbmdJdGVtTm90ZXNSZXNwb25zZRIpCgRpdGVtGAEgASgLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iTgoeVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWFSZXF1ZXN0EgoKAmlkGAEgASgJEiAKBGFyZWEYAiABKA4yEi5yZW1pbmRlcnMudjEuQXJlYSJMCh9VcGRhdGVSZWN1cnJpbmdJdGVtQXJlYVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSJYCh5VcGRhdGVSZWN1cnJpbmdJdGVtUnVsZVJlcXVlc3QSCgoCaWQYASABKAkSKgoEcnVsZRgCIAEoCzIcLnJlbWluZGVycy52MS5SZWN1cnJlbmNlUnVsZSJMCh9VcGRhdGVSZWN1cnJpbmdJdGVtUnVsZVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSIqChxDb21wbGV0ZVJlY3VycmluZ0l0ZW1SZXF1ZXN0EgoKAmlkGAEgASgJIkoKHUNvbXBsZXRlUmVjdXJyaW5nSXRlbVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSIoChpEZWxldGVSZWN1cnJpbmdJdGVtUmVxdWVzdBIKCgJpZBgBIAEoCSIdChtEZWxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2UqtgEKB1dlZWtkYXkSFwoTV0VFS0RBWV9VTlNQRUNJRklFRBAAEhIKDldFRUtEQVlfU1VOREFZEAESEgoOV0VFS0RBWV9NT05EQVkQAhITCg9XRUVLREFZX1RVRVNEQVkQAxIVChFXRUVLREFZX1dFRE5FU0RBWRAEEhQKEFdFRUtEQVlfVEhVUlNEQVkQBRISCg5XRUVLREFZX0ZSSURBWRAGEhQKEFdFRUtEQVlfU0FUVVJEQVkQBzK0BgoUUmVjdXJyaW5nSXRlbVNlcnZpY2USZwoSTGlzdFJlY3VycmluZ0l0ZW1zEicucmVtaW5kZXJzLnYxLkxpc3RSZWN1cnJpbmdJdGVtc1JlcXVlc3QaKC5yZW1pbmRlcnMudjEuTGlzdFJlY3VycmluZ0l0ZW1zUmVzcG9uc2USagoTQ3JlYXRlUmVjdXJyaW5nSXRlbRIoLnJlbWluZGVycy52MS5DcmVhdGVSZWN1cnJpbmdJdGVtUmVxdWVzdBopLnJlbWluZGVycy52MS5DcmVhdGVSZWN1cnJpbmdJdGVtUmVzcG9uc2USeQoYVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzEi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1Ob3Rlc1JlcXVlc3QaLi5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzUmVzcG9uc2USdgoXVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWESLC5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWFSZXF1ZXN0Gi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1BcmVhUmVzcG9uc2USdgoXVXBkYXRlUmVjdXJyaW5nSXRlbVJ1bGUSLC5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbVJ1bGVSZXF1ZXN0Gi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1SdWxlUmVzcG9uc2UScAoVQ29tcGxldGVSZWN1cnJpbmdJdGVtEioucmVtaW5kZXJzLnYxLkNvbXBsZXRlUmVjdXJyaW5nSXRlbVJlcXVlc3QaKy5yZW1pbmRlcnMudjEuQ29tcGxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2USagoTRGVsZXRlUmVjdXJyaW5nSXRlbRIoLnJlbWluZGVycy52MS5EZWxldGVSZWN1cnJpbmdJdGVtUmVxdWVzdBopLnJlbWluZGVycy52MS5EZWxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2VCPlo8Z2l0aHViLmNvbS9saWFtYXdoaXRlL3JlbWluZGVycy9nZW4vcmVtaW5kZXJzL3YxO3JlbWluZGVyc3YxYgZwcm90bzM", [file_google_protobuf_timestamp, file_reminders_v1_one_off_item]);
+  fileDesc("CiFyZW1pbmRlcnMvdjEvcmVjdXJyaW5nX2l0ZW0ucHJvdG8SDHJlbWluZGVycy52MSI5CgpXZWVrbHlSdWxlEisKDGRheXNfb2Zfd2VlaxgBIAMoDjIVLnJlbWluZGVycy52MS5XZWVrZGF5IiQKC01vbnRobHlSdWxlEhUKDWRheXNfb2ZfbW9udGgYASADKAUiJgoITW9udGhEYXkSDQoFbW9udGgYASABKAUSCwoDZGF5GAIgASgFIjMKClllYXJseVJ1bGUSJQoFZGF0ZXMYASADKAsyFi5yZW1pbmRlcnMudjEuTW9udGhEYXkiJQoMSW50ZXJ2YWxSdWxlEhUKDWludGVydmFsX2RheXMYASABKAUizgEKDlJlY3VycmVuY2VSdWxlEioKBndlZWtseRgBIAEoCzIYLnJlbWluZGVycy52MS5XZWVrbHlSdWxlSAASLAoHbW9udGhseRgCIAEoCzIZLnJlbWluZGVycy52MS5Nb250aGx5UnVsZUgAEioKBnllYXJseRgDIAEoCzIYLnJlbWluZGVycy52MS5ZZWFybHlSdWxlSAASLgoIaW50ZXJ2YWwYBCABKAsyGi5yZW1pbmRlcnMudjEuSW50ZXJ2YWxSdWxlSABCBgoEcnVsZSLqAQoNUmVjdXJyaW5nSXRlbRIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCRIuCgpjcmVhdGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBINCgVub3RlcxgEIAEoCRIxCg1uZXh0X2R1ZV9kYXRlGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIgCgRhcmVhGAYgASgOMhIucmVtaW5kZXJzLnYxLkFyZWESKgoEcnVsZRgHIAEoCzIcLnJlbWluZGVycy52MS5SZWN1cnJlbmNlUnVsZSIbChlMaXN0UmVjdXJyaW5nSXRlbXNSZXF1ZXN0IkgKGkxpc3RSZWN1cnJpbmdJdGVtc1Jlc3BvbnNlEioKBWl0ZW1zGAEgAygLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iiAEKGkNyZWF0ZVJlY3VycmluZ0l0ZW1SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEg0KBW5vdGVzGAIgASgJEiAKBGFyZWEYAyABKA4yEi5yZW1pbmRlcnMudjEuQXJlYRIqCgRydWxlGAQgASgLMhwucmVtaW5kZXJzLnYxLlJlY3VycmVuY2VSdWxlIkgKG0NyZWF0ZVJlY3VycmluZ0l0ZW1SZXNwb25zZRIpCgRpdGVtGAEgASgLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iPAofVXBkYXRlUmVjdXJyaW5nSXRlbVRpdGxlUmVxdWVzdBIKCgJpZBgBIAEoCRINCgV0aXRsZRgCIAEoCSJNCiBVcGRhdGVSZWN1cnJpbmdJdGVtVGl0bGVSZXNwb25zZRIpCgRpdGVtGAEgASgLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iPAofVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzUmVxdWVzdBIKCgJpZBgBIAEoCRINCgVub3RlcxgCIAEoCSJNCiBVcGRhdGVSZWN1cnJpbmdJdGVtTm90ZXNSZXNwb25zZRIpCgRpdGVtGAEgASgLMhsucmVtaW5kZXJzLnYxLlJlY3VycmluZ0l0ZW0iTgoeVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWFSZXF1ZXN0EgoKAmlkGAEgASgJEiAKBGFyZWEYAiABKA4yEi5yZW1pbmRlcnMudjEuQXJlYSJMCh9VcGRhdGVSZWN1cnJpbmdJdGVtQXJlYVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSJYCh5VcGRhdGVSZWN1cnJpbmdJdGVtUnVsZVJlcXVlc3QSCgoCaWQYASABKAkSKgoEcnVsZRgCIAEoCzIcLnJlbWluZGVycy52MS5SZWN1cnJlbmNlUnVsZSJMCh9VcGRhdGVSZWN1cnJpbmdJdGVtUnVsZVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSIqChxDb21wbGV0ZVJlY3VycmluZ0l0ZW1SZXF1ZXN0EgoKAmlkGAEgASgJIkoKHUNvbXBsZXRlUmVjdXJyaW5nSXRlbVJlc3BvbnNlEikKBGl0ZW0YASABKAsyGy5yZW1pbmRlcnMudjEuUmVjdXJyaW5nSXRlbSIoChpEZWxldGVSZWN1cnJpbmdJdGVtUmVxdWVzdBIKCgJpZBgBIAEoCSIdChtEZWxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2UqtgEKB1dlZWtkYXkSFwoTV0VFS0RBWV9VTlNQRUNJRklFRBAAEhIKDldFRUtEQVlfU1VOREFZEAESEgoOV0VFS0RBWV9NT05EQVkQAhITCg9XRUVLREFZX1RVRVNEQVkQAxIVChFXRUVLREFZX1dFRE5FU0RBWRAEEhQKEFdFRUtEQVlfVEhVUlNEQVkQBRISCg5XRUVLREFZX0ZSSURBWRAGEhQKEFdFRUtEQVlfU0FUVVJEQVkQBzKvBwoUUmVjdXJyaW5nSXRlbVNlcnZpY2USZwoSTGlzdFJlY3VycmluZ0l0ZW1zEicucmVtaW5kZXJzLnYxLkxpc3RSZWN1cnJpbmdJdGVtc1JlcXVlc3QaKC5yZW1pbmRlcnMudjEuTGlzdFJlY3VycmluZ0l0ZW1zUmVzcG9uc2USagoTQ3JlYXRlUmVjdXJyaW5nSXRlbRIoLnJlbWluZGVycy52MS5DcmVhdGVSZWN1cnJpbmdJdGVtUmVxdWVzdBopLnJlbWluZGVycy52MS5DcmVhdGVSZWN1cnJpbmdJdGVtUmVzcG9uc2USeQoYVXBkYXRlUmVjdXJyaW5nSXRlbVRpdGxlEi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1UaXRsZVJlcXVlc3QaLi5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbVRpdGxlUmVzcG9uc2USeQoYVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzEi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1Ob3Rlc1JlcXVlc3QaLi5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbU5vdGVzUmVzcG9uc2USdgoXVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWESLC5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbUFyZWFSZXF1ZXN0Gi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1BcmVhUmVzcG9uc2USdgoXVXBkYXRlUmVjdXJyaW5nSXRlbVJ1bGUSLC5yZW1pbmRlcnMudjEuVXBkYXRlUmVjdXJyaW5nSXRlbVJ1bGVSZXF1ZXN0Gi0ucmVtaW5kZXJzLnYxLlVwZGF0ZVJlY3VycmluZ0l0ZW1SdWxlUmVzcG9uc2UScAoVQ29tcGxldGVSZWN1cnJpbmdJdGVtEioucmVtaW5kZXJzLnYxLkNvbXBsZXRlUmVjdXJyaW5nSXRlbVJlcXVlc3QaKy5yZW1pbmRlcnMudjEuQ29tcGxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2USagoTRGVsZXRlUmVjdXJyaW5nSXRlbRIoLnJlbWluZGVycy52MS5EZWxldGVSZWN1cnJpbmdJdGVtUmVxdWVzdBopLnJlbWluZGVycy52MS5EZWxldGVSZWN1cnJpbmdJdGVtUmVzcG9uc2VCPlo8Z2l0aHViLmNvbS9saWFtYXdoaXRlL3JlbWluZGVycy9nZW4vcmVtaW5kZXJzL3YxO3JlbWluZGVyc3YxYgZwcm90bzM", [file_google_protobuf_timestamp, file_reminders_v1_one_off_item]);
 
 /**
  * @generated from message reminders.v1.WeeklyRule
@@ -294,6 +294,45 @@ export const CreateRecurringItemResponseSchema: GenMessage<CreateRecurringItemRe
   messageDesc(file_reminders_v1_recurring_item, 10);
 
 /**
+ * @generated from message reminders.v1.UpdateRecurringItemTitleRequest
+ */
+export type UpdateRecurringItemTitleRequest = Message<"reminders.v1.UpdateRecurringItemTitleRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+};
+
+/**
+ * Describes the message reminders.v1.UpdateRecurringItemTitleRequest.
+ * Use `create(UpdateRecurringItemTitleRequestSchema)` to create a new message.
+ */
+export const UpdateRecurringItemTitleRequestSchema: GenMessage<UpdateRecurringItemTitleRequest> = /*@__PURE__*/
+  messageDesc(file_reminders_v1_recurring_item, 11);
+
+/**
+ * @generated from message reminders.v1.UpdateRecurringItemTitleResponse
+ */
+export type UpdateRecurringItemTitleResponse = Message<"reminders.v1.UpdateRecurringItemTitleResponse"> & {
+  /**
+   * @generated from field: reminders.v1.RecurringItem item = 1;
+   */
+  item?: RecurringItem | undefined;
+};
+
+/**
+ * Describes the message reminders.v1.UpdateRecurringItemTitleResponse.
+ * Use `create(UpdateRecurringItemTitleResponseSchema)` to create a new message.
+ */
+export const UpdateRecurringItemTitleResponseSchema: GenMessage<UpdateRecurringItemTitleResponse> = /*@__PURE__*/
+  messageDesc(file_reminders_v1_recurring_item, 12);
+
+/**
  * @generated from message reminders.v1.UpdateRecurringItemNotesRequest
  */
 export type UpdateRecurringItemNotesRequest = Message<"reminders.v1.UpdateRecurringItemNotesRequest"> & {
@@ -313,7 +352,7 @@ export type UpdateRecurringItemNotesRequest = Message<"reminders.v1.UpdateRecurr
  * Use `create(UpdateRecurringItemNotesRequestSchema)` to create a new message.
  */
 export const UpdateRecurringItemNotesRequestSchema: GenMessage<UpdateRecurringItemNotesRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 11);
+  messageDesc(file_reminders_v1_recurring_item, 13);
 
 /**
  * @generated from message reminders.v1.UpdateRecurringItemNotesResponse
@@ -330,7 +369,7 @@ export type UpdateRecurringItemNotesResponse = Message<"reminders.v1.UpdateRecur
  * Use `create(UpdateRecurringItemNotesResponseSchema)` to create a new message.
  */
 export const UpdateRecurringItemNotesResponseSchema: GenMessage<UpdateRecurringItemNotesResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 12);
+  messageDesc(file_reminders_v1_recurring_item, 14);
 
 /**
  * @generated from message reminders.v1.UpdateRecurringItemAreaRequest
@@ -354,7 +393,7 @@ export type UpdateRecurringItemAreaRequest = Message<"reminders.v1.UpdateRecurri
  * Use `create(UpdateRecurringItemAreaRequestSchema)` to create a new message.
  */
 export const UpdateRecurringItemAreaRequestSchema: GenMessage<UpdateRecurringItemAreaRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 13);
+  messageDesc(file_reminders_v1_recurring_item, 15);
 
 /**
  * @generated from message reminders.v1.UpdateRecurringItemAreaResponse
@@ -371,7 +410,7 @@ export type UpdateRecurringItemAreaResponse = Message<"reminders.v1.UpdateRecurr
  * Use `create(UpdateRecurringItemAreaResponseSchema)` to create a new message.
  */
 export const UpdateRecurringItemAreaResponseSchema: GenMessage<UpdateRecurringItemAreaResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 14);
+  messageDesc(file_reminders_v1_recurring_item, 16);
 
 /**
  * @generated from message reminders.v1.UpdateRecurringItemRuleRequest
@@ -396,7 +435,7 @@ export type UpdateRecurringItemRuleRequest = Message<"reminders.v1.UpdateRecurri
  * Use `create(UpdateRecurringItemRuleRequestSchema)` to create a new message.
  */
 export const UpdateRecurringItemRuleRequestSchema: GenMessage<UpdateRecurringItemRuleRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 15);
+  messageDesc(file_reminders_v1_recurring_item, 17);
 
 /**
  * @generated from message reminders.v1.UpdateRecurringItemRuleResponse
@@ -413,7 +452,7 @@ export type UpdateRecurringItemRuleResponse = Message<"reminders.v1.UpdateRecurr
  * Use `create(UpdateRecurringItemRuleResponseSchema)` to create a new message.
  */
 export const UpdateRecurringItemRuleResponseSchema: GenMessage<UpdateRecurringItemRuleResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 16);
+  messageDesc(file_reminders_v1_recurring_item, 18);
 
 /**
  * @generated from message reminders.v1.CompleteRecurringItemRequest
@@ -430,7 +469,7 @@ export type CompleteRecurringItemRequest = Message<"reminders.v1.CompleteRecurri
  * Use `create(CompleteRecurringItemRequestSchema)` to create a new message.
  */
 export const CompleteRecurringItemRequestSchema: GenMessage<CompleteRecurringItemRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 17);
+  messageDesc(file_reminders_v1_recurring_item, 19);
 
 /**
  * @generated from message reminders.v1.CompleteRecurringItemResponse
@@ -447,7 +486,7 @@ export type CompleteRecurringItemResponse = Message<"reminders.v1.CompleteRecurr
  * Use `create(CompleteRecurringItemResponseSchema)` to create a new message.
  */
 export const CompleteRecurringItemResponseSchema: GenMessage<CompleteRecurringItemResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 18);
+  messageDesc(file_reminders_v1_recurring_item, 20);
 
 /**
  * @generated from message reminders.v1.DeleteRecurringItemRequest
@@ -464,7 +503,7 @@ export type DeleteRecurringItemRequest = Message<"reminders.v1.DeleteRecurringIt
  * Use `create(DeleteRecurringItemRequestSchema)` to create a new message.
  */
 export const DeleteRecurringItemRequestSchema: GenMessage<DeleteRecurringItemRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 19);
+  messageDesc(file_reminders_v1_recurring_item, 21);
 
 /**
  * @generated from message reminders.v1.DeleteRecurringItemResponse
@@ -477,7 +516,7 @@ export type DeleteRecurringItemResponse = Message<"reminders.v1.DeleteRecurringI
  * Use `create(DeleteRecurringItemResponseSchema)` to create a new message.
  */
 export const DeleteRecurringItemResponseSchema: GenMessage<DeleteRecurringItemResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_recurring_item, 20);
+  messageDesc(file_reminders_v1_recurring_item, 22);
 
 /**
  * @generated from enum reminders.v1.Weekday
@@ -549,6 +588,14 @@ export const RecurringItemService: GenService<{
     methodKind: "unary";
     input: typeof CreateRecurringItemRequestSchema;
     output: typeof CreateRecurringItemResponseSchema;
+  },
+  /**
+   * @generated from rpc reminders.v1.RecurringItemService.UpdateRecurringItemTitle
+   */
+  updateRecurringItemTitle: {
+    methodKind: "unary";
+    input: typeof UpdateRecurringItemTitleRequestSchema;
+    output: typeof UpdateRecurringItemTitleResponseSchema;
   },
   /**
    * @generated from rpc reminders.v1.RecurringItemService.UpdateRecurringItemNotes

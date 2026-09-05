@@ -39,6 +39,9 @@ const (
 	// RecurringItemServiceCreateRecurringItemProcedure is the fully-qualified name of the
 	// RecurringItemService's CreateRecurringItem RPC.
 	RecurringItemServiceCreateRecurringItemProcedure = "/reminders.v1.RecurringItemService/CreateRecurringItem"
+	// RecurringItemServiceUpdateRecurringItemTitleProcedure is the fully-qualified name of the
+	// RecurringItemService's UpdateRecurringItemTitle RPC.
+	RecurringItemServiceUpdateRecurringItemTitleProcedure = "/reminders.v1.RecurringItemService/UpdateRecurringItemTitle"
 	// RecurringItemServiceUpdateRecurringItemNotesProcedure is the fully-qualified name of the
 	// RecurringItemService's UpdateRecurringItemNotes RPC.
 	RecurringItemServiceUpdateRecurringItemNotesProcedure = "/reminders.v1.RecurringItemService/UpdateRecurringItemNotes"
@@ -60,6 +63,7 @@ const (
 type RecurringItemServiceClient interface {
 	ListRecurringItems(context.Context, *connect.Request[v1.ListRecurringItemsRequest]) (*connect.Response[v1.ListRecurringItemsResponse], error)
 	CreateRecurringItem(context.Context, *connect.Request[v1.CreateRecurringItemRequest]) (*connect.Response[v1.CreateRecurringItemResponse], error)
+	UpdateRecurringItemTitle(context.Context, *connect.Request[v1.UpdateRecurringItemTitleRequest]) (*connect.Response[v1.UpdateRecurringItemTitleResponse], error)
 	UpdateRecurringItemNotes(context.Context, *connect.Request[v1.UpdateRecurringItemNotesRequest]) (*connect.Response[v1.UpdateRecurringItemNotesResponse], error)
 	UpdateRecurringItemArea(context.Context, *connect.Request[v1.UpdateRecurringItemAreaRequest]) (*connect.Response[v1.UpdateRecurringItemAreaResponse], error)
 	UpdateRecurringItemRule(context.Context, *connect.Request[v1.UpdateRecurringItemRuleRequest]) (*connect.Response[v1.UpdateRecurringItemRuleResponse], error)
@@ -88,6 +92,12 @@ func NewRecurringItemServiceClient(httpClient connect.HTTPClient, baseURL string
 			httpClient,
 			baseURL+RecurringItemServiceCreateRecurringItemProcedure,
 			connect.WithSchema(recurringItemServiceMethods.ByName("CreateRecurringItem")),
+			connect.WithClientOptions(opts...),
+		),
+		updateRecurringItemTitle: connect.NewClient[v1.UpdateRecurringItemTitleRequest, v1.UpdateRecurringItemTitleResponse](
+			httpClient,
+			baseURL+RecurringItemServiceUpdateRecurringItemTitleProcedure,
+			connect.WithSchema(recurringItemServiceMethods.ByName("UpdateRecurringItemTitle")),
 			connect.WithClientOptions(opts...),
 		),
 		updateRecurringItemNotes: connect.NewClient[v1.UpdateRecurringItemNotesRequest, v1.UpdateRecurringItemNotesResponse](
@@ -127,6 +137,7 @@ func NewRecurringItemServiceClient(httpClient connect.HTTPClient, baseURL string
 type recurringItemServiceClient struct {
 	listRecurringItems       *connect.Client[v1.ListRecurringItemsRequest, v1.ListRecurringItemsResponse]
 	createRecurringItem      *connect.Client[v1.CreateRecurringItemRequest, v1.CreateRecurringItemResponse]
+	updateRecurringItemTitle *connect.Client[v1.UpdateRecurringItemTitleRequest, v1.UpdateRecurringItemTitleResponse]
 	updateRecurringItemNotes *connect.Client[v1.UpdateRecurringItemNotesRequest, v1.UpdateRecurringItemNotesResponse]
 	updateRecurringItemArea  *connect.Client[v1.UpdateRecurringItemAreaRequest, v1.UpdateRecurringItemAreaResponse]
 	updateRecurringItemRule  *connect.Client[v1.UpdateRecurringItemRuleRequest, v1.UpdateRecurringItemRuleResponse]
@@ -142,6 +153,11 @@ func (c *recurringItemServiceClient) ListRecurringItems(ctx context.Context, req
 // CreateRecurringItem calls reminders.v1.RecurringItemService.CreateRecurringItem.
 func (c *recurringItemServiceClient) CreateRecurringItem(ctx context.Context, req *connect.Request[v1.CreateRecurringItemRequest]) (*connect.Response[v1.CreateRecurringItemResponse], error) {
 	return c.createRecurringItem.CallUnary(ctx, req)
+}
+
+// UpdateRecurringItemTitle calls reminders.v1.RecurringItemService.UpdateRecurringItemTitle.
+func (c *recurringItemServiceClient) UpdateRecurringItemTitle(ctx context.Context, req *connect.Request[v1.UpdateRecurringItemTitleRequest]) (*connect.Response[v1.UpdateRecurringItemTitleResponse], error) {
+	return c.updateRecurringItemTitle.CallUnary(ctx, req)
 }
 
 // UpdateRecurringItemNotes calls reminders.v1.RecurringItemService.UpdateRecurringItemNotes.
@@ -174,6 +190,7 @@ func (c *recurringItemServiceClient) DeleteRecurringItem(ctx context.Context, re
 type RecurringItemServiceHandler interface {
 	ListRecurringItems(context.Context, *connect.Request[v1.ListRecurringItemsRequest]) (*connect.Response[v1.ListRecurringItemsResponse], error)
 	CreateRecurringItem(context.Context, *connect.Request[v1.CreateRecurringItemRequest]) (*connect.Response[v1.CreateRecurringItemResponse], error)
+	UpdateRecurringItemTitle(context.Context, *connect.Request[v1.UpdateRecurringItemTitleRequest]) (*connect.Response[v1.UpdateRecurringItemTitleResponse], error)
 	UpdateRecurringItemNotes(context.Context, *connect.Request[v1.UpdateRecurringItemNotesRequest]) (*connect.Response[v1.UpdateRecurringItemNotesResponse], error)
 	UpdateRecurringItemArea(context.Context, *connect.Request[v1.UpdateRecurringItemAreaRequest]) (*connect.Response[v1.UpdateRecurringItemAreaResponse], error)
 	UpdateRecurringItemRule(context.Context, *connect.Request[v1.UpdateRecurringItemRuleRequest]) (*connect.Response[v1.UpdateRecurringItemRuleResponse], error)
@@ -198,6 +215,12 @@ func NewRecurringItemServiceHandler(svc RecurringItemServiceHandler, opts ...con
 		RecurringItemServiceCreateRecurringItemProcedure,
 		svc.CreateRecurringItem,
 		connect.WithSchema(recurringItemServiceMethods.ByName("CreateRecurringItem")),
+		connect.WithHandlerOptions(opts...),
+	)
+	recurringItemServiceUpdateRecurringItemTitleHandler := connect.NewUnaryHandler(
+		RecurringItemServiceUpdateRecurringItemTitleProcedure,
+		svc.UpdateRecurringItemTitle,
+		connect.WithSchema(recurringItemServiceMethods.ByName("UpdateRecurringItemTitle")),
 		connect.WithHandlerOptions(opts...),
 	)
 	recurringItemServiceUpdateRecurringItemNotesHandler := connect.NewUnaryHandler(
@@ -236,6 +259,8 @@ func NewRecurringItemServiceHandler(svc RecurringItemServiceHandler, opts ...con
 			recurringItemServiceListRecurringItemsHandler.ServeHTTP(w, r)
 		case RecurringItemServiceCreateRecurringItemProcedure:
 			recurringItemServiceCreateRecurringItemHandler.ServeHTTP(w, r)
+		case RecurringItemServiceUpdateRecurringItemTitleProcedure:
+			recurringItemServiceUpdateRecurringItemTitleHandler.ServeHTTP(w, r)
 		case RecurringItemServiceUpdateRecurringItemNotesProcedure:
 			recurringItemServiceUpdateRecurringItemNotesHandler.ServeHTTP(w, r)
 		case RecurringItemServiceUpdateRecurringItemAreaProcedure:
@@ -261,6 +286,10 @@ func (UnimplementedRecurringItemServiceHandler) ListRecurringItems(context.Conte
 
 func (UnimplementedRecurringItemServiceHandler) CreateRecurringItem(context.Context, *connect.Request[v1.CreateRecurringItemRequest]) (*connect.Response[v1.CreateRecurringItemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("reminders.v1.RecurringItemService.CreateRecurringItem is not implemented"))
+}
+
+func (UnimplementedRecurringItemServiceHandler) UpdateRecurringItemTitle(context.Context, *connect.Request[v1.UpdateRecurringItemTitleRequest]) (*connect.Response[v1.UpdateRecurringItemTitleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("reminders.v1.RecurringItemService.UpdateRecurringItemTitle is not implemented"))
 }
 
 func (UnimplementedRecurringItemServiceHandler) UpdateRecurringItemNotes(context.Context, *connect.Request[v1.UpdateRecurringItemNotesRequest]) (*connect.Response[v1.UpdateRecurringItemNotesResponse], error) {

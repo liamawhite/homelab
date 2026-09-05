@@ -84,6 +84,15 @@ message CreateRecurringItemResponse {
   RecurringItem item = 1;
 }
 
+message UpdateRecurringItemTitleRequest {
+  string id = 1;
+  string title = 2;
+}
+
+message UpdateRecurringItemTitleResponse {
+  RecurringItem item = 1;
+}
+
 message UpdateRecurringItemNotesRequest {
   string id = 1;
   string notes = 2;
@@ -131,6 +140,7 @@ message DeleteRecurringItemResponse {}
 service RecurringItemService {
   rpc ListRecurringItems(ListRecurringItemsRequest) returns (ListRecurringItemsResponse);
   rpc CreateRecurringItem(CreateRecurringItemRequest) returns (CreateRecurringItemResponse);
+  rpc UpdateRecurringItemTitle(UpdateRecurringItemTitleRequest) returns (UpdateRecurringItemTitleResponse);
   rpc UpdateRecurringItemNotes(UpdateRecurringItemNotesRequest) returns (UpdateRecurringItemNotesResponse);
   rpc UpdateRecurringItemArea(UpdateRecurringItemAreaRequest) returns (UpdateRecurringItemAreaResponse);
   rpc UpdateRecurringItemRule(UpdateRecurringItemRuleRequest) returns (UpdateRecurringItemRuleResponse);

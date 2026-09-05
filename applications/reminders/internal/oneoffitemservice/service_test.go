@@ -71,6 +71,68 @@ func TestService_CreateOneOffItem_ThenListOneOffItems(t *testing.T) {
 	}
 }
 
+func TestService_UpdateOneOffItemTitle_RejectsEmptyID(t *testing.T) {
+	svc := newTestService(t)
+
+	_, err := svc.UpdateOneOffItemTitle(context.Background(), connect.NewRequest(&v1.UpdateOneOffItemTitleRequest{Id: "  ", Title: "t"}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("UpdateOneOffItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
+func TestService_UpdateOneOffItemTitle_RejectsEmptyTitle(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+
+	created, err := svc.CreateOneOffItem(ctx, connect.NewRequest(&v1.CreateOneOffItemRequest{Title: "Buy milk", Area: v1.Area_AREA_PERSONAL}))
+	if err != nil {
+		t.Fatalf("CreateOneOffItem() error = %v", err)
+	}
+
+	_, err = svc.UpdateOneOffItemTitle(ctx, connect.NewRequest(&v1.UpdateOneOffItemTitleRequest{Id: created.Msg.GetItem().GetId(), Title: "   "}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("UpdateOneOffItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
+func TestService_UpdateOneOffItemTitle_NotFound(t *testing.T) {
+	svc := newTestService(t)
+
+	_, err := svc.UpdateOneOffItemTitle(context.Background(), connect.NewRequest(&v1.UpdateOneOffItemTitleRequest{Id: "does-not-exist", Title: "t"}))
+	if connect.CodeOf(err) != connect.CodeNotFound {
+		t.Fatalf("UpdateOneOffItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeNotFound)
+	}
+}
+
+func TestService_UpdateOneOffItemTitle_ThenListOneOffItems(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+
+	created, err := svc.CreateOneOffItem(ctx, connect.NewRequest(&v1.CreateOneOffItemRequest{Title: "Buy milk", Area: v1.Area_AREA_PERSONAL}))
+	if err != nil {
+		t.Fatalf("CreateOneOffItem() error = %v", err)
+	}
+
+	updated, err := svc.UpdateOneOffItemTitle(ctx, connect.NewRequest(&v1.UpdateOneOffItemTitleRequest{
+		Id:    created.Msg.GetItem().GetId(),
+		Title: "Buy oat milk",
+	}))
+	if err != nil {
+		t.Fatalf("UpdateOneOffItemTitle() error = %v", err)
+	}
+	if updated.Msg.GetItem().GetTitle() != "Buy oat milk" {
+		t.Fatalf("UpdateOneOffItemTitle() title = %q, want %q", updated.Msg.GetItem().GetTitle(), "Buy oat milk")
+	}
+
+	listed, err := svc.ListOneOffItems(ctx, connect.NewRequest(&v1.ListOneOffItemsRequest{}))
+	if err != nil {
+		t.Fatalf("ListOneOffItems() error = %v", err)
+	}
+	if listed.Msg.GetItems()[0].GetTitle() != "Buy oat milk" {
+		t.Fatalf("ListOneOffItems()[0].Title = %q, want %q", listed.Msg.GetItems()[0].GetTitle(), "Buy oat milk")
+	}
+}
+
 func TestService_UpdateOneOffItemNotes_RejectsEmptyID(t *testing.T) {
 	svc := newTestService(t)
 

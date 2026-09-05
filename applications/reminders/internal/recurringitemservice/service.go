@@ -67,6 +67,29 @@ func (s *Service) CreateRecurringItem(ctx context.Context, req *connect.Request[
 	return connect.NewResponse(&v1.CreateRecurringItemResponse{Item: toProto(item)}), nil
 }
 
+// UpdateRecurringItemTitle sets the title for a recurring item.
+func (s *Service) UpdateRecurringItemTitle(ctx context.Context, req *connect.Request[v1.UpdateRecurringItemTitleRequest]) (*connect.Response[v1.UpdateRecurringItemTitleResponse], error) {
+	id := strings.TrimSpace(req.Msg.GetId())
+	if id == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id must not be empty"))
+	}
+
+	title := strings.TrimSpace(req.Msg.GetTitle())
+	if title == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("title must not be empty"))
+	}
+
+	item, err := s.items.UpdateTitle(ctx, id, title)
+	if err != nil {
+		if errors.Is(err, storage.ErrRecurringItemNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&v1.UpdateRecurringItemTitleResponse{Item: toProto(item)}), nil
+}
+
 // UpdateRecurringItemNotes sets the notes for a recurring item.
 func (s *Service) UpdateRecurringItemNotes(ctx context.Context, req *connect.Request[v1.UpdateRecurringItemNotesRequest]) (*connect.Response[v1.UpdateRecurringItemNotesResponse], error) {
 	id := strings.TrimSpace(req.Msg.GetId())

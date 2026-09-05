@@ -91,6 +91,20 @@ func (i *RecurringItems) Create(ctx context.Context, title, notes string, area A
 	return recurringItemFromRow(row)
 }
 
+// UpdateTitle sets the title for the recurring item with the given ID and
+// returns it. It returns ErrRecurringItemNotFound if no such item exists.
+func (i *RecurringItems) UpdateTitle(ctx context.Context, id, title string) (RecurringItem, error) {
+	row, err := i.q.UpdateRecurringItemTitle(ctx, sqlcgen.UpdateRecurringItemTitleParams{ID: id, Title: title})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return RecurringItem{}, ErrRecurringItemNotFound
+		}
+		return RecurringItem{}, fmt.Errorf("updating recurring item title: %w", err)
+	}
+
+	return recurringItemFromRow(row)
+}
+
 // UpdateNotes sets the notes for the recurring item with the given ID and
 // returns it. It returns ErrRecurringItemNotFound if no such item exists.
 func (i *RecurringItems) UpdateNotes(ctx context.Context, id, notes string) (RecurringItem, error) {

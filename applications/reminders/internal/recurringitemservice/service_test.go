@@ -321,6 +321,76 @@ func TestService_UpdateRecurringItemRule_NotFound(t *testing.T) {
 	}
 }
 
+func TestService_UpdateRecurringItemTitle_RejectsEmptyID(t *testing.T) {
+	svc := newTestService(t)
+
+	_, err := svc.UpdateRecurringItemTitle(context.Background(), connect.NewRequest(&v1.UpdateRecurringItemTitleRequest{Id: "  ", Title: "t"}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("UpdateRecurringItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
+func TestService_UpdateRecurringItemTitle_RejectsEmptyTitle(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+
+	created, err := svc.CreateRecurringItem(ctx, connect.NewRequest(&v1.CreateRecurringItemRequest{
+		Title: "Water plants",
+		Area:  v1.Area_AREA_PERSONAL,
+		Rule:  intervalRule(3),
+	}))
+	if err != nil {
+		t.Fatalf("CreateRecurringItem() error = %v", err)
+	}
+
+	_, err = svc.UpdateRecurringItemTitle(ctx, connect.NewRequest(&v1.UpdateRecurringItemTitleRequest{Id: created.Msg.GetItem().GetId(), Title: "   "}))
+	if connect.CodeOf(err) != connect.CodeInvalidArgument {
+		t.Fatalf("UpdateRecurringItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeInvalidArgument)
+	}
+}
+
+func TestService_UpdateRecurringItemTitle_NotFound(t *testing.T) {
+	svc := newTestService(t)
+
+	_, err := svc.UpdateRecurringItemTitle(context.Background(), connect.NewRequest(&v1.UpdateRecurringItemTitleRequest{Id: "does-not-exist", Title: "t"}))
+	if connect.CodeOf(err) != connect.CodeNotFound {
+		t.Fatalf("UpdateRecurringItemTitle() code = %v, want %v", connect.CodeOf(err), connect.CodeNotFound)
+	}
+}
+
+func TestService_UpdateRecurringItemTitle_ThenListRecurringItems(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+
+	created, err := svc.CreateRecurringItem(ctx, connect.NewRequest(&v1.CreateRecurringItemRequest{
+		Title: "Water plants",
+		Area:  v1.Area_AREA_PERSONAL,
+		Rule:  intervalRule(3),
+	}))
+	if err != nil {
+		t.Fatalf("CreateRecurringItem() error = %v", err)
+	}
+
+	updated, err := svc.UpdateRecurringItemTitle(ctx, connect.NewRequest(&v1.UpdateRecurringItemTitleRequest{
+		Id:    created.Msg.GetItem().GetId(),
+		Title: "Water succulents",
+	}))
+	if err != nil {
+		t.Fatalf("UpdateRecurringItemTitle() error = %v", err)
+	}
+	if updated.Msg.GetItem().GetTitle() != "Water succulents" {
+		t.Fatalf("UpdateRecurringItemTitle() title = %q, want %q", updated.Msg.GetItem().GetTitle(), "Water succulents")
+	}
+
+	listed, err := svc.ListRecurringItems(ctx, connect.NewRequest(&v1.ListRecurringItemsRequest{}))
+	if err != nil {
+		t.Fatalf("ListRecurringItems() error = %v", err)
+	}
+	if listed.Msg.GetItems()[0].GetTitle() != "Water succulents" {
+		t.Fatalf("ListRecurringItems()[0].Title = %q, want %q", listed.Msg.GetItems()[0].GetTitle(), "Water succulents")
+	}
+}
+
 func TestService_UpdateRecurringItemNotes_RejectsEmptyID(t *testing.T) {
 	svc := newTestService(t)
 

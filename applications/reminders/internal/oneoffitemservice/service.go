@@ -66,6 +66,29 @@ func (s *Service) CreateOneOffItem(ctx context.Context, req *connect.Request[v1.
 	return connect.NewResponse(&v1.CreateOneOffItemResponse{Item: toProto(item)}), nil
 }
 
+// UpdateOneOffItemTitle sets the title for a one-off item.
+func (s *Service) UpdateOneOffItemTitle(ctx context.Context, req *connect.Request[v1.UpdateOneOffItemTitleRequest]) (*connect.Response[v1.UpdateOneOffItemTitleResponse], error) {
+	id := strings.TrimSpace(req.Msg.GetId())
+	if id == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("id must not be empty"))
+	}
+
+	title := strings.TrimSpace(req.Msg.GetTitle())
+	if title == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("title must not be empty"))
+	}
+
+	item, err := s.items.UpdateTitle(ctx, id, title)
+	if err != nil {
+		if errors.Is(err, storage.ErrOneOffItemNotFound) {
+			return nil, connect.NewError(connect.CodeNotFound, err)
+		}
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&v1.UpdateOneOffItemTitleResponse{Item: toProto(item)}), nil
+}
+
 // UpdateOneOffItemNotes sets the notes for a one-off item.
 func (s *Service) UpdateOneOffItemNotes(ctx context.Context, req *connect.Request[v1.UpdateOneOffItemNotesRequest]) (*connect.Response[v1.UpdateOneOffItemNotesResponse], error) {
 	id := strings.TrimSpace(req.Msg.GetId())

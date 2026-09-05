@@ -100,6 +100,23 @@ func (i *OneOffItems) Create(ctx context.Context, title string, notes string, du
 	return fromRow(row)
 }
 
+// UpdateTitle sets the title for the one-off item with the given ID and
+// returns it. It returns ErrOneOffItemNotFound if no such item exists.
+func (i *OneOffItems) UpdateTitle(ctx context.Context, id string, title string) (OneOffItem, error) {
+	row, err := i.q.UpdateOneOffItemTitle(ctx, sqlcgen.UpdateOneOffItemTitleParams{
+		ID:    id,
+		Title: title,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return OneOffItem{}, ErrOneOffItemNotFound
+		}
+		return OneOffItem{}, fmt.Errorf("updating one-off item title: %w", err)
+	}
+
+	return fromRow(row)
+}
+
 // UpdateNotes sets the notes for the one-off item with the given ID and
 // returns it. It returns ErrOneOffItemNotFound if no such item exists.
 func (i *OneOffItems) UpdateNotes(ctx context.Context, id string, notes string) (OneOffItem, error) {

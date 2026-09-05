@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file reminders/v1/one_off_item.proto.
  */
 export const file_reminders_v1_one_off_item: GenFile = /*@__PURE__*/
-  fileDesc("Ch9yZW1pbmRlcnMvdjEvb25lX29mZl9pdGVtLnByb3RvEgxyZW1pbmRlcnMudjEi5gEKCk9uZU9mZkl0ZW0SCgoCaWQYASABKAkSDQoFdGl0bGUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFbm90ZXMYBCABKAkSLAoIZHVlX2RhdGUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiAKBGFyZWEYBiABKA4yEi5yZW1pbmRlcnMudjEuQXJlYRIuCgZzdGF0dXMYByABKA4yHi5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbVN0YXR1cyIYChZMaXN0T25lT2ZmSXRlbXNSZXF1ZXN0IkIKF0xpc3RPbmVPZmZJdGVtc1Jlc3BvbnNlEicKBWl0ZW1zGAEgAygLMhgucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW0ihwEKF0NyZWF0ZU9uZU9mZkl0ZW1SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEiwKCGR1ZV9kYXRlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIgCgRhcmVhGAMgASgOMhIucmVtaW5kZXJzLnYxLkFyZWESDQoFbm90ZXMYBCABKAkiQgoYQ3JlYXRlT25lT2ZmSXRlbVJlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSI5ChxVcGRhdGVPbmVPZmZJdGVtTm90ZXNSZXF1ZXN0EgoKAmlkGAEgASgJEg0KBW5vdGVzGAIgASgJIkcKHVVwZGF0ZU9uZU9mZkl0ZW1Ob3Rlc1Jlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSJaCh5VcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZVJlcXVlc3QSCgoCaWQYASABKAkSLAoIZHVlX2RhdGUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIkkKH1VwZGF0ZU9uZU9mZkl0ZW1EdWVEYXRlUmVzcG9uc2USJgoEaXRlbRgBIAEoCzIYLnJlbWluZGVycy52MS5PbmVPZmZJdGVtIksKG1VwZGF0ZU9uZU9mZkl0ZW1BcmVhUmVxdWVzdBIKCgJpZBgBIAEoCRIgCgRhcmVhGAIgASgOMhIucmVtaW5kZXJzLnYxLkFyZWEiRgocVXBkYXRlT25lT2ZmSXRlbUFyZWFSZXNwb25zZRImCgRpdGVtGAEgASgLMhgucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW0iWwodVXBkYXRlT25lT2ZmSXRlbVN0YXR1c1JlcXVlc3QSCgoCaWQYASABKAkSLgoGc3RhdHVzGAIgASgOMh4ucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW1TdGF0dXMiSAoeVXBkYXRlT25lT2ZmSXRlbVN0YXR1c1Jlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSIlChdEZWxldGVPbmVPZmZJdGVtUmVxdWVzdBIKCgJpZBgBIAEoCSIaChhEZWxldGVPbmVPZmZJdGVtUmVzcG9uc2UqZgoEQXJlYRIUChBBUkVBX1VOU1BFQ0lGSUVEEAASEQoNQVJFQV9QRVJTT05BTBABEg8KC0FSRUFfRkFNSUxZEAISDQoJQVJFQV9XT1JLEAMSFQoRQVJFQV9QUk9GRVNTSU9OQUwQBCp4ChBPbmVPZmZJdGVtU3RhdHVzEiMKH09ORV9PRkZfSVRFTV9TVEFUVVNfVU5TUEVDSUZJRUQQABIcChhPTkVfT0ZGX0lURU1fU1RBVFVTX09QRU4QARIhCh1PTkVfT0ZGX0lURU1fU1RBVFVTX0NPTVBMRVRFRBACMocGChFPbmVPZmZJdGVtU2VydmljZRJeCg9MaXN0T25lT2ZmSXRlbXMSJC5yZW1pbmRlcnMudjEuTGlzdE9uZU9mZkl0ZW1zUmVxdWVzdBolLnJlbWluZGVycy52MS5MaXN0T25lT2ZmSXRlbXNSZXNwb25zZRJhChBDcmVhdGVPbmVPZmZJdGVtEiUucmVtaW5kZXJzLnYxLkNyZWF0ZU9uZU9mZkl0ZW1SZXF1ZXN0GiYucmVtaW5kZXJzLnYxLkNyZWF0ZU9uZU9mZkl0ZW1SZXNwb25zZRJwChVVcGRhdGVPbmVPZmZJdGVtTm90ZXMSKi5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbU5vdGVzUmVxdWVzdBorLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtTm90ZXNSZXNwb25zZRJ2ChdVcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZRIsLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZVJlcXVlc3QaLS5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbUR1ZURhdGVSZXNwb25zZRJtChRVcGRhdGVPbmVPZmZJdGVtQXJlYRIpLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtQXJlYVJlcXVlc3QaKi5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbUFyZWFSZXNwb25zZRJzChZVcGRhdGVPbmVPZmZJdGVtU3RhdHVzEisucmVtaW5kZXJzLnYxLlVwZGF0ZU9uZU9mZkl0ZW1TdGF0dXNSZXF1ZXN0GiwucmVtaW5kZXJzLnYxLlVwZGF0ZU9uZU9mZkl0ZW1TdGF0dXNSZXNwb25zZRJhChBEZWxldGVPbmVPZmZJdGVtEiUucmVtaW5kZXJzLnYxLkRlbGV0ZU9uZU9mZkl0ZW1SZXF1ZXN0GiYucmVtaW5kZXJzLnYxLkRlbGV0ZU9uZU9mZkl0ZW1SZXNwb25zZUI+WjxnaXRodWIuY29tL2xpYW1hd2hpdGUvcmVtaW5kZXJzL2dlbi9yZW1pbmRlcnMvdjE7cmVtaW5kZXJzdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("Ch9yZW1pbmRlcnMvdjEvb25lX29mZl9pdGVtLnByb3RvEgxyZW1pbmRlcnMudjEi5gEKCk9uZU9mZkl0ZW0SCgoCaWQYASABKAkSDQoFdGl0bGUYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFbm90ZXMYBCABKAkSLAoIZHVlX2RhdGUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEiAKBGFyZWEYBiABKA4yEi5yZW1pbmRlcnMudjEuQXJlYRIuCgZzdGF0dXMYByABKA4yHi5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbVN0YXR1cyIYChZMaXN0T25lT2ZmSXRlbXNSZXF1ZXN0IkIKF0xpc3RPbmVPZmZJdGVtc1Jlc3BvbnNlEicKBWl0ZW1zGAEgAygLMhgucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW0ihwEKF0NyZWF0ZU9uZU9mZkl0ZW1SZXF1ZXN0Eg0KBXRpdGxlGAEgASgJEiwKCGR1ZV9kYXRlGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIgCgRhcmVhGAMgASgOMhIucmVtaW5kZXJzLnYxLkFyZWESDQoFbm90ZXMYBCABKAkiQgoYQ3JlYXRlT25lT2ZmSXRlbVJlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSI5ChxVcGRhdGVPbmVPZmZJdGVtVGl0bGVSZXF1ZXN0EgoKAmlkGAEgASgJEg0KBXRpdGxlGAIgASgJIkcKHVVwZGF0ZU9uZU9mZkl0ZW1UaXRsZVJlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSI5ChxVcGRhdGVPbmVPZmZJdGVtTm90ZXNSZXF1ZXN0EgoKAmlkGAEgASgJEg0KBW5vdGVzGAIgASgJIkcKHVVwZGF0ZU9uZU9mZkl0ZW1Ob3Rlc1Jlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSJaCh5VcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZVJlcXVlc3QSCgoCaWQYASABKAkSLAoIZHVlX2RhdGUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIkkKH1VwZGF0ZU9uZU9mZkl0ZW1EdWVEYXRlUmVzcG9uc2USJgoEaXRlbRgBIAEoCzIYLnJlbWluZGVycy52MS5PbmVPZmZJdGVtIksKG1VwZGF0ZU9uZU9mZkl0ZW1BcmVhUmVxdWVzdBIKCgJpZBgBIAEoCRIgCgRhcmVhGAIgASgOMhIucmVtaW5kZXJzLnYxLkFyZWEiRgocVXBkYXRlT25lT2ZmSXRlbUFyZWFSZXNwb25zZRImCgRpdGVtGAEgASgLMhgucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW0iWwodVXBkYXRlT25lT2ZmSXRlbVN0YXR1c1JlcXVlc3QSCgoCaWQYASABKAkSLgoGc3RhdHVzGAIgASgOMh4ucmVtaW5kZXJzLnYxLk9uZU9mZkl0ZW1TdGF0dXMiSAoeVXBkYXRlT25lT2ZmSXRlbVN0YXR1c1Jlc3BvbnNlEiYKBGl0ZW0YASABKAsyGC5yZW1pbmRlcnMudjEuT25lT2ZmSXRlbSIlChdEZWxldGVPbmVPZmZJdGVtUmVxdWVzdBIKCgJpZBgBIAEoCSIaChhEZWxldGVPbmVPZmZJdGVtUmVzcG9uc2UqZgoEQXJlYRIUChBBUkVBX1VOU1BFQ0lGSUVEEAASEQoNQVJFQV9QRVJTT05BTBABEg8KC0FSRUFfRkFNSUxZEAISDQoJQVJFQV9XT1JLEAMSFQoRQVJFQV9QUk9GRVNTSU9OQUwQBCp4ChBPbmVPZmZJdGVtU3RhdHVzEiMKH09ORV9PRkZfSVRFTV9TVEFUVVNfVU5TUEVDSUZJRUQQABIcChhPTkVfT0ZGX0lURU1fU1RBVFVTX09QRU4QARIhCh1PTkVfT0ZGX0lURU1fU1RBVFVTX0NPTVBMRVRFRBACMvkGChFPbmVPZmZJdGVtU2VydmljZRJeCg9MaXN0T25lT2ZmSXRlbXMSJC5yZW1pbmRlcnMudjEuTGlzdE9uZU9mZkl0ZW1zUmVxdWVzdBolLnJlbWluZGVycy52MS5MaXN0T25lT2ZmSXRlbXNSZXNwb25zZRJhChBDcmVhdGVPbmVPZmZJdGVtEiUucmVtaW5kZXJzLnYxLkNyZWF0ZU9uZU9mZkl0ZW1SZXF1ZXN0GiYucmVtaW5kZXJzLnYxLkNyZWF0ZU9uZU9mZkl0ZW1SZXNwb25zZRJwChVVcGRhdGVPbmVPZmZJdGVtVGl0bGUSKi5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbVRpdGxlUmVxdWVzdBorLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtVGl0bGVSZXNwb25zZRJwChVVcGRhdGVPbmVPZmZJdGVtTm90ZXMSKi5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbU5vdGVzUmVxdWVzdBorLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtTm90ZXNSZXNwb25zZRJ2ChdVcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZRIsLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtRHVlRGF0ZVJlcXVlc3QaLS5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbUR1ZURhdGVSZXNwb25zZRJtChRVcGRhdGVPbmVPZmZJdGVtQXJlYRIpLnJlbWluZGVycy52MS5VcGRhdGVPbmVPZmZJdGVtQXJlYVJlcXVlc3QaKi5yZW1pbmRlcnMudjEuVXBkYXRlT25lT2ZmSXRlbUFyZWFSZXNwb25zZRJzChZVcGRhdGVPbmVPZmZJdGVtU3RhdHVzEisucmVtaW5kZXJzLnYxLlVwZGF0ZU9uZU9mZkl0ZW1TdGF0dXNSZXF1ZXN0GiwucmVtaW5kZXJzLnYxLlVwZGF0ZU9uZU9mZkl0ZW1TdGF0dXNSZXNwb25zZRJhChBEZWxldGVPbmVPZmZJdGVtEiUucmVtaW5kZXJzLnYxLkRlbGV0ZU9uZU9mZkl0ZW1SZXF1ZXN0GiYucmVtaW5kZXJzLnYxLkRlbGV0ZU9uZU9mZkl0ZW1SZXNwb25zZUI+WjxnaXRodWIuY29tL2xpYW1hd2hpdGUvcmVtaW5kZXJzL2dlbi9yZW1pbmRlcnMvdjE7cmVtaW5kZXJzdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message reminders.v1.OneOffItem
@@ -145,6 +145,45 @@ export const CreateOneOffItemResponseSchema: GenMessage<CreateOneOffItemResponse
   messageDesc(file_reminders_v1_one_off_item, 4);
 
 /**
+ * @generated from message reminders.v1.UpdateOneOffItemTitleRequest
+ */
+export type UpdateOneOffItemTitleRequest = Message<"reminders.v1.UpdateOneOffItemTitleRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+
+  /**
+   * @generated from field: string title = 2;
+   */
+  title: string;
+};
+
+/**
+ * Describes the message reminders.v1.UpdateOneOffItemTitleRequest.
+ * Use `create(UpdateOneOffItemTitleRequestSchema)` to create a new message.
+ */
+export const UpdateOneOffItemTitleRequestSchema: GenMessage<UpdateOneOffItemTitleRequest> = /*@__PURE__*/
+  messageDesc(file_reminders_v1_one_off_item, 5);
+
+/**
+ * @generated from message reminders.v1.UpdateOneOffItemTitleResponse
+ */
+export type UpdateOneOffItemTitleResponse = Message<"reminders.v1.UpdateOneOffItemTitleResponse"> & {
+  /**
+   * @generated from field: reminders.v1.OneOffItem item = 1;
+   */
+  item?: OneOffItem | undefined;
+};
+
+/**
+ * Describes the message reminders.v1.UpdateOneOffItemTitleResponse.
+ * Use `create(UpdateOneOffItemTitleResponseSchema)` to create a new message.
+ */
+export const UpdateOneOffItemTitleResponseSchema: GenMessage<UpdateOneOffItemTitleResponse> = /*@__PURE__*/
+  messageDesc(file_reminders_v1_one_off_item, 6);
+
+/**
  * @generated from message reminders.v1.UpdateOneOffItemNotesRequest
  */
 export type UpdateOneOffItemNotesRequest = Message<"reminders.v1.UpdateOneOffItemNotesRequest"> & {
@@ -164,7 +203,7 @@ export type UpdateOneOffItemNotesRequest = Message<"reminders.v1.UpdateOneOffIte
  * Use `create(UpdateOneOffItemNotesRequestSchema)` to create a new message.
  */
 export const UpdateOneOffItemNotesRequestSchema: GenMessage<UpdateOneOffItemNotesRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 5);
+  messageDesc(file_reminders_v1_one_off_item, 7);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemNotesResponse
@@ -181,7 +220,7 @@ export type UpdateOneOffItemNotesResponse = Message<"reminders.v1.UpdateOneOffIt
  * Use `create(UpdateOneOffItemNotesResponseSchema)` to create a new message.
  */
 export const UpdateOneOffItemNotesResponseSchema: GenMessage<UpdateOneOffItemNotesResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 6);
+  messageDesc(file_reminders_v1_one_off_item, 8);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemDueDateRequest
@@ -205,7 +244,7 @@ export type UpdateOneOffItemDueDateRequest = Message<"reminders.v1.UpdateOneOffI
  * Use `create(UpdateOneOffItemDueDateRequestSchema)` to create a new message.
  */
 export const UpdateOneOffItemDueDateRequestSchema: GenMessage<UpdateOneOffItemDueDateRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 7);
+  messageDesc(file_reminders_v1_one_off_item, 9);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemDueDateResponse
@@ -222,7 +261,7 @@ export type UpdateOneOffItemDueDateResponse = Message<"reminders.v1.UpdateOneOff
  * Use `create(UpdateOneOffItemDueDateResponseSchema)` to create a new message.
  */
 export const UpdateOneOffItemDueDateResponseSchema: GenMessage<UpdateOneOffItemDueDateResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 8);
+  messageDesc(file_reminders_v1_one_off_item, 10);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemAreaRequest
@@ -246,7 +285,7 @@ export type UpdateOneOffItemAreaRequest = Message<"reminders.v1.UpdateOneOffItem
  * Use `create(UpdateOneOffItemAreaRequestSchema)` to create a new message.
  */
 export const UpdateOneOffItemAreaRequestSchema: GenMessage<UpdateOneOffItemAreaRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 9);
+  messageDesc(file_reminders_v1_one_off_item, 11);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemAreaResponse
@@ -263,7 +302,7 @@ export type UpdateOneOffItemAreaResponse = Message<"reminders.v1.UpdateOneOffIte
  * Use `create(UpdateOneOffItemAreaResponseSchema)` to create a new message.
  */
 export const UpdateOneOffItemAreaResponseSchema: GenMessage<UpdateOneOffItemAreaResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 10);
+  messageDesc(file_reminders_v1_one_off_item, 12);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemStatusRequest
@@ -287,7 +326,7 @@ export type UpdateOneOffItemStatusRequest = Message<"reminders.v1.UpdateOneOffIt
  * Use `create(UpdateOneOffItemStatusRequestSchema)` to create a new message.
  */
 export const UpdateOneOffItemStatusRequestSchema: GenMessage<UpdateOneOffItemStatusRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 11);
+  messageDesc(file_reminders_v1_one_off_item, 13);
 
 /**
  * @generated from message reminders.v1.UpdateOneOffItemStatusResponse
@@ -304,7 +343,7 @@ export type UpdateOneOffItemStatusResponse = Message<"reminders.v1.UpdateOneOffI
  * Use `create(UpdateOneOffItemStatusResponseSchema)` to create a new message.
  */
 export const UpdateOneOffItemStatusResponseSchema: GenMessage<UpdateOneOffItemStatusResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 12);
+  messageDesc(file_reminders_v1_one_off_item, 14);
 
 /**
  * @generated from message reminders.v1.DeleteOneOffItemRequest
@@ -321,7 +360,7 @@ export type DeleteOneOffItemRequest = Message<"reminders.v1.DeleteOneOffItemRequ
  * Use `create(DeleteOneOffItemRequestSchema)` to create a new message.
  */
 export const DeleteOneOffItemRequestSchema: GenMessage<DeleteOneOffItemRequest> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 13);
+  messageDesc(file_reminders_v1_one_off_item, 15);
 
 /**
  * @generated from message reminders.v1.DeleteOneOffItemResponse
@@ -334,7 +373,7 @@ export type DeleteOneOffItemResponse = Message<"reminders.v1.DeleteOneOffItemRes
  * Use `create(DeleteOneOffItemResponseSchema)` to create a new message.
  */
 export const DeleteOneOffItemResponseSchema: GenMessage<DeleteOneOffItemResponse> = /*@__PURE__*/
-  messageDesc(file_reminders_v1_one_off_item, 14);
+  messageDesc(file_reminders_v1_one_off_item, 16);
 
 /**
  * @generated from enum reminders.v1.Area
@@ -417,6 +456,14 @@ export const OneOffItemService: GenService<{
     methodKind: "unary";
     input: typeof CreateOneOffItemRequestSchema;
     output: typeof CreateOneOffItemResponseSchema;
+  },
+  /**
+   * @generated from rpc reminders.v1.OneOffItemService.UpdateOneOffItemTitle
+   */
+  updateOneOffItemTitle: {
+    methodKind: "unary";
+    input: typeof UpdateOneOffItemTitleRequestSchema;
+    output: typeof UpdateOneOffItemTitleResponseSchema;
   },
   /**
    * @generated from rpc reminders.v1.OneOffItemService.UpdateOneOffItemNotes

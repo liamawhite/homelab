@@ -412,6 +412,102 @@ func (x *CreateOneOffItemResponse) GetItem() *OneOffItem {
 	return nil
 }
 
+type UpdateOneOffItemTitleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateOneOffItemTitleRequest) Reset() {
+	*x = UpdateOneOffItemTitleRequest{}
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateOneOffItemTitleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateOneOffItemTitleRequest) ProtoMessage() {}
+
+func (x *UpdateOneOffItemTitleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateOneOffItemTitleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateOneOffItemTitleRequest) Descriptor() ([]byte, []int) {
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateOneOffItemTitleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateOneOffItemTitleRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+type UpdateOneOffItemTitleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Item          *OneOffItem            `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateOneOffItemTitleResponse) Reset() {
+	*x = UpdateOneOffItemTitleResponse{}
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateOneOffItemTitleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateOneOffItemTitleResponse) ProtoMessage() {}
+
+func (x *UpdateOneOffItemTitleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateOneOffItemTitleResponse.ProtoReflect.Descriptor instead.
+func (*UpdateOneOffItemTitleResponse) Descriptor() ([]byte, []int) {
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateOneOffItemTitleResponse) GetItem() *OneOffItem {
+	if x != nil {
+		return x.Item
+	}
+	return nil
+}
+
 type UpdateOneOffItemNotesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -422,7 +518,7 @@ type UpdateOneOffItemNotesRequest struct {
 
 func (x *UpdateOneOffItemNotesRequest) Reset() {
 	*x = UpdateOneOffItemNotesRequest{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[5]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +530,7 @@ func (x *UpdateOneOffItemNotesRequest) String() string {
 func (*UpdateOneOffItemNotesRequest) ProtoMessage() {}
 
 func (x *UpdateOneOffItemNotesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[5]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -447,7 +543,7 @@ func (x *UpdateOneOffItemNotesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemNotesRequest.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemNotesRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{5}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateOneOffItemNotesRequest) GetId() string {
@@ -473,7 +569,7 @@ type UpdateOneOffItemNotesResponse struct {
 
 func (x *UpdateOneOffItemNotesResponse) Reset() {
 	*x = UpdateOneOffItemNotesResponse{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[6]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -485,7 +581,7 @@ func (x *UpdateOneOffItemNotesResponse) String() string {
 func (*UpdateOneOffItemNotesResponse) ProtoMessage() {}
 
 func (x *UpdateOneOffItemNotesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[6]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -498,7 +594,7 @@ func (x *UpdateOneOffItemNotesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemNotesResponse.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemNotesResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{6}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateOneOffItemNotesResponse) GetItem() *OneOffItem {
@@ -519,7 +615,7 @@ type UpdateOneOffItemDueDateRequest struct {
 
 func (x *UpdateOneOffItemDueDateRequest) Reset() {
 	*x = UpdateOneOffItemDueDateRequest{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[7]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -531,7 +627,7 @@ func (x *UpdateOneOffItemDueDateRequest) String() string {
 func (*UpdateOneOffItemDueDateRequest) ProtoMessage() {}
 
 func (x *UpdateOneOffItemDueDateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[7]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +640,7 @@ func (x *UpdateOneOffItemDueDateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemDueDateRequest.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemDueDateRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{7}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdateOneOffItemDueDateRequest) GetId() string {
@@ -570,7 +666,7 @@ type UpdateOneOffItemDueDateResponse struct {
 
 func (x *UpdateOneOffItemDueDateResponse) Reset() {
 	*x = UpdateOneOffItemDueDateResponse{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[8]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -582,7 +678,7 @@ func (x *UpdateOneOffItemDueDateResponse) String() string {
 func (*UpdateOneOffItemDueDateResponse) ProtoMessage() {}
 
 func (x *UpdateOneOffItemDueDateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[8]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -595,7 +691,7 @@ func (x *UpdateOneOffItemDueDateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemDueDateResponse.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemDueDateResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{8}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UpdateOneOffItemDueDateResponse) GetItem() *OneOffItem {
@@ -616,7 +712,7 @@ type UpdateOneOffItemAreaRequest struct {
 
 func (x *UpdateOneOffItemAreaRequest) Reset() {
 	*x = UpdateOneOffItemAreaRequest{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[9]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -628,7 +724,7 @@ func (x *UpdateOneOffItemAreaRequest) String() string {
 func (*UpdateOneOffItemAreaRequest) ProtoMessage() {}
 
 func (x *UpdateOneOffItemAreaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[9]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -641,7 +737,7 @@ func (x *UpdateOneOffItemAreaRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemAreaRequest.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemAreaRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{9}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateOneOffItemAreaRequest) GetId() string {
@@ -667,7 +763,7 @@ type UpdateOneOffItemAreaResponse struct {
 
 func (x *UpdateOneOffItemAreaResponse) Reset() {
 	*x = UpdateOneOffItemAreaResponse{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[10]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -679,7 +775,7 @@ func (x *UpdateOneOffItemAreaResponse) String() string {
 func (*UpdateOneOffItemAreaResponse) ProtoMessage() {}
 
 func (x *UpdateOneOffItemAreaResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[10]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -692,7 +788,7 @@ func (x *UpdateOneOffItemAreaResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemAreaResponse.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemAreaResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{10}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UpdateOneOffItemAreaResponse) GetItem() *OneOffItem {
@@ -713,7 +809,7 @@ type UpdateOneOffItemStatusRequest struct {
 
 func (x *UpdateOneOffItemStatusRequest) Reset() {
 	*x = UpdateOneOffItemStatusRequest{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[11]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -725,7 +821,7 @@ func (x *UpdateOneOffItemStatusRequest) String() string {
 func (*UpdateOneOffItemStatusRequest) ProtoMessage() {}
 
 func (x *UpdateOneOffItemStatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[11]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -738,7 +834,7 @@ func (x *UpdateOneOffItemStatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemStatusRequest.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemStatusRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{11}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateOneOffItemStatusRequest) GetId() string {
@@ -764,7 +860,7 @@ type UpdateOneOffItemStatusResponse struct {
 
 func (x *UpdateOneOffItemStatusResponse) Reset() {
 	*x = UpdateOneOffItemStatusResponse{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[12]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -776,7 +872,7 @@ func (x *UpdateOneOffItemStatusResponse) String() string {
 func (*UpdateOneOffItemStatusResponse) ProtoMessage() {}
 
 func (x *UpdateOneOffItemStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[12]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -789,7 +885,7 @@ func (x *UpdateOneOffItemStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateOneOffItemStatusResponse.ProtoReflect.Descriptor instead.
 func (*UpdateOneOffItemStatusResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{12}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UpdateOneOffItemStatusResponse) GetItem() *OneOffItem {
@@ -808,7 +904,7 @@ type DeleteOneOffItemRequest struct {
 
 func (x *DeleteOneOffItemRequest) Reset() {
 	*x = DeleteOneOffItemRequest{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[13]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -820,7 +916,7 @@ func (x *DeleteOneOffItemRequest) String() string {
 func (*DeleteOneOffItemRequest) ProtoMessage() {}
 
 func (x *DeleteOneOffItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[13]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -833,7 +929,7 @@ func (x *DeleteOneOffItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteOneOffItemRequest.ProtoReflect.Descriptor instead.
 func (*DeleteOneOffItemRequest) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{13}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeleteOneOffItemRequest) GetId() string {
@@ -851,7 +947,7 @@ type DeleteOneOffItemResponse struct {
 
 func (x *DeleteOneOffItemResponse) Reset() {
 	*x = DeleteOneOffItemResponse{}
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[14]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -863,7 +959,7 @@ func (x *DeleteOneOffItemResponse) String() string {
 func (*DeleteOneOffItemResponse) ProtoMessage() {}
 
 func (x *DeleteOneOffItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_reminders_v1_one_off_item_proto_msgTypes[14]
+	mi := &file_reminders_v1_one_off_item_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -876,7 +972,7 @@ func (x *DeleteOneOffItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteOneOffItemResponse.ProtoReflect.Descriptor instead.
 func (*DeleteOneOffItemResponse) Descriptor() ([]byte, []int) {
-	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{14}
+	return file_reminders_v1_one_off_item_proto_rawDescGZIP(), []int{16}
 }
 
 var File_reminders_v1_one_off_item_proto protoreflect.FileDescriptor
@@ -903,6 +999,11 @@ const file_reminders_v1_one_off_item_proto_rawDesc = "" +
 	"\x04area\x18\x03 \x01(\x0e2\x12.reminders.v1.AreaR\x04area\x12\x14\n" +
 	"\x05notes\x18\x04 \x01(\tR\x05notes\"H\n" +
 	"\x18CreateOneOffItemResponse\x12,\n" +
+	"\x04item\x18\x01 \x01(\v2\x18.reminders.v1.OneOffItemR\x04item\"D\n" +
+	"\x1cUpdateOneOffItemTitleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\"M\n" +
+	"\x1dUpdateOneOffItemTitleResponse\x12,\n" +
 	"\x04item\x18\x01 \x01(\v2\x18.reminders.v1.OneOffItemR\x04item\"D\n" +
 	"\x1cUpdateOneOffItemNotesRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
@@ -936,10 +1037,11 @@ const file_reminders_v1_one_off_item_proto_rawDesc = "" +
 	"\x10OneOffItemStatus\x12#\n" +
 	"\x1fONE_OFF_ITEM_STATUS_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18ONE_OFF_ITEM_STATUS_OPEN\x10\x01\x12!\n" +
-	"\x1dONE_OFF_ITEM_STATUS_COMPLETED\x10\x022\x87\x06\n" +
+	"\x1dONE_OFF_ITEM_STATUS_COMPLETED\x10\x022\xf9\x06\n" +
 	"\x11OneOffItemService\x12^\n" +
 	"\x0fListOneOffItems\x12$.reminders.v1.ListOneOffItemsRequest\x1a%.reminders.v1.ListOneOffItemsResponse\x12a\n" +
 	"\x10CreateOneOffItem\x12%.reminders.v1.CreateOneOffItemRequest\x1a&.reminders.v1.CreateOneOffItemResponse\x12p\n" +
+	"\x15UpdateOneOffItemTitle\x12*.reminders.v1.UpdateOneOffItemTitleRequest\x1a+.reminders.v1.UpdateOneOffItemTitleResponse\x12p\n" +
 	"\x15UpdateOneOffItemNotes\x12*.reminders.v1.UpdateOneOffItemNotesRequest\x1a+.reminders.v1.UpdateOneOffItemNotesResponse\x12v\n" +
 	"\x17UpdateOneOffItemDueDate\x12,.reminders.v1.UpdateOneOffItemDueDateRequest\x1a-.reminders.v1.UpdateOneOffItemDueDateResponse\x12m\n" +
 	"\x14UpdateOneOffItemArea\x12).reminders.v1.UpdateOneOffItemAreaRequest\x1a*.reminders.v1.UpdateOneOffItemAreaResponse\x12s\n" +
@@ -959,7 +1061,7 @@ func file_reminders_v1_one_off_item_proto_rawDescGZIP() []byte {
 }
 
 var file_reminders_v1_one_off_item_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_reminders_v1_one_off_item_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_reminders_v1_one_off_item_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_reminders_v1_one_off_item_proto_goTypes = []any{
 	(Area)(0),                               // 0: reminders.v1.Area
 	(OneOffItemStatus)(0),                   // 1: reminders.v1.OneOffItemStatus
@@ -968,53 +1070,58 @@ var file_reminders_v1_one_off_item_proto_goTypes = []any{
 	(*ListOneOffItemsResponse)(nil),         // 4: reminders.v1.ListOneOffItemsResponse
 	(*CreateOneOffItemRequest)(nil),         // 5: reminders.v1.CreateOneOffItemRequest
 	(*CreateOneOffItemResponse)(nil),        // 6: reminders.v1.CreateOneOffItemResponse
-	(*UpdateOneOffItemNotesRequest)(nil),    // 7: reminders.v1.UpdateOneOffItemNotesRequest
-	(*UpdateOneOffItemNotesResponse)(nil),   // 8: reminders.v1.UpdateOneOffItemNotesResponse
-	(*UpdateOneOffItemDueDateRequest)(nil),  // 9: reminders.v1.UpdateOneOffItemDueDateRequest
-	(*UpdateOneOffItemDueDateResponse)(nil), // 10: reminders.v1.UpdateOneOffItemDueDateResponse
-	(*UpdateOneOffItemAreaRequest)(nil),     // 11: reminders.v1.UpdateOneOffItemAreaRequest
-	(*UpdateOneOffItemAreaResponse)(nil),    // 12: reminders.v1.UpdateOneOffItemAreaResponse
-	(*UpdateOneOffItemStatusRequest)(nil),   // 13: reminders.v1.UpdateOneOffItemStatusRequest
-	(*UpdateOneOffItemStatusResponse)(nil),  // 14: reminders.v1.UpdateOneOffItemStatusResponse
-	(*DeleteOneOffItemRequest)(nil),         // 15: reminders.v1.DeleteOneOffItemRequest
-	(*DeleteOneOffItemResponse)(nil),        // 16: reminders.v1.DeleteOneOffItemResponse
-	(*timestamppb.Timestamp)(nil),           // 17: google.protobuf.Timestamp
+	(*UpdateOneOffItemTitleRequest)(nil),    // 7: reminders.v1.UpdateOneOffItemTitleRequest
+	(*UpdateOneOffItemTitleResponse)(nil),   // 8: reminders.v1.UpdateOneOffItemTitleResponse
+	(*UpdateOneOffItemNotesRequest)(nil),    // 9: reminders.v1.UpdateOneOffItemNotesRequest
+	(*UpdateOneOffItemNotesResponse)(nil),   // 10: reminders.v1.UpdateOneOffItemNotesResponse
+	(*UpdateOneOffItemDueDateRequest)(nil),  // 11: reminders.v1.UpdateOneOffItemDueDateRequest
+	(*UpdateOneOffItemDueDateResponse)(nil), // 12: reminders.v1.UpdateOneOffItemDueDateResponse
+	(*UpdateOneOffItemAreaRequest)(nil),     // 13: reminders.v1.UpdateOneOffItemAreaRequest
+	(*UpdateOneOffItemAreaResponse)(nil),    // 14: reminders.v1.UpdateOneOffItemAreaResponse
+	(*UpdateOneOffItemStatusRequest)(nil),   // 15: reminders.v1.UpdateOneOffItemStatusRequest
+	(*UpdateOneOffItemStatusResponse)(nil),  // 16: reminders.v1.UpdateOneOffItemStatusResponse
+	(*DeleteOneOffItemRequest)(nil),         // 17: reminders.v1.DeleteOneOffItemRequest
+	(*DeleteOneOffItemResponse)(nil),        // 18: reminders.v1.DeleteOneOffItemResponse
+	(*timestamppb.Timestamp)(nil),           // 19: google.protobuf.Timestamp
 }
 var file_reminders_v1_one_off_item_proto_depIdxs = []int32{
-	17, // 0: reminders.v1.OneOffItem.created_at:type_name -> google.protobuf.Timestamp
-	17, // 1: reminders.v1.OneOffItem.due_date:type_name -> google.protobuf.Timestamp
+	19, // 0: reminders.v1.OneOffItem.created_at:type_name -> google.protobuf.Timestamp
+	19, // 1: reminders.v1.OneOffItem.due_date:type_name -> google.protobuf.Timestamp
 	0,  // 2: reminders.v1.OneOffItem.area:type_name -> reminders.v1.Area
 	1,  // 3: reminders.v1.OneOffItem.status:type_name -> reminders.v1.OneOffItemStatus
 	2,  // 4: reminders.v1.ListOneOffItemsResponse.items:type_name -> reminders.v1.OneOffItem
-	17, // 5: reminders.v1.CreateOneOffItemRequest.due_date:type_name -> google.protobuf.Timestamp
+	19, // 5: reminders.v1.CreateOneOffItemRequest.due_date:type_name -> google.protobuf.Timestamp
 	0,  // 6: reminders.v1.CreateOneOffItemRequest.area:type_name -> reminders.v1.Area
 	2,  // 7: reminders.v1.CreateOneOffItemResponse.item:type_name -> reminders.v1.OneOffItem
-	2,  // 8: reminders.v1.UpdateOneOffItemNotesResponse.item:type_name -> reminders.v1.OneOffItem
-	17, // 9: reminders.v1.UpdateOneOffItemDueDateRequest.due_date:type_name -> google.protobuf.Timestamp
-	2,  // 10: reminders.v1.UpdateOneOffItemDueDateResponse.item:type_name -> reminders.v1.OneOffItem
-	0,  // 11: reminders.v1.UpdateOneOffItemAreaRequest.area:type_name -> reminders.v1.Area
-	2,  // 12: reminders.v1.UpdateOneOffItemAreaResponse.item:type_name -> reminders.v1.OneOffItem
-	1,  // 13: reminders.v1.UpdateOneOffItemStatusRequest.status:type_name -> reminders.v1.OneOffItemStatus
-	2,  // 14: reminders.v1.UpdateOneOffItemStatusResponse.item:type_name -> reminders.v1.OneOffItem
-	3,  // 15: reminders.v1.OneOffItemService.ListOneOffItems:input_type -> reminders.v1.ListOneOffItemsRequest
-	5,  // 16: reminders.v1.OneOffItemService.CreateOneOffItem:input_type -> reminders.v1.CreateOneOffItemRequest
-	7,  // 17: reminders.v1.OneOffItemService.UpdateOneOffItemNotes:input_type -> reminders.v1.UpdateOneOffItemNotesRequest
-	9,  // 18: reminders.v1.OneOffItemService.UpdateOneOffItemDueDate:input_type -> reminders.v1.UpdateOneOffItemDueDateRequest
-	11, // 19: reminders.v1.OneOffItemService.UpdateOneOffItemArea:input_type -> reminders.v1.UpdateOneOffItemAreaRequest
-	13, // 20: reminders.v1.OneOffItemService.UpdateOneOffItemStatus:input_type -> reminders.v1.UpdateOneOffItemStatusRequest
-	15, // 21: reminders.v1.OneOffItemService.DeleteOneOffItem:input_type -> reminders.v1.DeleteOneOffItemRequest
-	4,  // 22: reminders.v1.OneOffItemService.ListOneOffItems:output_type -> reminders.v1.ListOneOffItemsResponse
-	6,  // 23: reminders.v1.OneOffItemService.CreateOneOffItem:output_type -> reminders.v1.CreateOneOffItemResponse
-	8,  // 24: reminders.v1.OneOffItemService.UpdateOneOffItemNotes:output_type -> reminders.v1.UpdateOneOffItemNotesResponse
-	10, // 25: reminders.v1.OneOffItemService.UpdateOneOffItemDueDate:output_type -> reminders.v1.UpdateOneOffItemDueDateResponse
-	12, // 26: reminders.v1.OneOffItemService.UpdateOneOffItemArea:output_type -> reminders.v1.UpdateOneOffItemAreaResponse
-	14, // 27: reminders.v1.OneOffItemService.UpdateOneOffItemStatus:output_type -> reminders.v1.UpdateOneOffItemStatusResponse
-	16, // 28: reminders.v1.OneOffItemService.DeleteOneOffItem:output_type -> reminders.v1.DeleteOneOffItemResponse
-	22, // [22:29] is the sub-list for method output_type
-	15, // [15:22] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	2,  // 8: reminders.v1.UpdateOneOffItemTitleResponse.item:type_name -> reminders.v1.OneOffItem
+	2,  // 9: reminders.v1.UpdateOneOffItemNotesResponse.item:type_name -> reminders.v1.OneOffItem
+	19, // 10: reminders.v1.UpdateOneOffItemDueDateRequest.due_date:type_name -> google.protobuf.Timestamp
+	2,  // 11: reminders.v1.UpdateOneOffItemDueDateResponse.item:type_name -> reminders.v1.OneOffItem
+	0,  // 12: reminders.v1.UpdateOneOffItemAreaRequest.area:type_name -> reminders.v1.Area
+	2,  // 13: reminders.v1.UpdateOneOffItemAreaResponse.item:type_name -> reminders.v1.OneOffItem
+	1,  // 14: reminders.v1.UpdateOneOffItemStatusRequest.status:type_name -> reminders.v1.OneOffItemStatus
+	2,  // 15: reminders.v1.UpdateOneOffItemStatusResponse.item:type_name -> reminders.v1.OneOffItem
+	3,  // 16: reminders.v1.OneOffItemService.ListOneOffItems:input_type -> reminders.v1.ListOneOffItemsRequest
+	5,  // 17: reminders.v1.OneOffItemService.CreateOneOffItem:input_type -> reminders.v1.CreateOneOffItemRequest
+	7,  // 18: reminders.v1.OneOffItemService.UpdateOneOffItemTitle:input_type -> reminders.v1.UpdateOneOffItemTitleRequest
+	9,  // 19: reminders.v1.OneOffItemService.UpdateOneOffItemNotes:input_type -> reminders.v1.UpdateOneOffItemNotesRequest
+	11, // 20: reminders.v1.OneOffItemService.UpdateOneOffItemDueDate:input_type -> reminders.v1.UpdateOneOffItemDueDateRequest
+	13, // 21: reminders.v1.OneOffItemService.UpdateOneOffItemArea:input_type -> reminders.v1.UpdateOneOffItemAreaRequest
+	15, // 22: reminders.v1.OneOffItemService.UpdateOneOffItemStatus:input_type -> reminders.v1.UpdateOneOffItemStatusRequest
+	17, // 23: reminders.v1.OneOffItemService.DeleteOneOffItem:input_type -> reminders.v1.DeleteOneOffItemRequest
+	4,  // 24: reminders.v1.OneOffItemService.ListOneOffItems:output_type -> reminders.v1.ListOneOffItemsResponse
+	6,  // 25: reminders.v1.OneOffItemService.CreateOneOffItem:output_type -> reminders.v1.CreateOneOffItemResponse
+	8,  // 26: reminders.v1.OneOffItemService.UpdateOneOffItemTitle:output_type -> reminders.v1.UpdateOneOffItemTitleResponse
+	10, // 27: reminders.v1.OneOffItemService.UpdateOneOffItemNotes:output_type -> reminders.v1.UpdateOneOffItemNotesResponse
+	12, // 28: reminders.v1.OneOffItemService.UpdateOneOffItemDueDate:output_type -> reminders.v1.UpdateOneOffItemDueDateResponse
+	14, // 29: reminders.v1.OneOffItemService.UpdateOneOffItemArea:output_type -> reminders.v1.UpdateOneOffItemAreaResponse
+	16, // 30: reminders.v1.OneOffItemService.UpdateOneOffItemStatus:output_type -> reminders.v1.UpdateOneOffItemStatusResponse
+	18, // 31: reminders.v1.OneOffItemService.DeleteOneOffItem:output_type -> reminders.v1.DeleteOneOffItemResponse
+	24, // [24:32] is the sub-list for method output_type
+	16, // [16:24] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_reminders_v1_one_off_item_proto_init() }
@@ -1028,7 +1135,7 @@ func file_reminders_v1_one_off_item_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_reminders_v1_one_off_item_proto_rawDesc), len(file_reminders_v1_one_off_item_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -4,6 +4,9 @@ SELECT id, title, created_at, notes, due_date, area, status FROM one_off_items O
 -- name: CreateOneOffItem :one
 INSERT INTO one_off_items (id, title, notes, created_at, due_date, area, status) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, created_at, notes, due_date, area, status;
 
+-- name: UpdateOneOffItemTitle :one
+UPDATE one_off_items SET title = ? WHERE id = ? RETURNING id, title, created_at, notes, due_date, area, status;
+
 -- name: UpdateOneOffItemNotes :one
 UPDATE one_off_items SET notes = ? WHERE id = ? RETURNING id, title, created_at, notes, due_date, area, status;
 
@@ -28,6 +31,10 @@ SELECT id, title, notes, created_at, next_due_date, area, rule_type, days_of_wee
 -- name: CreateRecurringItem :one
 INSERT INTO recurring_items (id, title, notes, created_at, next_due_date, area, rule_type, days_of_week, days_of_month, yearly_dates, interval_days)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id, title, notes, created_at, next_due_date, area, rule_type, days_of_week, days_of_month, yearly_dates, interval_days;
+
+-- name: UpdateRecurringItemTitle :one
+UPDATE recurring_items SET title = ? WHERE id = ?
 RETURNING id, title, notes, created_at, next_due_date, area, rule_type, days_of_week, days_of_month, yearly_dates, interval_days;
 
 -- name: UpdateRecurringItemNotes :one

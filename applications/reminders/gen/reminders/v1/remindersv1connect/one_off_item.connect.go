@@ -39,6 +39,9 @@ const (
 	// OneOffItemServiceCreateOneOffItemProcedure is the fully-qualified name of the OneOffItemService's
 	// CreateOneOffItem RPC.
 	OneOffItemServiceCreateOneOffItemProcedure = "/reminders.v1.OneOffItemService/CreateOneOffItem"
+	// OneOffItemServiceUpdateOneOffItemTitleProcedure is the fully-qualified name of the
+	// OneOffItemService's UpdateOneOffItemTitle RPC.
+	OneOffItemServiceUpdateOneOffItemTitleProcedure = "/reminders.v1.OneOffItemService/UpdateOneOffItemTitle"
 	// OneOffItemServiceUpdateOneOffItemNotesProcedure is the fully-qualified name of the
 	// OneOffItemService's UpdateOneOffItemNotes RPC.
 	OneOffItemServiceUpdateOneOffItemNotesProcedure = "/reminders.v1.OneOffItemService/UpdateOneOffItemNotes"
@@ -60,6 +63,7 @@ const (
 type OneOffItemServiceClient interface {
 	ListOneOffItems(context.Context, *connect.Request[v1.ListOneOffItemsRequest]) (*connect.Response[v1.ListOneOffItemsResponse], error)
 	CreateOneOffItem(context.Context, *connect.Request[v1.CreateOneOffItemRequest]) (*connect.Response[v1.CreateOneOffItemResponse], error)
+	UpdateOneOffItemTitle(context.Context, *connect.Request[v1.UpdateOneOffItemTitleRequest]) (*connect.Response[v1.UpdateOneOffItemTitleResponse], error)
 	UpdateOneOffItemNotes(context.Context, *connect.Request[v1.UpdateOneOffItemNotesRequest]) (*connect.Response[v1.UpdateOneOffItemNotesResponse], error)
 	UpdateOneOffItemDueDate(context.Context, *connect.Request[v1.UpdateOneOffItemDueDateRequest]) (*connect.Response[v1.UpdateOneOffItemDueDateResponse], error)
 	UpdateOneOffItemArea(context.Context, *connect.Request[v1.UpdateOneOffItemAreaRequest]) (*connect.Response[v1.UpdateOneOffItemAreaResponse], error)
@@ -88,6 +92,12 @@ func NewOneOffItemServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			httpClient,
 			baseURL+OneOffItemServiceCreateOneOffItemProcedure,
 			connect.WithSchema(oneOffItemServiceMethods.ByName("CreateOneOffItem")),
+			connect.WithClientOptions(opts...),
+		),
+		updateOneOffItemTitle: connect.NewClient[v1.UpdateOneOffItemTitleRequest, v1.UpdateOneOffItemTitleResponse](
+			httpClient,
+			baseURL+OneOffItemServiceUpdateOneOffItemTitleProcedure,
+			connect.WithSchema(oneOffItemServiceMethods.ByName("UpdateOneOffItemTitle")),
 			connect.WithClientOptions(opts...),
 		),
 		updateOneOffItemNotes: connect.NewClient[v1.UpdateOneOffItemNotesRequest, v1.UpdateOneOffItemNotesResponse](
@@ -127,6 +137,7 @@ func NewOneOffItemServiceClient(httpClient connect.HTTPClient, baseURL string, o
 type oneOffItemServiceClient struct {
 	listOneOffItems         *connect.Client[v1.ListOneOffItemsRequest, v1.ListOneOffItemsResponse]
 	createOneOffItem        *connect.Client[v1.CreateOneOffItemRequest, v1.CreateOneOffItemResponse]
+	updateOneOffItemTitle   *connect.Client[v1.UpdateOneOffItemTitleRequest, v1.UpdateOneOffItemTitleResponse]
 	updateOneOffItemNotes   *connect.Client[v1.UpdateOneOffItemNotesRequest, v1.UpdateOneOffItemNotesResponse]
 	updateOneOffItemDueDate *connect.Client[v1.UpdateOneOffItemDueDateRequest, v1.UpdateOneOffItemDueDateResponse]
 	updateOneOffItemArea    *connect.Client[v1.UpdateOneOffItemAreaRequest, v1.UpdateOneOffItemAreaResponse]
@@ -142,6 +153,11 @@ func (c *oneOffItemServiceClient) ListOneOffItems(ctx context.Context, req *conn
 // CreateOneOffItem calls reminders.v1.OneOffItemService.CreateOneOffItem.
 func (c *oneOffItemServiceClient) CreateOneOffItem(ctx context.Context, req *connect.Request[v1.CreateOneOffItemRequest]) (*connect.Response[v1.CreateOneOffItemResponse], error) {
 	return c.createOneOffItem.CallUnary(ctx, req)
+}
+
+// UpdateOneOffItemTitle calls reminders.v1.OneOffItemService.UpdateOneOffItemTitle.
+func (c *oneOffItemServiceClient) UpdateOneOffItemTitle(ctx context.Context, req *connect.Request[v1.UpdateOneOffItemTitleRequest]) (*connect.Response[v1.UpdateOneOffItemTitleResponse], error) {
+	return c.updateOneOffItemTitle.CallUnary(ctx, req)
 }
 
 // UpdateOneOffItemNotes calls reminders.v1.OneOffItemService.UpdateOneOffItemNotes.
@@ -173,6 +189,7 @@ func (c *oneOffItemServiceClient) DeleteOneOffItem(ctx context.Context, req *con
 type OneOffItemServiceHandler interface {
 	ListOneOffItems(context.Context, *connect.Request[v1.ListOneOffItemsRequest]) (*connect.Response[v1.ListOneOffItemsResponse], error)
 	CreateOneOffItem(context.Context, *connect.Request[v1.CreateOneOffItemRequest]) (*connect.Response[v1.CreateOneOffItemResponse], error)
+	UpdateOneOffItemTitle(context.Context, *connect.Request[v1.UpdateOneOffItemTitleRequest]) (*connect.Response[v1.UpdateOneOffItemTitleResponse], error)
 	UpdateOneOffItemNotes(context.Context, *connect.Request[v1.UpdateOneOffItemNotesRequest]) (*connect.Response[v1.UpdateOneOffItemNotesResponse], error)
 	UpdateOneOffItemDueDate(context.Context, *connect.Request[v1.UpdateOneOffItemDueDateRequest]) (*connect.Response[v1.UpdateOneOffItemDueDateResponse], error)
 	UpdateOneOffItemArea(context.Context, *connect.Request[v1.UpdateOneOffItemAreaRequest]) (*connect.Response[v1.UpdateOneOffItemAreaResponse], error)
@@ -197,6 +214,12 @@ func NewOneOffItemServiceHandler(svc OneOffItemServiceHandler, opts ...connect.H
 		OneOffItemServiceCreateOneOffItemProcedure,
 		svc.CreateOneOffItem,
 		connect.WithSchema(oneOffItemServiceMethods.ByName("CreateOneOffItem")),
+		connect.WithHandlerOptions(opts...),
+	)
+	oneOffItemServiceUpdateOneOffItemTitleHandler := connect.NewUnaryHandler(
+		OneOffItemServiceUpdateOneOffItemTitleProcedure,
+		svc.UpdateOneOffItemTitle,
+		connect.WithSchema(oneOffItemServiceMethods.ByName("UpdateOneOffItemTitle")),
 		connect.WithHandlerOptions(opts...),
 	)
 	oneOffItemServiceUpdateOneOffItemNotesHandler := connect.NewUnaryHandler(
@@ -235,6 +258,8 @@ func NewOneOffItemServiceHandler(svc OneOffItemServiceHandler, opts ...connect.H
 			oneOffItemServiceListOneOffItemsHandler.ServeHTTP(w, r)
 		case OneOffItemServiceCreateOneOffItemProcedure:
 			oneOffItemServiceCreateOneOffItemHandler.ServeHTTP(w, r)
+		case OneOffItemServiceUpdateOneOffItemTitleProcedure:
+			oneOffItemServiceUpdateOneOffItemTitleHandler.ServeHTTP(w, r)
 		case OneOffItemServiceUpdateOneOffItemNotesProcedure:
 			oneOffItemServiceUpdateOneOffItemNotesHandler.ServeHTTP(w, r)
 		case OneOffItemServiceUpdateOneOffItemDueDateProcedure:
@@ -260,6 +285,10 @@ func (UnimplementedOneOffItemServiceHandler) ListOneOffItems(context.Context, *c
 
 func (UnimplementedOneOffItemServiceHandler) CreateOneOffItem(context.Context, *connect.Request[v1.CreateOneOffItemRequest]) (*connect.Response[v1.CreateOneOffItemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("reminders.v1.OneOffItemService.CreateOneOffItem is not implemented"))
+}
+
+func (UnimplementedOneOffItemServiceHandler) UpdateOneOffItemTitle(context.Context, *connect.Request[v1.UpdateOneOffItemTitleRequest]) (*connect.Response[v1.UpdateOneOffItemTitleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("reminders.v1.OneOffItemService.UpdateOneOffItemTitle is not implemented"))
 }
 
 func (UnimplementedOneOffItemServiceHandler) UpdateOneOffItemNotes(context.Context, *connect.Request[v1.UpdateOneOffItemNotesRequest]) (*connect.Response[v1.UpdateOneOffItemNotesResponse], error) {

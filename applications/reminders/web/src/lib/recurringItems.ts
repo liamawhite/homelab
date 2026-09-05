@@ -6,6 +6,7 @@ import { recurringItemClient } from "./client";
 import type { RecurringItem } from "@/gen/reminders/v1/recurring_item_pb";
 import {
   CreateRecurringItemRequestSchema,
+  UpdateRecurringItemTitleRequestSchema,
   UpdateRecurringItemNotesRequestSchema,
   UpdateRecurringItemAreaRequestSchema,
   UpdateRecurringItemRuleRequestSchema,
@@ -36,6 +37,23 @@ export function useCreateRecurringItem() {
       const res = await recurringItemClient.createRecurringItem(input);
       if (!res.item) {
         throw new Error("CreateRecurringItem response did not include an item");
+      }
+      return res.item;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: recurringItemsQueryKey });
+    },
+  });
+}
+
+export function useUpdateRecurringItemTitle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: MessageInitShape<typeof UpdateRecurringItemTitleRequestSchema>) => {
+      const res = await recurringItemClient.updateRecurringItemTitle(input);
+      if (!res.item) {
+        throw new Error("UpdateRecurringItemTitle response did not include an item");
       }
       return res.item;
     },

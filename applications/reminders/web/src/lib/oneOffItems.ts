@@ -52,6 +52,23 @@ export function useCreateOneOffItem() {
   });
 }
 
+export function useUpdateOneOffItemTitle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+      const res = await oneOffItemClient.updateOneOffItemTitle({ id, title });
+      if (!res.item) {
+        throw new Error("UpdateOneOffItemTitle response did not include an item");
+      }
+      return res.item;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: oneOffItemsQueryKey });
+    },
+  });
+}
+
 export function useUpdateOneOffItemNotes() {
   const queryClient = useQueryClient();
 

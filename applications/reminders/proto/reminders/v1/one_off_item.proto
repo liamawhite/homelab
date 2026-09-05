@@ -49,6 +49,15 @@ message CreateOneOffItemResponse {
   OneOffItem item = 1;
 }
 
+message UpdateOneOffItemTitleRequest {
+  string id = 1;
+  string title = 2;
+}
+
+message UpdateOneOffItemTitleResponse {
+  OneOffItem item = 1;
+}
+
 message UpdateOneOffItemNotesRequest {
   string id = 1;
   string notes = 2;
@@ -97,6 +106,7 @@ message DeleteOneOffItemResponse {}
 service OneOffItemService {
   rpc ListOneOffItems(ListOneOffItemsRequest) returns (ListOneOffItemsResponse);
   rpc CreateOneOffItem(CreateOneOffItemRequest) returns (CreateOneOffItemResponse);
+  rpc UpdateOneOffItemTitle(UpdateOneOffItemTitleRequest) returns (UpdateOneOffItemTitleResponse);
   rpc UpdateOneOffItemNotes(UpdateOneOffItemNotesRequest) returns (UpdateOneOffItemNotesResponse);
   rpc UpdateOneOffItemDueDate(UpdateOneOffItemDueDateRequest) returns (UpdateOneOffItemDueDateResponse);
   rpc UpdateOneOffItemArea(UpdateOneOffItemAreaRequest) returns (UpdateOneOffItemAreaResponse);
