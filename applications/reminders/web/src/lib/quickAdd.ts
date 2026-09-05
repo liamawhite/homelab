@@ -37,14 +37,41 @@ export function extractDueDate(text: string, now: Date = new Date()): { date: Da
   if (result && toUTCMidnight(result.date()).getTime() < startOfTodayUTC(now).getTime()) {
     [result] = chrono.parse(text, now, { forwardDate: true });
   }
-  if (!result) return null;
+  if (result) {
+    // chrono resolves relative to local time; normalize to UTC midnight of
+    // that same calendar day so it lines up with how due dates are
+    // stored/compared everywhere else in this app (see time.ts).
+    const date = toUTCMidnight(result.date());
 
-  // chrono resolves relative to local time; normalize to UTC midnight of
-  // that same calendar day so it lines up with how due dates are
-  // stored/compared everywhere else in this app (see time.ts).
-  const date = toUTCMidnight(result.date());
+    const rest = (text.slice(0, result.index) + text.slice(result.index + result.text.length))
+      .replace(/\s+/g, " ")
+      .trim();
+    return { date, rest };
+  }
 
-  const rest = (text.slice(0, result.index) + text.slice(result.index + result.text.length))
+  // chrono only resolves an ordinal day when it's paired with a month
+  // ("sept 14th") - a bare "14th"/"the 14th" comes back empty, so handle
+  // that case ourselves: this month's Nth, unless today is on or past that
+  // day, in which case next month's Nth.
+  return extractOrdinalDayOfMonth(text, now);
+}
+
+const ORDINAL_DAY_RE = /(?:^|\s)(?:the\s+)?(\d{1,2})(?:st|nd|rd|th)\b/i;
+
+function extractOrdinalDayOfMonth(text: string, now: Date): { date: Date; rest: string } | null {
+  const match = ORDINAL_DAY_RE.exec(text);
+  if (!match || match.index === undefined) return null;
+
+  const day = Number(match[1]);
+  if (day < 1 || day > 31) return null;
+
+  const today = startOfTodayUTC(now);
+  let date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), day));
+  if (date.getTime() <= today.getTime()) {
+    date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, day));
+  }
+
+  const rest = (text.slice(0, match.index) + text.slice(match.index + match[0].length))
     .replace(/\s+/g, " ")
     .trim();
   return { date, rest };
