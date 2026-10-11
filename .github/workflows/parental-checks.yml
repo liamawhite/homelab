@@ -1,4 +1,4 @@
-name: parental checks
+name: applications / parental
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ env:
 
 jobs:
   format:
-    name: parental / format
+    name: format
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,7 +42,7 @@ jobs:
       - run: make format-check
 
   lint:
-    name: parental / lint
+    name: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,7 +68,7 @@ jobs:
           args: ./cmd/... ./internal/... ./gen/...
 
   test:
-    name: parental / test
+    name: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
