@@ -1,8 +1,8 @@
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 // Connect's HTTP paths are all under /<package>.<Service>/, so proxying
 // everything under /shopping.* to the local Go server (see
@@ -14,13 +14,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   server: {
     proxy: {
-      "/shopping.v1.ItemService": "http://localhost:8080",
-      "/shopping.v1.LabelService": "http://localhost:8080",
+      '/shopping.v1.ItemService': 'http://localhost:8080',
+      '/shopping.v1.LabelService': 'http://localhost:8080',
     },
   },
 });

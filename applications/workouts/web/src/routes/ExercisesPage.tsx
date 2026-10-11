@@ -1,17 +1,25 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Archive as ArchiveIcon, ArchiveRestore, Plus } from "lucide-react";
+} from '@tanstack/react-table';
+import { Archive as ArchiveIcon, ArchiveRestore, Plus } from 'lucide-react';
 
-import { ExerciseCategory, ExerciseEquipment, type Exercise } from "@/gen/workouts/v1/exercise_pb";
-import { useExercises, useArchiveExercise, useRestoreExercise } from "@/lib/exercises";
-import { AddExerciseDialog } from "@/components/AddExerciseDialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  ExerciseCategory,
+  ExerciseEquipment,
+  type Exercise,
+} from '@/gen/workouts/v1/exercise_pb';
+import {
+  useExercises,
+  useArchiveExercise,
+  useRestoreExercise,
+} from '@/lib/exercises';
+import { AddExerciseDialog } from '@/components/AddExerciseDialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -19,23 +27,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 function categoryLabel(category: ExerciseCategory): string {
-  return category === ExerciseCategory.MAIN_LIFT ? "Main lift" : "Accessory";
+  return category === ExerciseCategory.MAIN_LIFT ? 'Main lift' : 'Accessory';
 }
 
 function equipmentLabel(equipment: ExerciseEquipment): string {
   switch (equipment) {
     case ExerciseEquipment.BARBELL:
-      return "Barbell";
+      return 'Barbell';
     case ExerciseEquipment.DUMBBELL:
-      return "Dumbbell";
+      return 'Dumbbell';
     case ExerciseEquipment.BODYWEIGHT:
-      return "Bodyweight";
+      return 'Bodyweight';
     default:
-      return "Unknown";
+      return 'Unknown';
   }
 }
 
@@ -49,36 +57,49 @@ export function ExercisesPage() {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor('name', {
+        header: 'Name',
         cell: (info) => (
-          <span className={cn(info.row.original.archived && "text-muted-foreground line-through")}>
+          <span
+            className={cn(
+              info.row.original.archived &&
+                'text-muted-foreground line-through',
+            )}
+          >
             {info.getValue()}
           </span>
         ),
       }),
-      columnHelper.accessor("category", {
-        header: "Category",
+      columnHelper.accessor('category', {
+        header: 'Category',
         cell: (info) => (
-          <Badge variant={info.getValue() === ExerciseCategory.MAIN_LIFT ? "default" : "secondary"}>
+          <Badge
+            variant={
+              info.getValue() === ExerciseCategory.MAIN_LIFT
+                ? 'default'
+                : 'secondary'
+            }
+          >
             {categoryLabel(info.getValue())}
           </Badge>
         ),
       }),
-      columnHelper.accessor("equipment", {
-        header: "Equipment",
-        cell: (info) => <Badge variant="outline">{equipmentLabel(info.getValue())}</Badge>,
-      }),
-      columnHelper.accessor("archived", {
-        header: "Status",
+      columnHelper.accessor('equipment', {
+        header: 'Equipment',
         cell: (info) => (
-          <Badge variant={info.getValue() ? "outline" : "secondary"}>
-            {info.getValue() ? "Archived" : "Active"}
+          <Badge variant="outline">{equipmentLabel(info.getValue())}</Badge>
+        ),
+      }),
+      columnHelper.accessor('archived', {
+        header: 'Status',
+        cell: (info) => (
+          <Badge variant={info.getValue() ? 'outline' : 'secondary'}>
+            {info.getValue() ? 'Archived' : 'Active'}
           </Badge>
         ),
       }),
       columnHelper.display({
-        id: "actions",
+        id: 'actions',
         cell: (info) => (
           <div className="flex justify-end">
             {info.row.original.archived ? (
@@ -125,13 +146,19 @@ export function ExercisesPage() {
         </Button>
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading exercises…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading exercises…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
       {archiveExercise.isError && (
-        <p className="text-sm text-destructive">{archiveExercise.error.message}</p>
+        <p className="text-sm text-destructive">
+          {archiveExercise.error.message}
+        </p>
       )}
       {restoreExercise.isError && (
-        <p className="text-sm text-destructive">{restoreExercise.error.message}</p>
+        <p className="text-sm text-destructive">
+          {restoreExercise.error.message}
+        </p>
       )}
 
       {exercises && exercises.length > 0 && (
@@ -144,7 +171,10 @@ export function ExercisesPage() {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -155,7 +185,10 @@ export function ExercisesPage() {
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>

@@ -1,7 +1,7 @@
-import { Tag } from "lucide-react";
+import { Tag } from 'lucide-react';
 
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   onManageLabels: () => void;

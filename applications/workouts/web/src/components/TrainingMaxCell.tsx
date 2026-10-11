@@ -1,10 +1,13 @@
-import { useState, type FormEvent } from "react";
-import { Check } from "lucide-react";
+import { useState, type FormEvent } from 'react';
+import { Check } from 'lucide-react';
 
-import { WeightUnit, type TrainingMax } from "@/gen/workouts/v1/training_max_pb";
-import { useRecordTrainingMax } from "@/lib/trainingMaxes";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {
+  WeightUnit,
+  type TrainingMax,
+} from '@/gen/workouts/v1/training_max_pb';
+import { useRecordTrainingMax } from '@/lib/trainingMaxes';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface TrainingMaxCellProps {
   userId: string;
@@ -17,13 +20,17 @@ interface TrainingMaxCellProps {
 // useRecordTrainingMax, no dialog involved. Recording always inserts a new
 // history row (see storage.TrainingMaxes.Record's doc comment) rather than
 // overwriting, so re-saving the same value is harmless, just redundant.
-export function TrainingMaxCell({ userId, exerciseId, current }: TrainingMaxCellProps) {
-  const [weight, setWeight] = useState(current ? String(current.weight) : "");
+export function TrainingMaxCell({
+  userId,
+  exerciseId,
+  current,
+}: TrainingMaxCellProps) {
+  const [weight, setWeight] = useState(current ? String(current.weight) : '');
   const [unit, setUnit] = useState<WeightUnit>(current?.unit ?? WeightUnit.KG);
   const recordTrainingMax = useRecordTrainingMax();
 
   const parsed = Number(weight);
-  const valid = weight.trim() !== "" && !Number.isNaN(parsed) && parsed >= 0;
+  const valid = weight.trim() !== '' && !Number.isNaN(parsed) && parsed >= 0;
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -49,22 +56,30 @@ export function TrainingMaxCell({ userId, exerciseId, current }: TrainingMaxCell
           <Button
             key={option}
             type="button"
-            variant={unit === option ? "default" : "outline"}
+            variant={unit === option ? 'default' : 'outline'}
             size="sm"
-            aria-label={option === WeightUnit.KG ? "kg" : "lb"}
+            aria-label={option === WeightUnit.KG ? 'kg' : 'lb'}
             aria-pressed={unit === option}
             className="px-2 text-xs"
             onClick={() => setUnit(option)}
           >
-            {option === WeightUnit.KG ? "kg" : "lb"}
+            {option === WeightUnit.KG ? 'kg' : 'lb'}
           </Button>
         ))}
-        <Button type="submit" variant="ghost" size="icon-sm" aria-label="Save" disabled={!valid || recordTrainingMax.isPending}>
+        <Button
+          type="submit"
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Save"
+          disabled={!valid || recordTrainingMax.isPending}
+        >
           <Check />
         </Button>
       </div>
       {recordTrainingMax.isError && (
-        <span className="text-xs text-destructive">{recordTrainingMax.error.message}</span>
+        <span className="text-xs text-destructive">
+          {recordTrainingMax.error.message}
+        </span>
       )}
     </form>
   );

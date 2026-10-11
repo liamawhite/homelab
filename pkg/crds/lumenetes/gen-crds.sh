@@ -5,7 +5,7 @@
 # Unlike this directory's sibling gen-crds.sh scripts (whose CRD manifest
 # comes from an upstream Helm chart or GitHub release), the manifest here
 # is generated straight from this repo's own annotated Go structs in
-# applications/lumenetes/api/v1alpha1, via controller-gen
+# the lumenetes repository’s api/v1alpha1, via controller-gen
 # (sigs.k8s.io/controller-tools) - see doc.go for why. Once that manifest
 # exists, though, this generates typed Pulumi Go bindings from it via
 # crd2pulumi exactly like every sibling package, so callers create Light/
@@ -16,7 +16,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONTROLLER_MODULE_DIR="$(cd "${SCRIPT_DIR}/../../../applications/lumenetes" && pwd)"
+CONTROLLER_MODULE_DIR="${LUMENETES_SOURCE:-${SCRIPT_DIR}/../../../applications/lumenetes}"
+if [[ ! -f "${CONTROLLER_MODULE_DIR}/go.mod" ]]; then
+  echo "Missing applications/lumenetes; set LUMENETES_SOURCE to override its location." >&2
+  exit 1
+fi
+CONTROLLER_MODULE_DIR="$(cd "${CONTROLLER_MODULE_DIR}" && pwd)"
 
 echo "Generating DeepCopy methods..."
 (cd "${CONTROLLER_MODULE_DIR}" && controller-gen object paths=./api/...)

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { Outlet } from "@tanstack/react-router";
+import { useEffect } from 'react';
+import { Outlet } from '@tanstack/react-router';
 
-import { useUsers } from "@/lib/users";
-import { useActiveUser } from "@/lib/activeUser";
-import { Navbar } from "@/components/Navbar";
+import { useUsers } from '@/lib/users';
+import { useActiveUser } from '@/lib/activeUser';
+import { Navbar } from '@/components/Navbar';
 
 export function RootLayout() {
   const { data: users } = useUsers();
@@ -21,7 +21,11 @@ export function RootLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar users={users ?? []} activeUserId={activeUserId} onSelectUser={setActiveUserId} />
+      <Navbar
+        users={users ?? []}
+        activeUserId={activeUserId}
+        onSelectUser={setActiveUserId}
+      />
       <Outlet />
     </div>
   );

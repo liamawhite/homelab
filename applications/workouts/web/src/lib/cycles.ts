@@ -1,25 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { cycleClient } from "./client";
-import { MoveDirection } from "@/gen/workouts/v1/cycle_pb";
+import { cycleClient } from './client';
+import { MoveDirection } from '@/gen/workouts/v1/cycle_pb';
 
-const cyclesQueryKey = ["cycles"];
+const cyclesQueryKey = ['cycles'];
 
 export function useCycles(userId: string | null) {
   return useQuery({
-    queryKey: [...cyclesQueryKey, "list", userId],
-    queryFn: async () => (await cycleClient.listCycles({ userId: userId! })).cycles,
+    queryKey: [...cyclesQueryKey, 'list', userId],
+    queryFn: async () =>
+      (await cycleClient.listCycles({ userId: userId! })).cycles,
     enabled: !!userId,
   });
 }
 
 export function useCycle(cycleId: string | null) {
   return useQuery({
-    queryKey: [...cyclesQueryKey, "detail", cycleId],
+    queryKey: [...cyclesQueryKey, 'detail', cycleId],
     queryFn: async () => {
       const res = await cycleClient.getCycle({ id: cycleId! });
       if (!res.cycle) {
-        throw new Error("GetCycle response did not include a cycle");
+        throw new Error('GetCycle response did not include a cycle');
       }
       return res.cycle;
     },
@@ -42,7 +43,7 @@ export function useCreateCycle() {
     mutationFn: async ({ userId, name }: { userId: string; name: string }) => {
       const res = await cycleClient.createCycle({ userId, name });
       if (!res.cycle) {
-        throw new Error("CreateCycle response did not include a cycle");
+        throw new Error('CreateCycle response did not include a cycle');
       }
       return res.cycle;
     },
@@ -54,10 +55,16 @@ export function useDuplicateCycle() {
   const invalidate = useInvalidateCycles();
 
   return useMutation({
-    mutationFn: async ({ sourceCycleId, name }: { sourceCycleId: string; name: string }) => {
+    mutationFn: async ({
+      sourceCycleId,
+      name,
+    }: {
+      sourceCycleId: string;
+      name: string;
+    }) => {
       const res = await cycleClient.duplicateCycle({ sourceCycleId, name });
       if (!res.cycle) {
-        throw new Error("DuplicateCycle response did not include a cycle");
+        throw new Error('DuplicateCycle response did not include a cycle');
       }
       return res.cycle;
     },
@@ -80,10 +87,16 @@ export function useCreateBlock() {
   const invalidate = useInvalidateCycles();
 
   return useMutation({
-    mutationFn: async ({ cycleId, name }: { cycleId: string; name: string }) => {
+    mutationFn: async ({
+      cycleId,
+      name,
+    }: {
+      cycleId: string;
+      name: string;
+    }) => {
       const res = await cycleClient.createBlock({ cycleId, name });
       if (!res.block) {
-        throw new Error("CreateBlock response did not include a block");
+        throw new Error('CreateBlock response did not include a block');
       }
       return res.block;
     },
@@ -106,10 +119,18 @@ export function useAddCycleExercise() {
   const invalidate = useInvalidateCycles();
 
   return useMutation({
-    mutationFn: async ({ cycleId, exerciseId }: { cycleId: string; exerciseId: string }) => {
+    mutationFn: async ({
+      cycleId,
+      exerciseId,
+    }: {
+      cycleId: string;
+      exerciseId: string;
+    }) => {
       const res = await cycleClient.addCycleExercise({ cycleId, exerciseId });
       if (!res.cycleExercise) {
-        throw new Error("AddCycleExercise response did not include a cycle exercise");
+        throw new Error(
+          'AddCycleExercise response did not include a cycle exercise',
+        );
       }
       return res.cycleExercise;
     },
@@ -132,7 +153,13 @@ export function useMoveCycleExercise() {
   const invalidate = useInvalidateCycles();
 
   return useMutation({
-    mutationFn: async ({ id, direction }: { id: string; direction: MoveDirection }) => {
+    mutationFn: async ({
+      id,
+      direction,
+    }: {
+      id: string;
+      direction: MoveDirection;
+    }) => {
       await cycleClient.moveCycleExercise({ id, direction });
     },
     onSuccess: () => void invalidate(),
@@ -161,7 +188,7 @@ export function useAddSet() {
         percentageOfTm,
       });
       if (!res.exerciseSet) {
-        throw new Error("AddSet response did not include an exercise set");
+        throw new Error('AddSet response did not include an exercise set');
       }
       return res.exerciseSet;
     },
@@ -182,9 +209,13 @@ export function useUpdateSet() {
       reps: number;
       percentageOfTm?: number;
     }) => {
-      const res = await cycleClient.updateSet({ id, reps: BigInt(reps), percentageOfTm });
+      const res = await cycleClient.updateSet({
+        id,
+        reps: BigInt(reps),
+        percentageOfTm,
+      });
       if (!res.exerciseSet) {
-        throw new Error("UpdateSet response did not include an exercise set");
+        throw new Error('UpdateSet response did not include an exercise set');
       }
       return res.exerciseSet;
     },
@@ -207,7 +238,13 @@ export function useMoveSet() {
   const invalidate = useInvalidateCycles();
 
   return useMutation({
-    mutationFn: async ({ id, direction }: { id: string; direction: MoveDirection }) => {
+    mutationFn: async ({
+      id,
+      direction,
+    }: {
+      id: string;
+      direction: MoveDirection;
+    }) => {
       await cycleClient.moveSet({ id, direction });
     },
     onSuccess: () => void invalidate(),

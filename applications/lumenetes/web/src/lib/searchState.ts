@@ -8,22 +8,28 @@ export interface OpenSearch {
   open?: string;
 }
 
-export function validateOpenSearch(search: Record<string, unknown>): OpenSearch {
-  return { open: typeof search.open === "string" ? search.open : undefined };
+export function validateOpenSearch(
+  search: Record<string, unknown>,
+): OpenSearch {
+  return { open: typeof search.open === 'string' ? search.open : undefined };
 }
 
 export function parseOpenKeys(open: string | undefined): Set<string> {
-  return new Set(open ? open.split(",") : []);
+  return new Set(open ? open.split(',') : []);
 }
 
 // toggleOpenValue returns the next ?open= value after key's state changes to
 // isOpen - undefined (not "") once nothing is open, keeping the URL clean.
-export function toggleOpenValue(openKeys: Set<string>, key: string, isOpen: boolean): string | undefined {
+export function toggleOpenValue(
+  openKeys: Set<string>,
+  key: string,
+  isOpen: boolean,
+): string | undefined {
   const next = new Set(openKeys);
   if (isOpen) {
     next.add(key);
   } else {
     next.delete(key);
   }
-  return next.size > 0 ? Array.from(next).join(",") : undefined;
+  return next.size > 0 ? Array.from(next).join(',') : undefined;
 }

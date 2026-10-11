@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { labelClient } from "./client";
-import type { Label } from "@/gen/shopping/v1/label_pb";
+import { labelClient } from './client';
+import type { Label } from '@/gen/shopping/v1/label_pb';
 
-const labelsQueryKey = ["labels"];
+const labelsQueryKey = ['labels'];
 
 // Display order is entirely a client concern - the server returns labels in
 // no particular order (see queries.sql's ListLabels). Active labels sort
@@ -31,7 +31,7 @@ export function useCreateLabel() {
     mutationFn: async (name: string) => {
       const res = await labelClient.createLabel({ name });
       if (!res.label) {
-        throw new Error("CreateLabel response did not include a label");
+        throw new Error('CreateLabel response did not include a label');
       }
       return res.label;
     },
@@ -74,7 +74,7 @@ export function useUpdateLabelColor() {
     mutationFn: async ({ id, color }: { id: string; color: string }) => {
       const res = await labelClient.updateLabelColor({ id, color });
       if (!res.label) {
-        throw new Error("UpdateLabelColor response did not include a label");
+        throw new Error('UpdateLabelColor response did not include a label');
       }
       return res.label;
     },

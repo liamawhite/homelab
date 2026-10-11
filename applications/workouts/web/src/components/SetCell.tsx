@@ -1,11 +1,14 @@
-import { useState, type FormEvent } from "react";
-import { Check, ChevronUp, ChevronDown, Trash2 } from "lucide-react";
+import { useState, type FormEvent } from 'react';
+import { Check, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 
-import { MoveDirection, type ExerciseSet } from "@/gen/workouts/v1/cycle_pb";
-import { WeightUnit, type TrainingMax } from "@/gen/workouts/v1/training_max_pb";
-import { useUpdateSet, useRemoveSet, useMoveSet } from "@/lib/cycles";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { MoveDirection, type ExerciseSet } from '@/gen/workouts/v1/cycle_pb';
+import {
+  WeightUnit,
+  type TrainingMax,
+} from '@/gen/workouts/v1/training_max_pb';
+import { useUpdateSet, useRemoveSet, useMoveSet } from '@/lib/cycles';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface SetCellProps {
   set: ExerciseSet;
@@ -19,24 +22,37 @@ interface SetCellProps {
 // from `set` via useState's initializer, same pattern as TrainingMaxCell;
 // the parent (CycleDetailPage) only renders this once useCycle's isLoading
 // has resolved, so `set` is never stale/undefined on mount.
-export function SetCell({ set, isFirst, isLast, currentTrainingMax }: SetCellProps) {
+export function SetCell({
+  set,
+  isFirst,
+  isLast,
+  currentTrainingMax,
+}: SetCellProps) {
   const [reps, setReps] = useState(String(set.reps));
   const [percentage, setPercentage] = useState(
-    set.percentageOfTm !== undefined ? String(set.percentageOfTm) : "",
+    set.percentageOfTm !== undefined ? String(set.percentageOfTm) : '',
   );
   const updateSet = useUpdateSet();
   const removeSet = useRemoveSet();
   const moveSet = useMoveSet();
 
   const parsedReps = Number(reps);
-  const repsValid = reps.trim() !== "" && !Number.isNaN(parsedReps) && parsedReps > 0;
-  const parsedPercentage = percentage.trim() === "" ? undefined : Number(percentage);
-  const percentageValid = parsedPercentage === undefined || (!Number.isNaN(parsedPercentage) && parsedPercentage > 0);
+  const repsValid =
+    reps.trim() !== '' && !Number.isNaN(parsedReps) && parsedReps > 0;
+  const parsedPercentage =
+    percentage.trim() === '' ? undefined : Number(percentage);
+  const percentageValid =
+    parsedPercentage === undefined ||
+    (!Number.isNaN(parsedPercentage) && parsedPercentage > 0);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!repsValid || !percentageValid) return;
-    updateSet.mutate({ id: set.id, reps: parsedReps, percentageOfTm: parsedPercentage });
+    updateSet.mutate({
+      id: set.id,
+      reps: parsedReps,
+      percentageOfTm: parsedPercentage,
+    });
   }
 
   const computedWeight =
@@ -72,7 +88,8 @@ export function SetCell({ set, isFirst, isLast, currentTrainingMax }: SetCellPro
         <span className="text-xs text-muted-foreground">%</span>
         {computedWeight !== undefined && (
           <span className="text-xs text-muted-foreground">
-            ({computedWeight.toFixed(1)} {currentTrainingMax?.unit === WeightUnit.KG ? "kg" : "lb"})
+            ({computedWeight.toFixed(1)}{' '}
+            {currentTrainingMax?.unit === WeightUnit.KG ? 'kg' : 'lb'})
           </span>
         )}
         <Button
@@ -90,7 +107,9 @@ export function SetCell({ set, isFirst, isLast, currentTrainingMax }: SetCellPro
           size="icon-sm"
           aria-label="Move set up"
           disabled={isFirst || moveSet.isPending}
-          onClick={() => moveSet.mutate({ id: set.id, direction: MoveDirection.UP })}
+          onClick={() =>
+            moveSet.mutate({ id: set.id, direction: MoveDirection.UP })
+          }
         >
           <ChevronUp />
         </Button>
@@ -100,7 +119,9 @@ export function SetCell({ set, isFirst, isLast, currentTrainingMax }: SetCellPro
           size="icon-sm"
           aria-label="Move set down"
           disabled={isLast || moveSet.isPending}
-          onClick={() => moveSet.mutate({ id: set.id, direction: MoveDirection.DOWN })}
+          onClick={() =>
+            moveSet.mutate({ id: set.id, direction: MoveDirection.DOWN })
+          }
         >
           <ChevronDown />
         </Button>
@@ -115,7 +136,11 @@ export function SetCell({ set, isFirst, isLast, currentTrainingMax }: SetCellPro
           <Trash2 />
         </Button>
       </div>
-      {updateSet.isError && <span className="text-xs text-destructive">{updateSet.error.message}</span>}
+      {updateSet.isError && (
+        <span className="text-xs text-destructive">
+          {updateSet.error.message}
+        </span>
+      )}
     </form>
   );
 }

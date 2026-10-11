@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from 'react';
 
-import { useCreateBlock } from "@/lib/cycles";
+import { useCreateBlock } from '@/lib/cycles';
 import {
   Dialog,
   DialogContent,
@@ -8,10 +8,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface AddBlockDialogProps {
   open: boolean;
@@ -20,8 +20,13 @@ interface AddBlockDialogProps {
   onCreated?: (blockId: string) => void;
 }
 
-export function AddBlockDialog({ open, onOpenChange, cycleId, onCreated }: AddBlockDialogProps) {
-  const [name, setName] = useState("");
+export function AddBlockDialog({
+  open,
+  onOpenChange,
+  cycleId,
+  onCreated,
+}: AddBlockDialogProps) {
+  const [name, setName] = useState('');
   const createBlock = useCreateBlock();
 
   function handleSubmit(e: FormEvent) {
@@ -31,7 +36,7 @@ export function AddBlockDialog({ open, onOpenChange, cycleId, onCreated }: AddBl
       { cycleId, name: name.trim() },
       {
         onSuccess: (block) => {
-          setName("");
+          setName('');
           onOpenChange(false);
           onCreated?.(block.id);
         },
@@ -44,7 +49,9 @@ export function AddBlockDialog({ open, onOpenChange, cycleId, onCreated }: AddBl
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New block</DialogTitle>
-          <DialogDescription>A time period within this cycle (e.g. "Week 1", "Deload").</DialogDescription>
+          <DialogDescription>
+            A time period within this cycle (e.g. "Week 1", "Deload").
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
@@ -60,11 +67,16 @@ export function AddBlockDialog({ open, onOpenChange, cycleId, onCreated }: AddBl
           </div>
 
           {createBlock.isError && (
-            <p className="text-sm text-destructive">{createBlock.error.message}</p>
+            <p className="text-sm text-destructive">
+              {createBlock.error.message}
+            </p>
           )}
 
           <DialogFooter>
-            <Button type="submit" disabled={createBlock.isPending || !name.trim()}>
+            <Button
+              type="submit"
+              disabled={createBlock.isPending || !name.trim()}
+            >
               Add
             </Button>
           </DialogFooter>

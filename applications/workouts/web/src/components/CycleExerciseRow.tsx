@@ -1,12 +1,26 @@
-import { useState } from "react";
-import { ChevronUp, ChevronDown, ChevronRight, Trash2, Plus } from "lucide-react";
+import { useState } from 'react';
+import {
+  ChevronUp,
+  ChevronDown,
+  ChevronRight,
+  Trash2,
+  Plus,
+} from 'lucide-react';
 
-import { MoveDirection, type CycleExercise, type ExerciseSet } from "@/gen/workouts/v1/cycle_pb";
-import type { TrainingMax } from "@/gen/workouts/v1/training_max_pb";
-import { useRemoveCycleExercise, useMoveCycleExercise, useAddSet } from "@/lib/cycles";
-import { SetCell } from "@/components/SetCell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import {
+  MoveDirection,
+  type CycleExercise,
+  type ExerciseSet,
+} from '@/gen/workouts/v1/cycle_pb';
+import type { TrainingMax } from '@/gen/workouts/v1/training_max_pb';
+import {
+  useRemoveCycleExercise,
+  useMoveCycleExercise,
+  useAddSet,
+} from '@/lib/cycles';
+import { SetCell } from '@/components/SetCell';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface CycleExerciseRowProps {
   cycleExercise: CycleExercise;
@@ -43,12 +57,16 @@ export function CycleExerciseRow({
           aria-expanded={expanded}
           onClick={() => setExpanded((v) => !v)}
         >
-          {expanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
+          {expanded ? (
+            <ChevronDown className="size-4" />
+          ) : (
+            <ChevronRight className="size-4" />
+          )}
           {cycleExercise.exerciseName}
         </button>
         <div className="flex items-center gap-1">
-          <Badge variant={sets.length > 0 ? "secondary" : "outline"}>
-            {sets.length} {sets.length === 1 ? "set" : "sets"}
+          <Badge variant={sets.length > 0 ? 'secondary' : 'outline'}>
+            {sets.length} {sets.length === 1 ? 'set' : 'sets'}
           </Badge>
           <Button
             variant="ghost"
@@ -56,7 +74,10 @@ export function CycleExerciseRow({
             aria-label={`Move ${cycleExercise.exerciseName} up`}
             disabled={isFirstInGroup || moveCycleExercise.isPending}
             onClick={() =>
-              moveCycleExercise.mutate({ id: cycleExercise.id, direction: MoveDirection.UP })
+              moveCycleExercise.mutate({
+                id: cycleExercise.id,
+                direction: MoveDirection.UP,
+              })
             }
           >
             <ChevronUp />
@@ -67,7 +88,10 @@ export function CycleExerciseRow({
             aria-label={`Move ${cycleExercise.exerciseName} down`}
             disabled={isLastInGroup || moveCycleExercise.isPending}
             onClick={() =>
-              moveCycleExercise.mutate({ id: cycleExercise.id, direction: MoveDirection.DOWN })
+              moveCycleExercise.mutate({
+                id: cycleExercise.id,
+                direction: MoveDirection.DOWN,
+              })
             }
           >
             <ChevronDown />
@@ -87,7 +111,9 @@ export function CycleExerciseRow({
       {expanded && (
         <div className="grid gap-1 pl-1">
           {!blockId && (
-            <span className="text-xs text-muted-foreground">Select or create a block to add sets.</span>
+            <span className="text-xs text-muted-foreground">
+              Select or create a block to add sets.
+            </span>
           )}
           {blockId && (
             <>
@@ -106,12 +132,22 @@ export function CycleExerciseRow({
                 size="sm"
                 className="w-fit gap-1"
                 disabled={addSet.isPending}
-                onClick={() => addSet.mutate({ cycleExerciseId: cycleExercise.id, blockId, reps: 5 })}
+                onClick={() =>
+                  addSet.mutate({
+                    cycleExerciseId: cycleExercise.id,
+                    blockId,
+                    reps: 5,
+                  })
+                }
               >
                 <Plus />
                 Add set
               </Button>
-              {addSet.isError && <span className="text-xs text-destructive">{addSet.error.message}</span>}
+              {addSet.isError && (
+                <span className="text-xs text-destructive">
+                  {addSet.error.message}
+                </span>
+              )}
             </>
           )}
         </div>

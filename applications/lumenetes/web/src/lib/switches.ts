@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { switchClient } from "./client";
-import type { Switch } from "@/gen/lumenetes/v1/switch_pb";
+import { switchClient } from './client';
+import type { Switch } from '@/gen/lumenetes/v1/switch_pb';
 
 function compareSwitches(a: Switch, b: Switch): number {
   if (a.name !== b.name) return a.name.localeCompare(b.name);
@@ -10,7 +10,7 @@ function compareSwitches(a: Switch, b: Switch): number {
 
 export function useSwitches() {
   return useQuery({
-    queryKey: ["switches"],
+    queryKey: ['switches'],
     queryFn: async () => (await switchClient.listSwitches({})).switches,
     select: (switches) => switches.slice().sort(compareSwitches),
     refetchInterval: 15_000,
