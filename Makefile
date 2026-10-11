@@ -1,4 +1,8 @@
-.PHONY: clean gen sync
+.PHONY: clean gen sync kubeconfig
+
+# Refresh the default kubeconfig and select the stable homelab context.
+kubeconfig:
+	@scripts/homelab kubeconfig
 
 # Clean all generated files
 clean:

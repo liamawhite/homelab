@@ -41,6 +41,26 @@ uses a private SSH known-hosts file and accepts first-time host keys. Check host
 identity before accepting a changed key. Do not print evaluated inventory,
 credentials, server tokens, or kubeconfigs into logs or PRs.
 
+## Set up everyday kubectl and Flux access
+
+```sh
+make kubeconfig
+kubectl config current-context
+kubectl get nodes
+flux get all -A
+```
+
+`make kubeconfig` exports node kubeconfigs over SSH, selects a healthy direct API,
+and refreshes `~/.kube/config` using the API VIP. Cluster, user, and context entries
+use the stable name `homelab`. Existing entries with that name are replaced;
+unrelated clusters and contexts are preserved. It selects `homelab` as the active
+context, writes credentials with mode `0600`, and can be repeated without adding
+entries. It does not install or change cluster services.
+
+This target deliberately writes the default file, regardless of `KUBECONFIG`.
+If you previously exported `KUBECONFIG` for direct-node diagnostics, run
+`unset KUBECONFIG` to use the default file with kubectl and Flux.
+
 ## Bootstrap a cluster
 
 ### 1. Establish the starting state
