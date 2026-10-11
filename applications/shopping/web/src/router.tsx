@@ -1,10 +1,10 @@
-import { createRouter } from "@tanstack/react-router";
+import { createRouter } from '@tanstack/react-router';
 
-import { Route } from "@/routes/ShoppingListPage";
+import { Route } from '@/routes/ShoppingListPage';
 
 export const router = createRouter({ routeTree: Route });
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;
   }
