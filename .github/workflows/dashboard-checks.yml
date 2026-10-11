@@ -1,4 +1,4 @@
-name: dashboard checks
+name: applications / dashboard
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ env:
 
 jobs:
   format:
-    name: dashboard / format
+    name: format
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,7 +42,7 @@ jobs:
       - run: make format-check
 
   lint:
-    name: dashboard / lint
+    name: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,7 +68,7 @@ jobs:
           args: ./cmd/... ./internal/...
 
   test:
-    name: dashboard / test
+    name: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
