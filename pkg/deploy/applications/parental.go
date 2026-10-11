@@ -2,98 +2,36 @@ package applications
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	waypoint "github.com/liamawhite/homelab/pkg/components/istio/waypoint"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
+	"github.com/liamawhite/homelab/pkg/versions"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
-
-	"github.com/pulumi/pulumi-docker-build/sdk/go/dockerbuild"
 )
 
 const (
-	remindersImageName = "ghcr.io/liamawhite/reminders"
-	remindersPort      = 8080
+	parentalPort = 8080
 
-	// remindersUID is the non-root UID the container's binary runs as
-	// (matches applications/reminders/Dockerfile's scratch stage - no
+	// parentalUID is the non-root UID the container's binary runs as
+	// (matches liamawhite/parental’s Dockerfile's scratch stage - no
 	// /etc/passwd entry exists there either, so this is a bare numeric
-	// UID/GID, same convention as workouts/shopping/trips). The PVC's
+	// UID/GID, same convention as workouts/shopping). The PVC's
 	// fsGroup below has to match it: Longhorn (like any dynamically
 	// provisioned volume) mounts owned by root by default, which a
 	// non-root container can't write to without fsGroup chowning the
 	// mount to this GID first.
-	remindersUID = 65534
+	parentalUID = 65534
 )
 
-// BuildRemindersImage builds and pushes the reminders app's image (Go
-// backend with the built React frontend go:embedded into it - see
-// applications/reminders/Dockerfile) via buildx/BuildKit through the Pulumi
-// Docker Build provider, as part of `homelab up`/`preview` itself - same
-// convention as BuildWorkoutsImage/BuildShoppingImage, see BuildWorkoutsImage's
-// doc comment for why (declarative GHCR auth, a stable-per-lineage timestamp
-// tag instead of time.Now(), digest-pinned Deployments regardless of tag
-// naming).
-//
-// Like workouts/shopping/trips, this module has no local go.mod "replace"
-// back to the root module, so the build context is this module's own
-// directory (applications/reminders), not the repo root - repoRoot is
-// still resolved via os.Getwd() for the same reason BuildWorkoutsImage does
-// (this code runs in-process with the CLI, whose cwd is the repo root by
-// convention; the docker-build provider plugin's cwd is not).
-func BuildRemindersImage(ctx *pulumi.Context, name, ghcrUsername, ghcrToken string, opts ...pulumi.ResourceOption) (*dockerbuild.Image, error) {
-	repoRoot, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve working directory: %w", err)
-	}
-
-	buildTime, err := pulumitime.NewStatic(ctx, fmt.Sprintf("%s-build-time", name), nil, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	buildTag := buildTime.Rfc3339.ApplyT(func(ts string) string {
-		return strings.NewReplacer(":", "", "-", "").Replace(ts)
-	}).(pulumi.StringOutput)
-
-	return dockerbuild.NewImage(ctx, name, &dockerbuild.ImageArgs{
-		Context: &dockerbuild.BuildContextArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/reminders")),
-		},
-		Dockerfile: &dockerbuild.DockerfileArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/reminders/Dockerfile")),
-		},
-		Platforms: dockerbuild.PlatformArray{
-			dockerbuild.Platform_Linux_arm64,
-			dockerbuild.Platform_Linux_amd64,
-		},
-		Push: pulumi.Bool(true),
-		Registries: dockerbuild.RegistryArray{
-			&dockerbuild.RegistryArgs{
-				Address:  pulumi.String("ghcr.io"),
-				Username: pulumi.StringPtr(ghcrUsername),
-				Password: pulumi.StringPtr(ghcrToken),
-			},
-		},
-		Tags: pulumi.StringArray{
-			pulumi.String(remindersImageName + ":latest"),
-			pulumi.Sprintf("%s:%s", remindersImageName, buildTag),
-		},
-	}, opts...)
-}
-
-// Reminders represents the reminders app: a single Go binary (Connect API +
+// Parental represents the parental app: a single Go binary (Connect API +
 // embedded React frontend) backed by SQLite on a Longhorn PVC, reachable
-// only over Tailscale - same exposure pattern as Workouts/Shopping/Trips.
-type Reminders struct {
+// only over Tailscale - same exposure pattern as Workouts/Shopping.
+type Parental struct {
 	pulumi.ResourceState
 
 	Namespace   pulumi.StringOutput
@@ -105,14 +43,14 @@ type Reminders struct {
 // TailscaleRedirect returns this app's Cloudflare-redirect data - see
 // Private.TailscaleRedirect's doc comment for why this only hands back data
 // rather than applying anything itself.
-func (r *Reminders) TailscaleRedirect() ingress.RedirectRoute {
+func (r *Parental) TailscaleRedirect() ingress.RedirectRoute {
 	return r.redirect
 }
 
-// RemindersArgs contains the configuration for Reminders.
-type RemindersArgs struct {
+// ParentalArgs contains the configuration for Parental.
+type ParentalArgs struct {
 	// Namespace is created centrally by pkg/deploy/namespaces.go
-	// (RemindersNamespace) and passed in here - this component does not
+	// (ParentalNamespace) and passed in here - this component does not
 	// create it.
 	Namespace pulumi.StringInput
 
@@ -129,32 +67,23 @@ type RemindersArgs struct {
 	CloudflareBaseDomain       pulumi.StringInput
 	CloudflareProvider         *cloudflare.Provider
 
-	// GHCRUsername/GHCRToken authenticate BuildRemindersImage's push.
+	// Retained for call-site compatibility; image publishing runs in GitHub Actions.
 	GHCRUsername string
 	GHCRToken    string
 }
 
-// NewReminders builds the reminders image, provisions its PVC, and deploys
-// it behind a Tailscale-only waypoint - same shape as NewShopping, including
-// the PVC and the Recreate deployment strategy a single-writer ReadWriteOnce
-// volume needs (see the Deployment's Strategy field below for why).
-func NewReminders(ctx *pulumi.Context, name string, args *RemindersArgs, opts ...pulumi.ResourceOption) (*Reminders, error) {
-	reminders := &Reminders{}
+// NewParental provisions storage and deploys the published image behind a Tailscale-only waypoint.
+func NewParental(ctx *pulumi.Context, name string, args *ParentalArgs, opts ...pulumi.ResourceOption) (*Parental, error) {
+	parental := &Parental{}
 
-	err := ctx.RegisterComponentResource("homelab:applications:reminders", name, reminders, opts...)
+	err := ctx.RegisterComponentResource("homelab:applications:parental", name, parental, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	localOpts := append(opts, pulumi.Parent(reminders))
+	localOpts := append(opts, pulumi.Parent(parental))
 
 	labels := pulumi.StringMap{"app": pulumi.String(name)}
-
-	image, err := BuildRemindersImage(ctx, fmt.Sprintf("%s-image", name), args.GHCRUsername, args.GHCRToken, localOpts...)
-	if err != nil {
-		return nil, err
-	}
-	imageOpts := append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{image}))
 
 	// 1. Dedicated ServiceAccount for this app.
 	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
@@ -211,20 +140,20 @@ func NewReminders(ctx *pulumi.Context, name string, args *RemindersArgs, opts ..
 					ServiceAccountName: serviceAccount.Metadata.Name().Elem(),
 					// fsGroup chowns the PVC mount to this GID on attach -
 					// without it the mount stays root-owned and the
-					// non-root container (see remindersUID's doc comment)
+					// non-root container (see parentalUID's doc comment)
 					// can't write its SQLite file at all.
 					SecurityContext: &corev1.PodSecurityContextArgs{
-						FsGroup: pulumi.Int(remindersUID),
+						FsGroup: pulumi.Int(parentalUID),
 					},
 					Containers: corev1.ContainerArray{
 						&corev1.ContainerArgs{
 							Name:  pulumi.String(name),
-							Image: image.Ref,
+							Image: pulumi.String(versions.ParentalImage),
 							Env: corev1.EnvVarArray{
-								&corev1.EnvVarArgs{Name: pulumi.String("DB_PATH"), Value: pulumi.String("/data/reminders.db")},
+								&corev1.EnvVarArgs{Name: pulumi.String("DB_PATH"), Value: pulumi.String("/data/parental.db")},
 							},
 							Ports: corev1.ContainerPortArray{
-								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(remindersPort)},
+								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(parentalPort)},
 							},
 							VolumeMounts: corev1.VolumeMountArray{
 								&corev1.VolumeMountArgs{
@@ -255,7 +184,7 @@ func NewReminders(ctx *pulumi.Context, name string, args *RemindersArgs, opts ..
 				},
 			},
 		},
-	}, append(append([]pulumi.ResourceOption{}, imageOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
+	}, append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +216,7 @@ func NewReminders(ctx *pulumi.Context, name string, args *RemindersArgs, opts ..
 			Ports: corev1.ServicePortArray{
 				&corev1.ServicePortArgs{
 					Port:       pulumi.Int(80),
-					TargetPort: pulumi.Int(remindersPort),
+					TargetPort: pulumi.Int(parentalPort),
 				},
 			},
 		},
@@ -312,16 +241,16 @@ func NewReminders(ctx *pulumi.Context, name string, args *RemindersArgs, opts ..
 		return nil, err
 	}
 
-	reminders.Namespace = args.Namespace.ToStringOutput()
-	reminders.ServiceName = service.Metadata.Name().Elem()
-	reminders.redirect = tsIngress.Redirect
+	parental.Namespace = args.Namespace.ToStringOutput()
+	parental.ServiceName = service.Metadata.Name().Elem()
+	parental.redirect = tsIngress.Redirect
 
-	if err := ctx.RegisterResourceOutputs(reminders, pulumi.Map{
-		"namespace":   reminders.Namespace,
-		"serviceName": reminders.ServiceName,
+	if err := ctx.RegisterResourceOutputs(parental, pulumi.Map{
+		"namespace":   parental.Namespace,
+		"serviceName": parental.ServiceName,
 	}); err != nil {
 		return nil, err
 	}
 
-	return reminders, nil
+	return parental, nil
 }

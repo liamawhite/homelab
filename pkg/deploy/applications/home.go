@@ -2,82 +2,21 @@ package applications
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	waypoint "github.com/liamawhite/homelab/pkg/components/istio/waypoint"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
+	"github.com/liamawhite/homelab/pkg/versions"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
-
-	"github.com/pulumi/pulumi-docker-build/sdk/go/dockerbuild"
 )
 
 const (
-	homeImageName = "ghcr.io/liamawhite/home"
-	homePort      = 8080
+	homePort = 8080
 )
-
-// BuildHomeImage builds and pushes the home app's image (Go backend with the
-// built React frontend go:embedded into it - see
-// applications/home/Dockerfile) via buildx/BuildKit through the Pulumi
-// Docker Build provider, as part of `homelab up`/`preview` itself - same
-// convention as BuildWorkoutsImage, see its doc comment for why (declarative
-// GHCR auth, a stable-per-lineage timestamp tag instead of time.Now(),
-// digest-pinned Deployments regardless of tag naming).
-//
-// Like workouts/shopping, this module has no local go.mod "replace" back to
-// the root module, so the build context is this module's own directory
-// (applications/home), not the repo root - repoRoot is still resolved via
-// os.Getwd() for the same reason BuildWorkoutsImage does (this code runs
-// in-process with the CLI, whose cwd is the repo root by convention; the
-// docker-build provider plugin's cwd is not).
-func BuildHomeImage(ctx *pulumi.Context, name, ghcrUsername, ghcrToken string, opts ...pulumi.ResourceOption) (*dockerbuild.Image, error) {
-	repoRoot, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve working directory: %w", err)
-	}
-
-	buildTime, err := pulumitime.NewStatic(ctx, fmt.Sprintf("%s-build-time", name), nil, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	buildTag := buildTime.Rfc3339.ApplyT(func(ts string) string {
-		return strings.NewReplacer(":", "", "-", "").Replace(ts)
-	}).(pulumi.StringOutput)
-
-	return dockerbuild.NewImage(ctx, name, &dockerbuild.ImageArgs{
-		Context: &dockerbuild.BuildContextArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/home")),
-		},
-		Dockerfile: &dockerbuild.DockerfileArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/home/Dockerfile")),
-		},
-		Platforms: dockerbuild.PlatformArray{
-			dockerbuild.Platform_Linux_arm64,
-			dockerbuild.Platform_Linux_amd64,
-		},
-		Push: pulumi.Bool(true),
-		Registries: dockerbuild.RegistryArray{
-			&dockerbuild.RegistryArgs{
-				Address:  pulumi.String("ghcr.io"),
-				Username: pulumi.StringPtr(ghcrUsername),
-				Password: pulumi.StringPtr(ghcrToken),
-			},
-		},
-		Tags: pulumi.StringArray{
-			pulumi.String(homeImageName + ":latest"),
-			pulumi.Sprintf("%s:%s", homeImageName, buildTag),
-		},
-	}, opts...)
-}
 
 // Home represents the home app: a single Go binary (embedded React
 // frontend, no API, no storage - just cards linking out to every other app
@@ -115,14 +54,12 @@ type HomeArgs struct {
 	CloudflareBaseDomain       pulumi.StringInput
 	CloudflareProvider         *cloudflare.Provider
 
-	// GHCRUsername/GHCRToken authenticate BuildHomeImage's push.
+	// Retained for call-site compatibility; publishing runs in GitHub Actions.
 	GHCRUsername string
 	GHCRToken    string
 }
 
-// NewHome builds the home image and deploys it behind a Tailscale-only
-// waypoint - same shape as NewPrivate, but with a real built image instead
-// of the http-echo stand-in, and no PVC (this app is stateless).
+// NewHome deploys Dashboard using the existing Home resources.
 func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.ResourceOption) (*Home, error) {
 	home := &Home{}
 
@@ -134,12 +71,6 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 	localOpts := append(opts, pulumi.Parent(home))
 
 	labels := pulumi.StringMap{"app": pulumi.String(name)}
-
-	image, err := BuildHomeImage(ctx, fmt.Sprintf("%s-image", name), args.GHCRUsername, args.GHCRToken, localOpts...)
-	if err != nil {
-		return nil, err
-	}
-	imageOpts := append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{image}))
 
 	// 1. Dedicated ServiceAccount for this app.
 	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
@@ -169,7 +100,7 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 					Containers: corev1.ContainerArray{
 						&corev1.ContainerArgs{
 							Name:  pulumi.String(name),
-							Image: image.Ref,
+							Image: pulumi.String(versions.DashboardImage),
 							Ports: corev1.ContainerPortArray{
 								&corev1.ContainerPortArgs{ContainerPort: pulumi.Int(homePort)},
 							},
@@ -196,7 +127,7 @@ func NewHome(ctx *pulumi.Context, name string, args *HomeArgs, opts ...pulumi.Re
 				},
 			},
 		},
-	}, imageOpts...)
+	}, localOpts...)
 	if err != nil {
 		return nil, err
 	}

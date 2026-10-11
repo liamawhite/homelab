@@ -26,9 +26,7 @@ const (
 	MonitoringNamespace     = "monitoring"
 	WorkoutsNamespace       = "workouts"
 	ShoppingNamespace       = "shopping"
-	TripsNamespace          = "trips"
-	RemindersNamespace      = "reminders"
-	FinancesNamespace       = "finances"
+	ParentalNamespace       = "parental"
 	HomeNamespace           = "home"
 )
 
@@ -115,13 +113,7 @@ func createNamespaces(ctx *pulumi.Context, opts ...pulumi.ResourceOption) (*Name
 		{name: ShoppingNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
-		{name: TripsNamespace, labels: pulumi.StringMap{
-			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
-		}},
-		{name: RemindersNamespace, labels: pulumi.StringMap{
-			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
-		}},
-		{name: FinancesNamespace, labels: pulumi.StringMap{
+		{name: ParentalNamespace, labels: pulumi.StringMap{
 			istio.DataplaneModeLabelKey: pulumi.String(istio.DataplaneModeAmbient),
 		}},
 		{name: HomeNamespace, labels: pulumi.StringMap{
