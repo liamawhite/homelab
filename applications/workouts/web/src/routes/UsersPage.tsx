@@ -1,20 +1,20 @@
-import { useMemo, useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
+import { useMemo, useState, type FormEvent } from 'react';
+import { Link } from '@tanstack/react-router';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Trash2 } from "lucide-react";
+} from '@tanstack/react-table';
+import { Trash2 } from 'lucide-react';
 
-import type { User } from "@/gen/workouts/v1/user_pb";
-import { useUsers, useCreateUser, useDeleteUser } from "@/lib/users";
-import { useActiveUser } from "@/lib/activeUser";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import type { User } from '@/gen/workouts/v1/user_pb';
+import { useUsers, useCreateUser, useDeleteUser } from '@/lib/users';
+import { useActiveUser } from '@/lib/activeUser';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -22,32 +22,34 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 const columnHelper = createColumnHelper<User>();
 
 export function UsersPage() {
   const { data: users, isLoading, isError, error } = useUsers();
   const [activeUserId] = useActiveUser();
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const createUser = useCreateUser();
   const deleteUser = useDeleteUser();
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor('name', {
+        header: 'Name',
         cell: (info) => (
           <span>
             {info.getValue()}
             {info.row.original.id === activeUserId && (
-              <span className="ml-2 text-xs text-muted-foreground">(active)</span>
+              <span className="ml-2 text-xs text-muted-foreground">
+                (active)
+              </span>
             )}
           </span>
         ),
       }),
       columnHelper.display({
-        id: "actions",
+        id: 'actions',
         cell: (info) => (
           <div className="flex justify-end">
             <Button
@@ -75,7 +77,7 @@ export function UsersPage() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    createUser.mutate(name.trim(), { onSuccess: () => setName("") });
+    createUser.mutate(name.trim(), { onSuccess: () => setName('') });
   }
 
   return (
@@ -85,8 +87,12 @@ export function UsersPage() {
           <CardTitle>Manage users</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading users…</p>}
-          {isError && <p className="text-sm text-destructive">{error.message}</p>}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground">Loading users…</p>
+          )}
+          {isError && (
+            <p className="text-sm text-destructive">{error.message}</p>
+          )}
 
           {users && users.length > 0 && (
             <Table>
@@ -97,7 +103,10 @@ export function UsersPage() {
                       <TableHead key={header.id}>
                         {header.isPlaceholder
                           ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -108,7 +117,10 @@ export function UsersPage() {
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -120,7 +132,9 @@ export function UsersPage() {
             <p className="text-sm text-muted-foreground">No users yet.</p>
           )}
           {deleteUser.isError && (
-            <p className="text-sm text-destructive">{deleteUser.error.message}</p>
+            <p className="text-sm text-destructive">
+              {deleteUser.error.message}
+            </p>
           )}
 
           <form onSubmit={handleSubmit} className="grid gap-1.5">
@@ -133,16 +147,24 @@ export function UsersPage() {
                 placeholder="Name"
                 disabled={createUser.isPending}
               />
-              <Button type="submit" disabled={createUser.isPending || !name.trim()}>
+              <Button
+                type="submit"
+                disabled={createUser.isPending || !name.trim()}
+              >
                 Add
               </Button>
             </div>
             {createUser.isError && (
-              <p className="text-sm text-destructive">{createUser.error.message}</p>
+              <p className="text-sm text-destructive">
+                {createUser.error.message}
+              </p>
             )}
           </form>
 
-          <Link to="/" className="text-sm text-muted-foreground underline underline-offset-4">
+          <Link
+            to="/"
+            className="text-sm text-muted-foreground underline underline-offset-4"
+          >
             Back
           </Link>
         </CardContent>
