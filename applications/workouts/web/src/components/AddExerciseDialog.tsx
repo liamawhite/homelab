@@ -1,7 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from 'react';
 
-import { ExerciseCategory, ExerciseEquipment } from "@/gen/workouts/v1/exercise_pb";
-import { useCreateExercise } from "@/lib/exercises";
+import {
+  ExerciseCategory,
+  ExerciseEquipment,
+} from '@/gen/workouts/v1/exercise_pb';
+import { useCreateExercise } from '@/lib/exercises';
 import {
   Dialog,
   DialogContent,
@@ -9,25 +12,25 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 function categoryLabel(category: ExerciseCategory): string {
-  return category === ExerciseCategory.MAIN_LIFT ? "Main lift" : "Accessory";
+  return category === ExerciseCategory.MAIN_LIFT ? 'Main lift' : 'Accessory';
 }
 
 function equipmentLabel(equipment: ExerciseEquipment): string {
   switch (equipment) {
     case ExerciseEquipment.BARBELL:
-      return "Barbell";
+      return 'Barbell';
     case ExerciseEquipment.DUMBBELL:
-      return "Dumbbell";
+      return 'Dumbbell';
     case ExerciseEquipment.BODYWEIGHT:
-      return "Bodyweight";
+      return 'Bodyweight';
     default:
-      return "Unknown";
+      return 'Unknown';
   }
 }
 
@@ -36,10 +39,17 @@ interface AddExerciseDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState<ExerciseCategory>(ExerciseCategory.MAIN_LIFT);
-  const [equipment, setEquipment] = useState<ExerciseEquipment>(ExerciseEquipment.BARBELL);
+export function AddExerciseDialog({
+  open,
+  onOpenChange,
+}: AddExerciseDialogProps) {
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState<ExerciseCategory>(
+    ExerciseCategory.MAIN_LIFT,
+  );
+  const [equipment, setEquipment] = useState<ExerciseEquipment>(
+    ExerciseEquipment.BARBELL,
+  );
   const createExercise = useCreateExercise();
 
   function handleSubmit(e: FormEvent) {
@@ -49,7 +59,7 @@ export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps
       { name: name.trim(), category, equipment },
       {
         onSuccess: () => {
-          setName("");
+          setName('');
           setCategory(ExerciseCategory.MAIN_LIFT);
           setEquipment(ExerciseEquipment.BARBELL);
           onOpenChange(false);
@@ -63,7 +73,9 @@ export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New exercise</DialogTitle>
-          <DialogDescription>Added to the shared catalog everyone picks from.</DialogDescription>
+          <DialogDescription>
+            Added to the shared catalog everyone picks from.
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
@@ -81,47 +93,56 @@ export function AddExerciseDialog({ open, onOpenChange }: AddExerciseDialogProps
           <div className="grid gap-1.5">
             <Label>Category</Label>
             <div className="flex gap-1.5">
-              {[ExerciseCategory.MAIN_LIFT, ExerciseCategory.ACCESSORY].map((option) => (
-                <Button
-                  key={option}
-                  type="button"
-                  variant={category === option ? "default" : "outline"}
-                  size="sm"
-                  aria-pressed={category === option}
-                  onClick={() => setCategory(option)}
-                >
-                  {categoryLabel(option)}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-1.5">
-            <Label>Equipment</Label>
-            <div className="flex gap-1.5">
-              {[ExerciseEquipment.BARBELL, ExerciseEquipment.DUMBBELL, ExerciseEquipment.BODYWEIGHT].map(
+              {[ExerciseCategory.MAIN_LIFT, ExerciseCategory.ACCESSORY].map(
                 (option) => (
                   <Button
                     key={option}
                     type="button"
-                    variant={equipment === option ? "default" : "outline"}
+                    variant={category === option ? 'default' : 'outline'}
                     size="sm"
-                    aria-pressed={equipment === option}
-                    onClick={() => setEquipment(option)}
+                    aria-pressed={category === option}
+                    onClick={() => setCategory(option)}
                   >
-                    {equipmentLabel(option)}
+                    {categoryLabel(option)}
                   </Button>
                 ),
               )}
             </div>
           </div>
 
+          <div className="grid gap-1.5">
+            <Label>Equipment</Label>
+            <div className="flex gap-1.5">
+              {[
+                ExerciseEquipment.BARBELL,
+                ExerciseEquipment.DUMBBELL,
+                ExerciseEquipment.BODYWEIGHT,
+              ].map((option) => (
+                <Button
+                  key={option}
+                  type="button"
+                  variant={equipment === option ? 'default' : 'outline'}
+                  size="sm"
+                  aria-pressed={equipment === option}
+                  onClick={() => setEquipment(option)}
+                >
+                  {equipmentLabel(option)}
+                </Button>
+              ))}
+            </div>
+          </div>
+
           {createExercise.isError && (
-            <p className="text-sm text-destructive">{createExercise.error.message}</p>
+            <p className="text-sm text-destructive">
+              {createExercise.error.message}
+            </p>
           )}
 
           <DialogFooter>
-            <Button type="submit" disabled={createExercise.isPending || !name.trim()}>
+            <Button
+              type="submit"
+              disabled={createExercise.isPending || !name.trim()}
+            >
               Add
             </Button>
           </DialogFooter>

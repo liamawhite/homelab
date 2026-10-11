@@ -1,20 +1,20 @@
-import { useMemo } from "react";
-import { Link } from "@tanstack/react-router";
-import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { useMemo } from 'react';
+import { Link } from '@tanstack/react-router';
+import { timestampDate } from '@bufbuild/protobuf/wkt';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
-import type { Exercise } from "@/gen/workouts/v1/exercise_pb";
-import type { TrainingMax } from "@/gen/workouts/v1/training_max_pb";
-import { useActiveUser } from "@/lib/activeUser";
-import { useExercises } from "@/lib/exercises";
-import { useCurrentTrainingMaxes } from "@/lib/trainingMaxes";
-import { relativeTime } from "@/lib/time";
-import { TrainingMaxCell } from "@/components/TrainingMaxCell";
+import type { Exercise } from '@/gen/workouts/v1/exercise_pb';
+import type { TrainingMax } from '@/gen/workouts/v1/training_max_pb';
+import { useActiveUser } from '@/lib/activeUser';
+import { useExercises } from '@/lib/exercises';
+import { useCurrentTrainingMaxes } from '@/lib/trainingMaxes';
+import { relativeTime } from '@/lib/time';
+import { TrainingMaxCell } from '@/components/TrainingMaxCell';
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 interface Row {
   exercise: Exercise;
@@ -49,25 +49,32 @@ export function TrainingMaxesPage() {
   // recorded max.
   const isLoading = exercisesLoading || maxesLoading;
 
-  const activeExercises = useMemo(() => exercises?.filter((e) => !e.archived) ?? [], [exercises]);
+  const activeExercises = useMemo(
+    () => exercises?.filter((e) => !e.archived) ?? [],
+    [exercises],
+  );
   const currentByExerciseId = useMemo(
     () => new Map((trainingMaxes ?? []).map((max) => [max.exerciseId, max])),
     [trainingMaxes],
   );
   const rows = useMemo<Row[]>(
-    () => activeExercises.map((exercise) => ({ exercise, current: currentByExerciseId.get(exercise.id) })),
+    () =>
+      activeExercises.map((exercise) => ({
+        exercise,
+        current: currentByExerciseId.get(exercise.id),
+      })),
     [activeExercises, currentByExerciseId],
   );
 
   const columns = useMemo(
     () => [
       columnHelper.accessor((row) => row.exercise.name, {
-        id: "name",
-        header: "Exercise",
+        id: 'name',
+        header: 'Exercise',
       }),
       columnHelper.display({
-        id: "current",
-        header: "Current max",
+        id: 'current',
+        header: 'Current max',
         cell: (info) =>
           activeUserId ? (
             <TrainingMaxCell
@@ -78,13 +85,13 @@ export function TrainingMaxesPage() {
           ) : null,
       }),
       columnHelper.display({
-        id: "lastRecorded",
-        header: "Last recorded",
+        id: 'lastRecorded',
+        header: 'Last recorded',
         cell: (info) => {
           const effectiveAt = info.row.original.current?.effectiveAt;
           return (
             <span className="text-sm text-muted-foreground">
-              {effectiveAt ? relativeTime(timestampDate(effectiveAt)) : "—"}
+              {effectiveAt ? relativeTime(timestampDate(effectiveAt)) : '—'}
             </span>
           );
         },
@@ -103,10 +110,10 @@ export function TrainingMaxesPage() {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
         <p className="text-sm text-muted-foreground">
-          Select or create a{" "}
+          Select or create a{' '}
           <Link to="/users" className="underline underline-offset-4">
             user
-          </Link>{" "}
+          </Link>{' '}
           to track training maxes.
         </p>
       </div>
@@ -130,7 +137,10 @@ export function TrainingMaxesPage() {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -141,7 +151,10 @@ export function TrainingMaxesPage() {
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -152,10 +165,10 @@ export function TrainingMaxesPage() {
       )}
       {rows.length === 0 && !isLoading && (
         <p className="text-sm text-muted-foreground">
-          No exercises yet. Add one on the{" "}
+          No exercises yet. Add one on the{' '}
           <Link to="/exercises" className="underline underline-offset-4">
             exercises
-          </Link>{" "}
+          </Link>{' '}
           page first.
         </p>
       )}

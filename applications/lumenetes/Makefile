@@ -1,30 +1,44 @@
-.PHONY: gen build clean docker-build docker-push
-
-# Use nix develop shell for all commands
-SHELL := nix develop --command bash -c
-
-# One shared image for both lumenetes-controller and hub-controller (plus
-# the read-only web UI lumenetes-controller itself now serves) - see
-# Dockerfile's top comment.
+GO_PACKAGES := ./cmd/... ./internal/... ./gen/... ./api/...
 IMAGE_NAME ?= ghcr.io/liamawhite/lumenetes
 TAG ?= dev
+export CGO_ENABLED := 0
+export GOWORK := off
 
-gen:
+.PHONY: gen generate frontend build test format format-check lint docker-build docker-push
+
+gen: generate
+
+generate:
 	buf generate
+	controller-gen object paths=./api/...
+	controller-gen crd:allowDangerousTypes=true paths=./api/... output:crd:dir=config/crd/bases
 
-# Builds web/ and embeds it into internal/webui/dist before compiling -
-# only lumenetes-controller actually go:embeds that directory (see
-# internal/webui/embed.go), but running this unconditionally is simpler than
-# threading a binary-specific build step through.
-build: gen
+frontend:
 	cd web && npm ci && npm run build
+	mkdir -p internal/webui/dist
 	cp -r web/dist/. internal/webui/dist/
-	go build ./...
 
-# Build context is the repo root (../..), not this directory - see
-# Dockerfile's top comment for why.
+build: frontend
+	go build $(GO_PACKAGES)
+
+test: frontend
+	go test $(GO_PACKAGES)
+	go vet $(GO_PACKAGES)
+
+format:
+	gofmt -w cmd internal api gen
+	cd web && npm run format
+
+format-check:
+	@unformatted=$$(gofmt -l cmd internal api gen) || exit 1; if [ -n "$$unformatted" ]; then printf '%s\n' "$$unformatted"; exit 1; fi
+	cd web && npm run format:check
+
+lint: frontend
+	golangci-lint run $(GO_PACKAGES)
+	cd web && npm run lint
+
 docker-build:
-	docker buildx build --platform linux/arm64 -f Dockerfile -t $(IMAGE_NAME):$(TAG) ../..
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_NAME):$(TAG) .
 
 docker-push:
-	docker buildx build --platform linux/arm64 -f Dockerfile -t $(IMAGE_NAME):$(TAG) --push ../..
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(IMAGE_NAME):$(TAG) --push .

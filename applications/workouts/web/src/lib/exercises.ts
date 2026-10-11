@@ -1,9 +1,13 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { exerciseClient } from "./client";
-import { ExerciseCategory, ExerciseEquipment, type Exercise } from "@/gen/workouts/v1/exercise_pb";
+import { exerciseClient } from './client';
+import {
+  ExerciseCategory,
+  ExerciseEquipment,
+  type Exercise,
+} from '@/gen/workouts/v1/exercise_pb';
 
-const exercisesQueryKey = ["exercises"];
+const exercisesQueryKey = ['exercises'];
 
 // Display order is entirely a client concern - the server returns exercises
 // in creation order (see queries.sql's ListExercises). Active exercises
@@ -35,9 +39,13 @@ export function useCreateExercise() {
       category: ExerciseCategory;
       equipment: ExerciseEquipment;
     }) => {
-      const res = await exerciseClient.createExercise({ name, category, equipment });
+      const res = await exerciseClient.createExercise({
+        name,
+        category,
+        equipment,
+      });
       if (!res.exercise) {
-        throw new Error("CreateExercise response did not include an exercise");
+        throw new Error('CreateExercise response did not include an exercise');
       }
       return res.exercise;
     },
