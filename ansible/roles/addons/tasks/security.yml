@@ -67,4 +67,8 @@
           pod-security.kubernetes.io/enforce-version: null
           pod-security.kubernetes.io/warn: null
           pod-security.kubernetes.io/warn-version: null
+  register: retired_pod_security_labels
+  until: retired_pod_security_labels is succeeded
+  retries: 6
+  delay: 2
   loop: [default, istio-egress, istio-system, flux-system]
