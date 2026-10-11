@@ -85,7 +85,7 @@
     - name: Create cross-node network verification workloads
       kubernetes.core.k8s:
         kubeconfig: "{{ api_kubeconfig }}"
-        src: "{{ repo_root }}/ansible/verification/network.yaml"
+        definition: "{{ lookup('ansible.builtin.file', repo_root + '/ansible/verification/network.yaml') | from_yaml_all | rejectattr('metadata.name', 'in', ['network-intruder', 'network-blocked']) | list }}"
         state: present
       register: verification_created
 
@@ -98,7 +98,21 @@
         - name: Wait for test clients on the other two hosts
           ansible.builtin.command:
             argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
-          loop: [network-pi-1, network-nix-server, network-intruder, network-blocked]
+          loop: [network-pi-1, network-nix-server]
+          changed_when: false
+        - name: Start denial tests only after positive controls pass
+          kubernetes.core.k8s:
+            kubeconfig: "{{ api_kubeconfig }}"
+            definition: "{{ lookup('ansible.builtin.file', repo_root + '/ansible/verification/network.yaml') | from_yaml_all | selectattr('metadata.name', 'in', ['network-intruder', 'network-blocked']) | list }}"
+            state: present
+        - name: Require denied identities and missing L4 grants to fail
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
+          loop: [network-intruder, network-blocked]
+          changed_when: false
+        - name: Verify policy and identity admission restrictions
+          ansible.builtin.command:
+            argv: ["{{ ansible_playbook_python }}", "{{ repo_root }}/ansible/tools/verify_admission.py", "--kubeconfig={{ api_kubeconfig }}"]
           changed_when: false
       always:
         - name: Remove verification workloads

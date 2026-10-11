@@ -1,29 +1,15 @@
-# Require explicit L4 network access across the homelab
+# Require explicit pod and mesh network access
 
-Default deny applies to ingress and egress for every pod, including system workloads, and for the nodes themselves. Every allowed connection must identify its source, destination, protocol, destination port, and purpose; shared infrastructure exceptions must be explicit. This wider boundary adds bootstrap and recovery complexity but avoids leaving nodes or system workloads implicitly trusted.
+Default deny applies to ingress and egress for every pod, including system workloads. Each allowed connection identifies its source, destination, protocol, destination port (or ICMP type), and purpose; shared infrastructure exceptions must be explicit. Node processes and host-network workloads are outside this enforcement boundary: the homelab owner manages their isolation through external local-network controls and explicitly chose to remove repository-managed node firewalls. Pod policies still restrict application access to node services.
 
-Only trusted administration and deployment identities may modify network policies or security-relevant workload identities. Application identities must not be able to grant themselves network access. Enforcement mechanisms, bootstrap allowances, and rollout are still being designed; this decision records the agreed boundaries, not an implemented guarantee.
+Only trusted administration and deployment identities may modify network policies or security-relevant workload identities. Applications cannot grant themselves network access. Ordinary applications cannot use privileged containers, host namespaces, network administration capabilities, host ports, or host mounts that undermine enforcement; trusted infrastructure requires explicit exceptions.
 
-Nodes must have a minimal persistent allowlist for administration and cluster bootstrap before Cilium starts, including recovery access independent of Kubernetes and Cilium. DNS, Kubernetes API access, monitoring, and health probes require explicit grants for each workload that needs them.
+Cilium enforces permitted pod transport paths. Istio ambient enforces authenticated service identities and application permissions. Mesh grants name endpoints and tunnel ports rather than allowing HBONE cluster-wide. Every ambient workload receives default-deny authorization at ztunnel; waypoint-protected services must authorize the required waypoint identity to prevent direct bypass. Mesh enrollment, identity, and authorization failures must fail closed for application connections.
 
-Host networking is an explicit exception restricted to trusted infrastructure deployments. Each exception must document its required traffic and how node policy enforces it.
+Application internet egress defaults deny at L4. Workloads needing it receive explicit access through an egress waypoint, with direct bypass blocked by Cilium. Start with a shared waypoint and separate permissions for each workload and external destination. Protocols unsupported by the mesh remain denied unless a controlled proxy or specific infrastructure exception is approved. LAN exceptions identify the workload, device addresses, protocol, and ports.
 
-Cilium and node firewalls enforce permitted network paths; Istio ambient enforces authenticated service identities and application permissions. Mesh network grants identify permitted endpoints and tunnel ports rather than allowing the tunnel port cluster-wide. Both layers default deny.
+DNS, API access, monitoring, and probes require explicit grants. DNS clients use the designated cluster resolver, whose external queries may reach only the approved upstream. DNS-name filtering is a separate requirement; resolver-path restrictions alone do not prevent DNS exfiltration.
 
-Outbound internet access is denied at L4 by default. Workloads needing internet access must receive explicit access through an egress waypoint, with L4 enforcement blocking direct bypass. Start with a shared egress waypoint, with separate permissions for each workload identity and approved destination; split waypoints when a concrete isolation requirement warrants it.
+Git is authoritative for pod network grants, mesh policies, admission restrictions, and security-relevant identities. Flux owns these after bootstrap; Ansible consumes the same definitions for initial installation and deliberate recovery. Recovery uses SSH and direct-node APIs independently of the mesh and must not open application traffic. Emergency changes must be recorded and reconciled.
 
-Application access to LAN devices also defaults deny. Direct LAN exceptions identify the workload, device addresses, protocol, and destination ports.
-
-Application connections fail closed if mesh enrollment, identity issuance, or authorization fails. Authenticated mesh traffic is required, with narrowly defined exceptions for bootstrap, probes, and non-mesh infrastructure. These decisions describe the target model; they do not assert that the current deployment enforces it.
-
-Every ambient workload receives default-deny identity authorization at ztunnel, including workloads without waypoints. Where waypoint policies form part of a service's security boundary, backend authorization must require that waypoint path and prevent direct caller bypass.
-
-Enforcement is staged to preserve recovery access. Before further homelab work, verification must demonstrate both allowed and denied connections, including direct internet bypass, unauthorized mesh callers, node access, and recovery with the mesh unavailable. Successful connectivity alone is insufficient evidence of default deny.
-
-Admission restrictions prohibit ordinary applications from using privileged containers, host namespaces, network administration capabilities, or host mounts that could undermine enforcement. Explicitly trusted infrastructure may receive documented exceptions.
-
-Git is authoritative for network grants, mesh policies, and security-relevant identity assignments, following the existing Ansible/Flux ownership boundaries. Emergency changes must be recorded and reconciled afterward; recovery may restore administrative access but must not silently open application traffic.
-
-DNS grants permit queries only to designated cluster resolvers, which use explicitly approved upstreams. DNS-name filtering is a separate requirement: allowing unrestricted queries through an approved resolver does not prevent DNS exfiltration.
-
-Internet traffic that cannot use an egress waypoint remains denied unless explicitly approved as an infrastructure exception or routed through a suitable controlled proxy. There is no general direct-internet fallback; exceptions specify source, destination, protocol, destination ports, and purpose.
+Before further homelab work, verification must demonstrate allowed connections and denied identities, ports, direct internet bypass, unauthorized pod access to nodes, admission self-grants, and application failure with the mesh unavailable. Node firewall tests and administrator CIDR configuration are intentionally outside this milestone. These decisions describe the target model; the live cluster has not yet been migrated.

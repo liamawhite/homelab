@@ -107,7 +107,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: client
-        image: busybox:1.37.0
+        image: curlimages/curl:8.16.0
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -120,13 +120,17 @@ spec:
         command:
         - sh
         - -ec
-        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(wget -qO- -T 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
+        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(curl --fail --silent\
+          \ --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
           \ = network-ok; then\n    # Both ports are served by the same ready pod;\
-          \ only 8080 is authorized.\n    if wget -qO- -T 3 http://network-server.homelab-verification.svc.cluster.local:8081;\
+          \ only 8080 is authorized.\n    if curl --fail --silent --show-error --connect-timeout\
+          \ 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8081;\
           \ then echo \"UNEXPECTED: unauthorized service port\"; exit 1; fi\n    if\
-          \ nc -w 3 1.1.1.1 443 < /dev/null; then echo \"UNEXPECTED: direct internet\"; exit\
-          \ 1; fi\n    if nc -w 3 192.168.1.51 6443 < /dev/null; then echo \"UNEXPECTED: direct\
-          \ node API\"; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
+          \ curl --insecure --silent --show-error --connect-timeout 3 --max-time 5\
+          \ https://1.1.1.1; then echo \"UNEXPECTED: direct internet\"; exit 1; fi\n\
+          \    if curl --insecure --silent --show-error --connect-timeout 3 --max-time\
+          \ 5 https://192.168.1.51:6443; then echo \"UNEXPECTED: direct node API\"\
+          ; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -148,7 +152,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: client
-        image: busybox:1.37.0
+        image: curlimages/curl:8.16.0
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -161,13 +165,17 @@ spec:
         command:
         - sh
         - -ec
-        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(wget -qO- -T 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
+        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(curl --fail --silent\
+          \ --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
           \ = network-ok; then\n    # Both ports are served by the same ready pod;\
-          \ only 8080 is authorized.\n    if wget -qO- -T 3 http://network-server.homelab-verification.svc.cluster.local:8081;\
+          \ only 8080 is authorized.\n    if curl --fail --silent --show-error --connect-timeout\
+          \ 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8081;\
           \ then echo \"UNEXPECTED: unauthorized service port\"; exit 1; fi\n    if\
-          \ nc -w 3 1.1.1.1 443 < /dev/null; then echo \"UNEXPECTED: direct internet\"; exit\
-          \ 1; fi\n    if nc -w 3 192.168.1.51 6443 < /dev/null; then echo \"UNEXPECTED: direct\
-          \ node API\"; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
+          \ curl --insecure --silent --show-error --connect-timeout 3 --max-time 5\
+          \ https://1.1.1.1; then echo \"UNEXPECTED: direct internet\"; exit 1; fi\n\
+          \    if curl --insecure --silent --show-error --connect-timeout 3 --max-time\
+          \ 5 https://192.168.1.51:6443; then echo \"UNEXPECTED: direct node API\"\
+          ; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -189,7 +197,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: client
-        image: busybox:1.37.0
+        image: curlimages/curl:8.16.0
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -202,8 +210,7 @@ spec:
         command:
         - sh
         - -ec
-        - nslookup network-server.homelab-verification.svc.cluster.local; if wget
-          -qO- -T 5 http://network-server.homelab-verification.svc.cluster.local:8080;
+        - if curl --fail --silent --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080;
           then echo UNEXPECTED-authorized-identity; exit 1; fi
 ---
 apiVersion: batch/v1
@@ -226,7 +233,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: client
-        image: busybox:1.37.0
+        image: curlimages/curl:8.16.0
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -239,8 +246,7 @@ spec:
         command:
         - sh
         - -ec
-        - nslookup network-server.homelab-verification.svc.cluster.local; if wget
-          -qO- -T 5 http://network-server.homelab-verification.svc.cluster.local:8080;
+        - if curl --fail --silent --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080;
           then echo UNEXPECTED-L4-access; exit 1; fi
 ---
 apiVersion: cilium.io/v2

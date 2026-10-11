@@ -8,7 +8,6 @@
     util-linux
     iproute2
     iptables
-    nftables
     conntrack-tools
     socat
   ];
@@ -23,21 +22,15 @@
   # exposes Ansible's persistent unit on boot and daemon-reload, including
   # after a NixOS switch. The package is separately GC-rooted by Ansible.
   systemd.generators.homelab-k3s = pkgs.writeShellScript "homelab-k3s" ''
-    for entry in "k3s.service:multi-user.target" "homelab-host-firewall.service:network-pre.target" "homelab-firewall-dns.timer:timers.target"; do
-      unit="''${entry%:*}"
-      target="''${entry#*:}"
-      if [ -f "/var/lib/homelab/systemd/$unit" ]; then
-        ${pkgs.coreutils}/bin/mkdir -p "$1/$target.wants"
-        ${pkgs.coreutils}/bin/ln -sf "/var/lib/homelab/systemd/$unit" "$1/$unit"
-        ${pkgs.coreutils}/bin/ln -sf "../$unit" "$1/$target.wants/$unit"
-      fi
-    done
-    if [ -f /var/lib/homelab/systemd/homelab-firewall-dns.service ]; then
-      ${pkgs.coreutils}/bin/ln -sf /var/lib/homelab/systemd/homelab-firewall-dns.service "$1/homelab-firewall-dns.service"
+    unit=/var/lib/homelab/systemd/k3s.service
+    if [ -f "$unit" ]; then
+      ${pkgs.coreutils}/bin/mkdir -p "$1/multi-user.target.wants"
+      ${pkgs.coreutils}/bin/ln -sf "$unit" "$1/k3s.service"
+      ${pkgs.coreutils}/bin/ln -sf ../k3s.service "$1/multi-user.target.wants/k3s.service"
     fi
   '';
 
-  # Ansible owns the persistent homelab_host nftables table and its boot unit.
-  # Avoid a second OS firewall manager replacing K3s/Cilium rules.
+  # Preserve the current host networking behavior. Cilium policies belong
+  # to the cluster layer; a later firewall redesign is a separate change.
   networking.firewall.enable = false;
 }

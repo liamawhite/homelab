@@ -75,7 +75,7 @@ for d in security:
         for grant in d['spec'].get(direction, []):
             assert grant, 'Empty additive grant opens all traffic'
             assert 'world' not in grant.get('toEntities', [])
-            assert grant.get('toPorts'), 'Every TCP/UDP grant needs explicit ports'
+            assert grant.get('toPorts') or grant.get('icmps'), 'Every grant needs explicit ports or ICMP types'
             assert any(k in grant for k in ['fromEntities','fromEndpoints','fromCIDR','toEntities','toEndpoints','toCIDR','toFQDNs']), 'Every grant needs explicit peers'
 
 for d in yaml.safe_load_all((cluster / 'istio/releases.yaml').read_text()):

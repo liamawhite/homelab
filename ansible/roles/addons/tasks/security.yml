@@ -1,4 +1,4 @@
-- name: Read explicit resolver and administrator inputs
+- name: Read explicit pod resolver input
   ansible.builtin.include_vars:
     file: "{{ cluster_dir }}/flux-system/network-inputs.yaml"
     name: network_inputs

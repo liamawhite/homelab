@@ -927,3 +927,29 @@ spec:
     - ports:
       - port: '8000'
         protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-cilium-health
+spec:
+  description: Node agents may probe the reserved Cilium health endpoint using TCP
+    4240 and IPv4 ICMP echo.
+  endpointSelector:
+    matchLabels:
+      reserved:health: ''
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '4240'
+        protocol: TCP
+  - fromEntities:
+    - host
+    - remote-node
+    icmps:
+    - fields:
+      - family: IPv4
+        type: 8

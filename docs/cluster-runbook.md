@@ -1,7 +1,7 @@
 # Cluster bootstrap and recovery runbook
 
 Run commands from the repository root. Ansible owns K3s installation, configuration,
-services, and upgrades. Flux owns kube-vip, Cilium, and its own controllers after
+services, and upgrades. Flux owns kube-vip, Cilium, network/admission policy, Istio ambient, and its own controllers after
 handoff. Both bootstrap and repair consume `clusters/homelab/`.
 
 | Host | Address | OS | Role |
@@ -104,7 +104,8 @@ The command runs these stages in order:
    seed's direct API address.
 3. Apply kube-vip through a healthy direct API and verify access through the VIP.
 4. Install Cilium using the shared Helm release identity, chart version, and values.
-5. Install Flux, configure its public Git source, and wait for reconciliation.
+5. Apply the shared pod default-deny and foundation grants, install Istio ambient
+   and strict identity default deny, then install Flux and wait for adoption.
 6. Verify the exact three Ready control-plane/etcd nodes, kube-vip, Cilium,
    CoreDNS, VIP TLS/API readiness, and cross-node service traffic and DNS.
 
@@ -324,7 +325,8 @@ scripts/homelab phase2
 Expect all three inventory nodes Ready with control-plane/etcd labels; kube-vip
 and Cilium ready on every server; CoreDNS ready; VIP TLS/API access working;
 foundation Flux reconciliation Ready and resumed; and cross-node HTTP/DNS tests
-passing. Normal phase 2 should report zero changes after handoff.
+passing, with unauthorized identities, ports, direct internet, and node API access
+denied and admission self-grants rejected. Normal phase 2 should report zero changes after handoff.
 
 `verify` requires all three intended nodes, so it can fail while a degraded
 cluster still serves traffic. During an intentional Git outage, use
@@ -354,3 +356,54 @@ HTTP/DNS tests, and zero-change phase 2 convergence also passed. NixOS reboot
 persistence, lost-quorum restoration, missing-CRD recovery, and a real K3s version
 upgrade have not been validated. See `docs/deployment-rewrite.md` for the migration
 record and the unresolved Nix server reboot issue.
+
+
+## Network security migration
+
+The target and ownership boundaries are illustrated in
+[the network security architecture](architecture/network-security.md). This change
+has not yet been applied to the running cluster; the earlier verification history
+predates network enforcement.
+
+Node and host-network isolation is managed through the homelab owner's external
+local-network controls. This change adds no node firewall, administrator CIDR
+allowlist, host resolver migration, or host firewall boot dependency. Pod access
+to node services still requires an explicit Cilium grant.
+
+1. Review `UPSTREAM_DNS_IPV4` in
+   `clusters/homelab/flux-system/network-inputs.yaml`. Its initial value is the
+   observed `192.168.1.1` resolver. This limits CoreDNS pod egress; it does not
+   change node resolver settings.
+2. Run `scripts/homelab check` and review this change. Before merging the initial
+   enforcement migration, suspend existing root/Cilium reconciliation so Flux
+   cannot perform a partial migration:
+
+   ```sh
+   flux suspend kustomization flux-system -n flux-system
+   flux suspend kustomization cilium -n flux-system
+   flux suspend helmrelease cilium -n flux-system
+   ```
+
+   Publish the reviewed definitions to `main` and use a matching checkout. The
+   existing published-definition guard still applies.
+3. Run `scripts/homelab security`. It deliberately reconciles shared Cilium,
+   network/admission policy, Istio ambient, and Flux definitions through a direct
+   API, then resumes Flux and runs verification. It does not configure host
+   firewall rules or restart K3s for a host resolver migration.
+4. Complete the allowed/denied traffic and admission checks, then exercise mesh
+   failure and administrative recovery. Keep the milestone incomplete until all
+   checks pass. Automated `verify` covers cross-node traffic and admission;
+   disruptive mesh outage/recovery remains a separate deployment check.
+
+Flux's stock allow-all network policies are removed. Revocable network and mesh
+grants are pruned when removed from Git; default-deny baselines and admission
+controls are protected from accidental pruning. Existing non-foundation workloads
+must be inventoried before applying this to a cluster with additional applications.
+The inspected foundation contains no application workloads.
+
+Recovery now suspends `network-security`, `istio`, and `mesh-security` as well as
+the original foundation Kustomizations, and suspends managed ambient Helm releases.
+It uses the same definitions and resumes reconciliation only after repair. A
+failure leaves reconciliation suspended for diagnosis. During a Git outage,
+recovery preserves deny policies and leaves Flux suspended; chart and image
+availability still depend on external node connectivity and explicit pod grants.
