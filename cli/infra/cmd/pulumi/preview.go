@@ -27,8 +27,17 @@ Example:
 	RunE: runPreview,
 }
 
+func init() {
+	PreviewCmd.Flags().StringArray("target", nil, "Limit the preview to matching resource URNs (repeatable; supports Pulumi wildcards)")
+}
+
 func runPreview(cmd *cobra.Command, args []string) error {
 	ctx, timeout, stack, err := prepareStack(cmd)
+	if err != nil {
+		return err
+	}
+
+	targets, err := cmd.Flags().GetStringArray("target")
 	if err != nil {
 		return err
 	}
@@ -36,6 +45,6 @@ func runPreview(cmd *cobra.Command, args []string) error {
 	previewCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	_, err = stack.Preview(previewCtx, optpreview.ProgressStreams(os.Stdout))
+	_, err = stack.Preview(previewCtx, optpreview.ProgressStreams(os.Stdout), optpreview.Target(targets))
 	return err
 }

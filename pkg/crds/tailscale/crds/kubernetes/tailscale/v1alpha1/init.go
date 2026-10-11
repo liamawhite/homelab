@@ -33,6 +33,12 @@ func (m *module) Construct(ctx *pulumi.Context, name, typ, urn string) (r pulumi
 		r = &DNSConfigList{}
 	case "kubernetes:tailscale.com/v1alpha1:DNSConfigPatch":
 		r = &DNSConfigPatch{}
+	case "kubernetes:tailscale.com/v1alpha1:PeerRelay":
+		r = &PeerRelay{}
+	case "kubernetes:tailscale.com/v1alpha1:PeerRelayList":
+		r = &PeerRelayList{}
+	case "kubernetes:tailscale.com/v1alpha1:PeerRelayPatch":
+		r = &PeerRelayPatch{}
 	case "kubernetes:tailscale.com/v1alpha1:ProxyClass":
 		r = &ProxyClass{}
 	case "kubernetes:tailscale.com/v1alpha1:ProxyClassList":

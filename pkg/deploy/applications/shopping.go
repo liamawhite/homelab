@@ -2,29 +2,23 @@ package applications
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	waypoint "github.com/liamawhite/homelab/pkg/components/istio/waypoint"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
+	"github.com/liamawhite/homelab/pkg/versions"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
-
-	"github.com/pulumi/pulumi-docker-build/sdk/go/dockerbuild"
 )
 
 const (
-	shoppingImageName = "ghcr.io/liamawhite/shopping"
-	shoppingPort      = 8080
+	shoppingPort = 8080
 
 	// shoppingUID is the non-root UID the container's binary runs as
-	// (matches applications/shopping/Dockerfile's scratch stage - no
+	// (matches liamawhite/shopping’s Dockerfile's scratch stage - no
 	// /etc/passwd entry exists there either, so this is a bare numeric
 	// UID/GID, same convention as workouts/lumenetes). The PVC's fsGroup
 	// below has to match it: Longhorn (like any dynamically provisioned
@@ -32,61 +26,6 @@ const (
 	// can't write to without fsGroup chowning the mount to this GID first.
 	shoppingUID = 65534
 )
-
-// BuildShoppingImage builds and pushes the shopping app's image (Go backend
-// with the built React frontend go:embedded into it - see
-// applications/shopping/Dockerfile) via buildx/BuildKit through the Pulumi
-// Docker Build provider, as part of `homelab up`/`preview` itself - same
-// convention as BuildWorkoutsImage, see its doc comment for why (declarative
-// GHCR auth, a stable-per-lineage timestamp tag instead of time.Now(),
-// digest-pinned Deployments regardless of tag naming).
-//
-// Like workouts, this module has no local go.mod "replace" back to the root
-// module, so the build context is this module's own directory
-// (applications/shopping), not the repo root - repoRoot is still resolved
-// via os.Getwd() for the same reason BuildWorkoutsImage does (this code runs
-// in-process with the CLI, whose cwd is the repo root by convention; the
-// docker-build provider plugin's cwd is not).
-func BuildShoppingImage(ctx *pulumi.Context, name, ghcrUsername, ghcrToken string, opts ...pulumi.ResourceOption) (*dockerbuild.Image, error) {
-	repoRoot, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve working directory: %w", err)
-	}
-
-	buildTime, err := pulumitime.NewStatic(ctx, fmt.Sprintf("%s-build-time", name), nil, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	buildTag := buildTime.Rfc3339.ApplyT(func(ts string) string {
-		return strings.NewReplacer(":", "", "-", "").Replace(ts)
-	}).(pulumi.StringOutput)
-
-	return dockerbuild.NewImage(ctx, name, &dockerbuild.ImageArgs{
-		Context: &dockerbuild.BuildContextArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/shopping")),
-		},
-		Dockerfile: &dockerbuild.DockerfileArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/shopping/Dockerfile")),
-		},
-		Platforms: dockerbuild.PlatformArray{
-			dockerbuild.Platform_Linux_arm64,
-			dockerbuild.Platform_Linux_amd64,
-		},
-		Push: pulumi.Bool(true),
-		Registries: dockerbuild.RegistryArray{
-			&dockerbuild.RegistryArgs{
-				Address:  pulumi.String("ghcr.io"),
-				Username: pulumi.StringPtr(ghcrUsername),
-				Password: pulumi.StringPtr(ghcrToken),
-			},
-		},
-		Tags: pulumi.StringArray{
-			pulumi.String(shoppingImageName + ":latest"),
-			pulumi.Sprintf("%s:%s", shoppingImageName, buildTag),
-		},
-	}, opts...)
-}
 
 // Shopping represents the shopping-list app: a single Go binary (Connect API
 // + embedded React frontend) backed by SQLite on a Longhorn PVC, reachable
@@ -127,15 +66,12 @@ type ShoppingArgs struct {
 	CloudflareBaseDomain       pulumi.StringInput
 	CloudflareProvider         *cloudflare.Provider
 
-	// GHCRUsername/GHCRToken authenticate BuildShoppingImage's push.
+	// Retained for call-site compatibility; image publishing runs in GitHub Actions.
 	GHCRUsername string
 	GHCRToken    string
 }
 
-// NewShopping builds the shopping image, provisions its PVC, and deploys it
-// behind a Tailscale-only waypoint - same shape as NewWorkouts, including the
-// PVC and the Recreate deployment strategy a single-writer ReadWriteOnce
-// volume needs (see the Deployment's Strategy field below for why).
+// NewShopping provisions storage and deploys the published image behind a Tailscale-only waypoint.
 func NewShopping(ctx *pulumi.Context, name string, args *ShoppingArgs, opts ...pulumi.ResourceOption) (*Shopping, error) {
 	shopping := &Shopping{}
 
@@ -147,12 +83,6 @@ func NewShopping(ctx *pulumi.Context, name string, args *ShoppingArgs, opts ...p
 	localOpts := append(opts, pulumi.Parent(shopping))
 
 	labels := pulumi.StringMap{"app": pulumi.String(name)}
-
-	image, err := BuildShoppingImage(ctx, fmt.Sprintf("%s-image", name), args.GHCRUsername, args.GHCRToken, localOpts...)
-	if err != nil {
-		return nil, err
-	}
-	imageOpts := append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{image}))
 
 	// 1. Dedicated ServiceAccount for this app.
 	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
@@ -217,7 +147,7 @@ func NewShopping(ctx *pulumi.Context, name string, args *ShoppingArgs, opts ...p
 					Containers: corev1.ContainerArray{
 						&corev1.ContainerArgs{
 							Name:  pulumi.String(name),
-							Image: image.Ref,
+							Image: pulumi.String(versions.ShoppingImage),
 							Env: corev1.EnvVarArray{
 								&corev1.EnvVarArgs{Name: pulumi.String("DB_PATH"), Value: pulumi.String("/data/shopping.db")},
 							},
@@ -253,7 +183,7 @@ func NewShopping(ctx *pulumi.Context, name string, args *ShoppingArgs, opts ...p
 				},
 			},
 		},
-	}, append(append([]pulumi.ResourceOption{}, imageOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
+	}, append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
 	if err != nil {
 		return nil, err
 	}

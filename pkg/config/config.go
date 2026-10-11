@@ -13,41 +13,16 @@ import (
 
 // InfraConfig represents the complete infra.yaml structure
 type InfraConfig struct {
-	Cluster      ClusterConfig      `yaml:"cluster" mapstructure:"cluster"`
-	Nodes        []NodeConfig       `yaml:"nodes" mapstructure:"nodes"`
-	Cloudflare   CloudflareConfig   `yaml:"cloudflare" mapstructure:"cloudflare"`
-	Tailscale    TailscaleConfig    `yaml:"tailscale" mapstructure:"tailscale"`
-	Lumenetes    LumenetesConfig    `yaml:"lumenetes" mapstructure:"lumenetes"`
-	GHCR         GHCRConfig         `yaml:"ghcr" mapstructure:"ghcr"`
-	FlightData   FlightDataConfig   `yaml:"flightData" mapstructure:"flightData"`
-	GooglePlaces GooglePlacesConfig `yaml:"googlePlaces" mapstructure:"googlePlaces"`
+	Cluster    ClusterConfig    `yaml:"cluster" mapstructure:"cluster"`
+	Nodes      []NodeConfig     `yaml:"nodes" mapstructure:"nodes"`
+	Cloudflare CloudflareConfig `yaml:"cloudflare" mapstructure:"cloudflare"`
+	Tailscale  TailscaleConfig  `yaml:"tailscale" mapstructure:"tailscale"`
+	Lumenetes  LumenetesConfig  `yaml:"lumenetes" mapstructure:"lumenetes"`
+	GHCR       GHCRConfig       `yaml:"ghcr" mapstructure:"ghcr"`
 }
 
-// FlightDataConfig holds the AeroDataBox (via RapidAPI) API key the trips
-// app uses to sync flight status. Consumed by
-// pkg/deploy/applications/trips.go, which mounts it into the trips pod as a
-// Secret-backed file (see that file's Secret step) rather than a plain env
-// var. Optional - if empty, trips still runs, just without flight sync
-// (applications/trips/cmd/trips/main.go degrades gracefully).
-type FlightDataConfig struct {
-	APIKey string `yaml:"apiKey" mapstructure:"apiKey"`
-}
-
-// GooglePlacesConfig holds the Google Places API (New) key the trips app
-// uses to resolve itinerary item locations. Consumed by
-// pkg/deploy/applications/trips.go, which mounts it into the trips pod as a
-// Secret-backed file (see that file's Secret step) rather than a plain env
-// var. Optional - if empty, trips still runs, just without itinerary
-// location search (applications/trips/cmd/trips/main.go degrades
-// gracefully, same as FlightData.APIKey).
-type GooglePlacesConfig struct {
-	APIKey string `yaml:"apiKey" mapstructure:"apiKey"`
-}
-
-// GHCRConfig holds credentials for pushing images to GitHub Container
-// Registry (ghcr.io) - Token needs the write:packages scope. Used by
-// pkg/components/lumenetescontroller's dockerbuild.Image resource to build
-// and push the lumenetes-controller's image as part of `homelab up`.
+// GHCRConfig retains registry credentials for configuration compatibility.
+// Application image publishing runs in the individual GitHub repositories.
 type GHCRConfig struct {
 	Username string `yaml:"username" mapstructure:"username"`
 	Token    string `yaml:"token" mapstructure:"token"`

@@ -87,9 +87,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 		monitoringNS := namespaces.Get(MonitoringNamespace)
 		workoutsNS := namespaces.Get(WorkoutsNamespace)
 		shoppingNS := namespaces.Get(ShoppingNamespace)
-		tripsNS := namespaces.Get(TripsNamespace)
-		remindersNS := namespaces.Get(RemindersNamespace)
-		financesNS := namespaces.Get(FinancesNamespace)
+		parentalNS := namespaces.Get(ParentalNamespace)
 		homeNS := namespaces.Get(HomeNamespace)
 
 		crds, err := installCRDs(ctx, IstioSystemNamespace,
@@ -314,33 +312,9 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			return err
 		}
 
-		// Trips: same shape as Workouts/Shopping - SQLite-backed app on a
-		// Longhorn PVC, Tailscale-only - needs storage.DefaultStorageClass,
-		// so has to come after Longhorn.
-		_, err = applications.NewTrips(ctx, "trips", &applications.TripsArgs{
-			Namespace:                  tripsNS.Metadata.Name().Elem(),
-			StorageClassName:           storage.DefaultStorageClass,
-			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
-			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
-			CloudflareZoneID:           zoneID,
-			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
-			CloudflareProvider:         providers.Cloudflare,
-			GHCRUsername:               infraCfg.GHCR.Username,
-			GHCRToken:                  infraCfg.GHCR.Token,
-			FlightAPIKey:               pulumi.String(infraCfg.FlightData.APIKey),
-			GooglePlacesAPIKey:         pulumi.String(infraCfg.GooglePlaces.APIKey),
-		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, tripsNS, tsOperator, storage}),
-		)
-		if err != nil {
-			return err
-		}
-
-		// Reminders: same shape as Workouts/Shopping/Trips - SQLite-backed
-		// app on a Longhorn PVC, Tailscale-only - needs
-		// storage.DefaultStorageClass, so has to come after Longhorn.
-		_, err = applications.NewReminders(ctx, "reminders", &applications.RemindersArgs{
-			Namespace:                  remindersNS.Metadata.Name().Elem(),
+		// Parental: shared first-year coverage planner, persisted on Longhorn.
+		_, err = applications.NewParental(ctx, "parental", &applications.ParentalArgs{
+			Namespace:                  parentalNS.Metadata.Name().Elem(),
 			StorageClassName:           storage.DefaultStorageClass,
 			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
 			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
@@ -350,27 +324,7 @@ func Program(kubeconfig string, infraCfg *infraconfig.InfraConfig) pulumi.RunFun
 			GHCRUsername:               infraCfg.GHCR.Username,
 			GHCRToken:                  infraCfg.GHCR.Token,
 		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, remindersNS, tsOperator, storage}),
-		)
-		if err != nil {
-			return err
-		}
-
-		// Finances: same shape as Workouts/Shopping/Trips/Reminders -
-		// SQLite-backed app on a Longhorn PVC, Tailscale-only - needs
-		// storage.DefaultStorageClass, so has to come after Longhorn.
-		_, err = applications.NewFinances(ctx, "finances", &applications.FinancesArgs{
-			Namespace:                  financesNS.Metadata.Name().Elem(),
-			StorageClassName:           storage.DefaultStorageClass,
-			TailscaleOperatorNamespace: tailscaleNS.Metadata.Name().Elem(),
-			TailscaleMagicDNSSuffix:    pulumi.String(infraCfg.Tailscale.MagicDNSSuffix),
-			CloudflareZoneID:           zoneID,
-			CloudflareBaseDomain:       pulumi.String(infraCfg.Cloudflare.Tunnel.Domain),
-			CloudflareProvider:         providers.Cloudflare,
-			GHCRUsername:               infraCfg.GHCR.Username,
-			GHCRToken:                  infraCfg.GHCR.Token,
-		}, pulumi.Provider(providers.Kubernetes),
-			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, financesNS, tsOperator, storage}),
+			pulumi.DependsOn([]pulumi.Resource{crds.GatewayAPI, crds.Istio, mesh, ciliumComp, parentalNS, tsOperator, storage}),
 		)
 		if err != nil {
 			return err

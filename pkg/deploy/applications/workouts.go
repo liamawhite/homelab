@@ -2,29 +2,23 @@ package applications
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
 
 	waypoint "github.com/liamawhite/homelab/pkg/components/istio/waypoint"
 	"github.com/liamawhite/homelab/pkg/components/tailscale"
 	"github.com/liamawhite/homelab/pkg/components/tailscale/ingress"
+	"github.com/liamawhite/homelab/pkg/versions"
 	"github.com/pulumi/pulumi-cloudflare/sdk/v5/go/cloudflare"
 	appsv1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/apps/v1"
 	corev1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/core/v1"
 	metav1 "github.com/pulumi/pulumi-kubernetes/sdk/v4/go/kubernetes/meta/v1"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	pulumitime "github.com/pulumiverse/pulumi-time/sdk/go/time"
-
-	"github.com/pulumi/pulumi-docker-build/sdk/go/dockerbuild"
 )
 
 const (
-	workoutsImageName = "ghcr.io/liamawhite/workouts"
-	workoutsPort      = 8080
+	workoutsPort = 8080
 
 	// workoutsUID is the non-root UID the container's binary runs as
-	// (matches applications/workouts/Dockerfile's scratch stage - no
+	// (matches liamawhite/workouts’s Dockerfile's scratch stage - no
 	// /etc/passwd entry exists there either, so this is a bare numeric
 	// UID/GID, same convention as the lumenetes image). The PVC's fsGroup
 	// below has to match it: Longhorn (like any dynamically provisioned
@@ -32,61 +26,6 @@ const (
 	// can't write to without fsGroup chowning the mount to this GID first.
 	workoutsUID = 65534
 )
-
-// BuildWorkoutsImage builds and pushes the workouts app's image (Go backend
-// with the built React frontend go:embedded into it - see
-// applications/workouts/Dockerfile) via buildx/BuildKit through the Pulumi
-// Docker Build provider, as part of `homelab up`/`preview` itself - same
-// convention as BuildLumenetesControllerImage, see its doc comment for why
-// (declarative GHCR auth, a stable-per-lineage timestamp tag instead of
-// time.Now(), digest-pinned Deployments regardless of tag naming).
-//
-// Unlike lumenetes, this module has no local go.mod "replace" back to the
-// root module, so the build context is this module's own directory
-// (applications/workouts), not the repo root - repoRoot is still resolved
-// via os.Getwd() for the same reason BuildLumenetesControllerImage does
-// (this code runs in-process with the CLI, whose cwd is the repo root by
-// convention; the docker-build provider plugin's cwd is not).
-func BuildWorkoutsImage(ctx *pulumi.Context, name, ghcrUsername, ghcrToken string, opts ...pulumi.ResourceOption) (*dockerbuild.Image, error) {
-	repoRoot, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve working directory: %w", err)
-	}
-
-	buildTime, err := pulumitime.NewStatic(ctx, fmt.Sprintf("%s-build-time", name), nil, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	buildTag := buildTime.Rfc3339.ApplyT(func(ts string) string {
-		return strings.NewReplacer(":", "", "-", "").Replace(ts)
-	}).(pulumi.StringOutput)
-
-	return dockerbuild.NewImage(ctx, name, &dockerbuild.ImageArgs{
-		Context: &dockerbuild.BuildContextArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/workouts")),
-		},
-		Dockerfile: &dockerbuild.DockerfileArgs{
-			Location: pulumi.String(filepath.Join(repoRoot, "applications/workouts/Dockerfile")),
-		},
-		Platforms: dockerbuild.PlatformArray{
-			dockerbuild.Platform_Linux_arm64,
-			dockerbuild.Platform_Linux_amd64,
-		},
-		Push: pulumi.Bool(true),
-		Registries: dockerbuild.RegistryArray{
-			&dockerbuild.RegistryArgs{
-				Address:  pulumi.String("ghcr.io"),
-				Username: pulumi.StringPtr(ghcrUsername),
-				Password: pulumi.StringPtr(ghcrToken),
-			},
-		},
-		Tags: pulumi.StringArray{
-			pulumi.String(workoutsImageName + ":latest"),
-			pulumi.Sprintf("%s:%s", workoutsImageName, buildTag),
-		},
-	}, opts...)
-}
 
 // Workouts represents the workouts app: a single Go binary (Connect API +
 // embedded React frontend) backed by SQLite on a Longhorn PVC, reachable
@@ -127,15 +66,12 @@ type WorkoutsArgs struct {
 	CloudflareBaseDomain       pulumi.StringInput
 	CloudflareProvider         *cloudflare.Provider
 
-	// GHCRUsername/GHCRToken authenticate BuildWorkoutsImage's push.
+	// Retained for call-site compatibility; image publishing runs in GitHub Actions.
 	GHCRUsername string
 	GHCRToken    string
 }
 
-// NewWorkouts builds the workouts image, provisions its PVC, and deploys it
-// behind a Tailscale-only waypoint - same shape as NewPrivate, plus the PVC
-// and the Recreate deployment strategy a single-writer ReadWriteOnce volume
-// needs (see the Deployment's Strategy field below for why).
+// NewWorkouts provisions storage and deploys the published image behind a Tailscale-only waypoint.
 func NewWorkouts(ctx *pulumi.Context, name string, args *WorkoutsArgs, opts ...pulumi.ResourceOption) (*Workouts, error) {
 	workouts := &Workouts{}
 
@@ -147,12 +83,6 @@ func NewWorkouts(ctx *pulumi.Context, name string, args *WorkoutsArgs, opts ...p
 	localOpts := append(opts, pulumi.Parent(workouts))
 
 	labels := pulumi.StringMap{"app": pulumi.String(name)}
-
-	image, err := BuildWorkoutsImage(ctx, fmt.Sprintf("%s-image", name), args.GHCRUsername, args.GHCRToken, localOpts...)
-	if err != nil {
-		return nil, err
-	}
-	imageOpts := append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{image}))
 
 	// 1. Dedicated ServiceAccount for this app.
 	serviceAccount, err := corev1.NewServiceAccount(ctx, fmt.Sprintf("%s-sa", name), &corev1.ServiceAccountArgs{
@@ -217,7 +147,7 @@ func NewWorkouts(ctx *pulumi.Context, name string, args *WorkoutsArgs, opts ...p
 					Containers: corev1.ContainerArray{
 						&corev1.ContainerArgs{
 							Name:  pulumi.String(name),
-							Image: image.Ref,
+							Image: pulumi.String(versions.WorkoutsImage),
 							Env: corev1.EnvVarArray{
 								&corev1.EnvVarArgs{Name: pulumi.String("DB_PATH"), Value: pulumi.String("/data/workouts.db")},
 							},
@@ -253,7 +183,7 @@ func NewWorkouts(ctx *pulumi.Context, name string, args *WorkoutsArgs, opts ...p
 				},
 			},
 		},
-	}, append(append([]pulumi.ResourceOption{}, imageOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
+	}, append(append([]pulumi.ResourceOption{}, localOpts...), pulumi.DependsOn([]pulumi.Resource{pvc}))...)
 	if err != nil {
 		return nil, err
 	}

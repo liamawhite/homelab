@@ -10,4 +10,7 @@
 /.pulumi-state/.pulumi/backups/
 /.pulumi-state/.pulumi/history/
 
+# Rescued app data dumps (contain personal data) - not for version control.
+/shopping.sql
+
 

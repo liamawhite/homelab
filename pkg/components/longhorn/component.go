@@ -144,14 +144,24 @@ func NewLonghorn(
 		return nil, err
 	}
 
-	// 1. Deploy Longhorn Helm chart. defaultSettings.createDefaultDiskLabeledNodes
-	// is the only override - required for os/modules/longhorn.nix's
-	// node.longhorn.io/create-default-disk label + default-disks-config
-	// annotation mechanism to have any effect; without it,
-	// longhorn-manager's KubernetesNodeController.syncDefaultDisks
-	// unconditionally skips reading either (confirmed live against v1.9.1 -
-	// a fresh Node object still only got the single auto-created default
-	// disk with this off). Everything else is chart defaults.
+	// 1. Deploy Longhorn Helm chart. Two overrides on top of chart defaults:
+	//   - defaultSettings.createDefaultDiskLabeledNodes - required for
+	//     os/modules/longhorn.nix's node.longhorn.io/create-default-disk
+	//     label + default-disks-config annotation mechanism to have any
+	//     effect; without it, longhorn-manager's
+	//     KubernetesNodeController.syncDefaultDisks unconditionally skips
+	//     reading either (confirmed live against v1.9.1 - a fresh Node
+	//     object still only got the single auto-created default disk with
+	//     this off).
+	//   - persistence.reclaimPolicy: Retain - the chart default is Delete,
+	//     which means deleting a PVC (including accidentally, e.g. via a
+	//     botched Pulumi replace) immediately deletes the underlying
+	//     Longhorn volume's data with no recovery path. Retain leaves the
+	//     PV (and its Longhorn volume) behind as Released instead, so a
+	//     deleted-PVC incident is recoverable by rebinding a fresh PVC to
+	//     the orphaned PV rather than an unrecoverable data loss - learned
+	//     the hard way after an incident where several app PVCs got deleted
+	//     out from under their apps.
 	chart, err := helmv4.NewChart(ctx, fmt.Sprintf("%s-chart", name), &helmv4.ChartArgs{
 		Namespace: args.Namespace,
 		Chart:     pulumi.String("longhorn"),
@@ -162,6 +172,9 @@ func NewLonghorn(
 		Values: pulumi.Map{
 			"defaultSettings": pulumi.Map{
 				"createDefaultDiskLabeledNodes": pulumi.Bool(true),
+			},
+			"persistence": pulumi.Map{
+				"reclaimPolicy": pulumi.String("Retain"),
 			},
 		},
 	}, localOpts...)
