@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { sceneClient } from "./client";
-import type { Scene } from "@/gen/lumenetes/v1/scene_pb";
+import { sceneClient } from './client';
+import type { Scene } from '@/gen/lumenetes/v1/scene_pb';
 
 function compareScenes(a: Scene, b: Scene): number {
   return a.id.localeCompare(b.id);
@@ -9,7 +9,7 @@ function compareScenes(a: Scene, b: Scene): number {
 
 export function useScenes() {
   return useQuery({
-    queryKey: ["scenes"],
+    queryKey: ['scenes'],
     queryFn: async () => (await sceneClient.listScenes({})).scenes,
     select: (scenes) => scenes.slice().sort(compareScenes),
     refetchInterval: 15_000,

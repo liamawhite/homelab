@@ -1,8 +1,8 @@
-import { fileURLToPath, URL } from "node:url";
+import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 // Connect's HTTP paths are all under /<package>.<Service>/, so proxying
 // everything under /lumenetes.* to the local Go server (see
@@ -14,17 +14,17 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   server: {
     proxy: {
-      "/lumenetes.v1.BridgeService": "http://localhost:8080",
-      "/lumenetes.v1.LightService": "http://localhost:8080",
-      "/lumenetes.v1.SwitchService": "http://localhost:8080",
-      "/lumenetes.v1.GroupService": "http://localhost:8080",
-      "/lumenetes.v1.SceneService": "http://localhost:8080",
-      "/lumenetes.v1.CircadianScheduleService": "http://localhost:8080",
+      '/lumenetes.v1.BridgeService': 'http://localhost:8080',
+      '/lumenetes.v1.LightService': 'http://localhost:8080',
+      '/lumenetes.v1.SwitchService': 'http://localhost:8080',
+      '/lumenetes.v1.GroupService': 'http://localhost:8080',
+      '/lumenetes.v1.SceneService': 'http://localhost:8080',
+      '/lumenetes.v1.CircadianScheduleService': 'http://localhost:8080',
     },
   },
 });

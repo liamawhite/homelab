@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { bridgeClient } from "./client";
-import type { Bridge } from "@/gen/lumenetes/v1/bridge_pb";
+import { bridgeClient } from './client';
+import type { Bridge } from '@/gen/lumenetes/v1/bridge_pb';
 
 function compareBridges(a: Bridge, b: Bridge): number {
   return a.name.localeCompare(b.name);
@@ -9,7 +9,7 @@ function compareBridges(a: Bridge, b: Bridge): number {
 
 export function useBridges() {
   return useQuery({
-    queryKey: ["bridges"],
+    queryKey: ['bridges'],
     queryFn: async () => (await bridgeClient.listBridges({})).bridges,
     select: (bridges) => bridges.slice().sort(compareBridges),
     refetchInterval: 15_000,
