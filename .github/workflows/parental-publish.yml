@@ -54,15 +54,15 @@ jobs:
           cache-from: type=gha,scope=parental
           cache-to: type=gha,mode=max,scope=parental
 
-      - name: Update latest for the current main commit
+      - name: Update latest when this application is current on main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IMAGE: ${{ steps.image.outputs.name }}
           DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          main_sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')
-          if [ "$main_sha" = "$GITHUB_SHA" ]; then
+          git fetch --no-tags origin main
+          if git diff --quiet "$GITHUB_SHA" FETCH_HEAD -- applications/parental .github/workflows/parental-publish.yml; then
             docker buildx imagetools create --tag "$IMAGE:latest" "$IMAGE@$DIGEST"
           else
-            echo "Skipping latest because main has advanced."
+            echo "Skipping latest because this application has changed on main."
           fi
