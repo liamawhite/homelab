@@ -28,6 +28,7 @@ Example:
 }
 
 func init() {
+	UpCmd.Flags().StringArray("target", nil, "Limit the update to matching resource URNs (repeatable; supports Pulumi wildcards)")
 	UpCmd.Flags().Bool("refresh", false, "Reconcile Pulumi's state against the cluster's actual live state before diffing/applying - use when a resource may have drifted or been deleted outside Pulumi (e.g. manually, or by an interrupted prior operation), since a plain up only diffs against last-recorded state, not live state")
 }
 
@@ -42,15 +43,20 @@ func runUp(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	targets, err := cmd.Flags().GetStringArray("target")
+	if err != nil {
+		return err
+	}
+
 	upCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	if refresh {
-		if _, err := stack.Refresh(upCtx, optrefresh.ProgressStreams(os.Stdout)); err != nil {
+		if _, err := stack.Refresh(upCtx, optrefresh.ProgressStreams(os.Stdout), optrefresh.Target(targets)); err != nil {
 			return err
 		}
 	}
 
-	_, err = stack.Up(upCtx, optup.ProgressStreams(os.Stdout))
+	_, err = stack.Up(upCtx, optup.ProgressStreams(os.Stdout), optup.Target(targets))
 	return err
 }
