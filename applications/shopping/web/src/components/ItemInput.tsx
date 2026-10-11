@@ -1,14 +1,14 @@
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent } from 'react';
 
-import type { Label } from "@/gen/shopping/v1/label_pb";
-import { useCreateItem } from "@/lib/items";
-import { badgeVariants } from "@/components/ui/badge";
-import { contrastTextColor } from "@/lib/color";
-import { cn } from "@/lib/utils";
+import type { Label } from '@/gen/shopping/v1/label_pb';
+import { useCreateItem } from '@/lib/items';
+import { badgeVariants } from '@/components/ui/badge';
+import { contrastTextColor } from '@/lib/color';
+import { cn } from '@/lib/utils';
 
 const MAX_SUGGESTIONS = 8;
-const CHIP_ATTR = "data-chip-label-id";
-const CHIP_NAME_ATTR = "data-chip-label-name";
+const CHIP_ATTR = 'data-chip-label-id';
+const CHIP_NAME_ATTR = 'data-chip-label-name';
 
 interface ItemInputProps {
   labels: Label[];
@@ -31,7 +31,11 @@ interface TokenMatch {
 // hand-rolling the caret/selection logic below rather than tracking a
 // string, since contentEditable's DOM is the source of truth, not a value
 // prop.
-export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputProps) {
+export function ItemInput({
+  labels,
+  onManageLabels,
+  defaultLabelId,
+}: ItemInputProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState<{ text: string } | null>(null);
   const tokenRef = useRef<TokenMatch | null>(null);
@@ -51,7 +55,8 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
     if (!selection || !container || selection.rangeCount === 0) return null;
 
     const range = selection.getRangeAt(0);
-    if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE) return null;
+    if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE)
+      return null;
     if (!container.contains(range.startContainer)) return null;
 
     const textNode = range.startContainer as Text;
@@ -60,7 +65,7 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
     let start = -1;
     for (let i = offset - 1; i >= 0; i--) {
       const ch = textNode.data[i];
-      if (ch === "@") {
+      if (ch === '@') {
         start = i;
         break;
       }
@@ -68,7 +73,12 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
     }
     if (start === -1) return null;
 
-    return { textNode, start, end: offset, query: textNode.data.slice(start + 1, offset) };
+    return {
+      textNode,
+      start,
+      end: offset,
+      query: textNode.data.slice(start + 1, offset),
+    };
   }
 
   function handleInput() {
@@ -80,25 +90,29 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
   }
 
   function chipLabelId(): string | null {
-    return containerRef.current?.querySelector(`[${CHIP_ATTR}]`)?.getAttribute(CHIP_ATTR) ?? null;
+    return (
+      containerRef.current
+        ?.querySelector(`[${CHIP_ATTR}]`)
+        ?.getAttribute(CHIP_ATTR) ?? null
+    );
   }
 
   function plainName(): string {
     const container = containerRef.current;
-    if (!container) return "";
-    let text = "";
+    if (!container) return '';
+    let text = '';
     for (const node of Array.from(container.childNodes)) {
-      if (node.nodeType === Node.TEXT_NODE) text += node.textContent ?? "";
+      if (node.nodeType === Node.TEXT_NODE) text += node.textContent ?? '';
     }
-    return text.replace(/\s+/g, " ").trim();
+    return text.replace(/\s+/g, ' ').trim();
   }
 
   function buildChip(label: Label): HTMLSpanElement {
-    const chip = document.createElement("span");
+    const chip = document.createElement('span');
     chip.setAttribute(CHIP_ATTR, label.id);
     chip.setAttribute(CHIP_NAME_ATTR, label.name);
-    chip.contentEditable = "false";
-    chip.className = cn(badgeVariants(), "mx-0.5 align-baseline");
+    chip.contentEditable = 'false';
+    chip.className = cn(badgeVariants(), 'mx-0.5 align-baseline');
     chip.style.backgroundColor = label.color;
     chip.style.color = contrastTextColor(label.color);
     chip.textContent = label.name;
@@ -120,7 +134,7 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
 
     const beforeNode = document.createTextNode(before);
     const chip = buildChip(label);
-    const afterNode = document.createTextNode(" " + after);
+    const afterNode = document.createTextNode(' ' + after);
 
     const parent = textNode.parentNode!;
     parent.replaceChild(afterNode, textNode);
@@ -143,12 +157,21 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
   function removeChipBeforeCaret(): boolean {
     const selection = window.getSelection();
     const container = containerRef.current;
-    if (!selection || !container || selection.rangeCount === 0 || !selection.isCollapsed) return false;
+    if (
+      !selection ||
+      !container ||
+      selection.rangeCount === 0 ||
+      !selection.isCollapsed
+    )
+      return false;
 
     const range = selection.getRangeAt(0);
     let chip: Element | null = null;
 
-    if (range.startContainer.nodeType === Node.TEXT_NODE && range.startOffset === 0) {
+    if (
+      range.startContainer.nodeType === Node.TEXT_NODE &&
+      range.startOffset === 0
+    ) {
       const prev = (range.startContainer as Text).previousSibling;
       if (prev instanceof Element && prev.hasAttribute(CHIP_ATTR)) chip = prev;
     } else if (range.startContainer === container && range.startOffset > 0) {
@@ -163,35 +186,37 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     if (query && suggestions.length > 0) {
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
         setHighlightIndex((i) => (i + 1) % suggestions.length);
         return;
       }
-      if (e.key === "ArrowUp") {
+      if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setHighlightIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
+        setHighlightIndex(
+          (i) => (i - 1 + suggestions.length) % suggestions.length,
+        );
         return;
       }
-      if (e.key === "Enter" || e.key === "Tab") {
+      if (e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault();
         selectSuggestion(suggestions[highlightIndex]);
         return;
       }
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         e.preventDefault();
         setQuery(null);
         return;
       }
     }
 
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       submit();
       return;
     }
 
-    if (e.key === "Backspace" && removeChipBeforeCaret()) {
+    if (e.key === 'Backspace' && removeChipBeforeCaret()) {
       e.preventDefault();
       handleInput();
     }
@@ -211,7 +236,7 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
       { name, labelId },
       {
         onSuccess: () => {
-          if (containerRef.current) containerRef.current.textContent = "";
+          if (containerRef.current) containerRef.current.textContent = '';
           setNeedsLabel(false);
         },
       },
@@ -241,17 +266,18 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
         suppressContentEditableWarning
         onInput={handleInput}
         onKeyUp={(e) => {
-          if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) handleInput();
+          if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key))
+            handleInput();
         }}
         onClick={handleInput}
         onKeyDown={handleKeyDown}
         onBlur={() => setQuery(null)}
         data-placeholder={
-          defaultLabelId ? "Add an item…" : "Add an item… type @ to pick a list"
+          defaultLabelId ? 'Add an item…' : 'Add an item… type @ to pick a list'
         }
         className={cn(
-          "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base leading-6 whitespace-pre-wrap outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm",
-          "empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]",
+          'h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base leading-6 whitespace-pre-wrap outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm',
+          'empty:before:pointer-events-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)]',
         )}
       />
       {query && suggestions.length > 0 && (
@@ -261,8 +287,8 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
               key={label.id}
               type="button"
               className={cn(
-                "block w-full rounded-md px-2 py-1 text-left",
-                i === highlightIndex && "bg-muted",
+                'block w-full rounded-md px-2 py-1 text-left',
+                i === highlightIndex && 'bg-muted',
               )}
               onMouseDown={(e) => {
                 e.preventDefault();
@@ -275,7 +301,9 @@ export function ItemInput({ labels, onManageLabels, defaultLabelId }: ItemInputP
         </div>
       )}
       {needsLabel && (
-        <p className="text-sm text-destructive">Pick a list with @ before adding.</p>
+        <p className="text-sm text-destructive">
+          Pick a list with @ before adding.
+        </p>
       )}
       {createItem.isError && (
         <p className="text-sm text-destructive">{createItem.error.message}</p>
