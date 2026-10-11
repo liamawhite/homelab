@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/liamawhite/homelab/pkg/config"
+	"github.com/liamawhite/lumenetes/internal/config"
 	"github.com/liamawhite/lumenetes/internal/hue"
 	"github.com/spf13/cobra"
 )

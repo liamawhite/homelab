@@ -1,9 +1,16 @@
-import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { timestampDate } from '@bufbuild/protobuf/wkt';
 
-import { useBridges } from "@/lib/bridges";
-import { relativeTime } from "@/lib/time";
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useBridges } from '@/lib/bridges';
+import { relativeTime } from '@/lib/time';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 export function BridgesPage() {
   const { data: bridges, isLoading, isError, error } = useBridges();
@@ -12,7 +19,9 @@ export function BridgesPage() {
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
       <h1 className="text-lg font-semibold">Bridges</h1>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading bridges…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading bridges…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
 
       {bridges && bridges.length > 0 && (
@@ -32,16 +41,26 @@ export function BridgesPage() {
               {bridges.map((bridge) => (
                 <TableRow key={bridge.id}>
                   <TableCell className="font-medium">{bridge.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{bridge.ip}</TableCell>
-                  <TableCell className="text-muted-foreground">{bridge.modelId}</TableCell>
-                  <TableCell className="text-muted-foreground">{bridge.swVersion}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {bridge.ip}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {bridge.modelId}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {bridge.swVersion}
+                  </TableCell>
                   <TableCell>
-                    <Badge variant={bridge.reachable ? "default" : "destructive"}>
-                      {bridge.reachable ? "Reachable" : "Unreachable"}
+                    <Badge
+                      variant={bridge.reachable ? 'default' : 'destructive'}
+                    >
+                      {bridge.reachable ? 'Reachable' : 'Unreachable'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {bridge.lastResolved ? relativeTime(timestampDate(bridge.lastResolved)) : "—"}
+                    {bridge.lastResolved
+                      ? relativeTime(timestampDate(bridge.lastResolved))
+                      : '—'}
                   </TableCell>
                 </TableRow>
               ))}
