@@ -5,6 +5,7 @@ on:
     paths:
       - "applications/dashboard/**"
       - ".github/workflows/dashboard-checks.yml"
+      - ".github/workflows/dashboard-publish.yml"
   workflow_dispatch:
 
 defaults:
