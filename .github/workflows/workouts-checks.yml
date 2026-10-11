@@ -5,6 +5,7 @@ on:
     paths:
       - "applications/workouts/**"
       - ".github/workflows/workouts-checks.yml"
+      - ".github/workflows/workouts-publish.yml"
   workflow_dispatch:
 
 defaults:
