@@ -10,6 +10,10 @@ Run `make kubeconfig` from an unlocked checkout to refresh `~/.kube/config` and
 select the `homelab` context. Repeated runs update the same entry and preserve
 other clusters. Unset `KUBECONFIG` if your shell points at a different config.
 
+Run `make kubeconfig` from an unlocked checkout to refresh `~/.kube/config` and
+select the `homelab` context. Repeated runs update the same entry and preserve
+other clusters. Unset `KUBECONFIG` if your shell points at a different config.
+
 Application source lives under `applications/`: Dashboard, Parental, Shopping,
 Lumenetes, and Workouts. Each app is an independent Go module with its own
 multistage Dockerfile and frontend dependencies. Run its Makefile from its own
