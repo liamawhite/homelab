@@ -13,15 +13,20 @@
 
     <!-- iOS: opens in standalone mode (no Safari chrome) when launched from the home screen -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <meta name="apple-mobile-web-app-title" content="Shopping" />
     <script>
       // Applied before React mounts (see src/lib/theme.tsx) to avoid a
       // flash of the wrong theme on load.
       (function () {
-        var stored = localStorage.getItem("shopping.theme");
-        var dark = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-        document.documentElement.classList.toggle("dark", dark);
+        var stored = localStorage.getItem('shopping.theme');
+        var dark = stored
+          ? stored === 'dark'
+          : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
       })();
     </script>
   </head>

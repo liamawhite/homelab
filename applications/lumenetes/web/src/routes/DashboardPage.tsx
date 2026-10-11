@@ -1,19 +1,19 @@
-import { useNavigate, useSearch } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
-import { useBridges } from "@/lib/bridges";
-import { useGroups } from "@/lib/groups";
-import { useLights } from "@/lib/lights";
-import { activeSceneKindLabel, formatBrightness } from "@/lib/format";
-import { hexToRgba, lightSwatchColor } from "@/lib/color";
-import { parseOpenKeys, toggleOpenValue } from "@/lib/searchState";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { ColorSwatch } from "@/components/ColorSwatch";
-import type { Group } from "@/gen/lumenetes/v1/group_pb";
-import type { Light } from "@/gen/lumenetes/v1/light_pb";
+import { useBridges } from '@/lib/bridges';
+import { useGroups } from '@/lib/groups';
+import { useLights } from '@/lib/lights';
+import { activeSceneKindLabel, formatBrightness } from '@/lib/format';
+import { hexToRgba, lightSwatchColor } from '@/lib/color';
+import { parseOpenKeys, toggleOpenValue } from '@/lib/searchState';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { ColorSwatch } from '@/components/ColorSwatch';
+import type { Group } from '@/gen/lumenetes/v1/group_pb';
+import type { Light } from '@/gen/lumenetes/v1/light_pb';
 
 interface GroupCardProps {
   group: Group;
@@ -23,7 +23,9 @@ interface GroupCardProps {
 }
 
 function GroupCard({ group, lights, expanded, onToggle }: GroupCardProps) {
-  const members = group.lights.map((id) => lights.get(id)).filter((light): light is Light => light !== undefined);
+  const members = group.lights
+    .map((id) => lights.get(id))
+    .filter((light): light is Light => light !== undefined);
   const onCount = members.filter((light) => light.observedOn).length;
 
   return (
@@ -31,22 +33,29 @@ function GroupCard({ group, lights, expanded, onToggle }: GroupCardProps) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{group.id}</span>
-          <Badge variant={group.activeScene ? "default" : "outline"}>
-            {group.activeScene ? activeSceneKindLabel(group.activeScene.kind) : "Unmanaged"}
+          <Badge variant={group.activeScene ? 'default' : 'outline'}>
+            {group.activeScene
+              ? activeSceneKindLabel(group.activeScene.kind)
+              : 'Unmanaged'}
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 text-sm">
         <p className="text-muted-foreground">
-          {onCount}/{members.length} light{members.length === 1 ? "" : "s"} on
-          {group.activeScene && group.activeScene.name && ` · ${group.activeScene.name}`}
+          {onCount}/{members.length} light{members.length === 1 ? '' : 's'} on
+          {group.activeScene &&
+            group.activeScene.name &&
+            ` · ${group.activeScene.name}`}
         </p>
         {group.missingLights.length > 0 && (
           <Badge variant="destructive">
-            {group.missingLights.length} missing: {group.missingLights.join(", ")}
+            {group.missingLights.length} missing:{' '}
+            {group.missingLights.join(', ')}
           </Badge>
         )}
-        {group.activeSceneError && <Badge variant="destructive">{group.activeSceneError}</Badge>}
+        {group.activeSceneError && (
+          <Badge variant="destructive">{group.activeSceneError}</Badge>
+        )}
 
         {members.length > 0 && (
           <div>
@@ -57,7 +66,9 @@ function GroupCard({ group, lights, expanded, onToggle }: GroupCardProps) {
               onClick={() => onToggle(!expanded)}
             >
               {expanded ? <ChevronDown /> : <ChevronRight />}
-              {expanded ? "Hide lights" : `Show ${members.length} light${members.length === 1 ? "" : "s"}`}
+              {expanded
+                ? 'Hide lights'
+                : `Show ${members.length} light${members.length === 1 ? '' : 's'}`}
             </Button>
             {expanded && (
               <ul className="mt-2 flex flex-col gap-1.5">
@@ -67,22 +78,29 @@ function GroupCard({ group, lights, expanded, onToggle }: GroupCardProps) {
                     <li
                       key={light.id}
                       className={cn(
-                        "flex flex-wrap items-center gap-2 rounded-md border p-2 transition-colors",
-                        !light.observedOn && "opacity-60",
+                        'flex flex-wrap items-center gap-2 rounded-md border p-2 transition-colors',
+                        !light.observedOn && 'opacity-60',
                       )}
                       style={
                         swatch
-                          ? { backgroundColor: hexToRgba(swatch, 0.16), borderColor: hexToRgba(swatch, 0.5) }
+                          ? {
+                              backgroundColor: hexToRgba(swatch, 0.16),
+                              borderColor: hexToRgba(swatch, 0.5),
+                            }
                           : undefined
                       }
                     >
                       <span className="flex-1 font-medium">{light.name}</span>
-                      <Badge variant={light.observedOn ? "default" : "outline"}>
-                        {light.observedOn ? "On" : "Off"}
+                      <Badge variant={light.observedOn ? 'default' : 'outline'}>
+                        {light.observedOn ? 'On' : 'Off'}
                       </Badge>
-                      <span className="text-muted-foreground">{formatBrightness(light.observedBrightness)}</span>
+                      <span className="text-muted-foreground">
+                        {formatBrightness(light.observedBrightness)}
+                      </span>
                       <ColorSwatch color={light.observedColor} />
-                      {!light.reachable && <Badge variant="destructive">Unreachable</Badge>}
+                      {!light.reachable && (
+                        <Badge variant="destructive">Unreachable</Badge>
+                      )}
                     </li>
                   );
                 })}
@@ -100,11 +118,17 @@ export function DashboardPage() {
   const { data: groups, isLoading, isError, error } = useGroups();
   const { data: lights } = useLights();
 
-  const { open } = useSearch({ from: "/" });
-  const navigate = useNavigate({ from: "/" });
+  const { open } = useSearch({ from: '/' });
+  const navigate = useNavigate({ from: '/' });
   const openKeys = parseOpenKeys(open);
   const setOpen = (key: string, isOpen: boolean) =>
-    navigate({ search: (prev) => ({ ...prev, open: toggleOpenValue(openKeys, key, isOpen) }), replace: true });
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        open: toggleOpenValue(openKeys, key, isOpen),
+      }),
+      replace: true,
+    });
 
   const lightsById = new Map((lights ?? []).map((light) => [light.id, light]));
 
@@ -115,15 +139,21 @@ export function DashboardPage() {
         {bridges && bridges.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {bridges.map((bridge) => (
-              <Badge key={bridge.id} variant={bridge.reachable ? "default" : "destructive"}>
-                {bridge.name || bridge.id} {bridge.reachable ? "online" : "offline"}
+              <Badge
+                key={bridge.id}
+                variant={bridge.reachable ? 'default' : 'destructive'}
+              >
+                {bridge.name || bridge.id}{' '}
+                {bridge.reachable ? 'online' : 'offline'}
               </Badge>
             ))}
           </div>
         )}
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading groups…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading groups…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

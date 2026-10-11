@@ -1,38 +1,41 @@
-import { useSchedules } from "@/lib/schedules";
-import { formatBrightness, formatColorTempK } from "@/lib/format";
-import { CircadianAnchor, CircadianOnState } from "@/gen/lumenetes/v1/circadian_schedule_pb";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useSchedules } from '@/lib/schedules';
+import { formatBrightness, formatColorTempK } from '@/lib/format';
+import {
+  CircadianAnchor,
+  CircadianOnState,
+} from '@/gen/lumenetes/v1/circadian_schedule_pb';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 function anchorLabel(anchor: CircadianAnchor): string {
   switch (anchor) {
     case CircadianAnchor.SUNRISE:
-      return "sunrise";
+      return 'sunrise';
     case CircadianAnchor.SOLAR_NOON:
-      return "solar noon";
+      return 'solar noon';
     case CircadianAnchor.SUNSET:
-      return "sunset";
+      return 'sunset';
     case CircadianAnchor.SOLAR_MIDNIGHT:
-      return "solar midnight";
+      return 'solar midnight';
     default:
-      return "unknown";
+      return 'unknown';
   }
 }
 
 function offsetLabel(minutes: number): string {
-  if (minutes === 0) return "";
-  const sign = minutes > 0 ? "+" : "-";
+  if (minutes === 0) return '';
+  const sign = minutes > 0 ? '+' : '-';
   return ` ${sign}${Math.abs(minutes)}m`;
 }
 
 function onLabel(on: CircadianOnState): string {
   switch (on) {
     case CircadianOnState.ON:
-      return ", on";
+      return ', on';
     case CircadianOnState.OFF:
-      return ", off";
+      return ', off';
     default:
-      return "";
+      return '';
   }
 }
 
@@ -43,7 +46,9 @@ export function SchedulesPage() {
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 p-4">
       <h1 className="text-lg font-semibold">Schedules</h1>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading schedules…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading schedules…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -53,11 +58,15 @@ export function SchedulesPage() {
               <CardTitle className="flex items-center justify-between">
                 <span>{schedule.id}</span>
                 {schedule.validationError ? (
-                  <Badge variant="destructive">{schedule.validationError}</Badge>
+                  <Badge variant="destructive">
+                    {schedule.validationError}
+                  </Badge>
                 ) : (
                   <Badge variant="default">
-                    {schedule.currentBrightness !== undefined && formatBrightness(schedule.currentBrightness)}
-                    {schedule.currentColorTempK !== undefined && ` · ${formatColorTempK(schedule.currentColorTempK)}`}
+                    {schedule.currentBrightness !== undefined &&
+                      formatBrightness(schedule.currentBrightness)}
+                    {schedule.currentColorTempK !== undefined &&
+                      ` · ${formatColorTempK(schedule.currentColorTempK)}`}
                   </Badge>
                 )}
               </CardTitle>
@@ -68,7 +77,9 @@ export function SchedulesPage() {
                 {schedule.keyframes.map((kf, i) => (
                   <li key={i}>
                     {anchorLabel(kf.anchor)}
-                    {offsetLabel(kf.offsetMinutes)}: {formatBrightness(kf.brightness)}, {formatColorTempK(kf.colorTempK)}
+                    {offsetLabel(kf.offsetMinutes)}:{' '}
+                    {formatBrightness(kf.brightness)},{' '}
+                    {formatColorTempK(kf.colorTempK)}
                     {onLabel(kf.on)}
                   </li>
                 ))}

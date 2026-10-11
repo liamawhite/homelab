@@ -1,28 +1,33 @@
-import { useEffect, useMemo, useState } from "react";
-import { timestampDate } from "@bufbuild/protobuf/wkt";
-import { createRootRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { timestampDate } from '@bufbuild/protobuf/wkt';
+import { createRootRoute } from '@tanstack/react-router';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { RotateCcw, Trash2 } from "lucide-react";
+} from '@tanstack/react-table';
+import { RotateCcw, Trash2 } from 'lucide-react';
 
-import { type Item, ItemStatus } from "@/gen/shopping/v1/item_pb";
-import { useItems, useCreateItem, useDeleteItem, useUpdateItemStatus } from "@/lib/items";
-import { useLabels } from "@/lib/labels";
-import { contrastTextColor } from "@/lib/color";
-import { relativeTime } from "@/lib/time";
-import { Navbar } from "@/components/Navbar";
-import { ItemInput } from "@/components/ItemInput";
-import { ManageLabelsDialog } from "@/components/ManageLabelsDialog";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type Item, ItemStatus } from '@/gen/shopping/v1/item_pb';
+import {
+  useItems,
+  useCreateItem,
+  useDeleteItem,
+  useUpdateItemStatus,
+} from '@/lib/items';
+import { useLabels } from '@/lib/labels';
+import { contrastTextColor } from '@/lib/color';
+import { relativeTime } from '@/lib/time';
+import { Navbar } from '@/components/Navbar';
+import { ItemInput } from '@/components/ItemInput';
+import { ManageLabelsDialog } from '@/components/ManageLabelsDialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -30,15 +35,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
-const ALL_TAB = "all";
+const ALL_TAB = 'all';
 
 const columnHelper = createColumnHelper<Item>();
 
 export const Route = createRootRoute({
   validateSearch: (search: Record<string, unknown>): { label?: string } => ({
-    label: typeof search.label === "string" && search.label !== ALL_TAB ? search.label : undefined,
+    label:
+      typeof search.label === 'string' && search.label !== ALL_TAB
+        ? search.label
+        : undefined,
   }),
   component: ShoppingListPage,
 });
@@ -52,37 +60,57 @@ function ShoppingListPage() {
   const { label } = Route.useSearch();
   const selectedTab = label ?? ALL_TAB;
   const navigate = Route.useNavigate();
-  const setSelectedTab = (next: string) =>
-    navigate({ search: { label: next === ALL_TAB ? undefined : next }, replace: true });
+  const setSelectedTab = useCallback(
+    (next: string) =>
+      navigate({
+        search: { label: next === ALL_TAB ? undefined : next },
+        replace: true,
+      }),
+    [navigate],
+  );
   const [manageOpen, setManageOpen] = useState(false);
 
-  const activeLabels = useMemo(() => labels?.filter((l) => !l.archived) ?? [], [labels]);
+  const activeLabels = useMemo(
+    () => labels?.filter((l) => !l.archived) ?? [],
+    [labels],
+  );
   const labelColorById = useMemo(
     () => new Map((labels ?? []).map((l) => [l.id, l.color])),
     [labels],
   );
 
   useEffect(() => {
-    if (labels && selectedTab !== ALL_TAB && !activeLabels.some((l) => l.id === selectedTab)) {
+    if (
+      labels &&
+      selectedTab !== ALL_TAB &&
+      !activeLabels.some((l) => l.id === selectedTab)
+    ) {
       setSelectedTab(ALL_TAB);
     }
-  }, [labels, activeLabels, selectedTab]);
+  }, [labels, activeLabels, selectedTab, setSelectedTab]);
 
   const visibleItems = useMemo(
-    () => (selectedTab === ALL_TAB ? (items ?? []) : (items ?? []).filter((i) => i.labelId === selectedTab)),
+    () =>
+      selectedTab === ALL_TAB
+        ? (items ?? [])
+        : (items ?? []).filter((i) => i.labelId === selectedTab),
     [items, selectedTab],
   );
 
   const columns = useMemo(
     () => [
       columnHelper.display({
-        id: "done",
+        id: 'done',
         cell: (info) => {
           const done = info.row.original.status === ItemStatus.DONE;
           return (
             <Checkbox
               checked={done}
-              aria-label={done ? `Mark ${info.row.original.name} as todo` : `Mark ${info.row.original.name} as done`}
+              aria-label={
+                done
+                  ? `Mark ${info.row.original.name} as todo`
+                  : `Mark ${info.row.original.name} as done`
+              }
               disabled={updateStatus.isPending}
               onCheckedChange={(checked) =>
                 updateStatus.mutate({
@@ -94,19 +122,26 @@ function ShoppingListPage() {
           );
         },
       }),
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor('name', {
+        header: 'Name',
         cell: (info) => {
           const done = info.row.original.status === ItemStatus.DONE;
           const color = labelColorById.get(info.row.original.labelId);
           return (
-            <div className={cn(done && "text-muted-foreground line-through")}>
+            <div className={cn(done && 'text-muted-foreground line-through')}>
               <span>
                 {info.getValue()}
                 {selectedTab === ALL_TAB && (
                   <Badge
                     className="ml-2"
-                    style={color ? { backgroundColor: color, color: contrastTextColor(color) } : undefined}
+                    style={
+                      color
+                        ? {
+                            backgroundColor: color,
+                            color: contrastTextColor(color),
+                          }
+                        : undefined
+                    }
                   >
                     {info.row.original.labelName}
                   </Badge>
@@ -120,7 +155,7 @@ function ShoppingListPage() {
         },
       }),
       columnHelper.display({
-        id: "actions",
+        id: 'actions',
         cell: (info) => {
           const done = info.row.original.status === ItemStatus.DONE;
           return (
@@ -192,8 +227,12 @@ function ShoppingListPage() {
               </TabsList>
             </Tabs>
 
-            {isLoading && <p className="text-sm text-muted-foreground">Loading items…</p>}
-            {isError && <p className="text-sm text-destructive">{error.message}</p>}
+            {isLoading && (
+              <p className="text-sm text-muted-foreground">Loading items…</p>
+            )}
+            {isError && (
+              <p className="text-sm text-destructive">{error.message}</p>
+            )}
 
             {visibleItems.length > 0 && (
               <Table>
@@ -204,7 +243,10 @@ function ShoppingListPage() {
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
                         </TableHead>
                       ))}
                     </TableRow>
@@ -215,7 +257,10 @@ function ShoppingListPage() {
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -227,13 +272,19 @@ function ShoppingListPage() {
               <p className="text-sm text-muted-foreground">No items yet.</p>
             )}
             {deleteItem.isError && (
-              <p className="text-sm text-destructive">{deleteItem.error.message}</p>
+              <p className="text-sm text-destructive">
+                {deleteItem.error.message}
+              </p>
             )}
             {updateStatus.isError && (
-              <p className="text-sm text-destructive">{updateStatus.error.message}</p>
+              <p className="text-sm text-destructive">
+                {updateStatus.error.message}
+              </p>
             )}
             {createItem.isError && (
-              <p className="text-sm text-destructive">{createItem.error.message}</p>
+              <p className="text-sm text-destructive">
+                {createItem.error.message}
+              </p>
             )}
           </CardContent>
         </Card>
