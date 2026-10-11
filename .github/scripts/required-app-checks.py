@@ -4,7 +4,7 @@ import os
 import subprocess
 import time
 
-APPS = ("parental", "shopping", "lumenetes", "workouts", "dashboard")
+APPS = ("parental", "shopping", "lumenetes", "workouts", "dashboard", "melodical")
 CHECKS = ("format", "lint", "test")
 
 
