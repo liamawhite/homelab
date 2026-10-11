@@ -31,6 +31,7 @@ def main():
         reject(pod,'Application pods cannot disable ambient capture')
         del pod['metadata']['annotations']
         pod['spec']['containers'][0]['securityContext']['privileged']=True
+        pod['spec']['containers'][0]['securityContext']['allowPrivilegeEscalation']=True
         reject(pod,'violates PodSecurity')
         reject({'apiVersion':'v1','kind':'Namespace','metadata':{'name':'homelab-admission-negative'}},'Application namespaces require restricted Pod Security and ambient enrollment')
         print('Admission denied workload/identity self-grants, policy self-grants, ambient opt-out, privileged containers, and insecure namespace creation')

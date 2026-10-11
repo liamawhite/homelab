@@ -218,7 +218,13 @@ spec:
   validations:
   - expression: request.namespace in ['kube-system','istio-system','flux-system']
       || ((!has(object.metadata.labels) || !('istio.io/dataplane-mode' in object.metadata.labels)
-      || object.metadata.labels['istio.io/dataplane-mode'] == 'ambient') && (!has(object.metadata.annotations)
+      || object.metadata.labels['istio.io/dataplane-mode'] == 'ambient'
+      || (request.namespace == 'istio-egress' && object.spec.serviceAccountName == 'egress'
+      && object.metadata.labels['istio.io/dataplane-mode'] == 'none'
+      && 'gateway.networking.k8s.io/gateway-name' in object.metadata.labels
+      && object.metadata.labels['gateway.networking.k8s.io/gateway-name'] == 'egress'
+      && 'gateway.istio.io/managed' in object.metadata.labels
+      && object.metadata.labels['gateway.istio.io/managed'] == 'istio.io-mesh-controller')) && (!has(object.metadata.annotations)
       || !('ambient.istio.io/redirection' in object.metadata.annotations) || object.metadata.annotations['ambient.istio.io/redirection']
       != 'disabled') && object.spec.containers.all(c, !has(c.ports) || c.ports.all(p,
       !has(p.hostPort) || p.hostPort == 0)))
