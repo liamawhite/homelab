@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -34,10 +34,10 @@ func newScheme(t *testing.T) *runtime.Scheme {
 
 func TestResolveIP(t *testing.T) {
 	cases := []struct {
-		name    string
-		bridge  *lumenetesv1alpha1.HueBridge
-		wantIP  string
-		wantOK  bool
+		name   string
+		bridge *lumenetesv1alpha1.HueBridge
+		wantIP string
+		wantOK bool
 	}{
 		{
 			name: "reachable bridge",

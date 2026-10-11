@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"

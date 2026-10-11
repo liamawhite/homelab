@@ -5,3 +5,13 @@
 /web/node_modules/
 /web/dist/
 /internal/webui/dist/
+
+/bin/
+/result
+.env
+.env.*
+/infra.yaml
+/kubeconfig
+*.db
+*.db-shm
+*.db-wal

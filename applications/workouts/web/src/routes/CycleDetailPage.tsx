@@ -1,23 +1,28 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { useMemo, useState } from 'react';
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearch,
+} from '@tanstack/react-router';
+import { Plus } from 'lucide-react';
 
-import { ExerciseCategory } from "@/gen/workouts/v1/exercise_pb";
-import type { ExerciseSet } from "@/gen/workouts/v1/cycle_pb";
-import { useActiveUser } from "@/lib/activeUser";
-import { useCycle } from "@/lib/cycles";
-import { useCurrentTrainingMaxes } from "@/lib/trainingMaxes";
-import { AddBlockDialog } from "@/components/AddBlockDialog";
-import { AddCycleExerciseDialog } from "@/components/AddCycleExerciseDialog";
-import { CycleExerciseRow } from "@/components/CycleExerciseRow";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExerciseCategory } from '@/gen/workouts/v1/exercise_pb';
+import type { ExerciseSet } from '@/gen/workouts/v1/cycle_pb';
+import { useActiveUser } from '@/lib/activeUser';
+import { useCycle } from '@/lib/cycles';
+import { useCurrentTrainingMaxes } from '@/lib/trainingMaxes';
+import { AddBlockDialog } from '@/components/AddBlockDialog';
+import { AddCycleExerciseDialog } from '@/components/AddCycleExerciseDialog';
+import { CycleExerciseRow } from '@/components/CycleExerciseRow';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function CycleDetailPage() {
-  const { cycleId } = useParams({ from: "/cycles/$cycleId" });
-  const { blockId } = useSearch({ from: "/cycles/$cycleId" });
-  const navigate = useNavigate({ from: "/cycles/$cycleId" });
+  const { cycleId } = useParams({ from: '/cycles/$cycleId' });
+  const { blockId } = useSearch({ from: '/cycles/$cycleId' });
+  const navigate = useNavigate({ from: '/cycles/$cycleId' });
 
   const [activeUserId] = useActiveUser();
   const { data: cycle, isLoading, isError, error } = useCycle(cycleId);
@@ -26,7 +31,10 @@ export function CycleDetailPage() {
   const [addExerciseOpen, setAddExerciseOpen] = useState(false);
 
   const blocks = useMemo(
-    () => (cycle?.blocks ?? []).slice().sort((a, b) => Number(a.position) - Number(b.position)),
+    () =>
+      (cycle?.blocks ?? [])
+        .slice()
+        .sort((a, b) => Number(a.position) - Number(b.position)),
     [cycle],
   );
   const selectedBlockId = blockId ?? blocks[0]?.id;
@@ -80,7 +88,7 @@ export function CycleDetailPage() {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
         <p className="text-sm text-destructive">
-          {error.message}{" "}
+          {error.message}{' '}
           <Link to="/cycles" className="underline underline-offset-4">
             Back to cycles
           </Link>
@@ -101,14 +109,22 @@ export function CycleDetailPage() {
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4 p-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">{cycle.name}</h1>
-        <Button size="sm" className="gap-1" onClick={() => setAddExerciseOpen(true)}>
+        <Button
+          size="sm"
+          className="gap-1"
+          onClick={() => setAddExerciseOpen(true)}
+        >
           <Plus />
           Add exercise
         </Button>
       </div>
 
       <div className="flex items-center gap-2">
-        <Tabs value={selectedBlockId} onValueChange={setSelectedBlock} className="flex-1">
+        <Tabs
+          value={selectedBlockId}
+          onValueChange={setSelectedBlock}
+          className="flex-1"
+        >
           <TabsList>
             {blocks.map((block) => (
               <TabsTrigger key={block.id} value={block.id}>
@@ -117,14 +133,21 @@ export function CycleDetailPage() {
             ))}
           </TabsList>
         </Tabs>
-        <Button variant="outline" size="sm" className="gap-1" onClick={() => setAddBlockOpen(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1"
+          onClick={() => setAddBlockOpen(true)}
+        >
           <Plus />
           New block
         </Button>
       </div>
 
       {blocks.length === 0 && (
-        <p className="text-sm text-muted-foreground">Add a block to start prescribing sets.</p>
+        <p className="text-sm text-muted-foreground">
+          Add a block to start prescribing sets.
+        </p>
       )}
 
       {mainLifts.length > 0 && (
@@ -135,7 +158,11 @@ export function CycleDetailPage() {
               key={ce.id}
               cycleExercise={ce}
               blockId={selectedBlockId}
-              sets={selectedBlockId ? (setsByCell.get(`${ce.id}:${selectedBlockId}`) ?? []) : []}
+              sets={
+                selectedBlockId
+                  ? (setsByCell.get(`${ce.id}:${selectedBlockId}`) ?? [])
+                  : []
+              }
               isFirstInGroup={index === 0}
               isLastInGroup={index === mainLifts.length - 1}
               currentTrainingMax={trainingMaxByExerciseId.get(ce.exerciseId)}
@@ -154,7 +181,11 @@ export function CycleDetailPage() {
               key={ce.id}
               cycleExercise={ce}
               blockId={selectedBlockId}
-              sets={selectedBlockId ? (setsByCell.get(`${ce.id}:${selectedBlockId}`) ?? []) : []}
+              sets={
+                selectedBlockId
+                  ? (setsByCell.get(`${ce.id}:${selectedBlockId}`) ?? [])
+                  : []
+              }
               isFirstInGroup={index === 0}
               isLastInGroup={index === accessories.length - 1}
               currentTrainingMax={trainingMaxByExerciseId.get(ce.exerciseId)}
@@ -164,7 +195,9 @@ export function CycleDetailPage() {
       )}
 
       {mainLifts.length === 0 && accessories.length === 0 && (
-        <p className="text-sm text-muted-foreground">No exercises yet. Add one to get started.</p>
+        <p className="text-sm text-muted-foreground">
+          No exercises yet. Add one to get started.
+        </p>
       )}
 
       <AddBlockDialog

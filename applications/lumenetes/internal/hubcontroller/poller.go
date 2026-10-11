@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	lumenetesv1alpha1 "github.com/liamawhite/lumenetes/api/v1alpha1"
 	"github.com/liamawhite/lumenetes/internal/bridges"
+	lighthue "github.com/liamawhite/lumenetes/internal/hue"
 	"github.com/liamawhite/lumenetes/internal/metrics"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"

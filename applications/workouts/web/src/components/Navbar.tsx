@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { CalendarRange, Dumbbell, TrendingUp } from "lucide-react";
+import { Link } from '@tanstack/react-router';
+import { CalendarRange, Dumbbell, TrendingUp } from 'lucide-react';
 
-import type { User } from "@/gen/workouts/v1/user_pb";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { UserMenu } from "@/components/UserMenu";
-import { Button } from "@/components/ui/button";
+import type { User } from '@/gen/workouts/v1/user_pb';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { UserMenu } from '@/components/UserMenu';
+import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   users: User[];
@@ -32,7 +32,11 @@ export function Navbar({ users, activeUserId, onSelectUser }: NavbarProps) {
             <Dumbbell />
           </Link>
         </Button>
-        <UserMenu users={users} activeUserId={activeUserId} onSelect={onSelectUser} />
+        <UserMenu
+          users={users}
+          activeUserId={activeUserId}
+          onSelect={onSelectUser}
+        />
         <ThemeToggle />
       </div>
     </header>

@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { userClient } from "./client";
+import { userClient } from './client';
 
-const usersQueryKey = ["users"];
+const usersQueryKey = ['users'];
 
 export function useUsers() {
   return useQuery({
@@ -18,7 +18,7 @@ export function useCreateUser() {
     mutationFn: async (name: string) => {
       const res = await userClient.createUser({ name });
       if (!res.user) {
-        throw new Error("CreateUser response did not include a user");
+        throw new Error('CreateUser response did not include a user');
       }
       return res.user;
     },
