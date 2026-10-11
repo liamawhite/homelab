@@ -17920,6 +17920,2917 @@ func (o DNSConfigStatusPatchPtrOutput) Nameserver() DNSConfigStatusNameserverPat
 	}).(DNSConfigStatusNameserverPatchPtrOutput)
 }
 
+type PeerRelayType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMeta `pulumi:"metadata"`
+	Spec     *PeerRelaySpec     `pulumi:"spec"`
+	Status   *PeerRelayStatus   `pulumi:"status"`
+}
+
+// PeerRelayTypeInput is an input type that accepts PeerRelayTypeArgs and PeerRelayTypeOutput values.
+// You can construct a concrete instance of `PeerRelayTypeInput` via:
+//
+//	PeerRelayTypeArgs{...}
+type PeerRelayTypeInput interface {
+	pulumi.Input
+
+	ToPeerRelayTypeOutput() PeerRelayTypeOutput
+	ToPeerRelayTypeOutputWithContext(context.Context) PeerRelayTypeOutput
+}
+
+type PeerRelayTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPtrInput `pulumi:"metadata"`
+	Spec     PeerRelaySpecPtrInput     `pulumi:"spec"`
+	Status   PeerRelayStatusPtrInput   `pulumi:"status"`
+}
+
+func (PeerRelayTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayType)(nil)).Elem()
+}
+
+func (i PeerRelayTypeArgs) ToPeerRelayTypeOutput() PeerRelayTypeOutput {
+	return i.ToPeerRelayTypeOutputWithContext(context.Background())
+}
+
+func (i PeerRelayTypeArgs) ToPeerRelayTypeOutputWithContext(ctx context.Context) PeerRelayTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayTypeOutput)
+}
+
+// PeerRelayTypeArrayInput is an input type that accepts PeerRelayTypeArray and PeerRelayTypeArrayOutput values.
+// You can construct a concrete instance of `PeerRelayTypeArrayInput` via:
+//
+//	PeerRelayTypeArray{ PeerRelayTypeArgs{...} }
+type PeerRelayTypeArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelayTypeArrayOutput() PeerRelayTypeArrayOutput
+	ToPeerRelayTypeArrayOutputWithContext(context.Context) PeerRelayTypeArrayOutput
+}
+
+type PeerRelayTypeArray []PeerRelayTypeInput
+
+func (PeerRelayTypeArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayType)(nil)).Elem()
+}
+
+func (i PeerRelayTypeArray) ToPeerRelayTypeArrayOutput() PeerRelayTypeArrayOutput {
+	return i.ToPeerRelayTypeArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelayTypeArray) ToPeerRelayTypeArrayOutputWithContext(ctx context.Context) PeerRelayTypeArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayTypeArrayOutput)
+}
+
+type PeerRelayTypeOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayType)(nil)).Elem()
+}
+
+func (o PeerRelayTypeOutput) ToPeerRelayTypeOutput() PeerRelayTypeOutput {
+	return o
+}
+
+func (o PeerRelayTypeOutput) ToPeerRelayTypeOutputWithContext(ctx context.Context) PeerRelayTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o PeerRelayTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o PeerRelayTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o PeerRelayTypeOutput) Metadata() metav1.ObjectMetaPtrOutput {
+	return o.ApplyT(func(v PeerRelayType) *metav1.ObjectMeta { return v.Metadata }).(metav1.ObjectMetaPtrOutput)
+}
+
+func (o PeerRelayTypeOutput) Spec() PeerRelaySpecPtrOutput {
+	return o.ApplyT(func(v PeerRelayType) *PeerRelaySpec { return v.Spec }).(PeerRelaySpecPtrOutput)
+}
+
+func (o PeerRelayTypeOutput) Status() PeerRelayStatusPtrOutput {
+	return o.ApplyT(func(v PeerRelayType) *PeerRelayStatus { return v.Status }).(PeerRelayStatusPtrOutput)
+}
+
+type PeerRelayTypeArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayTypeArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayType)(nil)).Elem()
+}
+
+func (o PeerRelayTypeArrayOutput) ToPeerRelayTypeArrayOutput() PeerRelayTypeArrayOutput {
+	return o
+}
+
+func (o PeerRelayTypeArrayOutput) ToPeerRelayTypeArrayOutputWithContext(ctx context.Context) PeerRelayTypeArrayOutput {
+	return o
+}
+
+func (o PeerRelayTypeArrayOutput) Index(i pulumi.IntInput) PeerRelayTypeOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelayType {
+		return vs[0].([]PeerRelayType)[vs[1].(int)]
+	}).(PeerRelayTypeOutput)
+}
+
+// PeerRelayList is a list of PeerRelay
+type PeerRelayListType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// List of peerrelays. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items []PeerRelayType `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata *metav1.ListMeta `pulumi:"metadata"`
+}
+
+// PeerRelayListTypeInput is an input type that accepts PeerRelayListTypeArgs and PeerRelayListTypeOutput values.
+// You can construct a concrete instance of `PeerRelayListTypeInput` via:
+//
+//	PeerRelayListTypeArgs{...}
+type PeerRelayListTypeInput interface {
+	pulumi.Input
+
+	ToPeerRelayListTypeOutput() PeerRelayListTypeOutput
+	ToPeerRelayListTypeOutputWithContext(context.Context) PeerRelayListTypeOutput
+}
+
+// PeerRelayList is a list of PeerRelay
+type PeerRelayListTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// List of peerrelays. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+	Items PeerRelayTypeArrayInput `pulumi:"items"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Metadata metav1.ListMetaPtrInput `pulumi:"metadata"`
+}
+
+func (PeerRelayListTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayListType)(nil)).Elem()
+}
+
+func (i PeerRelayListTypeArgs) ToPeerRelayListTypeOutput() PeerRelayListTypeOutput {
+	return i.ToPeerRelayListTypeOutputWithContext(context.Background())
+}
+
+func (i PeerRelayListTypeArgs) ToPeerRelayListTypeOutputWithContext(ctx context.Context) PeerRelayListTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayListTypeOutput)
+}
+
+// PeerRelayList is a list of PeerRelay
+type PeerRelayListTypeOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayListTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayListType)(nil)).Elem()
+}
+
+func (o PeerRelayListTypeOutput) ToPeerRelayListTypeOutput() PeerRelayListTypeOutput {
+	return o
+}
+
+func (o PeerRelayListTypeOutput) ToPeerRelayListTypeOutputWithContext(ctx context.Context) PeerRelayListTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o PeerRelayListTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayListType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// List of peerrelays. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
+func (o PeerRelayListTypeOutput) Items() PeerRelayTypeArrayOutput {
+	return o.ApplyT(func(v PeerRelayListType) []PeerRelayType { return v.Items }).(PeerRelayTypeArrayOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o PeerRelayListTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayListType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o PeerRelayListTypeOutput) Metadata() metav1.ListMetaPtrOutput {
+	return o.ApplyT(func(v PeerRelayListType) *metav1.ListMeta { return v.Metadata }).(metav1.ListMetaPtrOutput)
+}
+
+type PeerRelayPatchType struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion *string `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind *string `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata *metav1.ObjectMetaPatch `pulumi:"metadata"`
+	Spec     *PeerRelaySpecPatch     `pulumi:"spec"`
+	Status   *PeerRelayStatusPatch   `pulumi:"status"`
+}
+
+// PeerRelayPatchTypeInput is an input type that accepts PeerRelayPatchTypeArgs and PeerRelayPatchTypeOutput values.
+// You can construct a concrete instance of `PeerRelayPatchTypeInput` via:
+//
+//	PeerRelayPatchTypeArgs{...}
+type PeerRelayPatchTypeInput interface {
+	pulumi.Input
+
+	ToPeerRelayPatchTypeOutput() PeerRelayPatchTypeOutput
+	ToPeerRelayPatchTypeOutputWithContext(context.Context) PeerRelayPatchTypeOutput
+}
+
+type PeerRelayPatchTypeArgs struct {
+	// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	ApiVersion pulumi.StringPtrInput `pulumi:"apiVersion"`
+	// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	Kind pulumi.StringPtrInput `pulumi:"kind"`
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	Metadata metav1.ObjectMetaPatchPtrInput `pulumi:"metadata"`
+	Spec     PeerRelaySpecPatchPtrInput     `pulumi:"spec"`
+	Status   PeerRelayStatusPatchPtrInput   `pulumi:"status"`
+}
+
+func (PeerRelayPatchTypeArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayPatchType)(nil)).Elem()
+}
+
+func (i PeerRelayPatchTypeArgs) ToPeerRelayPatchTypeOutput() PeerRelayPatchTypeOutput {
+	return i.ToPeerRelayPatchTypeOutputWithContext(context.Background())
+}
+
+func (i PeerRelayPatchTypeArgs) ToPeerRelayPatchTypeOutputWithContext(ctx context.Context) PeerRelayPatchTypeOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayPatchTypeOutput)
+}
+
+type PeerRelayPatchTypeOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayPatchTypeOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayPatchType)(nil)).Elem()
+}
+
+func (o PeerRelayPatchTypeOutput) ToPeerRelayPatchTypeOutput() PeerRelayPatchTypeOutput {
+	return o
+}
+
+func (o PeerRelayPatchTypeOutput) ToPeerRelayPatchTypeOutputWithContext(ctx context.Context) PeerRelayPatchTypeOutput {
+	return o
+}
+
+// APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+func (o PeerRelayPatchTypeOutput) ApiVersion() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayPatchType) *string { return v.ApiVersion }).(pulumi.StringPtrOutput)
+}
+
+// Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+func (o PeerRelayPatchTypeOutput) Kind() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayPatchType) *string { return v.Kind }).(pulumi.StringPtrOutput)
+}
+
+// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+func (o PeerRelayPatchTypeOutput) Metadata() metav1.ObjectMetaPatchPtrOutput {
+	return o.ApplyT(func(v PeerRelayPatchType) *metav1.ObjectMetaPatch { return v.Metadata }).(metav1.ObjectMetaPatchPtrOutput)
+}
+
+func (o PeerRelayPatchTypeOutput) Spec() PeerRelaySpecPatchPtrOutput {
+	return o.ApplyT(func(v PeerRelayPatchType) *PeerRelaySpecPatch { return v.Spec }).(PeerRelaySpecPatchPtrOutput)
+}
+
+func (o PeerRelayPatchTypeOutput) Status() PeerRelayStatusPatchPtrOutput {
+	return o.ApplyT(func(v PeerRelayPatchType) *PeerRelayStatusPatch { return v.Status }).(PeerRelayStatusPatchPtrOutput)
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpec struct {
+	Aws *PeerRelaySpecAws `pulumi:"aws"`
+	// HostnamePrefix specifies the hostname prefix for each
+	// replica. Each device will have the integer number
+	// from its StatefulSet pod appended to this prefix to form the full hostname.
+	// HostnamePrefix can contain lower case letters, numbers and dashes, it
+	// must not start with a dash and must be between 1 and 62 characters long.
+	HostnamePrefix *string `pulumi:"hostnamePrefix"`
+	// ProxyClass is the name of the ProxyClass custom resource that
+	// contains configuration options that should be applied to the
+	// resources created for this PeerRelay. If unset, the operator will
+	// create resources with the default configuration.
+	ProxyClass *string `pulumi:"proxyClass"`
+	// Replicas specifies how many devices to create. Set this to enable
+	// high availability for peer relays.
+	// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+	Replicas *int                  `pulumi:"replicas"`
+	Service  *PeerRelaySpecService `pulumi:"service"`
+	// Tags that the Tailscale node will be tagged with.
+	// Defaults to [tag:k8s].
+	// To autoapprove the device defined by a PeerRelay,
+	// you can configure Tailscale ACLs to give these tags the necessary
+	// permissions.
+	// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+	// If you specify custom tags here, you must also make the operator an owner of these tags.
+	// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+	// Tags cannot be changed once a PeerRelay node has been created.
+	// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+	Tags []string `pulumi:"tags"`
+	// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+	// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+	Tailnet *string `pulumi:"tailnet"`
+}
+
+// PeerRelaySpecInput is an input type that accepts PeerRelaySpecArgs and PeerRelaySpecOutput values.
+// You can construct a concrete instance of `PeerRelaySpecInput` via:
+//
+//	PeerRelaySpecArgs{...}
+type PeerRelaySpecInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecOutput() PeerRelaySpecOutput
+	ToPeerRelaySpecOutputWithContext(context.Context) PeerRelaySpecOutput
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpecArgs struct {
+	Aws PeerRelaySpecAwsPtrInput `pulumi:"aws"`
+	// HostnamePrefix specifies the hostname prefix for each
+	// replica. Each device will have the integer number
+	// from its StatefulSet pod appended to this prefix to form the full hostname.
+	// HostnamePrefix can contain lower case letters, numbers and dashes, it
+	// must not start with a dash and must be between 1 and 62 characters long.
+	HostnamePrefix pulumi.StringPtrInput `pulumi:"hostnamePrefix"`
+	// ProxyClass is the name of the ProxyClass custom resource that
+	// contains configuration options that should be applied to the
+	// resources created for this PeerRelay. If unset, the operator will
+	// create resources with the default configuration.
+	ProxyClass pulumi.StringPtrInput `pulumi:"proxyClass"`
+	// Replicas specifies how many devices to create. Set this to enable
+	// high availability for peer relays.
+	// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+	Replicas pulumi.IntPtrInput           `pulumi:"replicas"`
+	Service  PeerRelaySpecServicePtrInput `pulumi:"service"`
+	// Tags that the Tailscale node will be tagged with.
+	// Defaults to [tag:k8s].
+	// To autoapprove the device defined by a PeerRelay,
+	// you can configure Tailscale ACLs to give these tags the necessary
+	// permissions.
+	// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+	// If you specify custom tags here, you must also make the operator an owner of these tags.
+	// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+	// Tags cannot be changed once a PeerRelay node has been created.
+	// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+	Tags pulumi.StringArrayInput `pulumi:"tags"`
+	// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+	// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+	Tailnet pulumi.StringPtrInput `pulumi:"tailnet"`
+}
+
+func (PeerRelaySpecArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpec)(nil)).Elem()
+}
+
+func (i PeerRelaySpecArgs) ToPeerRelaySpecOutput() PeerRelaySpecOutput {
+	return i.ToPeerRelaySpecOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecArgs) ToPeerRelaySpecOutputWithContext(ctx context.Context) PeerRelaySpecOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecOutput)
+}
+
+func (i PeerRelaySpecArgs) ToPeerRelaySpecPtrOutput() PeerRelaySpecPtrOutput {
+	return i.ToPeerRelaySpecPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecArgs) ToPeerRelaySpecPtrOutputWithContext(ctx context.Context) PeerRelaySpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecOutput).ToPeerRelaySpecPtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecPtrInput is an input type that accepts PeerRelaySpecArgs, PeerRelaySpecPtr and PeerRelaySpecPtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecPtrInput` via:
+//
+//	        PeerRelaySpecArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecPtrOutput() PeerRelaySpecPtrOutput
+	ToPeerRelaySpecPtrOutputWithContext(context.Context) PeerRelaySpecPtrOutput
+}
+
+type peerRelaySpecPtrType PeerRelaySpecArgs
+
+func PeerRelaySpecPtr(v *PeerRelaySpecArgs) PeerRelaySpecPtrInput {
+	return (*peerRelaySpecPtrType)(v)
+}
+
+func (*peerRelaySpecPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpec)(nil)).Elem()
+}
+
+func (i *peerRelaySpecPtrType) ToPeerRelaySpecPtrOutput() PeerRelaySpecPtrOutput {
+	return i.ToPeerRelaySpecPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecPtrType) ToPeerRelaySpecPtrOutputWithContext(ctx context.Context) PeerRelaySpecPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecPtrOutput)
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpecOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpec)(nil)).Elem()
+}
+
+func (o PeerRelaySpecOutput) ToPeerRelaySpecOutput() PeerRelaySpecOutput {
+	return o
+}
+
+func (o PeerRelaySpecOutput) ToPeerRelaySpecOutputWithContext(ctx context.Context) PeerRelaySpecOutput {
+	return o
+}
+
+func (o PeerRelaySpecOutput) ToPeerRelaySpecPtrOutput() PeerRelaySpecPtrOutput {
+	return o.ToPeerRelaySpecPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecOutput) ToPeerRelaySpecPtrOutputWithContext(ctx context.Context) PeerRelaySpecPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpec) *PeerRelaySpec {
+		return &v
+	}).(PeerRelaySpecPtrOutput)
+}
+
+func (o PeerRelaySpecOutput) Aws() PeerRelaySpecAwsPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *PeerRelaySpecAws { return v.Aws }).(PeerRelaySpecAwsPtrOutput)
+}
+
+// HostnamePrefix specifies the hostname prefix for each
+// replica. Each device will have the integer number
+// from its StatefulSet pod appended to this prefix to form the full hostname.
+// HostnamePrefix can contain lower case letters, numbers and dashes, it
+// must not start with a dash and must be between 1 and 62 characters long.
+func (o PeerRelaySpecOutput) HostnamePrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *string { return v.HostnamePrefix }).(pulumi.StringPtrOutput)
+}
+
+// ProxyClass is the name of the ProxyClass custom resource that
+// contains configuration options that should be applied to the
+// resources created for this PeerRelay. If unset, the operator will
+// create resources with the default configuration.
+func (o PeerRelaySpecOutput) ProxyClass() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *string { return v.ProxyClass }).(pulumi.StringPtrOutput)
+}
+
+// Replicas specifies how many devices to create. Set this to enable
+// high availability for peer relays.
+// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+func (o PeerRelaySpecOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *int { return v.Replicas }).(pulumi.IntPtrOutput)
+}
+
+func (o PeerRelaySpecOutput) Service() PeerRelaySpecServicePtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *PeerRelaySpecService { return v.Service }).(PeerRelaySpecServicePtrOutput)
+}
+
+// Tags that the Tailscale node will be tagged with.
+// Defaults to [tag:k8s].
+// To autoapprove the device defined by a PeerRelay,
+// you can configure Tailscale ACLs to give these tags the necessary
+// permissions.
+// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+// If you specify custom tags here, you must also make the operator an owner of these tags.
+// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+// Tags cannot be changed once a PeerRelay node has been created.
+// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+func (o PeerRelaySpecOutput) Tags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v PeerRelaySpec) []string { return v.Tags }).(pulumi.StringArrayOutput)
+}
+
+// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+func (o PeerRelaySpecOutput) Tailnet() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpec) *string { return v.Tailnet }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelaySpecPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpec)(nil)).Elem()
+}
+
+func (o PeerRelaySpecPtrOutput) ToPeerRelaySpecPtrOutput() PeerRelaySpecPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecPtrOutput) ToPeerRelaySpecPtrOutputWithContext(ctx context.Context) PeerRelaySpecPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecPtrOutput) Elem() PeerRelaySpecOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) PeerRelaySpec {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpec
+		return ret
+	}).(PeerRelaySpecOutput)
+}
+
+func (o PeerRelaySpecPtrOutput) Aws() PeerRelaySpecAwsPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *PeerRelaySpecAws {
+		if v == nil {
+			return nil
+		}
+		return v.Aws
+	}).(PeerRelaySpecAwsPtrOutput)
+}
+
+// HostnamePrefix specifies the hostname prefix for each
+// replica. Each device will have the integer number
+// from its StatefulSet pod appended to this prefix to form the full hostname.
+// HostnamePrefix can contain lower case letters, numbers and dashes, it
+// must not start with a dash and must be between 1 and 62 characters long.
+func (o PeerRelaySpecPtrOutput) HostnamePrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.HostnamePrefix
+	}).(pulumi.StringPtrOutput)
+}
+
+// ProxyClass is the name of the ProxyClass custom resource that
+// contains configuration options that should be applied to the
+// resources created for this PeerRelay. If unset, the operator will
+// create resources with the default configuration.
+func (o PeerRelaySpecPtrOutput) ProxyClass() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ProxyClass
+	}).(pulumi.StringPtrOutput)
+}
+
+// Replicas specifies how many devices to create. Set this to enable
+// high availability for peer relays.
+// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+func (o PeerRelaySpecPtrOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Replicas
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o PeerRelaySpecPtrOutput) Service() PeerRelaySpecServicePtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *PeerRelaySpecService {
+		if v == nil {
+			return nil
+		}
+		return v.Service
+	}).(PeerRelaySpecServicePtrOutput)
+}
+
+// Tags that the Tailscale node will be tagged with.
+// Defaults to [tag:k8s].
+// To autoapprove the device defined by a PeerRelay,
+// you can configure Tailscale ACLs to give these tags the necessary
+// permissions.
+// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+// If you specify custom tags here, you must also make the operator an owner of these tags.
+// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+// Tags cannot be changed once a PeerRelay node has been created.
+// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+func (o PeerRelaySpecPtrOutput) Tags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Tags
+	}).(pulumi.StringArrayOutput)
+}
+
+// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+func (o PeerRelaySpecPtrOutput) Tailnet() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpec) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Tailnet
+	}).(pulumi.StringPtrOutput)
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAws struct {
+	// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+	// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+	// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+	// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+	//
+	// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+	// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+	// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+	// on its Elastic IP while still appearing healthy.
+	//
+	// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+	// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+	// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+	// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+	// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+	// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+	// currently express.
+	//
+	// When set, the reconciler stamps
+	// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+	// spec.service.annotations.
+	ElasticIPs []PeerRelaySpecAwsElasticIPs `pulumi:"elasticIPs"`
+}
+
+// PeerRelaySpecAwsInput is an input type that accepts PeerRelaySpecAwsArgs and PeerRelaySpecAwsOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsInput` via:
+//
+//	PeerRelaySpecAwsArgs{...}
+type PeerRelaySpecAwsInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsOutput() PeerRelaySpecAwsOutput
+	ToPeerRelaySpecAwsOutputWithContext(context.Context) PeerRelaySpecAwsOutput
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAwsArgs struct {
+	// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+	// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+	// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+	// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+	//
+	// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+	// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+	// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+	// on its Elastic IP while still appearing healthy.
+	//
+	// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+	// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+	// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+	// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+	// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+	// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+	// currently express.
+	//
+	// When set, the reconciler stamps
+	// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+	// spec.service.annotations.
+	ElasticIPs PeerRelaySpecAwsElasticIPsArrayInput `pulumi:"elasticIPs"`
+}
+
+func (PeerRelaySpecAwsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAws)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsArgs) ToPeerRelaySpecAwsOutput() PeerRelaySpecAwsOutput {
+	return i.ToPeerRelaySpecAwsOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsArgs) ToPeerRelaySpecAwsOutputWithContext(ctx context.Context) PeerRelaySpecAwsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsOutput)
+}
+
+func (i PeerRelaySpecAwsArgs) ToPeerRelaySpecAwsPtrOutput() PeerRelaySpecAwsPtrOutput {
+	return i.ToPeerRelaySpecAwsPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsArgs) ToPeerRelaySpecAwsPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsOutput).ToPeerRelaySpecAwsPtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecAwsPtrInput is an input type that accepts PeerRelaySpecAwsArgs, PeerRelaySpecAwsPtr and PeerRelaySpecAwsPtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsPtrInput` via:
+//
+//	        PeerRelaySpecAwsArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecAwsPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsPtrOutput() PeerRelaySpecAwsPtrOutput
+	ToPeerRelaySpecAwsPtrOutputWithContext(context.Context) PeerRelaySpecAwsPtrOutput
+}
+
+type peerRelaySpecAwsPtrType PeerRelaySpecAwsArgs
+
+func PeerRelaySpecAwsPtr(v *PeerRelaySpecAwsArgs) PeerRelaySpecAwsPtrInput {
+	return (*peerRelaySpecAwsPtrType)(v)
+}
+
+func (*peerRelaySpecAwsPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecAws)(nil)).Elem()
+}
+
+func (i *peerRelaySpecAwsPtrType) ToPeerRelaySpecAwsPtrOutput() PeerRelaySpecAwsPtrOutput {
+	return i.ToPeerRelaySpecAwsPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecAwsPtrType) ToPeerRelaySpecAwsPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsPtrOutput)
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAwsOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAws)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsOutput) ToPeerRelaySpecAwsOutput() PeerRelaySpecAwsOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsOutput) ToPeerRelaySpecAwsOutputWithContext(ctx context.Context) PeerRelaySpecAwsOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsOutput) ToPeerRelaySpecAwsPtrOutput() PeerRelaySpecAwsPtrOutput {
+	return o.ToPeerRelaySpecAwsPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecAwsOutput) ToPeerRelaySpecAwsPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpecAws) *PeerRelaySpecAws {
+		return &v
+	}).(PeerRelaySpecAwsPtrOutput)
+}
+
+// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+//
+// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+// on its Elastic IP while still appearing healthy.
+//
+// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+// currently express.
+//
+// When set, the reconciler stamps
+// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+// spec.service.annotations.
+func (o PeerRelaySpecAwsOutput) ElasticIPs() PeerRelaySpecAwsElasticIPsArrayOutput {
+	return o.ApplyT(func(v PeerRelaySpecAws) []PeerRelaySpecAwsElasticIPs { return v.ElasticIPs }).(PeerRelaySpecAwsElasticIPsArrayOutput)
+}
+
+type PeerRelaySpecAwsPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecAws)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsPtrOutput) ToPeerRelaySpecAwsPtrOutput() PeerRelaySpecAwsPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPtrOutput) ToPeerRelaySpecAwsPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPtrOutput) Elem() PeerRelaySpecAwsOutput {
+	return o.ApplyT(func(v *PeerRelaySpecAws) PeerRelaySpecAws {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpecAws
+		return ret
+	}).(PeerRelaySpecAwsOutput)
+}
+
+// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+//
+// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+// on its Elastic IP while still appearing healthy.
+//
+// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+// currently express.
+//
+// When set, the reconciler stamps
+// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+// spec.service.annotations.
+func (o PeerRelaySpecAwsPtrOutput) ElasticIPs() PeerRelaySpecAwsElasticIPsArrayOutput {
+	return o.ApplyT(func(v *PeerRelaySpecAws) []PeerRelaySpecAwsElasticIPs {
+		if v == nil {
+			return nil
+		}
+		return v.ElasticIPs
+	}).(PeerRelaySpecAwsElasticIPsArrayOutput)
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPs struct {
+	// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+	// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+	AllocationID *string `pulumi:"allocationID"`
+	// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+	// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+	// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+	// the zone of whichever subnet it is paired with here. Stamped as
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+	SubnetID *string `pulumi:"subnetID"`
+}
+
+// PeerRelaySpecAwsElasticIPsInput is an input type that accepts PeerRelaySpecAwsElasticIPsArgs and PeerRelaySpecAwsElasticIPsOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsElasticIPsInput` via:
+//
+//	PeerRelaySpecAwsElasticIPsArgs{...}
+type PeerRelaySpecAwsElasticIPsInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsElasticIPsOutput() PeerRelaySpecAwsElasticIPsOutput
+	ToPeerRelaySpecAwsElasticIPsOutputWithContext(context.Context) PeerRelaySpecAwsElasticIPsOutput
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPsArgs struct {
+	// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+	// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+	AllocationID pulumi.StringPtrInput `pulumi:"allocationID"`
+	// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+	// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+	// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+	// the zone of whichever subnet it is paired with here. Stamped as
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+	SubnetID pulumi.StringPtrInput `pulumi:"subnetID"`
+}
+
+func (PeerRelaySpecAwsElasticIPsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsElasticIPs)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsElasticIPsArgs) ToPeerRelaySpecAwsElasticIPsOutput() PeerRelaySpecAwsElasticIPsOutput {
+	return i.ToPeerRelaySpecAwsElasticIPsOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsElasticIPsArgs) ToPeerRelaySpecAwsElasticIPsOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsElasticIPsOutput)
+}
+
+// PeerRelaySpecAwsElasticIPsArrayInput is an input type that accepts PeerRelaySpecAwsElasticIPsArray and PeerRelaySpecAwsElasticIPsArrayOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsElasticIPsArrayInput` via:
+//
+//	PeerRelaySpecAwsElasticIPsArray{ PeerRelaySpecAwsElasticIPsArgs{...} }
+type PeerRelaySpecAwsElasticIPsArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsElasticIPsArrayOutput() PeerRelaySpecAwsElasticIPsArrayOutput
+	ToPeerRelaySpecAwsElasticIPsArrayOutputWithContext(context.Context) PeerRelaySpecAwsElasticIPsArrayOutput
+}
+
+type PeerRelaySpecAwsElasticIPsArray []PeerRelaySpecAwsElasticIPsInput
+
+func (PeerRelaySpecAwsElasticIPsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelaySpecAwsElasticIPs)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsElasticIPsArray) ToPeerRelaySpecAwsElasticIPsArrayOutput() PeerRelaySpecAwsElasticIPsArrayOutput {
+	return i.ToPeerRelaySpecAwsElasticIPsArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsElasticIPsArray) ToPeerRelaySpecAwsElasticIPsArrayOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsElasticIPsArrayOutput)
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPsOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsElasticIPsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsElasticIPs)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsElasticIPsOutput) ToPeerRelaySpecAwsElasticIPsOutput() PeerRelaySpecAwsElasticIPsOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsOutput) ToPeerRelaySpecAwsElasticIPsOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsOutput {
+	return o
+}
+
+// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+func (o PeerRelaySpecAwsElasticIPsOutput) AllocationID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecAwsElasticIPs) *string { return v.AllocationID }).(pulumi.StringPtrOutput)
+}
+
+// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+// the zone of whichever subnet it is paired with here. Stamped as
+// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+func (o PeerRelaySpecAwsElasticIPsOutput) SubnetID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecAwsElasticIPs) *string { return v.SubnetID }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelaySpecAwsElasticIPsArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsElasticIPsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelaySpecAwsElasticIPs)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsElasticIPsArrayOutput) ToPeerRelaySpecAwsElasticIPsArrayOutput() PeerRelaySpecAwsElasticIPsArrayOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsArrayOutput) ToPeerRelaySpecAwsElasticIPsArrayOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsArrayOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsArrayOutput) Index(i pulumi.IntInput) PeerRelaySpecAwsElasticIPsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelaySpecAwsElasticIPs {
+		return vs[0].([]PeerRelaySpecAwsElasticIPs)[vs[1].(int)]
+	}).(PeerRelaySpecAwsElasticIPsOutput)
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPsPatch struct {
+	// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+	// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+	AllocationID *string `pulumi:"allocationID"`
+	// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+	// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+	// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+	// the zone of whichever subnet it is paired with here. Stamped as
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+	SubnetID *string `pulumi:"subnetID"`
+}
+
+// PeerRelaySpecAwsElasticIPsPatchInput is an input type that accepts PeerRelaySpecAwsElasticIPsPatchArgs and PeerRelaySpecAwsElasticIPsPatchOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsElasticIPsPatchInput` via:
+//
+//	PeerRelaySpecAwsElasticIPsPatchArgs{...}
+type PeerRelaySpecAwsElasticIPsPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsElasticIPsPatchOutput() PeerRelaySpecAwsElasticIPsPatchOutput
+	ToPeerRelaySpecAwsElasticIPsPatchOutputWithContext(context.Context) PeerRelaySpecAwsElasticIPsPatchOutput
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPsPatchArgs struct {
+	// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+	// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+	AllocationID pulumi.StringPtrInput `pulumi:"allocationID"`
+	// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+	// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+	// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+	// the zone of whichever subnet it is paired with here. Stamped as
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+	SubnetID pulumi.StringPtrInput `pulumi:"subnetID"`
+}
+
+func (PeerRelaySpecAwsElasticIPsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsElasticIPsPatch)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsElasticIPsPatchArgs) ToPeerRelaySpecAwsElasticIPsPatchOutput() PeerRelaySpecAwsElasticIPsPatchOutput {
+	return i.ToPeerRelaySpecAwsElasticIPsPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsElasticIPsPatchArgs) ToPeerRelaySpecAwsElasticIPsPatchOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsElasticIPsPatchOutput)
+}
+
+// PeerRelaySpecAwsElasticIPsPatchArrayInput is an input type that accepts PeerRelaySpecAwsElasticIPsPatchArray and PeerRelaySpecAwsElasticIPsPatchArrayOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsElasticIPsPatchArrayInput` via:
+//
+//	PeerRelaySpecAwsElasticIPsPatchArray{ PeerRelaySpecAwsElasticIPsPatchArgs{...} }
+type PeerRelaySpecAwsElasticIPsPatchArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsElasticIPsPatchArrayOutput() PeerRelaySpecAwsElasticIPsPatchArrayOutput
+	ToPeerRelaySpecAwsElasticIPsPatchArrayOutputWithContext(context.Context) PeerRelaySpecAwsElasticIPsPatchArrayOutput
+}
+
+type PeerRelaySpecAwsElasticIPsPatchArray []PeerRelaySpecAwsElasticIPsPatchInput
+
+func (PeerRelaySpecAwsElasticIPsPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelaySpecAwsElasticIPsPatch)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsElasticIPsPatchArray) ToPeerRelaySpecAwsElasticIPsPatchArrayOutput() PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return i.ToPeerRelaySpecAwsElasticIPsPatchArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsElasticIPsPatchArray) ToPeerRelaySpecAwsElasticIPsPatchArrayOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsElasticIPsPatchArrayOutput)
+}
+
+// PeerRelayAWSElasticIP pairs an EIP allocation with the subnet it is attached to.
+type PeerRelaySpecAwsElasticIPsPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsElasticIPsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsElasticIPsPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsElasticIPsPatchOutput) ToPeerRelaySpecAwsElasticIPsPatchOutput() PeerRelaySpecAwsElasticIPsPatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsPatchOutput) ToPeerRelaySpecAwsElasticIPsPatchOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsPatchOutput {
+	return o
+}
+
+// AllocationID is the AWS EIP allocation ID (e.g. eipalloc-0123abcd) whose public IP this replica is reachable
+// on. Stamped as service.beta.kubernetes.io/aws-load-balancer-eip-allocations on the replica's Service.
+func (o PeerRelaySpecAwsElasticIPsPatchOutput) AllocationID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecAwsElasticIPsPatch) *string { return v.AllocationID }).(pulumi.StringPtrOutput)
+}
+
+// SubnetID is the AWS subnet the replica's load balancer is provisioned in (e.g. subnet-0123abcd). It must be
+// a public subnet, and no two replicas may name subnets in the same availability zone, since a load balancer
+// accepts only one Elastic IP per zone. A standard VPC Elastic IP is regional rather than zonal, so it takes
+// the zone of whichever subnet it is paired with here. Stamped as
+// service.beta.kubernetes.io/aws-load-balancer-subnets on the replica's Service.
+func (o PeerRelaySpecAwsElasticIPsPatchOutput) SubnetID() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecAwsElasticIPsPatch) *string { return v.SubnetID }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelaySpecAwsElasticIPsPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsElasticIPsPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelaySpecAwsElasticIPsPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsElasticIPsPatchArrayOutput) ToPeerRelaySpecAwsElasticIPsPatchArrayOutput() PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsPatchArrayOutput) ToPeerRelaySpecAwsElasticIPsPatchArrayOutputWithContext(ctx context.Context) PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsElasticIPsPatchArrayOutput) Index(i pulumi.IntInput) PeerRelaySpecAwsElasticIPsPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelaySpecAwsElasticIPsPatch {
+		return vs[0].([]PeerRelaySpecAwsElasticIPsPatch)[vs[1].(int)]
+	}).(PeerRelaySpecAwsElasticIPsPatchOutput)
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAwsPatch struct {
+	// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+	// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+	// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+	// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+	//
+	// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+	// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+	// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+	// on its Elastic IP while still appearing healthy.
+	//
+	// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+	// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+	// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+	// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+	// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+	// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+	// currently express.
+	//
+	// When set, the reconciler stamps
+	// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+	// spec.service.annotations.
+	ElasticIPs []PeerRelaySpecAwsElasticIPsPatch `pulumi:"elasticIPs"`
+}
+
+// PeerRelaySpecAwsPatchInput is an input type that accepts PeerRelaySpecAwsPatchArgs and PeerRelaySpecAwsPatchOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsPatchInput` via:
+//
+//	PeerRelaySpecAwsPatchArgs{...}
+type PeerRelaySpecAwsPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsPatchOutput() PeerRelaySpecAwsPatchOutput
+	ToPeerRelaySpecAwsPatchOutputWithContext(context.Context) PeerRelaySpecAwsPatchOutput
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAwsPatchArgs struct {
+	// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+	// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+	// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+	// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+	//
+	// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+	// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+	// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+	// on its Elastic IP while still appearing healthy.
+	//
+	// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+	// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+	// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+	// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+	// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+	// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+	// currently express.
+	//
+	// When set, the reconciler stamps
+	// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+	// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+	// spec.service.annotations.
+	ElasticIPs PeerRelaySpecAwsElasticIPsPatchArrayInput `pulumi:"elasticIPs"`
+}
+
+func (PeerRelaySpecAwsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsPatch)(nil)).Elem()
+}
+
+func (i PeerRelaySpecAwsPatchArgs) ToPeerRelaySpecAwsPatchOutput() PeerRelaySpecAwsPatchOutput {
+	return i.ToPeerRelaySpecAwsPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsPatchArgs) ToPeerRelaySpecAwsPatchOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsPatchOutput)
+}
+
+func (i PeerRelaySpecAwsPatchArgs) ToPeerRelaySpecAwsPatchPtrOutput() PeerRelaySpecAwsPatchPtrOutput {
+	return i.ToPeerRelaySpecAwsPatchPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecAwsPatchArgs) ToPeerRelaySpecAwsPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsPatchOutput).ToPeerRelaySpecAwsPatchPtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecAwsPatchPtrInput is an input type that accepts PeerRelaySpecAwsPatchArgs, PeerRelaySpecAwsPatchPtr and PeerRelaySpecAwsPatchPtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecAwsPatchPtrInput` via:
+//
+//	        PeerRelaySpecAwsPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecAwsPatchPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecAwsPatchPtrOutput() PeerRelaySpecAwsPatchPtrOutput
+	ToPeerRelaySpecAwsPatchPtrOutputWithContext(context.Context) PeerRelaySpecAwsPatchPtrOutput
+}
+
+type peerRelaySpecAwsPatchPtrType PeerRelaySpecAwsPatchArgs
+
+func PeerRelaySpecAwsPatchPtr(v *PeerRelaySpecAwsPatchArgs) PeerRelaySpecAwsPatchPtrInput {
+	return (*peerRelaySpecAwsPatchPtrType)(v)
+}
+
+func (*peerRelaySpecAwsPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecAwsPatch)(nil)).Elem()
+}
+
+func (i *peerRelaySpecAwsPatchPtrType) ToPeerRelaySpecAwsPatchPtrOutput() PeerRelaySpecAwsPatchPtrOutput {
+	return i.ToPeerRelaySpecAwsPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecAwsPatchPtrType) ToPeerRelaySpecAwsPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecAwsPatchPtrOutput)
+}
+
+// AWS contains configuration for pinning each replica to a specific AWS Elastic IP and subnet. Only meaningful
+// when running on EKS with the AWS Load Balancer Controller. When set, the per-replica values override any
+// aws-load-balancer-eip-allocations or aws-load-balancer-subnets values supplied via spec.service.annotations.
+//
+// Leave this unset unless the peer relays must be reachable on addresses you control. Pinning a subnet
+// confines a replica's load balancer to that subnet's availability zone, and an AWS Network Load Balancer
+// only forwards to targets in a zone that is enabled on it, so a replica whose pod is scheduled into any
+// other zone stops receiving traffic. Setting this field therefore also requires pinning the pods to the
+// matching zone with a ProxyClass, as described on ElasticIPs. Without this field the AWS Load Balancer
+// Controller instead provisions each load balancer across every zone it discovers, and the operator turns on
+// cross-zone load balancing so the replica is reachable wherever it happens to be scheduled, with no
+// scheduling constraints needed.
+type PeerRelaySpecAwsPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecAwsPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsPatchOutput) ToPeerRelaySpecAwsPatchOutput() PeerRelaySpecAwsPatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPatchOutput) ToPeerRelaySpecAwsPatchOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPatchOutput) ToPeerRelaySpecAwsPatchPtrOutput() PeerRelaySpecAwsPatchPtrOutput {
+	return o.ToPeerRelaySpecAwsPatchPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecAwsPatchOutput) ToPeerRelaySpecAwsPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpecAwsPatch) *PeerRelaySpecAwsPatch {
+		return &v
+	}).(PeerRelaySpecAwsPatchPtrOutput)
+}
+
+// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+//
+// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+// on its Elastic IP while still appearing healthy.
+//
+// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+// currently express.
+//
+// When set, the reconciler stamps
+// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+// spec.service.annotations.
+func (o PeerRelaySpecAwsPatchOutput) ElasticIPs() PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return o.ApplyT(func(v PeerRelaySpecAwsPatch) []PeerRelaySpecAwsElasticIPsPatch { return v.ElasticIPs }).(PeerRelaySpecAwsElasticIPsPatchArrayOutput)
+}
+
+type PeerRelaySpecAwsPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecAwsPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecAwsPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecAwsPatchPtrOutput) ToPeerRelaySpecAwsPatchPtrOutput() PeerRelaySpecAwsPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPatchPtrOutput) ToPeerRelaySpecAwsPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecAwsPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecAwsPatchPtrOutput) Elem() PeerRelaySpecAwsPatchOutput {
+	return o.ApplyT(func(v *PeerRelaySpecAwsPatch) PeerRelaySpecAwsPatch {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpecAwsPatch
+		return ret
+	}).(PeerRelaySpecAwsPatchOutput)
+}
+
+// ElasticIPs pins each replica to a specific AWS EIP allocation and subnet. Only meaningful when Network Load
+// Balancers are provisioned by the AWS Load Balancer Controller. ElasticIPs supplies one allocation-subnet pair
+// per replica: replica N uses ElasticIPs[N]. The list must be at least as long as spec.replicas so every replica
+// has a distinct EIP; extra entries are permitted so that scale-up doesn't immediately trip validation.
+//
+// Pinning a subnet enables only that subnet's availability zone on the replica's load balancer, and a Network
+// Load Balancer only forwards to targets in an enabled zone. Nothing constrains the scheduler to place the
+// replica's pod in that zone, so a pod scheduled elsewhere, including after a reschedule, becomes unreachable
+// on its Elastic IP while still appearing healthy.
+//
+// Every replica of a PeerRelay shares one pod template, so a ProxyClass referenced by spec.proxyClass can
+// confine the pods to a zone but cannot place different replicas in different zones. To use this field
+// safely, name subnets in a single availability zone and pin the pods to that same zone with a ProxyClass
+// setting spec.statefulSet.pod.nodeSelector to topology.kubernetes.io/zone. Note that this trades the zone
+// redundancy that running several replicas would otherwise buy. Spreading replicas across zones with their
+// own Elastic IPs needs a per-replica scheduling constraint that neither PeerRelay nor ProxyClass can
+// currently express.
+//
+// When set, the reconciler stamps
+// service.beta.kubernetes.io/aws-load-balancer-eip-allocations and
+// service.beta.kubernetes.io/aws-load-balancer-subnets on each per-replica Service, overriding any values in
+// spec.service.annotations.
+func (o PeerRelaySpecAwsPatchPtrOutput) ElasticIPs() PeerRelaySpecAwsElasticIPsPatchArrayOutput {
+	return o.ApplyT(func(v *PeerRelaySpecAwsPatch) []PeerRelaySpecAwsElasticIPsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.ElasticIPs
+	}).(PeerRelaySpecAwsElasticIPsPatchArrayOutput)
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpecPatch struct {
+	Aws *PeerRelaySpecAwsPatch `pulumi:"aws"`
+	// HostnamePrefix specifies the hostname prefix for each
+	// replica. Each device will have the integer number
+	// from its StatefulSet pod appended to this prefix to form the full hostname.
+	// HostnamePrefix can contain lower case letters, numbers and dashes, it
+	// must not start with a dash and must be between 1 and 62 characters long.
+	HostnamePrefix *string `pulumi:"hostnamePrefix"`
+	// ProxyClass is the name of the ProxyClass custom resource that
+	// contains configuration options that should be applied to the
+	// resources created for this PeerRelay. If unset, the operator will
+	// create resources with the default configuration.
+	ProxyClass *string `pulumi:"proxyClass"`
+	// Replicas specifies how many devices to create. Set this to enable
+	// high availability for peer relays.
+	// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+	Replicas *int                       `pulumi:"replicas"`
+	Service  *PeerRelaySpecServicePatch `pulumi:"service"`
+	// Tags that the Tailscale node will be tagged with.
+	// Defaults to [tag:k8s].
+	// To autoapprove the device defined by a PeerRelay,
+	// you can configure Tailscale ACLs to give these tags the necessary
+	// permissions.
+	// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+	// If you specify custom tags here, you must also make the operator an owner of these tags.
+	// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+	// Tags cannot be changed once a PeerRelay node has been created.
+	// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+	Tags []string `pulumi:"tags"`
+	// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+	// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+	Tailnet *string `pulumi:"tailnet"`
+}
+
+// PeerRelaySpecPatchInput is an input type that accepts PeerRelaySpecPatchArgs and PeerRelaySpecPatchOutput values.
+// You can construct a concrete instance of `PeerRelaySpecPatchInput` via:
+//
+//	PeerRelaySpecPatchArgs{...}
+type PeerRelaySpecPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecPatchOutput() PeerRelaySpecPatchOutput
+	ToPeerRelaySpecPatchOutputWithContext(context.Context) PeerRelaySpecPatchOutput
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpecPatchArgs struct {
+	Aws PeerRelaySpecAwsPatchPtrInput `pulumi:"aws"`
+	// HostnamePrefix specifies the hostname prefix for each
+	// replica. Each device will have the integer number
+	// from its StatefulSet pod appended to this prefix to form the full hostname.
+	// HostnamePrefix can contain lower case letters, numbers and dashes, it
+	// must not start with a dash and must be between 1 and 62 characters long.
+	HostnamePrefix pulumi.StringPtrInput `pulumi:"hostnamePrefix"`
+	// ProxyClass is the name of the ProxyClass custom resource that
+	// contains configuration options that should be applied to the
+	// resources created for this PeerRelay. If unset, the operator will
+	// create resources with the default configuration.
+	ProxyClass pulumi.StringPtrInput `pulumi:"proxyClass"`
+	// Replicas specifies how many devices to create. Set this to enable
+	// high availability for peer relays.
+	// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+	Replicas pulumi.IntPtrInput                `pulumi:"replicas"`
+	Service  PeerRelaySpecServicePatchPtrInput `pulumi:"service"`
+	// Tags that the Tailscale node will be tagged with.
+	// Defaults to [tag:k8s].
+	// To autoapprove the device defined by a PeerRelay,
+	// you can configure Tailscale ACLs to give these tags the necessary
+	// permissions.
+	// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+	// If you specify custom tags here, you must also make the operator an owner of these tags.
+	// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+	// Tags cannot be changed once a PeerRelay node has been created.
+	// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+	Tags pulumi.StringArrayInput `pulumi:"tags"`
+	// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+	// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+	Tailnet pulumi.StringPtrInput `pulumi:"tailnet"`
+}
+
+func (PeerRelaySpecPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecPatch)(nil)).Elem()
+}
+
+func (i PeerRelaySpecPatchArgs) ToPeerRelaySpecPatchOutput() PeerRelaySpecPatchOutput {
+	return i.ToPeerRelaySpecPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecPatchArgs) ToPeerRelaySpecPatchOutputWithContext(ctx context.Context) PeerRelaySpecPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecPatchOutput)
+}
+
+func (i PeerRelaySpecPatchArgs) ToPeerRelaySpecPatchPtrOutput() PeerRelaySpecPatchPtrOutput {
+	return i.ToPeerRelaySpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecPatchArgs) ToPeerRelaySpecPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecPatchOutput).ToPeerRelaySpecPatchPtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecPatchPtrInput is an input type that accepts PeerRelaySpecPatchArgs, PeerRelaySpecPatchPtr and PeerRelaySpecPatchPtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecPatchPtrInput` via:
+//
+//	        PeerRelaySpecPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecPatchPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecPatchPtrOutput() PeerRelaySpecPatchPtrOutput
+	ToPeerRelaySpecPatchPtrOutputWithContext(context.Context) PeerRelaySpecPatchPtrOutput
+}
+
+type peerRelaySpecPatchPtrType PeerRelaySpecPatchArgs
+
+func PeerRelaySpecPatchPtr(v *PeerRelaySpecPatchArgs) PeerRelaySpecPatchPtrInput {
+	return (*peerRelaySpecPatchPtrType)(v)
+}
+
+func (*peerRelaySpecPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecPatch)(nil)).Elem()
+}
+
+func (i *peerRelaySpecPatchPtrType) ToPeerRelaySpecPatchPtrOutput() PeerRelaySpecPatchPtrOutput {
+	return i.ToPeerRelaySpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecPatchPtrType) ToPeerRelaySpecPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecPatchPtrOutput)
+}
+
+// Spec describes the desired state of the PeerRelay.
+// More info:
+// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+type PeerRelaySpecPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecPatchOutput) ToPeerRelaySpecPatchOutput() PeerRelaySpecPatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecPatchOutput) ToPeerRelaySpecPatchOutputWithContext(ctx context.Context) PeerRelaySpecPatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecPatchOutput) ToPeerRelaySpecPatchPtrOutput() PeerRelaySpecPatchPtrOutput {
+	return o.ToPeerRelaySpecPatchPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecPatchOutput) ToPeerRelaySpecPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpecPatch) *PeerRelaySpecPatch {
+		return &v
+	}).(PeerRelaySpecPatchPtrOutput)
+}
+
+func (o PeerRelaySpecPatchOutput) Aws() PeerRelaySpecAwsPatchPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *PeerRelaySpecAwsPatch { return v.Aws }).(PeerRelaySpecAwsPatchPtrOutput)
+}
+
+// HostnamePrefix specifies the hostname prefix for each
+// replica. Each device will have the integer number
+// from its StatefulSet pod appended to this prefix to form the full hostname.
+// HostnamePrefix can contain lower case letters, numbers and dashes, it
+// must not start with a dash and must be between 1 and 62 characters long.
+func (o PeerRelaySpecPatchOutput) HostnamePrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *string { return v.HostnamePrefix }).(pulumi.StringPtrOutput)
+}
+
+// ProxyClass is the name of the ProxyClass custom resource that
+// contains configuration options that should be applied to the
+// resources created for this PeerRelay. If unset, the operator will
+// create resources with the default configuration.
+func (o PeerRelaySpecPatchOutput) ProxyClass() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *string { return v.ProxyClass }).(pulumi.StringPtrOutput)
+}
+
+// Replicas specifies how many devices to create. Set this to enable
+// high availability for peer relays.
+// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+func (o PeerRelaySpecPatchOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *int { return v.Replicas }).(pulumi.IntPtrOutput)
+}
+
+func (o PeerRelaySpecPatchOutput) Service() PeerRelaySpecServicePatchPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *PeerRelaySpecServicePatch { return v.Service }).(PeerRelaySpecServicePatchPtrOutput)
+}
+
+// Tags that the Tailscale node will be tagged with.
+// Defaults to [tag:k8s].
+// To autoapprove the device defined by a PeerRelay,
+// you can configure Tailscale ACLs to give these tags the necessary
+// permissions.
+// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+// If you specify custom tags here, you must also make the operator an owner of these tags.
+// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+// Tags cannot be changed once a PeerRelay node has been created.
+// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+func (o PeerRelaySpecPatchOutput) Tags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) []string { return v.Tags }).(pulumi.StringArrayOutput)
+}
+
+// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+func (o PeerRelaySpecPatchOutput) Tailnet() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelaySpecPatch) *string { return v.Tailnet }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelaySpecPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecPatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecPatchPtrOutput) ToPeerRelaySpecPatchPtrOutput() PeerRelaySpecPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecPatchPtrOutput) ToPeerRelaySpecPatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecPatchPtrOutput) Elem() PeerRelaySpecPatchOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) PeerRelaySpecPatch {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpecPatch
+		return ret
+	}).(PeerRelaySpecPatchOutput)
+}
+
+func (o PeerRelaySpecPatchPtrOutput) Aws() PeerRelaySpecAwsPatchPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *PeerRelaySpecAwsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Aws
+	}).(PeerRelaySpecAwsPatchPtrOutput)
+}
+
+// HostnamePrefix specifies the hostname prefix for each
+// replica. Each device will have the integer number
+// from its StatefulSet pod appended to this prefix to form the full hostname.
+// HostnamePrefix can contain lower case letters, numbers and dashes, it
+// must not start with a dash and must be between 1 and 62 characters long.
+func (o PeerRelaySpecPatchPtrOutput) HostnamePrefix() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.HostnamePrefix
+	}).(pulumi.StringPtrOutput)
+}
+
+// ProxyClass is the name of the ProxyClass custom resource that
+// contains configuration options that should be applied to the
+// resources created for this PeerRelay. If unset, the operator will
+// create resources with the default configuration.
+func (o PeerRelaySpecPatchPtrOutput) ProxyClass() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.ProxyClass
+	}).(pulumi.StringPtrOutput)
+}
+
+// Replicas specifies how many devices to create. Set this to enable
+// high availability for peer relays.
+// https://tailscale.com/kb/1115/high-availability. Defaults to 1.
+func (o PeerRelaySpecPatchPtrOutput) Replicas() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *int {
+		if v == nil {
+			return nil
+		}
+		return v.Replicas
+	}).(pulumi.IntPtrOutput)
+}
+
+func (o PeerRelaySpecPatchPtrOutput) Service() PeerRelaySpecServicePatchPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *PeerRelaySpecServicePatch {
+		if v == nil {
+			return nil
+		}
+		return v.Service
+	}).(PeerRelaySpecServicePatchPtrOutput)
+}
+
+// Tags that the Tailscale node will be tagged with.
+// Defaults to [tag:k8s].
+// To autoapprove the device defined by a PeerRelay,
+// you can configure Tailscale ACLs to give these tags the necessary
+// permissions.
+// See https://tailscale.com/kb/1337/acl-syntax#autoapprovers.
+// If you specify custom tags here, you must also make the operator an owner of these tags.
+// See  https://tailscale.com/kb/1236/kubernetes-operator/#setting-up-the-kubernetes-operator.
+// Tags cannot be changed once a PeerRelay node has been created.
+// Tag values must be in form ^tag:[a-zA-Z][a-zA-Z0-9-]*$.
+func (o PeerRelaySpecPatchPtrOutput) Tags() pulumi.StringArrayOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) []string {
+		if v == nil {
+			return nil
+		}
+		return v.Tags
+	}).(pulumi.StringArrayOutput)
+}
+
+// Tailnet specifies the tailnet this PeerRelay should join. If blank, the default tailnet is used. When set, this
+// name must match that of a valid Tailnet resource. This field is immutable and cannot be changed once set.
+func (o PeerRelaySpecPatchPtrOutput) Tailnet() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v *PeerRelaySpecPatch) *string {
+		if v == nil {
+			return nil
+		}
+		return v.Tailnet
+	}).(pulumi.StringPtrOutput)
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecService struct {
+	// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+	// cloud providers to ensure IP addresses rather than DNS names are ignored.
+	Annotations map[string]string `pulumi:"annotations"`
+}
+
+// PeerRelaySpecServiceInput is an input type that accepts PeerRelaySpecServiceArgs and PeerRelaySpecServiceOutput values.
+// You can construct a concrete instance of `PeerRelaySpecServiceInput` via:
+//
+//	PeerRelaySpecServiceArgs{...}
+type PeerRelaySpecServiceInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecServiceOutput() PeerRelaySpecServiceOutput
+	ToPeerRelaySpecServiceOutputWithContext(context.Context) PeerRelaySpecServiceOutput
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecServiceArgs struct {
+	// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+	// cloud providers to ensure IP addresses rather than DNS names are ignored.
+	Annotations pulumi.StringMapInput `pulumi:"annotations"`
+}
+
+func (PeerRelaySpecServiceArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecService)(nil)).Elem()
+}
+
+func (i PeerRelaySpecServiceArgs) ToPeerRelaySpecServiceOutput() PeerRelaySpecServiceOutput {
+	return i.ToPeerRelaySpecServiceOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecServiceArgs) ToPeerRelaySpecServiceOutputWithContext(ctx context.Context) PeerRelaySpecServiceOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServiceOutput)
+}
+
+func (i PeerRelaySpecServiceArgs) ToPeerRelaySpecServicePtrOutput() PeerRelaySpecServicePtrOutput {
+	return i.ToPeerRelaySpecServicePtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecServiceArgs) ToPeerRelaySpecServicePtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServiceOutput).ToPeerRelaySpecServicePtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecServicePtrInput is an input type that accepts PeerRelaySpecServiceArgs, PeerRelaySpecServicePtr and PeerRelaySpecServicePtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecServicePtrInput` via:
+//
+//	        PeerRelaySpecServiceArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecServicePtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecServicePtrOutput() PeerRelaySpecServicePtrOutput
+	ToPeerRelaySpecServicePtrOutputWithContext(context.Context) PeerRelaySpecServicePtrOutput
+}
+
+type peerRelaySpecServicePtrType PeerRelaySpecServiceArgs
+
+func PeerRelaySpecServicePtr(v *PeerRelaySpecServiceArgs) PeerRelaySpecServicePtrInput {
+	return (*peerRelaySpecServicePtrType)(v)
+}
+
+func (*peerRelaySpecServicePtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecService)(nil)).Elem()
+}
+
+func (i *peerRelaySpecServicePtrType) ToPeerRelaySpecServicePtrOutput() PeerRelaySpecServicePtrOutput {
+	return i.ToPeerRelaySpecServicePtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecServicePtrType) ToPeerRelaySpecServicePtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServicePtrOutput)
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecServiceOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecServiceOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecService)(nil)).Elem()
+}
+
+func (o PeerRelaySpecServiceOutput) ToPeerRelaySpecServiceOutput() PeerRelaySpecServiceOutput {
+	return o
+}
+
+func (o PeerRelaySpecServiceOutput) ToPeerRelaySpecServiceOutputWithContext(ctx context.Context) PeerRelaySpecServiceOutput {
+	return o
+}
+
+func (o PeerRelaySpecServiceOutput) ToPeerRelaySpecServicePtrOutput() PeerRelaySpecServicePtrOutput {
+	return o.ToPeerRelaySpecServicePtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecServiceOutput) ToPeerRelaySpecServicePtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpecService) *PeerRelaySpecService {
+		return &v
+	}).(PeerRelaySpecServicePtrOutput)
+}
+
+// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+// cloud providers to ensure IP addresses rather than DNS names are ignored.
+func (o PeerRelaySpecServiceOutput) Annotations() pulumi.StringMapOutput {
+	return o.ApplyT(func(v PeerRelaySpecService) map[string]string { return v.Annotations }).(pulumi.StringMapOutput)
+}
+
+type PeerRelaySpecServicePtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecServicePtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecService)(nil)).Elem()
+}
+
+func (o PeerRelaySpecServicePtrOutput) ToPeerRelaySpecServicePtrOutput() PeerRelaySpecServicePtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePtrOutput) ToPeerRelaySpecServicePtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePtrOutput) Elem() PeerRelaySpecServiceOutput {
+	return o.ApplyT(func(v *PeerRelaySpecService) PeerRelaySpecService {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpecService
+		return ret
+	}).(PeerRelaySpecServiceOutput)
+}
+
+// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+// cloud providers to ensure IP addresses rather than DNS names are ignored.
+func (o PeerRelaySpecServicePtrOutput) Annotations() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *PeerRelaySpecService) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.Annotations
+	}).(pulumi.StringMapOutput)
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecServicePatch struct {
+	// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+	// cloud providers to ensure IP addresses rather than DNS names are ignored.
+	Annotations map[string]string `pulumi:"annotations"`
+}
+
+// PeerRelaySpecServicePatchInput is an input type that accepts PeerRelaySpecServicePatchArgs and PeerRelaySpecServicePatchOutput values.
+// You can construct a concrete instance of `PeerRelaySpecServicePatchInput` via:
+//
+//	PeerRelaySpecServicePatchArgs{...}
+type PeerRelaySpecServicePatchInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecServicePatchOutput() PeerRelaySpecServicePatchOutput
+	ToPeerRelaySpecServicePatchOutputWithContext(context.Context) PeerRelaySpecServicePatchOutput
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecServicePatchArgs struct {
+	// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+	// cloud providers to ensure IP addresses rather than DNS names are ignored.
+	Annotations pulumi.StringMapInput `pulumi:"annotations"`
+}
+
+func (PeerRelaySpecServicePatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecServicePatch)(nil)).Elem()
+}
+
+func (i PeerRelaySpecServicePatchArgs) ToPeerRelaySpecServicePatchOutput() PeerRelaySpecServicePatchOutput {
+	return i.ToPeerRelaySpecServicePatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecServicePatchArgs) ToPeerRelaySpecServicePatchOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServicePatchOutput)
+}
+
+func (i PeerRelaySpecServicePatchArgs) ToPeerRelaySpecServicePatchPtrOutput() PeerRelaySpecServicePatchPtrOutput {
+	return i.ToPeerRelaySpecServicePatchPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelaySpecServicePatchArgs) ToPeerRelaySpecServicePatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServicePatchOutput).ToPeerRelaySpecServicePatchPtrOutputWithContext(ctx)
+}
+
+// PeerRelaySpecServicePatchPtrInput is an input type that accepts PeerRelaySpecServicePatchArgs, PeerRelaySpecServicePatchPtr and PeerRelaySpecServicePatchPtrOutput values.
+// You can construct a concrete instance of `PeerRelaySpecServicePatchPtrInput` via:
+//
+//	        PeerRelaySpecServicePatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelaySpecServicePatchPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelaySpecServicePatchPtrOutput() PeerRelaySpecServicePatchPtrOutput
+	ToPeerRelaySpecServicePatchPtrOutputWithContext(context.Context) PeerRelaySpecServicePatchPtrOutput
+}
+
+type peerRelaySpecServicePatchPtrType PeerRelaySpecServicePatchArgs
+
+func PeerRelaySpecServicePatchPtr(v *PeerRelaySpecServicePatchArgs) PeerRelaySpecServicePatchPtrInput {
+	return (*peerRelaySpecServicePatchPtrType)(v)
+}
+
+func (*peerRelaySpecServicePatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecServicePatch)(nil)).Elem()
+}
+
+func (i *peerRelaySpecServicePatchPtrType) ToPeerRelaySpecServicePatchPtrOutput() PeerRelaySpecServicePatchPtrOutput {
+	return i.ToPeerRelaySpecServicePatchPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelaySpecServicePatchPtrType) ToPeerRelaySpecServicePatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelaySpecServicePatchPtrOutput)
+}
+
+// Service contains configuration values to modify the LoadBalancer service used to expose the peer relay.
+type PeerRelaySpecServicePatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecServicePatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelaySpecServicePatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecServicePatchOutput) ToPeerRelaySpecServicePatchOutput() PeerRelaySpecServicePatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePatchOutput) ToPeerRelaySpecServicePatchOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePatchOutput) ToPeerRelaySpecServicePatchPtrOutput() PeerRelaySpecServicePatchPtrOutput {
+	return o.ToPeerRelaySpecServicePatchPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelaySpecServicePatchOutput) ToPeerRelaySpecServicePatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelaySpecServicePatch) *PeerRelaySpecServicePatch {
+		return &v
+	}).(PeerRelaySpecServicePatchPtrOutput)
+}
+
+// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+// cloud providers to ensure IP addresses rather than DNS names are ignored.
+func (o PeerRelaySpecServicePatchOutput) Annotations() pulumi.StringMapOutput {
+	return o.ApplyT(func(v PeerRelaySpecServicePatch) map[string]string { return v.Annotations }).(pulumi.StringMapOutput)
+}
+
+type PeerRelaySpecServicePatchPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelaySpecServicePatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelaySpecServicePatch)(nil)).Elem()
+}
+
+func (o PeerRelaySpecServicePatchPtrOutput) ToPeerRelaySpecServicePatchPtrOutput() PeerRelaySpecServicePatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePatchPtrOutput) ToPeerRelaySpecServicePatchPtrOutputWithContext(ctx context.Context) PeerRelaySpecServicePatchPtrOutput {
+	return o
+}
+
+func (o PeerRelaySpecServicePatchPtrOutput) Elem() PeerRelaySpecServicePatchOutput {
+	return o.ApplyT(func(v *PeerRelaySpecServicePatch) PeerRelaySpecServicePatch {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelaySpecServicePatch
+		return ret
+	}).(PeerRelaySpecServicePatchOutput)
+}
+
+// Annotations to apply to the LoadBalancer service. Any annotations that conflict with those used by known
+// cloud providers to ensure IP addresses rather than DNS names are ignored.
+func (o PeerRelaySpecServicePatchPtrOutput) Annotations() pulumi.StringMapOutput {
+	return o.ApplyT(func(v *PeerRelaySpecServicePatch) map[string]string {
+		if v == nil {
+			return nil
+		}
+		return v.Annotations
+	}).(pulumi.StringMapOutput)
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatus struct {
+	Conditions []PeerRelayStatusConditions `pulumi:"conditions"`
+	// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+	// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+	// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+	// and every one of them is listed.
+	Endpoints []PeerRelayStatusEndpoints `pulumi:"endpoints"`
+}
+
+// PeerRelayStatusInput is an input type that accepts PeerRelayStatusArgs and PeerRelayStatusOutput values.
+// You can construct a concrete instance of `PeerRelayStatusInput` via:
+//
+//	PeerRelayStatusArgs{...}
+type PeerRelayStatusInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusOutput() PeerRelayStatusOutput
+	ToPeerRelayStatusOutputWithContext(context.Context) PeerRelayStatusOutput
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatusArgs struct {
+	Conditions PeerRelayStatusConditionsArrayInput `pulumi:"conditions"`
+	// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+	// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+	// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+	// and every one of them is listed.
+	Endpoints PeerRelayStatusEndpointsArrayInput `pulumi:"endpoints"`
+}
+
+func (PeerRelayStatusArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatus)(nil)).Elem()
+}
+
+func (i PeerRelayStatusArgs) ToPeerRelayStatusOutput() PeerRelayStatusOutput {
+	return i.ToPeerRelayStatusOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusArgs) ToPeerRelayStatusOutputWithContext(ctx context.Context) PeerRelayStatusOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusOutput)
+}
+
+func (i PeerRelayStatusArgs) ToPeerRelayStatusPtrOutput() PeerRelayStatusPtrOutput {
+	return i.ToPeerRelayStatusPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusArgs) ToPeerRelayStatusPtrOutputWithContext(ctx context.Context) PeerRelayStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusOutput).ToPeerRelayStatusPtrOutputWithContext(ctx)
+}
+
+// PeerRelayStatusPtrInput is an input type that accepts PeerRelayStatusArgs, PeerRelayStatusPtr and PeerRelayStatusPtrOutput values.
+// You can construct a concrete instance of `PeerRelayStatusPtrInput` via:
+//
+//	        PeerRelayStatusArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelayStatusPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusPtrOutput() PeerRelayStatusPtrOutput
+	ToPeerRelayStatusPtrOutputWithContext(context.Context) PeerRelayStatusPtrOutput
+}
+
+type peerRelayStatusPtrType PeerRelayStatusArgs
+
+func PeerRelayStatusPtr(v *PeerRelayStatusArgs) PeerRelayStatusPtrInput {
+	return (*peerRelayStatusPtrType)(v)
+}
+
+func (*peerRelayStatusPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelayStatus)(nil)).Elem()
+}
+
+func (i *peerRelayStatusPtrType) ToPeerRelayStatusPtrOutput() PeerRelayStatusPtrOutput {
+	return i.ToPeerRelayStatusPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelayStatusPtrType) ToPeerRelayStatusPtrOutputWithContext(ctx context.Context) PeerRelayStatusPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusPtrOutput)
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatusOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatus)(nil)).Elem()
+}
+
+func (o PeerRelayStatusOutput) ToPeerRelayStatusOutput() PeerRelayStatusOutput {
+	return o
+}
+
+func (o PeerRelayStatusOutput) ToPeerRelayStatusOutputWithContext(ctx context.Context) PeerRelayStatusOutput {
+	return o
+}
+
+func (o PeerRelayStatusOutput) ToPeerRelayStatusPtrOutput() PeerRelayStatusPtrOutput {
+	return o.ToPeerRelayStatusPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelayStatusOutput) ToPeerRelayStatusPtrOutputWithContext(ctx context.Context) PeerRelayStatusPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelayStatus) *PeerRelayStatus {
+		return &v
+	}).(PeerRelayStatusPtrOutput)
+}
+
+func (o PeerRelayStatusOutput) Conditions() PeerRelayStatusConditionsArrayOutput {
+	return o.ApplyT(func(v PeerRelayStatus) []PeerRelayStatusConditions { return v.Conditions }).(PeerRelayStatusConditionsArrayOutput)
+}
+
+// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+// and every one of them is listed.
+func (o PeerRelayStatusOutput) Endpoints() PeerRelayStatusEndpointsArrayOutput {
+	return o.ApplyT(func(v PeerRelayStatus) []PeerRelayStatusEndpoints { return v.Endpoints }).(PeerRelayStatusEndpointsArrayOutput)
+}
+
+type PeerRelayStatusPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelayStatus)(nil)).Elem()
+}
+
+func (o PeerRelayStatusPtrOutput) ToPeerRelayStatusPtrOutput() PeerRelayStatusPtrOutput {
+	return o
+}
+
+func (o PeerRelayStatusPtrOutput) ToPeerRelayStatusPtrOutputWithContext(ctx context.Context) PeerRelayStatusPtrOutput {
+	return o
+}
+
+func (o PeerRelayStatusPtrOutput) Elem() PeerRelayStatusOutput {
+	return o.ApplyT(func(v *PeerRelayStatus) PeerRelayStatus {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelayStatus
+		return ret
+	}).(PeerRelayStatusOutput)
+}
+
+func (o PeerRelayStatusPtrOutput) Conditions() PeerRelayStatusConditionsArrayOutput {
+	return o.ApplyT(func(v *PeerRelayStatus) []PeerRelayStatusConditions {
+		if v == nil {
+			return nil
+		}
+		return v.Conditions
+	}).(PeerRelayStatusConditionsArrayOutput)
+}
+
+// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+// and every one of them is listed.
+func (o PeerRelayStatusPtrOutput) Endpoints() PeerRelayStatusEndpointsArrayOutput {
+	return o.ApplyT(func(v *PeerRelayStatus) []PeerRelayStatusEndpoints {
+		if v == nil {
+			return nil
+		}
+		return v.Endpoints
+	}).(PeerRelayStatusEndpointsArrayOutput)
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditions struct {
+	// lastTransitionTime is the last time the condition transitioned from one status to another.
+	// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+	LastTransitionTime *string `pulumi:"lastTransitionTime"`
+	// message is a human readable message indicating details about the transition.
+	// This may be an empty string.
+	Message *string `pulumi:"message"`
+	// observedGeneration represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	ObservedGeneration *int `pulumi:"observedGeneration"`
+	// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+	// Producers of specific condition types may define expected values and meanings for this field,
+	// and whether the values are considered a guaranteed API.
+	// The value should be a CamelCase string.
+	// This field may not be empty.
+	Reason *string `pulumi:"reason"`
+	// status of the condition, one of True, False, Unknown.
+	Status *string `pulumi:"status"`
+	// type of condition in CamelCase or in foo.example.com/CamelCase.
+	Type *string `pulumi:"type"`
+}
+
+// PeerRelayStatusConditionsInput is an input type that accepts PeerRelayStatusConditionsArgs and PeerRelayStatusConditionsOutput values.
+// You can construct a concrete instance of `PeerRelayStatusConditionsInput` via:
+//
+//	PeerRelayStatusConditionsArgs{...}
+type PeerRelayStatusConditionsInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusConditionsOutput() PeerRelayStatusConditionsOutput
+	ToPeerRelayStatusConditionsOutputWithContext(context.Context) PeerRelayStatusConditionsOutput
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditionsArgs struct {
+	// lastTransitionTime is the last time the condition transitioned from one status to another.
+	// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+	LastTransitionTime pulumi.StringPtrInput `pulumi:"lastTransitionTime"`
+	// message is a human readable message indicating details about the transition.
+	// This may be an empty string.
+	Message pulumi.StringPtrInput `pulumi:"message"`
+	// observedGeneration represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	ObservedGeneration pulumi.IntPtrInput `pulumi:"observedGeneration"`
+	// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+	// Producers of specific condition types may define expected values and meanings for this field,
+	// and whether the values are considered a guaranteed API.
+	// The value should be a CamelCase string.
+	// This field may not be empty.
+	Reason pulumi.StringPtrInput `pulumi:"reason"`
+	// status of the condition, one of True, False, Unknown.
+	Status pulumi.StringPtrInput `pulumi:"status"`
+	// type of condition in CamelCase or in foo.example.com/CamelCase.
+	Type pulumi.StringPtrInput `pulumi:"type"`
+}
+
+func (PeerRelayStatusConditionsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusConditions)(nil)).Elem()
+}
+
+func (i PeerRelayStatusConditionsArgs) ToPeerRelayStatusConditionsOutput() PeerRelayStatusConditionsOutput {
+	return i.ToPeerRelayStatusConditionsOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusConditionsArgs) ToPeerRelayStatusConditionsOutputWithContext(ctx context.Context) PeerRelayStatusConditionsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusConditionsOutput)
+}
+
+// PeerRelayStatusConditionsArrayInput is an input type that accepts PeerRelayStatusConditionsArray and PeerRelayStatusConditionsArrayOutput values.
+// You can construct a concrete instance of `PeerRelayStatusConditionsArrayInput` via:
+//
+//	PeerRelayStatusConditionsArray{ PeerRelayStatusConditionsArgs{...} }
+type PeerRelayStatusConditionsArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusConditionsArrayOutput() PeerRelayStatusConditionsArrayOutput
+	ToPeerRelayStatusConditionsArrayOutputWithContext(context.Context) PeerRelayStatusConditionsArrayOutput
+}
+
+type PeerRelayStatusConditionsArray []PeerRelayStatusConditionsInput
+
+func (PeerRelayStatusConditionsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusConditions)(nil)).Elem()
+}
+
+func (i PeerRelayStatusConditionsArray) ToPeerRelayStatusConditionsArrayOutput() PeerRelayStatusConditionsArrayOutput {
+	return i.ToPeerRelayStatusConditionsArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusConditionsArray) ToPeerRelayStatusConditionsArrayOutputWithContext(ctx context.Context) PeerRelayStatusConditionsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusConditionsArrayOutput)
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditionsOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusConditionsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusConditions)(nil)).Elem()
+}
+
+func (o PeerRelayStatusConditionsOutput) ToPeerRelayStatusConditionsOutput() PeerRelayStatusConditionsOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsOutput) ToPeerRelayStatusConditionsOutputWithContext(ctx context.Context) PeerRelayStatusConditionsOutput {
+	return o
+}
+
+// lastTransitionTime is the last time the condition transitioned from one status to another.
+// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+func (o PeerRelayStatusConditionsOutput) LastTransitionTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *string { return v.LastTransitionTime }).(pulumi.StringPtrOutput)
+}
+
+// message is a human readable message indicating details about the transition.
+// This may be an empty string.
+func (o PeerRelayStatusConditionsOutput) Message() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *string { return v.Message }).(pulumi.StringPtrOutput)
+}
+
+// observedGeneration represents the .metadata.generation that the condition was set based upon.
+// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+// with respect to the current state of the instance.
+func (o PeerRelayStatusConditionsOutput) ObservedGeneration() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *int { return v.ObservedGeneration }).(pulumi.IntPtrOutput)
+}
+
+// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+// Producers of specific condition types may define expected values and meanings for this field,
+// and whether the values are considered a guaranteed API.
+// The value should be a CamelCase string.
+// This field may not be empty.
+func (o PeerRelayStatusConditionsOutput) Reason() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *string { return v.Reason }).(pulumi.StringPtrOutput)
+}
+
+// status of the condition, one of True, False, Unknown.
+func (o PeerRelayStatusConditionsOutput) Status() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *string { return v.Status }).(pulumi.StringPtrOutput)
+}
+
+// type of condition in CamelCase or in foo.example.com/CamelCase.
+func (o PeerRelayStatusConditionsOutput) Type() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditions) *string { return v.Type }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelayStatusConditionsArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusConditionsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusConditions)(nil)).Elem()
+}
+
+func (o PeerRelayStatusConditionsArrayOutput) ToPeerRelayStatusConditionsArrayOutput() PeerRelayStatusConditionsArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsArrayOutput) ToPeerRelayStatusConditionsArrayOutputWithContext(ctx context.Context) PeerRelayStatusConditionsArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsArrayOutput) Index(i pulumi.IntInput) PeerRelayStatusConditionsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelayStatusConditions {
+		return vs[0].([]PeerRelayStatusConditions)[vs[1].(int)]
+	}).(PeerRelayStatusConditionsOutput)
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditionsPatch struct {
+	// lastTransitionTime is the last time the condition transitioned from one status to another.
+	// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+	LastTransitionTime *string `pulumi:"lastTransitionTime"`
+	// message is a human readable message indicating details about the transition.
+	// This may be an empty string.
+	Message *string `pulumi:"message"`
+	// observedGeneration represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	ObservedGeneration *int `pulumi:"observedGeneration"`
+	// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+	// Producers of specific condition types may define expected values and meanings for this field,
+	// and whether the values are considered a guaranteed API.
+	// The value should be a CamelCase string.
+	// This field may not be empty.
+	Reason *string `pulumi:"reason"`
+	// status of the condition, one of True, False, Unknown.
+	Status *string `pulumi:"status"`
+	// type of condition in CamelCase or in foo.example.com/CamelCase.
+	Type *string `pulumi:"type"`
+}
+
+// PeerRelayStatusConditionsPatchInput is an input type that accepts PeerRelayStatusConditionsPatchArgs and PeerRelayStatusConditionsPatchOutput values.
+// You can construct a concrete instance of `PeerRelayStatusConditionsPatchInput` via:
+//
+//	PeerRelayStatusConditionsPatchArgs{...}
+type PeerRelayStatusConditionsPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusConditionsPatchOutput() PeerRelayStatusConditionsPatchOutput
+	ToPeerRelayStatusConditionsPatchOutputWithContext(context.Context) PeerRelayStatusConditionsPatchOutput
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditionsPatchArgs struct {
+	// lastTransitionTime is the last time the condition transitioned from one status to another.
+	// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+	LastTransitionTime pulumi.StringPtrInput `pulumi:"lastTransitionTime"`
+	// message is a human readable message indicating details about the transition.
+	// This may be an empty string.
+	Message pulumi.StringPtrInput `pulumi:"message"`
+	// observedGeneration represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	ObservedGeneration pulumi.IntPtrInput `pulumi:"observedGeneration"`
+	// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+	// Producers of specific condition types may define expected values and meanings for this field,
+	// and whether the values are considered a guaranteed API.
+	// The value should be a CamelCase string.
+	// This field may not be empty.
+	Reason pulumi.StringPtrInput `pulumi:"reason"`
+	// status of the condition, one of True, False, Unknown.
+	Status pulumi.StringPtrInput `pulumi:"status"`
+	// type of condition in CamelCase or in foo.example.com/CamelCase.
+	Type pulumi.StringPtrInput `pulumi:"type"`
+}
+
+func (PeerRelayStatusConditionsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusConditionsPatch)(nil)).Elem()
+}
+
+func (i PeerRelayStatusConditionsPatchArgs) ToPeerRelayStatusConditionsPatchOutput() PeerRelayStatusConditionsPatchOutput {
+	return i.ToPeerRelayStatusConditionsPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusConditionsPatchArgs) ToPeerRelayStatusConditionsPatchOutputWithContext(ctx context.Context) PeerRelayStatusConditionsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusConditionsPatchOutput)
+}
+
+// PeerRelayStatusConditionsPatchArrayInput is an input type that accepts PeerRelayStatusConditionsPatchArray and PeerRelayStatusConditionsPatchArrayOutput values.
+// You can construct a concrete instance of `PeerRelayStatusConditionsPatchArrayInput` via:
+//
+//	PeerRelayStatusConditionsPatchArray{ PeerRelayStatusConditionsPatchArgs{...} }
+type PeerRelayStatusConditionsPatchArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusConditionsPatchArrayOutput() PeerRelayStatusConditionsPatchArrayOutput
+	ToPeerRelayStatusConditionsPatchArrayOutputWithContext(context.Context) PeerRelayStatusConditionsPatchArrayOutput
+}
+
+type PeerRelayStatusConditionsPatchArray []PeerRelayStatusConditionsPatchInput
+
+func (PeerRelayStatusConditionsPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusConditionsPatch)(nil)).Elem()
+}
+
+func (i PeerRelayStatusConditionsPatchArray) ToPeerRelayStatusConditionsPatchArrayOutput() PeerRelayStatusConditionsPatchArrayOutput {
+	return i.ToPeerRelayStatusConditionsPatchArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusConditionsPatchArray) ToPeerRelayStatusConditionsPatchArrayOutputWithContext(ctx context.Context) PeerRelayStatusConditionsPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusConditionsPatchArrayOutput)
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+type PeerRelayStatusConditionsPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusConditionsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusConditionsPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusConditionsPatchOutput) ToPeerRelayStatusConditionsPatchOutput() PeerRelayStatusConditionsPatchOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsPatchOutput) ToPeerRelayStatusConditionsPatchOutputWithContext(ctx context.Context) PeerRelayStatusConditionsPatchOutput {
+	return o
+}
+
+// lastTransitionTime is the last time the condition transitioned from one status to another.
+// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+func (o PeerRelayStatusConditionsPatchOutput) LastTransitionTime() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *string { return v.LastTransitionTime }).(pulumi.StringPtrOutput)
+}
+
+// message is a human readable message indicating details about the transition.
+// This may be an empty string.
+func (o PeerRelayStatusConditionsPatchOutput) Message() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *string { return v.Message }).(pulumi.StringPtrOutput)
+}
+
+// observedGeneration represents the .metadata.generation that the condition was set based upon.
+// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+// with respect to the current state of the instance.
+func (o PeerRelayStatusConditionsPatchOutput) ObservedGeneration() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *int { return v.ObservedGeneration }).(pulumi.IntPtrOutput)
+}
+
+// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+// Producers of specific condition types may define expected values and meanings for this field,
+// and whether the values are considered a guaranteed API.
+// The value should be a CamelCase string.
+// This field may not be empty.
+func (o PeerRelayStatusConditionsPatchOutput) Reason() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *string { return v.Reason }).(pulumi.StringPtrOutput)
+}
+
+// status of the condition, one of True, False, Unknown.
+func (o PeerRelayStatusConditionsPatchOutput) Status() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *string { return v.Status }).(pulumi.StringPtrOutput)
+}
+
+// type of condition in CamelCase or in foo.example.com/CamelCase.
+func (o PeerRelayStatusConditionsPatchOutput) Type() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusConditionsPatch) *string { return v.Type }).(pulumi.StringPtrOutput)
+}
+
+type PeerRelayStatusConditionsPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusConditionsPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusConditionsPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusConditionsPatchArrayOutput) ToPeerRelayStatusConditionsPatchArrayOutput() PeerRelayStatusConditionsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsPatchArrayOutput) ToPeerRelayStatusConditionsPatchArrayOutputWithContext(ctx context.Context) PeerRelayStatusConditionsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusConditionsPatchArrayOutput) Index(i pulumi.IntInput) PeerRelayStatusConditionsPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelayStatusConditionsPatch {
+		return vs[0].([]PeerRelayStatusConditionsPatch)[vs[1].(int)]
+	}).(PeerRelayStatusConditionsPatchOutput)
+}
+
+type PeerRelayStatusEndpoints struct {
+	// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+	// Peers reach this relay by connecting to Address:Port over UDP.
+	Address *string `pulumi:"address"`
+	// Port is the UDP port the peer relay listens on.
+	Port *int `pulumi:"port"`
+	// Replica is the zero-based index of the peer relay replica this endpoint targets.
+	Replica *int `pulumi:"replica"`
+}
+
+// PeerRelayStatusEndpointsInput is an input type that accepts PeerRelayStatusEndpointsArgs and PeerRelayStatusEndpointsOutput values.
+// You can construct a concrete instance of `PeerRelayStatusEndpointsInput` via:
+//
+//	PeerRelayStatusEndpointsArgs{...}
+type PeerRelayStatusEndpointsInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusEndpointsOutput() PeerRelayStatusEndpointsOutput
+	ToPeerRelayStatusEndpointsOutputWithContext(context.Context) PeerRelayStatusEndpointsOutput
+}
+
+type PeerRelayStatusEndpointsArgs struct {
+	// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+	// Peers reach this relay by connecting to Address:Port over UDP.
+	Address pulumi.StringPtrInput `pulumi:"address"`
+	// Port is the UDP port the peer relay listens on.
+	Port pulumi.IntPtrInput `pulumi:"port"`
+	// Replica is the zero-based index of the peer relay replica this endpoint targets.
+	Replica pulumi.IntPtrInput `pulumi:"replica"`
+}
+
+func (PeerRelayStatusEndpointsArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusEndpoints)(nil)).Elem()
+}
+
+func (i PeerRelayStatusEndpointsArgs) ToPeerRelayStatusEndpointsOutput() PeerRelayStatusEndpointsOutput {
+	return i.ToPeerRelayStatusEndpointsOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusEndpointsArgs) ToPeerRelayStatusEndpointsOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusEndpointsOutput)
+}
+
+// PeerRelayStatusEndpointsArrayInput is an input type that accepts PeerRelayStatusEndpointsArray and PeerRelayStatusEndpointsArrayOutput values.
+// You can construct a concrete instance of `PeerRelayStatusEndpointsArrayInput` via:
+//
+//	PeerRelayStatusEndpointsArray{ PeerRelayStatusEndpointsArgs{...} }
+type PeerRelayStatusEndpointsArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusEndpointsArrayOutput() PeerRelayStatusEndpointsArrayOutput
+	ToPeerRelayStatusEndpointsArrayOutputWithContext(context.Context) PeerRelayStatusEndpointsArrayOutput
+}
+
+type PeerRelayStatusEndpointsArray []PeerRelayStatusEndpointsInput
+
+func (PeerRelayStatusEndpointsArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusEndpoints)(nil)).Elem()
+}
+
+func (i PeerRelayStatusEndpointsArray) ToPeerRelayStatusEndpointsArrayOutput() PeerRelayStatusEndpointsArrayOutput {
+	return i.ToPeerRelayStatusEndpointsArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusEndpointsArray) ToPeerRelayStatusEndpointsArrayOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusEndpointsArrayOutput)
+}
+
+type PeerRelayStatusEndpointsOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusEndpointsOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusEndpoints)(nil)).Elem()
+}
+
+func (o PeerRelayStatusEndpointsOutput) ToPeerRelayStatusEndpointsOutput() PeerRelayStatusEndpointsOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsOutput) ToPeerRelayStatusEndpointsOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsOutput {
+	return o
+}
+
+// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+// Peers reach this relay by connecting to Address:Port over UDP.
+func (o PeerRelayStatusEndpointsOutput) Address() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpoints) *string { return v.Address }).(pulumi.StringPtrOutput)
+}
+
+// Port is the UDP port the peer relay listens on.
+func (o PeerRelayStatusEndpointsOutput) Port() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpoints) *int { return v.Port }).(pulumi.IntPtrOutput)
+}
+
+// Replica is the zero-based index of the peer relay replica this endpoint targets.
+func (o PeerRelayStatusEndpointsOutput) Replica() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpoints) *int { return v.Replica }).(pulumi.IntPtrOutput)
+}
+
+type PeerRelayStatusEndpointsArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusEndpointsArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusEndpoints)(nil)).Elem()
+}
+
+func (o PeerRelayStatusEndpointsArrayOutput) ToPeerRelayStatusEndpointsArrayOutput() PeerRelayStatusEndpointsArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsArrayOutput) ToPeerRelayStatusEndpointsArrayOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsArrayOutput) Index(i pulumi.IntInput) PeerRelayStatusEndpointsOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelayStatusEndpoints {
+		return vs[0].([]PeerRelayStatusEndpoints)[vs[1].(int)]
+	}).(PeerRelayStatusEndpointsOutput)
+}
+
+type PeerRelayStatusEndpointsPatch struct {
+	// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+	// Peers reach this relay by connecting to Address:Port over UDP.
+	Address *string `pulumi:"address"`
+	// Port is the UDP port the peer relay listens on.
+	Port *int `pulumi:"port"`
+	// Replica is the zero-based index of the peer relay replica this endpoint targets.
+	Replica *int `pulumi:"replica"`
+}
+
+// PeerRelayStatusEndpointsPatchInput is an input type that accepts PeerRelayStatusEndpointsPatchArgs and PeerRelayStatusEndpointsPatchOutput values.
+// You can construct a concrete instance of `PeerRelayStatusEndpointsPatchInput` via:
+//
+//	PeerRelayStatusEndpointsPatchArgs{...}
+type PeerRelayStatusEndpointsPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusEndpointsPatchOutput() PeerRelayStatusEndpointsPatchOutput
+	ToPeerRelayStatusEndpointsPatchOutputWithContext(context.Context) PeerRelayStatusEndpointsPatchOutput
+}
+
+type PeerRelayStatusEndpointsPatchArgs struct {
+	// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+	// Peers reach this relay by connecting to Address:Port over UDP.
+	Address pulumi.StringPtrInput `pulumi:"address"`
+	// Port is the UDP port the peer relay listens on.
+	Port pulumi.IntPtrInput `pulumi:"port"`
+	// Replica is the zero-based index of the peer relay replica this endpoint targets.
+	Replica pulumi.IntPtrInput `pulumi:"replica"`
+}
+
+func (PeerRelayStatusEndpointsPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusEndpointsPatch)(nil)).Elem()
+}
+
+func (i PeerRelayStatusEndpointsPatchArgs) ToPeerRelayStatusEndpointsPatchOutput() PeerRelayStatusEndpointsPatchOutput {
+	return i.ToPeerRelayStatusEndpointsPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusEndpointsPatchArgs) ToPeerRelayStatusEndpointsPatchOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusEndpointsPatchOutput)
+}
+
+// PeerRelayStatusEndpointsPatchArrayInput is an input type that accepts PeerRelayStatusEndpointsPatchArray and PeerRelayStatusEndpointsPatchArrayOutput values.
+// You can construct a concrete instance of `PeerRelayStatusEndpointsPatchArrayInput` via:
+//
+//	PeerRelayStatusEndpointsPatchArray{ PeerRelayStatusEndpointsPatchArgs{...} }
+type PeerRelayStatusEndpointsPatchArrayInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusEndpointsPatchArrayOutput() PeerRelayStatusEndpointsPatchArrayOutput
+	ToPeerRelayStatusEndpointsPatchArrayOutputWithContext(context.Context) PeerRelayStatusEndpointsPatchArrayOutput
+}
+
+type PeerRelayStatusEndpointsPatchArray []PeerRelayStatusEndpointsPatchInput
+
+func (PeerRelayStatusEndpointsPatchArray) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusEndpointsPatch)(nil)).Elem()
+}
+
+func (i PeerRelayStatusEndpointsPatchArray) ToPeerRelayStatusEndpointsPatchArrayOutput() PeerRelayStatusEndpointsPatchArrayOutput {
+	return i.ToPeerRelayStatusEndpointsPatchArrayOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusEndpointsPatchArray) ToPeerRelayStatusEndpointsPatchArrayOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsPatchArrayOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusEndpointsPatchArrayOutput)
+}
+
+type PeerRelayStatusEndpointsPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusEndpointsPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusEndpointsPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusEndpointsPatchOutput) ToPeerRelayStatusEndpointsPatchOutput() PeerRelayStatusEndpointsPatchOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsPatchOutput) ToPeerRelayStatusEndpointsPatchOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsPatchOutput {
+	return o
+}
+
+// Address is the public IP or hostname the cloud has allocated for this replica's LoadBalancer Service.
+// Peers reach this relay by connecting to Address:Port over UDP.
+func (o PeerRelayStatusEndpointsPatchOutput) Address() pulumi.StringPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpointsPatch) *string { return v.Address }).(pulumi.StringPtrOutput)
+}
+
+// Port is the UDP port the peer relay listens on.
+func (o PeerRelayStatusEndpointsPatchOutput) Port() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpointsPatch) *int { return v.Port }).(pulumi.IntPtrOutput)
+}
+
+// Replica is the zero-based index of the peer relay replica this endpoint targets.
+func (o PeerRelayStatusEndpointsPatchOutput) Replica() pulumi.IntPtrOutput {
+	return o.ApplyT(func(v PeerRelayStatusEndpointsPatch) *int { return v.Replica }).(pulumi.IntPtrOutput)
+}
+
+type PeerRelayStatusEndpointsPatchArrayOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusEndpointsPatchArrayOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*[]PeerRelayStatusEndpointsPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusEndpointsPatchArrayOutput) ToPeerRelayStatusEndpointsPatchArrayOutput() PeerRelayStatusEndpointsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsPatchArrayOutput) ToPeerRelayStatusEndpointsPatchArrayOutputWithContext(ctx context.Context) PeerRelayStatusEndpointsPatchArrayOutput {
+	return o
+}
+
+func (o PeerRelayStatusEndpointsPatchArrayOutput) Index(i pulumi.IntInput) PeerRelayStatusEndpointsPatchOutput {
+	return pulumi.All(o, i).ApplyT(func(vs []interface{}) PeerRelayStatusEndpointsPatch {
+		return vs[0].([]PeerRelayStatusEndpointsPatch)[vs[1].(int)]
+	}).(PeerRelayStatusEndpointsPatchOutput)
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatusPatch struct {
+	Conditions []PeerRelayStatusConditionsPatch `pulumi:"conditions"`
+	// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+	// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+	// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+	// and every one of them is listed.
+	Endpoints []PeerRelayStatusEndpointsPatch `pulumi:"endpoints"`
+}
+
+// PeerRelayStatusPatchInput is an input type that accepts PeerRelayStatusPatchArgs and PeerRelayStatusPatchOutput values.
+// You can construct a concrete instance of `PeerRelayStatusPatchInput` via:
+//
+//	PeerRelayStatusPatchArgs{...}
+type PeerRelayStatusPatchInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusPatchOutput() PeerRelayStatusPatchOutput
+	ToPeerRelayStatusPatchOutputWithContext(context.Context) PeerRelayStatusPatchOutput
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatusPatchArgs struct {
+	Conditions PeerRelayStatusConditionsPatchArrayInput `pulumi:"conditions"`
+	// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+	// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+	// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+	// and every one of them is listed.
+	Endpoints PeerRelayStatusEndpointsPatchArrayInput `pulumi:"endpoints"`
+}
+
+func (PeerRelayStatusPatchArgs) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusPatch)(nil)).Elem()
+}
+
+func (i PeerRelayStatusPatchArgs) ToPeerRelayStatusPatchOutput() PeerRelayStatusPatchOutput {
+	return i.ToPeerRelayStatusPatchOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusPatchArgs) ToPeerRelayStatusPatchOutputWithContext(ctx context.Context) PeerRelayStatusPatchOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusPatchOutput)
+}
+
+func (i PeerRelayStatusPatchArgs) ToPeerRelayStatusPatchPtrOutput() PeerRelayStatusPatchPtrOutput {
+	return i.ToPeerRelayStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i PeerRelayStatusPatchArgs) ToPeerRelayStatusPatchPtrOutputWithContext(ctx context.Context) PeerRelayStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusPatchOutput).ToPeerRelayStatusPatchPtrOutputWithContext(ctx)
+}
+
+// PeerRelayStatusPatchPtrInput is an input type that accepts PeerRelayStatusPatchArgs, PeerRelayStatusPatchPtr and PeerRelayStatusPatchPtrOutput values.
+// You can construct a concrete instance of `PeerRelayStatusPatchPtrInput` via:
+//
+//	        PeerRelayStatusPatchArgs{...}
+//
+//	or:
+//
+//	        nil
+type PeerRelayStatusPatchPtrInput interface {
+	pulumi.Input
+
+	ToPeerRelayStatusPatchPtrOutput() PeerRelayStatusPatchPtrOutput
+	ToPeerRelayStatusPatchPtrOutputWithContext(context.Context) PeerRelayStatusPatchPtrOutput
+}
+
+type peerRelayStatusPatchPtrType PeerRelayStatusPatchArgs
+
+func PeerRelayStatusPatchPtr(v *PeerRelayStatusPatchArgs) PeerRelayStatusPatchPtrInput {
+	return (*peerRelayStatusPatchPtrType)(v)
+}
+
+func (*peerRelayStatusPatchPtrType) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelayStatusPatch)(nil)).Elem()
+}
+
+func (i *peerRelayStatusPatchPtrType) ToPeerRelayStatusPatchPtrOutput() PeerRelayStatusPatchPtrOutput {
+	return i.ToPeerRelayStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (i *peerRelayStatusPatchPtrType) ToPeerRelayStatusPatchPtrOutputWithContext(ctx context.Context) PeerRelayStatusPatchPtrOutput {
+	return pulumi.ToOutputWithContext(ctx, i).(PeerRelayStatusPatchPtrOutput)
+}
+
+// Status describes the status of the PeerRelay. This is set
+// and managed by the Tailscale operator.
+type PeerRelayStatusPatchOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusPatchOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((*PeerRelayStatusPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusPatchOutput) ToPeerRelayStatusPatchOutput() PeerRelayStatusPatchOutput {
+	return o
+}
+
+func (o PeerRelayStatusPatchOutput) ToPeerRelayStatusPatchOutputWithContext(ctx context.Context) PeerRelayStatusPatchOutput {
+	return o
+}
+
+func (o PeerRelayStatusPatchOutput) ToPeerRelayStatusPatchPtrOutput() PeerRelayStatusPatchPtrOutput {
+	return o.ToPeerRelayStatusPatchPtrOutputWithContext(context.Background())
+}
+
+func (o PeerRelayStatusPatchOutput) ToPeerRelayStatusPatchPtrOutputWithContext(ctx context.Context) PeerRelayStatusPatchPtrOutput {
+	return o.ApplyTWithContext(ctx, func(_ context.Context, v PeerRelayStatusPatch) *PeerRelayStatusPatch {
+		return &v
+	}).(PeerRelayStatusPatchPtrOutput)
+}
+
+func (o PeerRelayStatusPatchOutput) Conditions() PeerRelayStatusConditionsPatchArrayOutput {
+	return o.ApplyT(func(v PeerRelayStatusPatch) []PeerRelayStatusConditionsPatch { return v.Conditions }).(PeerRelayStatusConditionsPatchArrayOutput)
+}
+
+// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+// and every one of them is listed.
+func (o PeerRelayStatusPatchOutput) Endpoints() PeerRelayStatusEndpointsPatchArrayOutput {
+	return o.ApplyT(func(v PeerRelayStatusPatch) []PeerRelayStatusEndpointsPatch { return v.Endpoints }).(PeerRelayStatusEndpointsPatchArrayOutput)
+}
+
+type PeerRelayStatusPatchPtrOutput struct{ *pulumi.OutputState }
+
+func (PeerRelayStatusPatchPtrOutput) ElementType() reflect.Type {
+	return reflect.TypeOf((**PeerRelayStatusPatch)(nil)).Elem()
+}
+
+func (o PeerRelayStatusPatchPtrOutput) ToPeerRelayStatusPatchPtrOutput() PeerRelayStatusPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelayStatusPatchPtrOutput) ToPeerRelayStatusPatchPtrOutputWithContext(ctx context.Context) PeerRelayStatusPatchPtrOutput {
+	return o
+}
+
+func (o PeerRelayStatusPatchPtrOutput) Elem() PeerRelayStatusPatchOutput {
+	return o.ApplyT(func(v *PeerRelayStatusPatch) PeerRelayStatusPatch {
+		if v != nil {
+			return *v
+		}
+		var ret PeerRelayStatusPatch
+		return ret
+	}).(PeerRelayStatusPatchOutput)
+}
+
+func (o PeerRelayStatusPatchPtrOutput) Conditions() PeerRelayStatusConditionsPatchArrayOutput {
+	return o.ApplyT(func(v *PeerRelayStatusPatch) []PeerRelayStatusConditionsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Conditions
+	}).(PeerRelayStatusConditionsPatchArrayOutput)
+}
+
+// Endpoints lists the public address:port pairs each peer relay replica is reachable on. Entries appear as the
+// underlying cloud provisions each Service. A replica has one entry per address its LoadBalancer Service was
+// given, which is usually one, but a load balancer spanning several availability zones has an address in each
+// and every one of them is listed.
+func (o PeerRelayStatusPatchPtrOutput) Endpoints() PeerRelayStatusEndpointsPatchArrayOutput {
+	return o.ApplyT(func(v *PeerRelayStatusPatch) []PeerRelayStatusEndpointsPatch {
+		if v == nil {
+			return nil
+		}
+		return v.Endpoints
+	}).(PeerRelayStatusEndpointsPatchArrayOutput)
+}
+
 // ProxyClass describes a set of configuration parameters that can be applied to
 // proxy resources created by the Tailscale Kubernetes operator.
 // To apply a given ProxyClass to resources created for a tailscale Ingress or
@@ -78578,10 +81489,13 @@ func (o TailnetSpecPtrOutput) LoginUrl() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentials struct {
-	// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-	// "client_secret".
+	// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+	// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+	// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+	// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+	// token. "client_secret" and "audience" are mutually exclusive.
 	SecretName *string `pulumi:"secretName"`
 }
 
@@ -78596,10 +81510,13 @@ type TailnetSpecCredentialsInput interface {
 	ToTailnetSpecCredentialsOutputWithContext(context.Context) TailnetSpecCredentialsOutput
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentialsArgs struct {
-	// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-	// "client_secret".
+	// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+	// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+	// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+	// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+	// token. "client_secret" and "audience" are mutually exclusive.
 	SecretName pulumi.StringPtrInput `pulumi:"secretName"`
 }
 
@@ -78656,7 +81573,7 @@ func (i *tailnetSpecCredentialsPtrType) ToTailnetSpecCredentialsPtrOutputWithCon
 	return pulumi.ToOutputWithContext(ctx, i).(TailnetSpecCredentialsPtrOutput)
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentialsOutput struct{ *pulumi.OutputState }
 
 func (TailnetSpecCredentialsOutput) ElementType() reflect.Type {
@@ -78681,8 +81598,11 @@ func (o TailnetSpecCredentialsOutput) ToTailnetSpecCredentialsPtrOutputWithConte
 	}).(TailnetSpecCredentialsPtrOutput)
 }
 
-// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-// "client_secret".
+// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+// token. "client_secret" and "audience" are mutually exclusive.
 func (o TailnetSpecCredentialsOutput) SecretName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v TailnetSpecCredentials) *string { return v.SecretName }).(pulumi.StringPtrOutput)
 }
@@ -78711,8 +81631,11 @@ func (o TailnetSpecCredentialsPtrOutput) Elem() TailnetSpecCredentialsOutput {
 	}).(TailnetSpecCredentialsOutput)
 }
 
-// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-// "client_secret".
+// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+// token. "client_secret" and "audience" are mutually exclusive.
 func (o TailnetSpecCredentialsPtrOutput) SecretName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TailnetSpecCredentials) *string {
 		if v == nil {
@@ -78722,10 +81645,13 @@ func (o TailnetSpecCredentialsPtrOutput) SecretName() pulumi.StringPtrOutput {
 	}).(pulumi.StringPtrOutput)
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentialsPatch struct {
-	// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-	// "client_secret".
+	// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+	// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+	// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+	// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+	// token. "client_secret" and "audience" are mutually exclusive.
 	SecretName *string `pulumi:"secretName"`
 }
 
@@ -78740,10 +81666,13 @@ type TailnetSpecCredentialsPatchInput interface {
 	ToTailnetSpecCredentialsPatchOutputWithContext(context.Context) TailnetSpecCredentialsPatchOutput
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentialsPatchArgs struct {
-	// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-	// "client_secret".
+	// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+	// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+	// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+	// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+	// token. "client_secret" and "audience" are mutually exclusive.
 	SecretName pulumi.StringPtrInput `pulumi:"secretName"`
 }
 
@@ -78800,7 +81729,7 @@ func (i *tailnetSpecCredentialsPatchPtrType) ToTailnetSpecCredentialsPatchPtrOut
 	return pulumi.ToOutputWithContext(ctx, i).(TailnetSpecCredentialsPatchPtrOutput)
 }
 
-// Denotes the location of the OAuth credentials to use for authenticating with this Tailnet.
+// Denotes the location of the credentials to use for authenticating with this Tailnet.
 type TailnetSpecCredentialsPatchOutput struct{ *pulumi.OutputState }
 
 func (TailnetSpecCredentialsPatchOutput) ElementType() reflect.Type {
@@ -78825,8 +81754,11 @@ func (o TailnetSpecCredentialsPatchOutput) ToTailnetSpecCredentialsPatchPtrOutpu
 	}).(TailnetSpecCredentialsPatchPtrOutput)
 }
 
-// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-// "client_secret".
+// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+// token. "client_secret" and "audience" are mutually exclusive.
 func (o TailnetSpecCredentialsPatchOutput) SecretName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v TailnetSpecCredentialsPatch) *string { return v.SecretName }).(pulumi.StringPtrOutput)
 }
@@ -78855,8 +81787,11 @@ func (o TailnetSpecCredentialsPatchPtrOutput) Elem() TailnetSpecCredentialsPatch
 	}).(TailnetSpecCredentialsPatchOutput)
 }
 
-// The name of the secret containing the OAuth credentials. This secret must contain two fields "client_id" and
-// "client_secret".
+// The name of the secret containing the credentials used to authenticate with this Tailnet. The secret must always
+// contain a "client_id" field. To authenticate with a static OAuth client, also set "client_secret". To authenticate
+// via workload identity federation, set "audience" to the audience value expected by the Tailscale OAuth
+// client; the operator will mint a ServiceAccount token for itself with that audience and exchange it for an API
+// token. "client_secret" and "audience" are mutually exclusive.
 func (o TailnetSpecCredentialsPatchPtrOutput) SecretName() pulumi.StringPtrOutput {
 	return o.ApplyT(func(v *TailnetSpecCredentialsPatch) *string {
 		if v == nil {
@@ -79848,6 +82783,38 @@ func init() {
 	pulumi.RegisterInputType(reflect.TypeOf((*DNSConfigStatusNameserverPatchPtrInput)(nil)).Elem(), DNSConfigStatusNameserverPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DNSConfigStatusPatchInput)(nil)).Elem(), DNSConfigStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*DNSConfigStatusPatchPtrInput)(nil)).Elem(), DNSConfigStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayTypeInput)(nil)).Elem(), PeerRelayTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayTypeArrayInput)(nil)).Elem(), PeerRelayTypeArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayListTypeInput)(nil)).Elem(), PeerRelayListTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayPatchTypeInput)(nil)).Elem(), PeerRelayPatchTypeArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecInput)(nil)).Elem(), PeerRelaySpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecPtrInput)(nil)).Elem(), PeerRelaySpecArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsInput)(nil)).Elem(), PeerRelaySpecAwsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsPtrInput)(nil)).Elem(), PeerRelaySpecAwsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsElasticIPsInput)(nil)).Elem(), PeerRelaySpecAwsElasticIPsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsElasticIPsArrayInput)(nil)).Elem(), PeerRelaySpecAwsElasticIPsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsElasticIPsPatchInput)(nil)).Elem(), PeerRelaySpecAwsElasticIPsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsElasticIPsPatchArrayInput)(nil)).Elem(), PeerRelaySpecAwsElasticIPsPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsPatchInput)(nil)).Elem(), PeerRelaySpecAwsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecAwsPatchPtrInput)(nil)).Elem(), PeerRelaySpecAwsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecPatchInput)(nil)).Elem(), PeerRelaySpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecPatchPtrInput)(nil)).Elem(), PeerRelaySpecPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecServiceInput)(nil)).Elem(), PeerRelaySpecServiceArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecServicePtrInput)(nil)).Elem(), PeerRelaySpecServiceArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecServicePatchInput)(nil)).Elem(), PeerRelaySpecServicePatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelaySpecServicePatchPtrInput)(nil)).Elem(), PeerRelaySpecServicePatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusInput)(nil)).Elem(), PeerRelayStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusPtrInput)(nil)).Elem(), PeerRelayStatusArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusConditionsInput)(nil)).Elem(), PeerRelayStatusConditionsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusConditionsArrayInput)(nil)).Elem(), PeerRelayStatusConditionsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusConditionsPatchInput)(nil)).Elem(), PeerRelayStatusConditionsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusConditionsPatchArrayInput)(nil)).Elem(), PeerRelayStatusConditionsPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusEndpointsInput)(nil)).Elem(), PeerRelayStatusEndpointsArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusEndpointsArrayInput)(nil)).Elem(), PeerRelayStatusEndpointsArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusEndpointsPatchInput)(nil)).Elem(), PeerRelayStatusEndpointsPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusEndpointsPatchArrayInput)(nil)).Elem(), PeerRelayStatusEndpointsPatchArray{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusPatchInput)(nil)).Elem(), PeerRelayStatusPatchArgs{})
+	pulumi.RegisterInputType(reflect.TypeOf((*PeerRelayStatusPatchPtrInput)(nil)).Elem(), PeerRelayStatusPatchArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ProxyClassTypeInput)(nil)).Elem(), ProxyClassTypeArgs{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ProxyClassTypeArrayInput)(nil)).Elem(), ProxyClassTypeArray{})
 	pulumi.RegisterInputType(reflect.TypeOf((*ProxyClassListTypeInput)(nil)).Elem(), ProxyClassListTypeArgs{})
@@ -80692,6 +83659,38 @@ func init() {
 	pulumi.RegisterOutputType(DNSConfigStatusNameserverPatchPtrOutput{})
 	pulumi.RegisterOutputType(DNSConfigStatusPatchOutput{})
 	pulumi.RegisterOutputType(DNSConfigStatusPatchPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelayTypeOutput{})
+	pulumi.RegisterOutputType(PeerRelayTypeArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelayListTypeOutput{})
+	pulumi.RegisterOutputType(PeerRelayPatchTypeOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsElasticIPsOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsElasticIPsArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsElasticIPsPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsElasticIPsPatchArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecAwsPatchPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecPatchPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecServiceOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecServicePtrOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecServicePatchOutput{})
+	pulumi.RegisterOutputType(PeerRelaySpecServicePatchPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusPtrOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusConditionsOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusConditionsArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusConditionsPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusConditionsPatchArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusEndpointsOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusEndpointsArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusEndpointsPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusEndpointsPatchArrayOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusPatchOutput{})
+	pulumi.RegisterOutputType(PeerRelayStatusPatchPtrOutput{})
 	pulumi.RegisterOutputType(ProxyClassTypeOutput{})
 	pulumi.RegisterOutputType(ProxyClassTypeArrayOutput{})
 	pulumi.RegisterOutputType(ProxyClassListTypeOutput{})

@@ -8,7 +8,7 @@ const (
 	Istio      = "1.30.2"
 	Longhorn   = "v1.9.1"
 	Cilium     = "1.19.5"
-	Tailscale  = "1.98.9"
+	Tailscale  = "1.102.4"
 
 	Prometheus         = "3.5.0"
 	PrometheusOperator = "0.84.1"
