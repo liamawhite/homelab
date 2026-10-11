@@ -5,6 +5,7 @@ on:
     paths:
       - "applications/lumenetes/**"
       - ".github/workflows/lumenetes-checks.yml"
+      - ".github/workflows/lumenetes-publish.yml"
   workflow_dispatch:
 
 defaults:
