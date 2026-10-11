@@ -1,7 +1,7 @@
-import { ChevronDown, Settings, User as UserIcon } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ChevronDown, Settings, User as UserIcon } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
-import type { User } from "@/gen/workouts/v1/user_pb";
+import type { User } from '@/gen/workouts/v1/user_pb';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface UserMenuProps {
   users: User[];
@@ -26,14 +26,20 @@ export function UserMenu({ users, activeUserId, onSelect }: UserMenuProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-1.5">
           <UserIcon />
-          {activeUser ? activeUser.name : users.length === 0 ? "No users" : "Select user"}
+          {activeUser
+            ? activeUser.name
+            : users.length === 0
+              ? 'No users'
+              : 'Select user'}
           <ChevronDown className="text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Switch user</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {users.length === 0 && <DropdownMenuItem disabled>No users yet</DropdownMenuItem>}
+        {users.length === 0 && (
+          <DropdownMenuItem disabled>No users yet</DropdownMenuItem>
+        )}
         {users.map((user) => (
           <DropdownMenuItem key={user.id} onSelect={() => onSelect(user.id)}>
             {user.name}

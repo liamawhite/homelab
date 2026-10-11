@@ -1,6 +1,12 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  type ReactNode,
+} from 'react';
 
-const STORAGE_KEY = "workouts.activeUserId";
+const STORAGE_KEY = 'workouts.activeUserId';
 
 // No auth/session concept exists yet, so "active user" is purely a
 // client-side convenience for picking who you're acting as - not a security
@@ -36,7 +42,7 @@ export function ActiveUserProvider({ children }: { children: ReactNode }) {
 export function useActiveUser(): [string | null, (id: string) => void] {
   const ctx = useContext(ActiveUserContext);
   if (!ctx) {
-    throw new Error("useActiveUser must be used within an ActiveUserProvider");
+    throw new Error('useActiveUser must be used within an ActiveUserProvider');
   }
   return [ctx.activeUserId, ctx.setActiveUserId];
 }

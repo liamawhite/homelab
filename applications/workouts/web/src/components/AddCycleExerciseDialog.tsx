@@ -1,16 +1,16 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { ExerciseCategory } from "@/gen/workouts/v1/exercise_pb";
-import { useExercises } from "@/lib/exercises";
-import { useAddCycleExercise } from "@/lib/cycles";
+import { ExerciseCategory } from '@/gen/workouts/v1/exercise_pb';
+import { useExercises } from '@/lib/exercises';
+import { useAddCycleExercise } from '@/lib/cycles';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface AddCycleExerciseDialogProps {
   open: boolean;
@@ -29,14 +29,24 @@ export function AddCycleExerciseDialog({
   const addCycleExercise = useAddCycleExercise();
 
   const available = useMemo(
-    () => (exercises ?? []).filter((e) => !e.archived && !existingExerciseIds.has(e.id)),
+    () =>
+      (exercises ?? []).filter(
+        (e) => !e.archived && !existingExerciseIds.has(e.id),
+      ),
     [exercises, existingExerciseIds],
   );
-  const mainLifts = available.filter((e) => e.category === ExerciseCategory.MAIN_LIFT);
-  const accessories = available.filter((e) => e.category === ExerciseCategory.ACCESSORY);
+  const mainLifts = available.filter(
+    (e) => e.category === ExerciseCategory.MAIN_LIFT,
+  );
+  const accessories = available.filter(
+    (e) => e.category === ExerciseCategory.ACCESSORY,
+  );
 
   function add(exerciseId: string) {
-    addCycleExercise.mutate({ cycleId, exerciseId }, { onSuccess: () => onOpenChange(false) });
+    addCycleExercise.mutate(
+      { cycleId, exerciseId },
+      { onSuccess: () => onOpenChange(false) },
+    );
   }
 
   return (
@@ -50,15 +60,23 @@ export function AddCycleExerciseDialog({
         </DialogHeader>
 
         <div className="grid gap-4">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading exercises…</p>}
-          {isError && <p className="text-sm text-destructive">{error.message}</p>}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground">Loading exercises…</p>
+          )}
+          {isError && (
+            <p className="text-sm text-destructive">{error.message}</p>
+          )}
           {addCycleExercise.isError && (
-            <p className="text-sm text-destructive">{addCycleExercise.error.message}</p>
+            <p className="text-sm text-destructive">
+              {addCycleExercise.error.message}
+            </p>
           )}
 
           {mainLifts.length > 0 && (
             <div className="grid gap-1">
-              <span className="text-xs font-medium text-muted-foreground">Main lifts</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                Main lifts
+              </span>
               {mainLifts.map((exercise) => (
                 <Button
                   key={exercise.id}
@@ -76,7 +94,9 @@ export function AddCycleExerciseDialog({
 
           {accessories.length > 0 && (
             <div className="grid gap-1">
-              <span className="text-xs font-medium text-muted-foreground">Accessory</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                Accessory
+              </span>
               {accessories.map((exercise) => (
                 <Button
                   key={exercise.id}
@@ -94,7 +114,8 @@ export function AddCycleExerciseDialog({
 
           {!isLoading && available.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No more exercises to add - every active exercise is already in this cycle.
+              No more exercises to add - every active exercise is already in
+              this cycle.
             </p>
           )}
         </div>

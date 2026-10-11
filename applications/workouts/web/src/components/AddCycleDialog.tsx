@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from 'react';
 
-import { useCreateCycle, useDuplicateCycle, useCycles } from "@/lib/cycles";
+import { useCreateCycle, useDuplicateCycle, useCycles } from '@/lib/cycles';
 import {
   Dialog,
   DialogContent,
@@ -8,13 +8,13 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 
-const BLANK = "";
+const BLANK = '';
 
 interface AddCycleDialogProps {
   open: boolean;
@@ -23,8 +23,13 @@ interface AddCycleDialogProps {
   onCreated?: (cycleId: string) => void;
 }
 
-export function AddCycleDialog({ open, onOpenChange, userId, onCreated }: AddCycleDialogProps) {
-  const [name, setName] = useState("");
+export function AddCycleDialog({
+  open,
+  onOpenChange,
+  userId,
+  onCreated,
+}: AddCycleDialogProps) {
+  const [name, setName] = useState('');
   const [sourceCycleId, setSourceCycleId] = useState(BLANK);
   const { data: cycles } = useCycles(userId);
   const createCycle = useCreateCycle();
@@ -33,7 +38,7 @@ export function AddCycleDialog({ open, onOpenChange, userId, onCreated }: AddCyc
   const error = createCycle.error ?? duplicateCycle.error;
 
   function reset() {
-    setName("");
+    setName('');
     setSourceCycleId(BLANK);
   }
 
@@ -80,7 +85,9 @@ export function AddCycleDialog({ open, onOpenChange, userId, onCreated }: AddCyc
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New cycle</DialogTitle>
-          <DialogDescription>A training program made up of blocks (e.g. weeks).</DialogDescription>
+          <DialogDescription>
+            A training program made up of blocks (e.g. weeks).
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="grid gap-4">
@@ -118,7 +125,7 @@ export function AddCycleDialog({ open, onOpenChange, userId, onCreated }: AddCyc
 
           <DialogFooter>
             <Button type="submit" disabled={isPending || !name.trim()}>
-              {sourceCycleId ? "Duplicate" : "Add"}
+              {sourceCycleId ? 'Duplicate' : 'Add'}
             </Button>
           </DialogFooter>
         </form>

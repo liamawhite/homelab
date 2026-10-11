@@ -1,20 +1,20 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { timestampDate } from '@bufbuild/protobuf/wkt';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Plus, Trash2 } from "lucide-react";
+} from '@tanstack/react-table';
+import { Plus, Trash2 } from 'lucide-react';
 
-import type { Cycle } from "@/gen/workouts/v1/cycle_pb";
-import { useActiveUser } from "@/lib/activeUser";
-import { useCycles, useDeleteCycle } from "@/lib/cycles";
-import { relativeTime } from "@/lib/time";
-import { AddCycleDialog } from "@/components/AddCycleDialog";
-import { Button } from "@/components/ui/button";
+import type { Cycle } from '@/gen/workouts/v1/cycle_pb';
+import { useActiveUser } from '@/lib/activeUser';
+import { useCycles, useDeleteCycle } from '@/lib/cycles';
+import { relativeTime } from '@/lib/time';
+import { AddCycleDialog } from '@/components/AddCycleDialog';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 
 const columnHelper = createColumnHelper<Cycle>();
 
@@ -35,8 +35,8 @@ export function CyclesPage() {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor('name', {
+        header: 'Name',
         cell: (info) => (
           <Link
             to="/cycles/$cycleId"
@@ -48,16 +48,18 @@ export function CyclesPage() {
         ),
       }),
       columnHelper.display({
-        id: "createdAt",
-        header: "Created",
+        id: 'createdAt',
+        header: 'Created',
         cell: (info) => (
           <span className="text-sm text-muted-foreground">
-            {info.row.original.createdAt ? relativeTime(timestampDate(info.row.original.createdAt)) : "—"}
+            {info.row.original.createdAt
+              ? relativeTime(timestampDate(info.row.original.createdAt))
+              : '—'}
           </span>
         ),
       }),
       columnHelper.display({
-        id: "actions",
+        id: 'actions',
         cell: (info) => (
           <div className="flex justify-end">
             <Button
@@ -86,10 +88,10 @@ export function CyclesPage() {
     return (
       <div className="flex flex-1 items-center justify-center p-4">
         <p className="text-sm text-muted-foreground">
-          Select or create a{" "}
+          Select or create a{' '}
           <Link to="/users" className="underline underline-offset-4">
             user
-          </Link>{" "}
+          </Link>{' '}
           to build training cycles.
         </p>
       </div>
@@ -106,7 +108,9 @@ export function CyclesPage() {
         </Button>
       </div>
 
-      {isLoading && <p className="text-sm text-muted-foreground">Loading cycles…</p>}
+      {isLoading && (
+        <p className="text-sm text-muted-foreground">Loading cycles…</p>
+      )}
       {isError && <p className="text-sm text-destructive">{error.message}</p>}
       {deleteCycle.isError && (
         <p className="text-sm text-destructive">{deleteCycle.error.message}</p>
@@ -122,7 +126,10 @@ export function CyclesPage() {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -133,7 +140,10 @@ export function CyclesPage() {
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -150,7 +160,9 @@ export function CyclesPage() {
         open={addOpen}
         onOpenChange={setAddOpen}
         userId={activeUserId}
-        onCreated={(cycleId) => navigate({ to: "/cycles/$cycleId", params: { cycleId } })}
+        onCreated={(cycleId) =>
+          navigate({ to: '/cycles/$cycleId', params: { cycleId } })
+        }
       />
     </div>
   );

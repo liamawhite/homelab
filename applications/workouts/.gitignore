@@ -8,3 +8,13 @@
 *.db
 *.db-shm
 *.db-wal
+
+/bin/
+/result
+.env
+.env.*
+/infra.yaml
+/kubeconfig
+*.db
+*.db-shm
+*.db-wal
