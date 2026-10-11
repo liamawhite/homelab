@@ -35,7 +35,6 @@ allow_addon_recovery: false
 run_disruptive_checks: false
 reboot_test_host: pi-0
 resume_gitops: true
-# Enable after the foundation is verified and these definitions are merged.
-# enable_flux: true
-enable_flux: false
+# Foundation definitions are published on main; Flux owns add-on reconciliation.
+enable_flux: true
 verify_gitops: "{{ enable_flux }}"

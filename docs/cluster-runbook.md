@@ -22,8 +22,9 @@ Backups and cluster teardown are maintained separately. These playbooks require
 clean hosts or an existing cluster already owned by this Ansible configuration;
 they refuse to overwrite unmanaged cluster state.
 
-1. Flux is temporarily disabled with `enable_flux: false` in the inventory.
-   Verify the foundation from this checkout before publishing for handoff.
+1. Publish the shared cluster definitions to `main` before enabling Flux.
+   Flux is enabled in the inventory after the initial foundation review.
+   For a pre-publication bootstrap, override with `-e enable_flux=false`.
 2. Run `scripts/homelab prepare-nixos` to build the NixOS prerequisite changes
    without switching. The pinned nixos-rebuild-ng tool builds on the Nix server.
    Run it with `-e apply_nixos_runtime=true` to apply the reviewed configuration.
@@ -31,7 +32,8 @@ they refuse to overwrite unmanaged cluster state.
    the persistent Ansible unit generator.
 3. Run `scripts/homelab bootstrap`. pi-0 starts first, then the other servers
    join through its direct address. Phase 2 installs kube-vip and Cilium from
-   shared definitions, with Flux installation and checks currently skipped.
+   shared definitions, then installs Flux and hands reconciliation to Git.
+   With `enable_flux=false`, Flux installation and checks are skipped.
    Verification checks the nodes, VIP API, DNS, and cross-node traffic.
 4. Repeat `scripts/homelab bootstrap` to check convergence, then run
    `scripts/homelab failover -e run_disruptive_checks=true`. This stops the
@@ -43,15 +45,13 @@ Initialization refuses configuration and identity conflicts. Matching K3s
 inputs do not restart the service. Once Flux owns the add-ons, ordinary
 phase 2 verifies them instead of reinstalling them.
 
-## Enable Flux after review
+## Flux handoff
 
-Open a PR with the verified foundation and merge it to `main`. Replace
-`enable_flux: false` with the commented `enable_flux: true` setting in
-`ansible/inventory/group_vars/all.yml`, then rerun `scripts/homelab phase2`
-and `scripts/homelab verify`. The handoff now requires the shared cluster
-manifests to match published main, installs Flux, and verifies reconciliation.
-The same Cilium release and kube-vip definitions are adopted. Keep the setting
-true for later runs.
+The initial foundation PR has been merged and `enable_flux: true` is set in
+`ansible/inventory/group_vars/all.yml`. Run `scripts/homelab phase2` and
+`scripts/homelab verify` to install or verify the handoff. Shared cluster
+manifests must match published main before installation. Flux adopts the same
+Cilium release and kube-vip definitions. Keep the setting true for later runs.
 
 ## Upgrades
 
@@ -77,6 +77,8 @@ Run `scripts/homelab recover -e allow_addon_recovery=true` to suspend Flux's
 foundation reconciliation and repair the same definitions through a healthy
 direct-node API. Successful online repair resumes reconciliation. Cilium repair performs a Helm
 upgrade even when release metadata matches, so missing resources are recreated.
+With Helm 4, deliberate repair uses server-side conflict takeover while Flux
+is suspended; it does not replace or uninstall Cilium resources.
 Application reconciliations are left alone. Failure leaves foundation
 reconciliation suspended for investigation; it never automatically uninstalls
 the networking foundation.

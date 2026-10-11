@@ -102,3 +102,19 @@ three-server cluster. Applications and storage have not been redeployed.
 - Explicit pre-Flux add-on repair succeeded using the shared definitions.
 - Flux `v2.9.6` definitions are checked in but installation remains disabled.
   Flux adoption and a real K3s version upgrade remain later validation steps.
+
+## Flux handoff: 2026-10-11
+
+PR #17 was merged and Flux installation enabled. All four controllers became
+Ready, the public Git source fetched merged main, and all foundation
+Kustomizations became Ready. Flux adopted the existing Cilium release under
+the same identity and chart version.
+
+Post-handoff recovery initially encountered Helm 4 server-side field conflicts
+with helm-controller. The repair command now detects conflict-takeover support
+and uses it during explicit recovery while Flux is suspended. Resources are
+updated without replacement or uninstall. The retry repaired Cilium, resumed
+Flux, and passed node readiness, VIP, DNS, and cross-node traffic checks.
+
+Application and storage deployment remain the next phase. The earlier Nix
+server reboot issue and real K3s version-upgrade validation remain outstanding.
