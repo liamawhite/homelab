@@ -1,0 +1,52 @@
+syntax = "proto3";
+package parental.v1;
+option go_package = "github.com/liamawhite/parental/gen/parental/v1;parentalv1";
+
+message Plan { string birth_date = 1; bool actual = 2; }
+message Person { string id = 1; string name = 2; string color = 3; optional int32 budget_days = 4; }
+message Assignment { string id = 1; string person_id = 2; string start_date = 3; string end_date = 4; string notes = 5; }
+message Vacation { string id = 1; string name = 2; string start_date = 3; string end_date = 4; }
+message Holiday { string date = 1; string name = 2; }
+message Day { string date = 1; bool required = 2; repeated string person_ids = 3; }
+message Budget { string person_id = 1; int32 used_days = 2; }
+message Gap { string start_date = 1; string end_date = 2; int32 days = 3; }
+message GetPlanRequest {}
+message GetPlanResponse {
+  Plan plan = 1;
+  repeated Person people = 2;
+  repeated Assignment assignments = 3;
+  repeated Day days = 4;
+  repeated Budget budgets = 5;
+  repeated Gap gaps = 6;
+  string first_birthday = 7;
+  int32 required_days = 8;
+  int32 covered_days = 9;
+  int32 multiple_days = 10;
+  repeated Holiday holidays = 11;
+  repeated Vacation vacations = 12;
+}
+message UpdatePlanRequest { Plan plan = 1; }
+message UpdatePlanResponse {}
+// Omit id to create; supply an existing id to update.
+message SavePersonRequest { Person person = 1; }
+message SavePersonResponse { Person person = 1; }
+message DeletePersonRequest { string id = 1; }
+message DeletePersonResponse {}
+message SaveAssignmentRequest { Assignment assignment = 1; }
+message SaveAssignmentResponse { Assignment assignment = 1; }
+message DeleteAssignmentRequest { string id = 1; }
+message DeleteAssignmentResponse {}
+message SaveVacationRequest { Vacation vacation = 1; }
+message SaveVacationResponse { Vacation vacation = 1; }
+message DeleteVacationRequest { string id = 1; }
+message DeleteVacationResponse {}
+service PlannerService {
+  rpc SaveVacation(SaveVacationRequest) returns (SaveVacationResponse);
+  rpc DeleteVacation(DeleteVacationRequest) returns (DeleteVacationResponse);
+  rpc GetPlan(GetPlanRequest) returns (GetPlanResponse);
+  rpc UpdatePlan(UpdatePlanRequest) returns (UpdatePlanResponse);
+  rpc SavePerson(SavePersonRequest) returns (SavePersonResponse);
+  rpc DeletePerson(DeletePersonRequest) returns (DeletePersonResponse);
+  rpc SaveAssignment(SaveAssignmentRequest) returns (SaveAssignmentResponse);
+  rpc DeleteAssignment(DeleteAssignmentRequest) returns (DeleteAssignmentResponse);
+}
