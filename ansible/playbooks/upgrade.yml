@@ -1,0 +1,105 @@
+- ansible.builtin.import_playbook: access.yml
+
+- name: Require a healthy cluster before rolling upgrades
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles: [access]
+  tasks:
+    - name: Require every server to be Ready
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", wait, --for=condition=Ready, nodes, --all, --timeout=60s]
+      changed_when: false
+
+- name: Upgrade one server at a time
+  hosts: k3s_servers
+  become: true
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  vars:
+    allow_k3s_upgrade: true
+  roles: [preflight]
+  tasks:
+    - name: Read the installed K3s version
+      ansible.builtin.command:
+        argv: ["{{ k3s_binary }}", --version]
+      register: upgrade_current
+      changed_when: false
+
+    - name: Validate the supported version transition
+      ansible.builtin.command:
+        argv:
+          - "{{ ansible_playbook_python }}"
+          - "{{ repo_root }}/ansible/tools/check_upgrade.py"
+          - "{{ upgrade_current.stdout }}"
+          - "{{ k3s_version }}"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+
+    - name: Upgrade only a node whose version differs
+      when: "('k3s version ' + k3s_version + ' ') not in upgrade_current.stdout"
+      block:
+        - name: Stage and validate the new binary before interrupting the node
+          ansible.builtin.include_role:
+            name: k3s
+            tasks_from: stage
+
+        - name: Check quorum health immediately before each node upgrade
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ hostvars['localhost'].api_kubeconfig }}", wait, --for=condition=Ready, nodes, --all, --timeout=60s]
+          delegate_to: localhost
+          become: false
+          changed_when: false
+
+        - name: Drain the node while respecting disruption budgets
+          kubernetes.core.k8s_drain:
+            kubeconfig: "{{ hostvars['localhost'].api_kubeconfig }}"
+            name: "{{ inventory_hostname }}"
+            state: drain
+            delete_options:
+              ignore_daemonsets: true
+              delete_emptydir_data: true
+              terminate_grace_period: 60
+              wait_timeout: 300
+          delegate_to: localhost
+          become: false
+
+        - name: Switch the managed package and restart K3s
+          ansible.builtin.include_role:
+            name: k3s
+
+        - name: Wait for this node to rejoin
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ hostvars['localhost'].api_kubeconfig }}", wait, --for=condition=Ready, "node/{{ inventory_hostname }}", --timeout=300s]
+          delegate_to: localhost
+          become: false
+          changed_when: false
+
+        - name: Check the node advertises the requested version
+          kubernetes.core.k8s_info:
+            kubeconfig: "{{ hostvars['localhost'].api_kubeconfig }}"
+            kind: Node
+            name: "{{ inventory_hostname }}"
+          register: upgraded_node
+          delegate_to: localhost
+          become: false
+          retries: 30
+          delay: 5
+          until: upgraded_node.resources[0].status.nodeInfo.kubeletVersion == k3s_version
+
+        - name: Uncordon after successful recovery
+          kubernetes.core.k8s_drain:
+            kubeconfig: "{{ hostvars['localhost'].api_kubeconfig }}"
+            name: "{{ inventory_hostname }}"
+            state: uncordon
+          delegate_to: localhost
+          become: false
+
+      rescue:
+        - name: Stop the upgrade and leave the failed node cordoned
+          ansible.builtin.fail:
+            msg: "Upgrade failed on {{ inventory_hostname }}. No further hosts will be upgraded; inspect the direct API and service logs. Do not blindly downgrade etcd."
+
+- ansible.builtin.import_playbook: verify.yml

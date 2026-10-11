@@ -1,0 +1,40 @@
+- name: Build the NixOS prerequisites before applying any change
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Build the reviewed OS configuration on the Nix server
+      ansible.builtin.command:
+        argv:
+          - nix
+          - run
+          - "github:NixOS/nixpkgs/{{ k3s_nixpkgs_revision }}#nixos-rebuild-ng"
+          - --
+          - build
+          - --flake
+          - "{{ repo_root }}/os#nix-gpu-3070-1"
+          - --build-host
+          - liam@192.168.1.60
+          - --use-remote-sudo
+      environment:
+        NIX_SSHOPTS: "-i {{ repo_root }}/os/ssh/nix-gpu-3070-1 -o IdentitiesOnly=yes -o UserKnownHostsFile={{ local_state_dir }}/known_hosts -o StrictHostKeyChecking=accept-new"
+      changed_when: false
+
+    - name: Apply the OS prerequisite configuration only when explicitly requested
+      ansible.builtin.command:
+        argv:
+          - nix
+          - run
+          - "github:NixOS/nixpkgs/{{ k3s_nixpkgs_revision }}#nixos-rebuild-ng"
+          - --
+          - switch
+          - --flake
+          - "{{ repo_root }}/os#nix-gpu-3070-1"
+          - --build-host
+          - liam@192.168.1.60
+          - --target-host
+          - liam@192.168.1.60
+          - --use-remote-sudo
+      environment:
+        NIX_SSHOPTS: "-i {{ repo_root }}/os/ssh/nix-gpu-3070-1 -o IdentitiesOnly=yes -o UserKnownHostsFile={{ local_state_dir }}/known_hosts -o StrictHostKeyChecking=accept-new"
+      when: apply_nixos_runtime | default(false) | bool

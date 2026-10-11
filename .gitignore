@@ -14,3 +14,10 @@
 /shopping.sql
 
 
+
+# Private cluster credentials and local tooling
+/.homelab/
+/ansible/.venv/
+**/__pycache__/
+/os/result
+/result

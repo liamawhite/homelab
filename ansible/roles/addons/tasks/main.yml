@@ -1,0 +1,187 @@
+- name: Read the shared Cilium release definition
+  ansible.builtin.include_vars:
+    file: "{{ cluster_dir }}/cilium/release.yaml"
+    name: cilium_release
+
+- name: Read the shared Cilium repository definition
+  ansible.builtin.include_vars:
+    file: "{{ cluster_dir }}/cilium/repository.yaml"
+    name: cilium_repository
+
+- name: Inspect Flux ownership
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ api_kubeconfig }}"
+    api_version: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    name: flux-system
+    namespace: flux-system
+  register: flux_ownership
+
+- name: Decide whether this is initial bootstrap
+  ansible.builtin.set_fact:
+    bootstrap_addons: "{{ flux_ownership.resources | default([]) | length == 0 }}"
+
+- name: Bootstrap shared definitions before Flux takes ownership
+  when: bootstrap_addons | bool or allow_addon_recovery | bool
+  block:
+    - name: Render the shared kube-vip manifests
+      ansible.builtin.command:
+        argv: [kubectl, kustomize, "{{ cluster_dir }}/kube-vip"]
+      register: kubevip_rendered
+      changed_when: false
+
+    - name: Apply kube-vip through the direct API
+      kubernetes.core.k8s:
+        kubeconfig: "{{ api_kubeconfig }}"
+        definition: "{{ kubevip_rendered.stdout | from_yaml_all | list }}"
+        apply: true
+        server_side_apply:
+          field_manager: homelab-bootstrap
+          force_conflicts: "{{ allow_addon_recovery | bool }}"
+
+    - name: Wait for kube-vip on every control-plane host
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, kube-system, rollout, status, daemonset/kube-vip, --timeout=300s]
+      changed_when: false
+
+    - name: Create private VIP kubeconfig
+      ansible.builtin.copy:
+        dest: "{{ local_state_dir }}/vip.yaml"
+        content: "{{ lookup('ansible.builtin.file', api_kubeconfig) | regex_replace('https://[0-9.]+:6443', 'https://' + cluster_vip + ':6443') }}"
+        mode: "0600"
+      no_log: true
+
+    - name: Verify the API through the VIP before bootstrapping Cilium
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ local_state_dir }}/vip.yaml", --request-timeout=10s, get, --raw=/readyz]
+      register: vip_ready
+      retries: 20
+      delay: 3
+      until: vip_ready.rc == 0
+      changed_when: false
+
+    - name: Install Cilium with Flux's exact Helm identity and values
+      kubernetes.core.helm:
+        kubeconfig: "{{ api_kubeconfig }}"
+        name: "{{ cilium_release.spec.releaseName }}"
+        release_namespace: "{{ cilium_release.spec.storageNamespace }}"
+        chart_ref: "{{ cilium_release.spec.chart.spec.chart }}"
+        chart_repo_url: "{{ cilium_repository.spec.url }}"
+        chart_version: "{{ cilium_release.spec.chart.spec.version }}"
+        release_values: "{{ cilium_release.spec['values'] }}"
+        reset_values: true
+        wait: true
+        timeout: "{{ cilium_release.spec.timeout }}"
+      when: not allow_addon_recovery | bool
+
+    - name: Reconcile the actual Cilium resources during deliberate repair
+      when: allow_addon_recovery | bool
+      block:
+        - name: Create a private file for the shared Helm values
+          ansible.builtin.tempfile:
+            state: file
+            path: "{{ local_state_dir }}"
+            suffix: -cilium-values.yaml
+          register: repair_values
+        - name: Write the exact shared values
+          ansible.builtin.copy:
+            dest: "{{ repair_values.path }}"
+            content: "{{ cilium_release.spec['values'] | to_nice_yaml }}"
+            mode: "0600"
+        - name: Repair Helm resources even when release metadata already matches
+          ansible.builtin.command:
+            argv:
+              - helm
+              - "--kubeconfig={{ api_kubeconfig }}"
+              - upgrade
+              - --install
+              - "{{ cilium_release.spec.releaseName }}"
+              - "{{ cilium_release.spec.chart.spec.chart }}"
+              - --repo
+              - "{{ cilium_repository.spec.url }}"
+              - --version
+              - "{{ cilium_release.spec.chart.spec.version }}"
+              - --namespace
+              - "{{ cilium_release.spec.storageNamespace }}"
+              - --reset-values
+              - --values
+              - "{{ repair_values.path }}"
+              - --wait
+              - --timeout
+              - "{{ cilium_release.spec.timeout }}"
+      always:
+        - name: Remove the temporary values file
+          ansible.builtin.file:
+            path: "{{ repair_values.path }}"
+            state: absent
+          when: repair_values.path is defined
+
+    - name: Wait for all nodes to become Ready
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", wait, --for=condition=Ready, nodes, --all, --timeout=600s]
+      changed_when: false
+
+    - name: Hand off the verified foundation to Flux
+      when: enable_flux | bool
+      block:
+        - name: Install the checked-in Flux controllers
+          kubernetes.core.k8s:
+            kubeconfig: "{{ api_kubeconfig }}"
+            src: "{{ cluster_dir }}/flux-system/gotk-components.yaml"
+            apply: true
+            server_side_apply:
+              field_manager: homelab-bootstrap
+              force_conflicts: "{{ allow_addon_recovery | bool }}"
+
+        - name: Wait for Flux controller readiness
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, rollout, status, "deployment/{{ item }}", --timeout=300s]
+          loop: [source-controller, kustomize-controller, helm-controller, notification-controller]
+          changed_when: false
+
+        - name: Apply the shared Git source and reconciliation definitions
+          kubernetes.core.k8s:
+            kubeconfig: "{{ api_kubeconfig }}"
+            definition: "{{ item | combine({'spec': {'suspend': true}}, recursive=true) if allow_addon_recovery | bool and item.kind == 'Kustomization' else item }}"
+            apply: true
+            server_side_apply:
+              field_manager: homelab-bootstrap
+              force_conflicts: "{{ allow_addon_recovery | bool }}"
+          loop: "{{ (lookup('ansible.builtin.file', cluster_dir + '/flux-system/gotk-sync.yaml') | from_yaml_all | list) + (lookup('ansible.builtin.file', cluster_dir + '/flux-system/infrastructure.yaml') | from_yaml_all | list) }}"
+          loop_control:
+            label: "{{ item.kind }}/{{ item.metadata.name }}"
+- name: Resume managed Kustomizations after successful online repair
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    definition:
+      apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: "{{ item }}"
+        namespace: flux-system
+      spec:
+        suspend: false
+  loop: [flux-system, kube-vip, cilium]
+  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool
+
+- name: Resume Cilium Helm reconciliation after successful online repair
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    definition:
+      apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      metadata: {name: cilium, namespace: flux-system}
+      spec: {suspend: false}
+  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
+
+- name: Wait for the GitOps handoff
+  ansible.builtin.command:
+    argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, wait, --for=condition=Ready, "{{ item }}", --timeout=600s]
+  loop:
+    - gitrepository/flux-system
+    - kustomization/flux-system
+    - kustomization/kube-vip
+    - kustomization/cilium
+    - helmrelease/cilium
+  changed_when: false
+  when: enable_flux | bool and (not allow_addon_recovery | bool or resume_gitops | bool)

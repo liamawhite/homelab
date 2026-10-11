@@ -1,5 +1,10 @@
 # homelab
 
+The cluster foundation is being migrated to Ansible for K3s and bootstrap, then
+Flux for kube-vip and Cilium. See [the deployment runbook](docs/cluster-runbook.md)
+for initialization, upgrades, and recovery. Application deployment is deferred until the foundation is verified and its
+migration is complete.
+
 Application source lives under `applications/`: Dashboard, Parental, Shopping,
 Lumenetes, and Workouts. Each app is an independent Go module with its own
 multistage Dockerfile and frontend dependencies. Run its Makefile from its own
@@ -14,9 +19,10 @@ Workflows can also be started manually.
 
 Publishing uses `GHCR_TOKEN` when configured, otherwise `GITHUB_TOKEN`. Existing
 GHCR packages must grant homelab Actions write access to use `GITHUB_TOKEN`.
-Application publishing does not deploy to the cluster. Select releases in
-`pkg/versions/versions.go` and run the homelab preview/up commands. Dashboard
-keeps the existing Home Kubernetes resources and hostname.
+Application publishing does not deploy to the cluster. The legacy release pins
+remain in `pkg/versions/versions.go`; application deployment will be migrated
+after the foundation. The legacy homelab preview/up commands also manage
+cluster infrastructure and must remain unused against the new foundation.
 
 The app checks have path filters. Do not require every app's checks on every PR:
 GitHub leaves skipped required workflows pending. Require checks only with

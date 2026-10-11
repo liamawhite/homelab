@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+export ANSIBLE_CONFIG="$repo_root/ansible/ansible.cfg"
+export ANSIBLE_COLLECTIONS_PATH="$repo_root/.homelab/collections"
+export ANSIBLE_LOCAL_TEMP="$repo_root/.homelab/tmp"
+export ANSIBLE_SSH_ARGS="-o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=$repo_root/.homelab/known_hosts -o StrictHostKeyChecking=accept-new"
+umask 077
+mkdir -p "$repo_root/.homelab/tmp"
+command -v uv >/dev/null || { echo 'Install uv or enter nix develop.' >&2; exit 1; }
+
+task=${1:-help}
+if [[ $# -gt 0 ]]; then shift; fi
+run() { uv run --project "$repo_root/ansible" --locked "$@"; }
+
+case "$task" in
+  help)
+    echo 'Usage: scripts/homelab {bootstrap|phase1|phase2|upgrade|recover|verify|failover|check|prepare-nixos} [arguments]'
+    exit 0
+    ;;
+  check)
+    run python "$repo_root/ansible/tools/check_definitions.py"
+    ;;
+  bootstrap|phase1|phase2|upgrade|recover|verify|failover|prepare-nixos) ;;
+  *) echo "Unknown command: $task" >&2; exit 2 ;;
+esac
+
+collection_manifest="$ANSIBLE_COLLECTIONS_PATH/ansible_collections/kubernetes/core/MANIFEST.json"
+if ! run python - "$collection_manifest" "$repo_root/ansible/requirements.yml" <<'PYTHON'
+import json, pathlib, sys, yaml
+manifest = pathlib.Path(sys.argv[1])
+required = yaml.safe_load(pathlib.Path(sys.argv[2]).read_text())['collections'][0]['version']
+installed = json.loads(manifest.read_text())['collection_info']['version'] if manifest.exists() else None
+sys.exit(0 if installed == required else 1)
+PYTHON
+then
+  run ansible-galaxy collection install -r "$repo_root/ansible/requirements.yml" -p "$ANSIBLE_COLLECTIONS_PATH" --force
+fi
+if [[ "$task" == check ]]; then
+  for playbook in site upgrade recover verify failover prepare-nixos; do
+    run ansible-playbook "$repo_root/ansible/playbooks/$playbook.yml" --syntax-check
+  done
+  exit 0
+fi
+
+[[ "$task" != bootstrap ]] || task=site
+exec uv run --project "$repo_root/ansible" --locked ansible-playbook "$repo_root/ansible/playbooks/$task.yml" "$@"

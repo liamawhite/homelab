@@ -1,0 +1,61 @@
+- name: Read host facts
+  ansible.builtin.setup:
+    gather_subset: [min, hardware]
+
+- name: Require supported architecture and sufficient resources
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.architecture in ['aarch64', 'x86_64']
+      - ansible_facts.memtotal_mb >= 4096
+      - groups['k3s_servers'] | length == 3
+      - k3s_seed in groups['k3s_servers']
+      - host_os in ['debian', 'nixos']
+    fail_msg: "The foundation requires three supported control-plane hosts with at least 4 GiB RAM."
+
+- name: Check that bootstrap credentials are unlocked and populated
+  ansible.builtin.assert:
+    that:
+      - k3s_bootstrap_password | length >= 16
+  no_log: true
+
+- name: Check the Ansible ownership marker
+  ansible.builtin.stat:
+    path: /var/lib/homelab/managed-k3s
+  register: managed_k3s
+
+- name: Check for an existing cluster
+  ansible.builtin.stat:
+    path: /var/lib/rancher/k3s/server/db
+  register: existing_k3s
+
+- name: Refuse to adopt or overwrite an unmanaged cluster
+  ansible.builtin.assert:
+    that:
+      - not existing_k3s.stat.exists or managed_k3s.stat.exists
+    fail_msg: "Existing unmanaged K3s state found. Prepare this host through the separately maintained teardown procedure; initialization never overwrites a cluster."
+
+- name: Read the ownership marker when present
+  ansible.builtin.slurp:
+    src: /var/lib/homelab/managed-k3s
+  register: ownership_marker
+  when: managed_k3s.stat.exists
+
+- name: Validate the ownership marker
+  ansible.builtin.assert:
+    that: (ownership_marker.content | b64decode | trim) == 'homelab-k3s-v1'
+    fail_msg: Unexpected K3s ownership marker; inspect before continuing.
+  when: managed_k3s.stat.exists
+
+- name: Verify NixOS runtime hook is installed
+  ansible.builtin.stat:
+    path: /etc/systemd/system-generators/homelab-k3s
+    follow: true
+  register: nix_generator
+  when: host_os == 'nixos'
+
+- name: Require the NixOS prerequisite configuration
+  ansible.builtin.assert:
+    that:
+      - nix_generator.stat.exists
+    fail_msg: "Apply os/ with the Ansible runtime hook before initializing this NixOS host."
+  when: host_os == 'nixos'
