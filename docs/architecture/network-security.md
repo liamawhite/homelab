@@ -2,7 +2,9 @@
 
 ## Deployment status
 
-These diagrams describe the model agreed in [ADR 0006](../adr/0006-explicit-l4-network-access.md) and the configuration in this PR. **The live cluster has not been migrated.** Inspection found Cilium and Flux running, Flux's stock broad network grants, and no Istio installation. Dry runs and manifest checks validate configuration; they do not prove live enforcement.
+These diagrams describe the model agreed in [ADR 0006](../adr/0006-explicit-l4-network-access.md). The live cluster was migrated on 2026-10-11. All six Flux Kustomizations and five Helm releases converged at `be2a9606ae2616c6ffc6d7638a3a283cd6ad3092`, with reconciliation resumed. Allowed cross-node traffic, denied identities/ports/direct internet/node API access, and admission restrictions passed. The egress waypoint is Programmed. Disruptive mesh outage/recovery remains untested.
+
+See the [continuous security verification proposal](continuous-security-verification.md) for scheduled checks, evidence, and missed-run detection.
 
 Node and host-network isolation is managed by the homelab owner through external local-network controls. This repository does not configure node firewalls or administrator CIDR allowlists. Cilium still restricts pod access to node services.
 
@@ -14,8 +16,8 @@ flowchart LR
     Nodes --> Cilium["Cilium pod networking"]
     Flux["Flux"] --> Cilium
     Flux --> VIP["kube-vip"]
-    Flux --> Controllers["Flux controllers with stock broad network grants"]
-    Pending["Pending migration: pod deny baseline, Istio ambient, admission guards"]
+    Flux --> Controllers["Flux controllers with explicit foundation grants"]
+    Flux --> Security["Pod default deny, Istio ambient, admission guards"]
 ```
 
 ## Ownership after migration
@@ -138,4 +140,4 @@ Recovery restores the reviewed policies rather than opening application traffic.
 | Privileged application, capture opt-out, or unauthorized policy/identity change | Rejected by admission |
 | Mesh unavailable | Application access fails closed; external administrative recovery remains usable |
 
-`security` performs the deliberate cluster-policy migration; `verify` runs the cross-node and admission checks. Repository checks render manifests and exact Helm values and validate security contracts. The full live matrix, including a disruptive mesh outage/recovery exercise, remains a deployment gate. Node firewall tests and administrator CIDRs are outside this model.
+`security` performs the deliberate cluster-policy migration; `verify` runs the cross-node and admission checks. Repository checks render manifests and exact Helm values and validate security contracts. Live traffic and admission checks passed on 2026-10-11. A disruptive mesh outage/recovery exercise remains a deployment gate. Node firewall tests and administrator CIDRs are outside this model.

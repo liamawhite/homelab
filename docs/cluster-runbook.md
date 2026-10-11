@@ -361,9 +361,10 @@ record and the unresolved Nix server reboot issue.
 ## Network security migration
 
 The target and ownership boundaries are illustrated in
-[the network security architecture](architecture/network-security.md). This change
-has not yet been applied to the running cluster; the earlier verification history
-predates network enforcement.
+[the network security architecture](architecture/network-security.md). The migration completed on 2026-10-11, with Flux converged at
+`be2a9606ae2616c6ffc6d7638a3a283cd6ad3092`. Live traffic and admission checks passed;
+disruptive mesh outage/recovery remains untested. The following steps document
+the initial migration procedure.
 
 Node and host-network isolation is managed through the homelab owner's external
 local-network controls. This change adds no node firewall, administrator CIDR
