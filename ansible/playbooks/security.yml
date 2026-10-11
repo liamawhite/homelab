@@ -1,0 +1,5 @@
+# Explicitly migrate the Kubernetes layer using shared, published definitions.
+# Node / host-network isolation is managed outside this repository.
+- ansible.builtin.import_playbook: recover.yml
+  vars:
+    allow_addon_recovery: true

@@ -116,10 +116,16 @@
             state: absent
           when: repair_values.path is defined
 
+    - name: Enforce the shared L4 and admission model
+      ansible.builtin.include_tasks: security.yml
+
     - name: Wait for all nodes to become Ready
       ansible.builtin.command:
         argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", wait, --for=condition=Ready, nodes, --all, --timeout=600s]
       changed_when: false
+
+    - name: Bootstrap ambient and its shared authorization baseline
+      ansible.builtin.include_tasks: mesh.yml
 
     - name: Hand off the verified foundation to Flux
       block:
@@ -146,7 +152,7 @@
             server_side_apply:
               field_manager: homelab-bootstrap
               force_conflicts: "{{ allow_addon_recovery | bool }}"
-          loop: "{{ (lookup('ansible.builtin.file', cluster_dir + '/flux-system/gotk-sync.yaml') | from_yaml_all | list) + (lookup('ansible.builtin.file', cluster_dir + '/flux-system/infrastructure.yaml') | from_yaml_all | list) }}"
+          loop: "{{ [lookup('ansible.builtin.file', cluster_dir + '/flux-system/network-inputs.yaml') | from_yaml] + (lookup('ansible.builtin.file', cluster_dir + '/flux-system/gotk-sync.yaml') | from_yaml_all | list) + (lookup('ansible.builtin.file', cluster_dir + '/flux-system/infrastructure.yaml') | from_yaml_all | list) }}"
           loop_control:
             label: "{{ item.kind }}/{{ item.metadata.name }}"
 - name: Resume managed Kustomizations after successful online repair
@@ -160,18 +166,23 @@
         namespace: flux-system
       spec:
         suspend: false
-  loop: [flux-system, kube-vip, cilium]
+  loop: [flux-system, kube-vip, cilium, network-security, istio, mesh-security]
   when: allow_addon_recovery | bool and resume_gitops | bool
 
-- name: Resume Cilium Helm reconciliation after successful online repair
+- name: Resume managed Helm reconciliation after successful online repair
   kubernetes.core.k8s:
     kubeconfig: "{{ api_kubeconfig }}"
     definition:
       apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      metadata: {name: cilium, namespace: flux-system}
+      metadata:
+        name: "{{ item.metadata.name }}"
+        namespace: flux-system
       spec: {suspend: false}
-  when: allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
+  loop: "{{ recovery_helmreleases.resources | default([]) | selectattr('metadata.name', 'in', ['cilium', 'istio-base', 'istiod', 'istio-cni', 'ztunnel']) | list }}"
+  loop_control:
+    label: "{{ item.metadata.name }}"
+  when: allow_addon_recovery | bool and resume_gitops | bool
 
 - name: Wait for the GitOps handoff
   ansible.builtin.command:
@@ -182,5 +193,8 @@
     - kustomization/kube-vip
     - kustomization/cilium
     - helmrelease/cilium
+    - kustomization/network-security
+    - kustomization/istio
+    - kustomization/mesh-security
   changed_when: false
   when: not allow_addon_recovery | bool or resume_gitops | bool

@@ -1,0 +1,955 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-default-deny
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  description: All pods deny ingress and egress unless an explicit grant exists.
+  endpointSelector: {}
+  enableDefaultDeny:
+    ingress: true
+    egress: true
+  ingress: []
+  egress: []
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-kube-system-coredns
+spec:
+  description: API access for kube-system/coredns.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: coredns
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-kube-system-metrics-server
+spec:
+  description: API access for kube-system/metrics-server.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: metrics-server
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-kube-system-local-path-provisioner-service-account
+spec:
+  description: API access for kube-system/local-path-provisioner-service-account.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: local-path-provisioner-service-account
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-flux-system-source-controller
+spec:
+  description: API access for flux-system/source-controller.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-flux-system-kustomize-controller
+spec:
+  description: API access for flux-system/kustomize-controller.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: kustomize-controller
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-flux-system-helm-controller
+spec:
+  description: API access for flux-system/helm-controller.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: helm-controller
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-flux-system-notification-controller
+spec:
+  description: API access for flux-system/notification-controller.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: notification-controller
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-istio-system-istiod
+spec:
+  description: API access for istio-system/istiod.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:io.cilium.k8s.policy.serviceaccount: istiod
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-api-istio-system-ztunnel
+spec:
+  description: API access for istio-system/ztunnel.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:io.cilium.k8s.policy.serviceaccount: ztunnel
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-cluster-dns
+spec:
+  description: Only explicit DNS clients can query CoreDNS on TCP/UDP 53.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:k8s-app: kube-dns
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:io.cilium.k8s.policy.serviceaccount: coredns
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:io.cilium.k8s.policy.serviceaccount: metrics-server
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:io.cilium.k8s.policy.serviceaccount: local-path-provisioner-service-account
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: kustomize-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: helm-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: notification-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+        k8s:io.cilium.k8s.policy.serviceaccount: istiod
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+        k8s:io.cilium.k8s.policy.serviceaccount: ztunnel
+    - matchLabels:
+        k8s:homelab.local/dns: allowed
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-egress
+        k8s:gateway.networking.k8s.io/gateway-name: egress
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-0
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: coredns
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-1
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: metrics-server
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-2
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: local-path-provisioner-service-account
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-3
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-4
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: kustomize-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-5
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: helm-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-6
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: notification-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-7
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:io.cilium.k8s.policy.serviceaccount: istiod
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-8
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:io.cilium.k8s.policy.serviceaccount: ztunnel
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-9
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:homelab.local/dns: allowed
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-client-10
+spec:
+  description: Explicit DNS permission to the cluster resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:gateway.networking.k8s.io/gateway-name: egress
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-dns-upstream
+spec:
+  description: CoreDNS forwards only to the approved LAN resolver.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:k8s-app: kube-dns
+  egress:
+  - toCIDR:
+    - ${UPSTREAM_DNS_IPV4}/32
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-coredns
+spec:
+  description: Kubelet health probes for coredns on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:k8s-app: kube-dns
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '8080'
+        protocol: TCP
+      - port: '8181'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-metrics-server
+spec:
+  description: Kubelet health probes for metrics-server on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: metrics-server
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '10250'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-flux
+spec:
+  description: Kubelet health probes for flux on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '9440'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-istiod
+spec:
+  description: Kubelet health probes for istiod on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:app: istiod
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '8080'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-ztunnel
+spec:
+  description: Kubelet health probes for ztunnel on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:app: ztunnel
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '15021'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-probes-egress
+spec:
+  description: Kubelet health probes for egress on its declared health ports.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:gateway.networking.k8s.io/gateway-name: egress
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '15021'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-metrics-kubelets
+spec:
+  description: Metrics-server scrapes node kubelets.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: kube-system
+      k8s:io.cilium.k8s.policy.serviceaccount: metrics-server
+  egress:
+  - toEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '10250'
+        protocol: TCP
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '10250'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-artifact-server
+spec:
+  description: Source-controller serves artifacts to the two consumers.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: source-controller
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: kustomize-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: helm-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-artifacts-kustomize-controller
+spec:
+  description: Flux artifact retrieval.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: kustomize-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: source-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-artifacts-helm-controller
+spec:
+  description: Flux artifact retrieval.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: helm-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: source-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-events
+spec:
+  description: Notification-controller accepts events from named Flux controllers.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: notification-controller
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: source-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: kustomize-controller
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: helm-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-events-source-controller
+spec:
+  description: Flux event delivery.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: source-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: notification-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-events-kustomize-controller
+spec:
+  description: Flux event delivery.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: kustomize-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: notification-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-events-helm-controller
+spec:
+  description: Flux event delivery.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:app: helm-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:app: notification-controller
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-source-downloads
+spec:
+  description: 'Non-mesh bootstrap exception: public Git and pinned foundation Helm
+    repositories.'
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  egress:
+  - toFQDNs:
+    - matchName: github.com
+    - matchName: helm.cilium.io
+    - matchName: istio-release.storage.googleapis.com
+    toPorts:
+    - ports:
+      - port: '443'
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: '*'
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-xds-ztunnel
+spec:
+  description: Authenticated xDS and identity issuance to istiod.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:app: ztunnel
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+        k8s:app: istiod
+    toPorts:
+    - ports:
+      - port: '15012'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-xds-egress
+spec:
+  description: Authenticated xDS and identity issuance to istiod.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:gateway.networking.k8s.io/gateway-name: egress
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+        k8s:app: istiod
+    toPorts:
+    - ports:
+      - port: '15012'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-istiod-xds
+spec:
+  description: Istiod accepts authenticated xDS from named mesh infrastructure.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:app: istiod
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+        k8s:app: ztunnel
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-egress
+        k8s:gateway.networking.k8s.io/gateway-name: egress
+    toPorts:
+    - ports:
+      - port: '15012'
+        protocol: TCP
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '15017'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-istio-cni-api
+spec:
+  description: Istio CNI watches workload enrollment and repairs pod capture.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-system
+      k8s:io.cilium.k8s.policy.serviceaccount: istio-cni
+  egress:
+  - toEntities:
+    - kube-apiserver
+    toPorts:
+    - ports:
+      - port: '6443'
+        protocol: TCP
+      - port: '443'
+        protocol: TCP
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '8000'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-cilium-health
+spec:
+  description: Node agents may probe the reserved Cilium health endpoint using TCP
+    4240 and IPv4 ICMP echo.
+  endpointSelector:
+    matchLabels:
+      reserved:health: ''
+  ingress:
+  - fromEntities:
+    - host
+    - remote-node
+    toPorts:
+    - ports:
+      - port: '4240'
+        protocol: TCP
+  - fromEntities:
+    - host
+    - remote-node
+    icmps:
+    - fields:
+      - family: IPv4
+        type: 8

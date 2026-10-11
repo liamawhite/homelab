@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homelab-network-inputs
+  namespace: flux-system
+data:
+  # Observed current node resolver. This is a pod egress destination grant,
+  # not a node firewall or administrator access configuration.
+  UPSTREAM_DNS_IPV4: 192.168.1.1

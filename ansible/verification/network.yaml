@@ -2,6 +2,38 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: homelab-verification
+  labels:
+    istio.io/dataplane-mode: ambient
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.36
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: server
+  namespace: homelab-verification
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: client
+  namespace: homelab-verification
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: intruder
+  namespace: homelab-verification
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: blocked
+  namespace: homelab-verification
+automountServiceAccountToken: false
 ---
 apiVersion: v1
 kind: Pod
@@ -12,13 +44,32 @@ metadata:
     app: network-server
 spec:
   nodeName: pi-0
+  serviceAccountName: server
+  automountServiceAccountToken: false
   containers:
-    - name: server
-      image: busybox:1.37.0
-      command: [sh, -c, "mkdir -p /www; echo network-ok > /www/index.html; exec httpd -f -p 8080 -h /www"]
-      readinessProbe:
-        tcpSocket:
-          port: 8080
+  - name: server
+    image: busybox:1.37.0
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    command:
+    - sh
+    - -ec
+    - mkdir -p /tmp/www; echo network-ok > /tmp/www/index.html; httpd -p 8081 -h /tmp/www;
+      exec httpd -f -p 8080 -h /tmp/www
+    readinessProbe:
+      exec:
+        command:
+        - sh
+        - -ec
+        - test "$(wget -qO- http://127.0.0.1:8080)" = network-ok; test "$(wget -qO-
+          http://127.0.0.1:8081)" = network-ok
 ---
 apiVersion: v1
 kind: Service
@@ -29,8 +80,12 @@ spec:
   selector:
     app: network-server
   ports:
-    - port: 8080
-      targetPort: 8080
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: http-denied
+    port: 8081
+    targetPort: 8081
 ---
 apiVersion: batch/v1
 kind: Job
@@ -39,15 +94,43 @@ metadata:
   namespace: homelab-verification
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 120
+  activeDeadlineSeconds: 180
   template:
+    metadata:
+      labels:
+        homelab.local/dns: allowed
+        app: network-pi-1
     spec:
       nodeName: pi-1
+      serviceAccountName: client
+      automountServiceAccountToken: false
       restartPolicy: Never
       containers:
-        - name: client
-          image: busybox:1.37.0
-          command: [sh, -ec, "for attempt in 1 2 3 4 5 6 7 8 9 10; do nslookup kubernetes.default.svc.cluster.local && test \"$(wget -qO- -T 10 http://network-server.homelab-verification.svc.cluster.local:8080)\" = network-ok && exit 0; sleep 5; done; exit 1"]
+      - name: client
+        image: curlimages/curl:8.16.0
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - sh
+        - -ec
+        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(curl --fail --silent\
+          \ --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
+          \ = network-ok; then\n    # Both ports are served by the same ready pod;\
+          \ only 8080 is authorized.\n    if curl --fail --silent --show-error --connect-timeout\
+          \ 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8081;\
+          \ then echo \"UNEXPECTED: unauthorized service port\"; exit 1; fi\n    if\
+          \ curl --insecure --silent --show-error --connect-timeout 3 --max-time 5\
+          \ https://1.1.1.1; then echo \"UNEXPECTED: direct internet\"; exit 1; fi\n\
+          \    if curl --insecure --silent --show-error --connect-timeout 3 --max-time\
+          \ 5 https://192.168.1.51:6443; then echo \"UNEXPECTED: direct node API\"\
+          ; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -56,12 +139,199 @@ metadata:
   namespace: homelab-verification
 spec:
   backoffLimit: 0
-  activeDeadlineSeconds: 120
+  activeDeadlineSeconds: 180
   template:
+    metadata:
+      labels:
+        homelab.local/dns: allowed
+        app: network-nix-server
     spec:
       nodeName: nix-gpu-3070-1
+      serviceAccountName: client
+      automountServiceAccountToken: false
       restartPolicy: Never
       containers:
-        - name: client
-          image: busybox:1.37.0
-          command: [sh, -ec, "for attempt in 1 2 3 4 5 6 7 8 9 10; do nslookup kubernetes.default.svc.cluster.local && test \"$(wget -qO- -T 10 http://network-server.homelab-verification.svc.cluster.local:8080)\" = network-ok && exit 0; sleep 5; done; exit 1"]
+      - name: client
+        image: curlimages/curl:8.16.0
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - sh
+        - -ec
+        - "for attempt in 1 2 3 4 5 6 7 8 9 10; do\n  if test \"$(curl --fail --silent\
+          \ --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080)\"\
+          \ = network-ok; then\n    # Both ports are served by the same ready pod;\
+          \ only 8080 is authorized.\n    if curl --fail --silent --show-error --connect-timeout\
+          \ 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8081;\
+          \ then echo \"UNEXPECTED: unauthorized service port\"; exit 1; fi\n    if\
+          \ curl --insecure --silent --show-error --connect-timeout 3 --max-time 5\
+          \ https://1.1.1.1; then echo \"UNEXPECTED: direct internet\"; exit 1; fi\n\
+          \    if curl --insecure --silent --show-error --connect-timeout 3 --max-time\
+          \ 5 https://192.168.1.51:6443; then echo \"UNEXPECTED: direct node API\"\
+          ; exit 1; fi\n    exit 0\n  fi\n  sleep 3\ndone\nexit 1"
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: network-intruder
+  namespace: homelab-verification
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 180
+  template:
+    metadata:
+      labels:
+        homelab.local/dns: allowed
+        app: network-intruder
+    spec:
+      nodeName: pi-1
+      serviceAccountName: intruder
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      containers:
+      - name: client
+        image: curlimages/curl:8.16.0
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - sh
+        - -ec
+        - if curl --fail --silent --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080;
+          then echo UNEXPECTED-authorized-identity; exit 1; fi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: network-blocked
+  namespace: homelab-verification
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 180
+  template:
+    metadata:
+      labels:
+        homelab.local/dns: allowed
+        app: network-blocked
+    spec:
+      nodeName: nix-gpu-3070-1
+      serviceAccountName: blocked
+      automountServiceAccountToken: false
+      restartPolicy: Never
+      containers:
+      - name: client
+        image: curlimages/curl:8.16.0
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          seccompProfile:
+            type: RuntimeDefault
+        command:
+        - sh
+        - -ec
+        - if curl --fail --silent --show-error --connect-timeout 3 --max-time 5 http://network-server.homelab-verification.svc.cluster.local:8080;
+          then echo UNEXPECTED-L4-access; exit 1; fi
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: homelab-verification-server
+  namespace: homelab-verification
+spec:
+  description: Temporary HBONE grant for positive and identity-negative tests; blocked
+    SA gets no path.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: homelab-verification
+      k8s:io.cilium.k8s.policy.serviceaccount: server
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: homelab-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: client
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: homelab-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: intruder
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: homelab-verification-client
+  namespace: homelab-verification
+spec:
+  description: Temporary explicit HBONE path to the test server.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: homelab-verification
+      k8s:io.cilium.k8s.policy.serviceaccount: client
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: homelab-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: server
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: homelab-verification-intruder
+  namespace: homelab-verification
+spec:
+  description: Temporary explicit HBONE path to the test server.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: homelab-verification
+      k8s:io.cilium.k8s.policy.serviceaccount: intruder
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: homelab-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: server
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-test-client
+  namespace: homelab-verification
+spec:
+  selector:
+    matchLabels:
+      app: network-server
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/homelab-verification/sa/client
+    to:
+    - operation:
+        ports:
+        - '8080'

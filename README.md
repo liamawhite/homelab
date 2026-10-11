@@ -1,9 +1,14 @@
 # homelab
 
 The cluster foundation is being migrated to Ansible for K3s and bootstrap, then
-Flux for kube-vip and Cilium. See [the deployment runbook](docs/cluster-runbook.md)
+Flux for kube-vip, Cilium, network policy, and Istio ambient. See [the deployment runbook](docs/cluster-runbook.md)
 for initialization, upgrades, and recovery. Application deployment is deferred until the foundation is verified and its
-migration is complete.
+migration is complete. The [network security architecture](docs/architecture/network-security.md)
+shows Ansible/Flux ownership, allowed traffic paths, and the deployment verification gate.
+
+Run `make kubeconfig` from an unlocked checkout to refresh `~/.kube/config` and
+select the `homelab` context. Repeated runs update the same entry and preserve
+other clusters. Unset `KUBECONFIG` if your shell points at a different config.
 
 Run `make kubeconfig` from an unlocked checkout to refresh `~/.kube/config` and
 select the `homelab` context. Repeated runs update the same entry and preserve

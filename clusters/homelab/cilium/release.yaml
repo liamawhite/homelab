@@ -35,7 +35,8 @@ spec:
     ipam:
       mode: cluster-pool
       operator:
-        clusterPoolIPv4PodCIDRList: [10.42.0.0/16]
+        clusterPoolIPv4PodCIDRList:
+        - 10.42.0.0/16
     cni:
       exclusive: false
       confPath: /var/lib/rancher/k3s/agent/etc/cni/net.d
@@ -46,5 +47,9 @@ spec:
       hostNamespaceOnly: true
     bpf:
       hostLegacyRouting: true
+      masquerade: false
     operator:
       replicas: 2
+    policyEnforcementMode: default
+    extraConfig:
+      allow-localhost: policy

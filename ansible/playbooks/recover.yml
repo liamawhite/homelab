@@ -40,28 +40,31 @@
             namespace: flux-system
           spec:
             suspend: true
-      loop: "{{ recovery_kustomizations.resources | default([]) | selectattr('metadata.name', 'in', ['flux-system', 'kube-vip', 'cilium']) | list }}"
+      loop: "{{ recovery_kustomizations.resources | default([]) | selectattr('metadata.name', 'in', ['flux-system', 'kube-vip', 'cilium', 'network-security', 'istio', 'mesh-security']) | list }}"
       loop_control:
         label: "{{ item.metadata.name }}"
 
-    - name: Inspect the Cilium HelmRelease
+    - name: Inspect foundation Helm releases
       kubernetes.core.k8s_info:
         kubeconfig: "{{ api_kubeconfig }}"
         api_version: helm.toolkit.fluxcd.io/v2
         kind: HelmRelease
-        name: cilium
         namespace: flux-system
-      register: recovery_cilium
+      register: recovery_helmreleases
 
-    - name: Suspend Cilium Helm reconciliation
+    - name: Suspend managed Helm reconciliation
       kubernetes.core.k8s:
         kubeconfig: "{{ api_kubeconfig }}"
         definition:
           apiVersion: helm.toolkit.fluxcd.io/v2
           kind: HelmRelease
-          metadata: {name: cilium, namespace: flux-system}
+          metadata:
+            name: "{{ item.metadata.name }}"
+            namespace: flux-system
           spec: {suspend: true}
-      when: recovery_cilium.resources | default([]) | length > 0
+      loop: "{{ recovery_helmreleases.resources | default([]) | selectattr('metadata.name', 'in', ['cilium', 'istio-base', 'istiod', 'istio-cni', 'ztunnel']) | list }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
 
     - name: Reapply known-good definitions
       ansible.builtin.include_role:

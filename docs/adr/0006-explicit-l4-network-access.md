@@ -1,0 +1,15 @@
+# Require explicit pod and mesh network access
+
+Default deny applies to ingress and egress for every pod, including system workloads. Each allowed connection identifies its source, destination, protocol, destination port (or ICMP type), and purpose; shared infrastructure exceptions must be explicit. Node processes and host-network workloads are outside this enforcement boundary: the homelab owner manages their isolation through external local-network controls and explicitly chose to remove repository-managed node firewalls. Pod policies still restrict application access to node services.
+
+Only trusted administration and deployment identities may modify network policies or security-relevant workload identities. Applications cannot grant themselves network access. Ordinary applications cannot use privileged containers, host namespaces, network administration capabilities, host ports, or host mounts that undermine enforcement; trusted infrastructure requires explicit exceptions.
+
+Cilium enforces permitted pod transport paths. Istio ambient enforces authenticated service identities and application permissions. Mesh grants name endpoints and tunnel ports rather than allowing HBONE cluster-wide. Every ambient workload receives default-deny authorization at ztunnel; waypoint-protected services must authorize the required waypoint identity to prevent direct bypass. Mesh enrollment, identity, and authorization failures must fail closed for application connections.
+
+Application internet egress defaults deny at L4. Workloads needing it receive explicit access through an egress waypoint, with direct bypass blocked by Cilium. Start with a shared waypoint and separate permissions for each workload and external destination. Protocols unsupported by the mesh remain denied unless a controlled proxy or specific infrastructure exception is approved. LAN exceptions identify the workload, device addresses, protocol, and ports.
+
+DNS, API access, monitoring, and probes require explicit grants. DNS clients use the designated cluster resolver, whose external queries may reach only the approved upstream. DNS-name filtering is a separate requirement; resolver-path restrictions alone do not prevent DNS exfiltration.
+
+Git is authoritative for pod network grants, mesh policies, admission restrictions, and security-relevant identities. Flux owns these after bootstrap; Ansible consumes the same definitions for initial installation and deliberate recovery. Recovery uses SSH and direct-node APIs independently of the mesh and must not open application traffic. Emergency changes must be recorded and reconciled.
+
+Before further homelab work, verification must demonstrate allowed connections and denied identities, ports, direct internet bypass, unauthorized pod access to nodes, admission self-grants, and application failure with the mesh unavailable. Node firewall tests and administrator CIDR configuration are intentionally outside this milestone. These decisions describe the target model; the live cluster has not yet been migrated.

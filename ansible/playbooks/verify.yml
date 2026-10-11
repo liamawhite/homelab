@@ -57,18 +57,39 @@
     - name: Verify Flux reconciliation
       ansible.builtin.command:
         argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, wait, --for=condition=Ready, "{{ item }}", --timeout=300s]
-      loop: [kustomization/flux-system, kustomization/kube-vip, kustomization/cilium, helmrelease/cilium]
+      loop: [kustomization/flux-system, kustomization/kube-vip, kustomization/cilium, kustomization/network-security, kustomization/istio, kustomization/mesh-security, helmrelease/cilium]
       changed_when: false
       when: verify_gitops | bool
+
+    - name: Require the active pod deny baseline
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ api_kubeconfig }}"
+        api_version: cilium.io/v2
+        kind: CiliumClusterwideNetworkPolicy
+        name: homelab-default-deny
+      register: deny_baseline
+
+    - name: Refuse connectivity tests without enforcement
+      ansible.builtin.assert:
+        that:
+          - deny_baseline.resources | length == 1
+          - deny_baseline.resources[0].spec.enableDefaultDeny.ingress
+          - deny_baseline.resources[0].spec.enableDefaultDeny.egress
+
+    - name: Check that the public denial target is reachable from the operator
+      ansible.builtin.wait_for:
+        host: 1.1.1.1
+        port: 443
+        timeout: 10
 
     - name: Create cross-node network verification workloads
       kubernetes.core.k8s:
         kubeconfig: "{{ api_kubeconfig }}"
-        src: "{{ repo_root }}/ansible/verification/network.yaml"
+        definition: "{{ lookup('ansible.builtin.file', repo_root + '/ansible/verification/network.yaml') | from_yaml_all | rejectattr('metadata.name', 'in', ['network-intruder', 'network-blocked']) | list }}"
         state: present
       register: verification_created
 
-    - name: Verify pod networking and DNS
+    - name: Verify allowed mesh traffic and denied identities, ports, node access, and internet bypass
       block:
         - name: Wait for the test server on pi-0
           ansible.builtin.command:
@@ -78,6 +99,20 @@
           ansible.builtin.command:
             argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
           loop: [network-pi-1, network-nix-server]
+          changed_when: false
+        - name: Start denial tests only after positive controls pass
+          kubernetes.core.k8s:
+            kubeconfig: "{{ api_kubeconfig }}"
+            definition: "{{ lookup('ansible.builtin.file', repo_root + '/ansible/verification/network.yaml') | from_yaml_all | selectattr('metadata.name', 'in', ['network-intruder', 'network-blocked']) | list }}"
+            state: present
+        - name: Require denied identities and missing L4 grants to fail
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
+          loop: [network-intruder, network-blocked]
+          changed_when: false
+        - name: Verify policy and identity admission restrictions
+          ansible.builtin.command:
+            argv: ["{{ ansible_playbook_python }}", "{{ repo_root }}/ansible/tools/verify_admission.py", "--kubeconfig={{ api_kubeconfig }}"]
           changed_when: false
       always:
         - name: Remove verification workloads

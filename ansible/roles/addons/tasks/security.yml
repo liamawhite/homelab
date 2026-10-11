@@ -1,0 +1,29 @@
+- name: Read explicit pod resolver input
+  ansible.builtin.include_vars:
+    file: "{{ cluster_dir }}/flux-system/network-inputs.yaml"
+    name: network_inputs
+
+- name: Render shared pod network and admission definitions
+  ansible.builtin.command:
+    argv: [kubectl, kustomize, "{{ cluster_dir }}/security"]
+  register: security_rendered
+  changed_when: false
+
+- name: Apply shared L4 and admission enforcement before Flux workloads
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    definition: "{{ security_rendered.stdout | replace('${UPSTREAM_DNS_IPV4}', network_inputs.data.UPSTREAM_DNS_IPV4) | from_yaml_all | list }}"
+    apply: true
+    server_side_apply:
+      field_manager: homelab-bootstrap
+      force_conflicts: "{{ allow_addon_recovery | bool }}"
+
+- name: Remove legacy additive Flux grants after explicit grants exist
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: flux-system
+    name: "{{ item }}"
+    state: absent
+  loop: [allow-egress, allow-scraping, allow-webhooks]

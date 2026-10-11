@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 10m
   path: ./clusters/homelab/kube-vip
-  # Critical API infrastructure must survive an accidental Git removal.
   prune: false
   sourceRef:
     kind: GitRepository
@@ -21,7 +20,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: kube-vip
+  - name: kube-vip
   interval: 10m
   path: ./clusters/homelab/cilium
   prune: false
@@ -29,8 +28,82 @@ spec:
     kind: GitRepository
     name: flux-system
   healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: cilium
-      namespace: flux-system
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: cilium
+    namespace: flux-system
   timeout: 10m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: network-security
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: cilium
+  interval: 10m
+  path: ./clusters/homelab/security
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  timeout: 10m
+  postBuild:
+    substituteFrom:
+    - kind: ConfigMap
+      name: homelab-network-inputs
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: istio
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: network-security
+  interval: 10m
+  path: ./clusters/homelab/istio
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  timeout: 10m
+  healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: istio-base
+    namespace: flux-system
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: istiod
+    namespace: flux-system
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: istio-cni
+    namespace: flux-system
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: ztunnel
+    namespace: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: mesh-security
+  namespace: flux-system
+spec:
+  dependsOn:
+  - name: istio
+  interval: 10m
+  path: ./clusters/homelab/mesh-security
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  timeout: 10m
+  healthChecks:
+  - apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    name: egress
+    namespace: istio-egress
