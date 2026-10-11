@@ -1,4 +1,4 @@
-name: lumenetes checks
+name: applications / lumenetes
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ env:
 
 jobs:
   format:
-    name: lumenetes / format
+    name: format
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,7 +42,7 @@ jobs:
       - run: make format-check
 
   lint:
-    name: lumenetes / lint
+    name: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,7 +68,7 @@ jobs:
           args: ./cmd/... ./internal/... ./gen/... ./api/...
 
   test:
-    name: lumenetes / test
+    name: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
