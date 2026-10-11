@@ -122,7 +122,6 @@
       changed_when: false
 
     - name: Hand off the verified foundation to Flux
-      when: enable_flux | bool
       block:
         - name: Install the checked-in Flux controllers
           kubernetes.core.k8s:
@@ -162,7 +161,7 @@
       spec:
         suspend: false
   loop: [flux-system, kube-vip, cilium]
-  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool
+  when: allow_addon_recovery | bool and resume_gitops | bool
 
 - name: Resume Cilium Helm reconciliation after successful online repair
   kubernetes.core.k8s:
@@ -172,7 +171,7 @@
       kind: HelmRelease
       metadata: {name: cilium, namespace: flux-system}
       spec: {suspend: false}
-  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
+  when: allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
 
 - name: Wait for the GitOps handoff
   ansible.builtin.command:
@@ -184,4 +183,4 @@
     - kustomization/cilium
     - helmrelease/cilium
   changed_when: false
-  when: enable_flux | bool and (not allow_addon_recovery | bool or resume_gitops | bool)
+  when: not allow_addon_recovery | bool or resume_gitops | bool

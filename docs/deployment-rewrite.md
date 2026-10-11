@@ -118,3 +118,8 @@ Flux, and passed node readiness, VIP, DNS, and cross-node traffic checks.
 
 Application and storage deployment remain the next phase. The earlier Nix
 server reboot issue and real K3s version-upgrade validation remain outstanding.
+
+After live handoff, the temporary Flux enablement switch was removed. Flux is
+now included in every complete bootstrap; `phase1` still permits K3s-only work.
+`resume_gitops=false` remains available for recovery during a Git outage, and
+`verify_gitops=false` skips reconciliation checks while intentionally suspended.
