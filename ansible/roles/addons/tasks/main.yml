@@ -116,7 +116,7 @@
             state: absent
           when: repair_values.path is defined
 
-    - name: Enforce the shared L4 and admission model
+    - name: Enforce the shared L4 model
       ansible.builtin.include_tasks: security.yml
 
     - name: Wait for all nodes to become Ready

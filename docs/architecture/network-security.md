@@ -2,8 +2,8 @@
 
 This first architecture lesson covers how Cilium controls pod traffic using source,
 destination, protocol, and port. The agreed security model is recorded in
-[ADR 0006](../adr/0006-explicit-l4-network-access.md). Istio and admission controls
-are also deployed; their architecture is reserved for later learning milestones.
+[ADR 0006](../adr/0006-explicit-l4-network-access.md). Istio is also deployed; its architecture is reserved for a later learning milestone.
+Admission controls are deferred to [issue #26](https://github.com/liamawhite/homelab/issues/26).
 
 ## Default deny
 
@@ -128,3 +128,9 @@ flowchart TB
 The initial rollout completed on 2026-10-11. Flux converged at
 `be2a9606ae2616c6ffc6d7638a3a283cd6ad3092`. Verification implementation and continuous
 checks are tracked separately in [issue #25](https://github.com/liamawhite/homelab/issues/25).
+
+Admission ownership and Pod Security enforcement are deferred. Existing Kubernetes
+RBAC still applies, but L4 rules alone do not prevent a sufficiently authorized
+API identity from changing policy or deploying a host-network/privileged workload.
+The removal PR requires the documented migration before previously deployed
+admission controls are retired.
