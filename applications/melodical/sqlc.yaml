@@ -1,0 +1,11 @@
+version: '2'
+sql:
+  - engine: sqlite
+    schema: internal/store/sql/schema.sql
+    queries: internal/store/sql/queries.sql
+    gen:
+      go:
+        package: sqlitedb
+        out: internal/store/sqlitedb
+        emit_json_tags: true
+        emit_empty_slices: true

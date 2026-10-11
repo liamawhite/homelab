@@ -1,0 +1,38 @@
+CREATE TABLE IF NOT EXISTS questions (
+ id TEXT PRIMARY KEY,
+ payload TEXT NOT NULL,
+ created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS attempts (
+ question_id TEXT PRIMARY KEY REFERENCES questions(id),
+ skill TEXT NOT NULL,
+ instrument TEXT NOT NULL,
+ topic TEXT NOT NULL,
+ key_name TEXT NOT NULL,
+ correct INTEGER NOT NULL,
+ assisted INTEGER NOT NULL,
+ interrupted INTEGER NOT NULL,
+ elapsed_ms INTEGER NOT NULL,
+ level INTEGER NOT NULL,
+ feedback TEXT NOT NULL,
+ created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS attempts_skill_time ON attempts(skill, created_at);
+CREATE TABLE IF NOT EXISTS reviews (
+ skill TEXT PRIMARY KEY,
+ instrument TEXT NOT NULL,
+ topic TEXT NOT NULL,
+ key_name TEXT NOT NULL,
+ attempts INTEGER NOT NULL DEFAULT 0,
+ correct INTEGER NOT NULL DEFAULT 0,
+ unaided INTEGER NOT NULL DEFAULT 0,
+ speed_total INTEGER NOT NULL DEFAULT 0,
+ speed_count INTEGER NOT NULL DEFAULT 0,
+ streak INTEGER NOT NULL DEFAULT 0,
+ due_at INTEGER NOT NULL DEFAULT 0,
+ last_seen INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS settings (
+ id INTEGER PRIMARY KEY CHECK (id = 1),
+ payload TEXT NOT NULL
+);

@@ -1,0 +1,32 @@
+{
+  "name": "melodical-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.71.1",
+    "vite": "8.3.4"
+  }
+}
