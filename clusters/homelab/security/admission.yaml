@@ -77,7 +77,7 @@ spec:
   validations:
   - expression: '''system:masters'' in request.userInfo.groups || request.userInfo.username
       in [''system:admin'', ''system:serviceaccount:flux-system:kustomize-controller'',
-      ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
+      ''system:serviceaccount:flux-system:helm-controller'', ''system:serviceaccount:flux-system:source-controller''] || request.userInfo.username
       in [''system:serviceaccount:kube-system:namespace-controller'', ''system:serviceaccount:kube-system:clusterrole-aggregation-controller'', ''system:kube-apiserver'', ''system:serviceaccount:kube-system:k3s-server'',
       ''system:serviceaccount:istio-system:istiod'']'
     message: Security configuration is owned by trusted administration and deployment
@@ -140,7 +140,7 @@ spec:
   validations:
   - expression: '''system:masters'' in request.userInfo.groups || request.userInfo.username
       in [''system:admin'', ''system:serviceaccount:flux-system:kustomize-controller'',
-      ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
+      ''system:serviceaccount:flux-system:helm-controller'', ''system:serviceaccount:flux-system:source-controller''] || request.userInfo.username
       in [''system:serviceaccount:kube-system:deployment-controller'', ''system:serviceaccount:kube-system:replicaset-controller'', ''system:serviceaccount:kube-system:daemon-set-controller'', ''system:serviceaccount:kube-system:statefulset-controller'', ''system:serviceaccount:kube-system:job-controller'', ''system:serviceaccount:kube-system:cronjob-controller'', ''system:serviceaccount:kube-system:replication-controller'', ''system:serviceaccount:kube-system:service-account-controller'', ''system:serviceaccount:kube-system:horizontal-pod-autoscaler'', ''system:kube-controller-manager'', ''system:kube-scheduler'', ''system:serviceaccount:istio-system:istiod'',
       ''system:serviceaccount:kube-system:local-path-provisioner-service-account'']
       || request.userInfo.username.startsWith(''system:node:'') || request.userInfo.username
