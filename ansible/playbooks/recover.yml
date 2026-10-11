@@ -5,8 +5,8 @@
   tasks:
     - name: Require an explicit add-on repair request
       ansible.builtin.assert:
-        that: [allow_addon_recovery | bool, enable_flux | bool]
-        fail_msg: "Recovery requires Flux to be enabled and allow_addon_recovery=true. Before handoff rerun phase2."
+        that: allow_addon_recovery | bool
+        fail_msg: "Recovery requires allow_addon_recovery=true. Before handoff rerun phase2."
 
     - name: Require published agreement before resuming Flux
       ansible.builtin.include_role:
@@ -69,4 +69,4 @@
 
 - ansible.builtin.import_playbook: verify.yml
   vars:
-    verify_gitops: "{{ enable_flux | bool and resume_gitops | bool }}"
+    verify_gitops: "{{ resume_gitops | bool }}"

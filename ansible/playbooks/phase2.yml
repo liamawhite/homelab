@@ -6,7 +6,6 @@
     - name: Require published definitions for the Flux handoff
       ansible.builtin.include_role:
         name: published
-      when: enable_flux | bool
 
 - ansible.builtin.import_playbook: access.yml
 

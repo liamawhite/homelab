@@ -88,27 +88,27 @@
             dest: "{{ repair_values.path }}"
             content: "{{ cilium_release.spec['values'] | to_nice_yaml }}"
             mode: "0600"
+        - name: Inspect Helm server-side repair support
+          ansible.builtin.command:
+            argv: [helm, upgrade, --help]
+          register: repair_helm_help
+          changed_when: false
         - name: Repair Helm resources even when release metadata already matches
           ansible.builtin.command:
-            argv:
-              - helm
-              - "--kubeconfig={{ api_kubeconfig }}"
-              - upgrade
-              - --install
-              - "{{ cilium_release.spec.releaseName }}"
-              - "{{ cilium_release.spec.chart.spec.chart }}"
-              - --repo
-              - "{{ cilium_repository.spec.url }}"
-              - --version
-              - "{{ cilium_release.spec.chart.spec.version }}"
-              - --namespace
-              - "{{ cilium_release.spec.storageNamespace }}"
-              - --reset-values
-              - --values
-              - "{{ repair_values.path }}"
-              - --wait
-              - --timeout
-              - "{{ cilium_release.spec.timeout }}"
+            # Flux owns these fields after adoption. During explicit repair,
+            # reclaim conflicts without replacing or uninstalling resources.
+            # Helm 3 uses client-side updates and has no force-conflicts flag.
+            argv: >-
+              {{ ['helm', '--kubeconfig=' + api_kubeconfig, 'upgrade', '--install',
+                  cilium_release.spec.releaseName, cilium_release.spec.chart.spec.chart,
+                  '--repo', cilium_repository.spec.url,
+                  '--version', cilium_release.spec.chart.spec.version,
+                  '--namespace', cilium_release.spec.storageNamespace,
+                  '--reset-values', '--values', repair_values.path,
+                  '--wait', '--timeout', cilium_release.spec.timeout]
+                 + (['--server-side=true', '--force-conflicts']
+                    if '--force-conflicts' in repair_helm_help.stdout else []) }}
+
       always:
         - name: Remove the temporary values file
           ansible.builtin.file:
@@ -122,7 +122,6 @@
       changed_when: false
 
     - name: Hand off the verified foundation to Flux
-      when: enable_flux | bool
       block:
         - name: Install the checked-in Flux controllers
           kubernetes.core.k8s:
@@ -162,7 +161,7 @@
       spec:
         suspend: false
   loop: [flux-system, kube-vip, cilium]
-  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool
+  when: allow_addon_recovery | bool and resume_gitops | bool
 
 - name: Resume Cilium Helm reconciliation after successful online repair
   kubernetes.core.k8s:
@@ -172,7 +171,7 @@
       kind: HelmRelease
       metadata: {name: cilium, namespace: flux-system}
       spec: {suspend: false}
-  when: enable_flux | bool and allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
+  when: allow_addon_recovery | bool and resume_gitops | bool and recovery_cilium.resources | default([]) | length > 0
 
 - name: Wait for the GitOps handoff
   ansible.builtin.command:
@@ -184,4 +183,4 @@
     - kustomization/cilium
     - helmrelease/cilium
   changed_when: false
-  when: enable_flux | bool and (not allow_addon_recovery | bool or resume_gitops | bool)
+  when: not allow_addon_recovery | bool or resume_gitops | bool

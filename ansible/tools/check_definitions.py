@@ -46,11 +46,10 @@ for old, new in [('v1.36.2+k3s1', 'v1.35.9+k3s1'), ('v1.36.2+k3s1', 'v1.38.0+k3s
 role = yaml.safe_load((root / 'ansible/roles/addons/tasks/main.yml').read_text())
 block = next(task for task in role if 'block' in task)['block']
 flux_block = next(task for task in block if task['name'] == 'Hand off the verified foundation to Flux')
-assert flux_block['when'] == 'enable_flux | bool'
+assert 'when' not in flux_block
 apply = next(task for task in flux_block['block'] if task['name'].startswith('Apply the shared'))
 settings = yaml.safe_load((root / 'ansible/inventory/group_vars/all.yml').read_text())
-assert isinstance(settings['enable_flux'], bool)
-assert settings['verify_gitops'] == '{{ enable_flux }}'
+assert settings['verify_gitops'] is True
 recovery_tasks = [
     {'ansible.builtin.set_fact': {'rendered': apply['kubernetes.core.k8s']['definition']}, 'loop': apply['loop'], 'register': 'renderings', 'no_log': True},
     {'ansible.builtin.assert': {'that': ["renderings.results[0].ansible_facts.rendered | type_debug == 'dict'", "not renderings.results[0].ansible_facts.rendered.spec.suspend | default(false)", 'renderings.results[1].ansible_facts.rendered.spec.suspend'], 'quiet': True}},
