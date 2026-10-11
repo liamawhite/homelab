@@ -5,6 +5,7 @@ on:
     paths:
       - "applications/parental/**"
       - ".github/workflows/parental-checks.yml"
+      - ".github/workflows/parental-publish.yml"
   workflow_dispatch:
 
 defaults:
