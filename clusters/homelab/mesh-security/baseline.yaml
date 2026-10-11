@@ -1,0 +1,60 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: homelab-strict-mtls
+  namespace: istio-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: homelab-workload-default-deny
+  namespace: istio-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  action: ALLOW
+  rules: []
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: homelab-waypoint-default-deny
+  namespace: istio-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: GatewayClass
+    name: istio-waypoint
+  action: ALLOW
+  rules: []
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-egress
+  labels:
+    istio.io/dataplane-mode: ambient
+    istio.io/use-waypoint: egress
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.36
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: egress
+  namespace: istio-egress
+  labels:
+    istio.io/waypoint-for: service
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE

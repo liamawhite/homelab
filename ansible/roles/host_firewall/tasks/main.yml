@@ -1,0 +1,83 @@
+- name: Read shared security inputs
+  ansible.builtin.include_vars:
+    file: "{{ cluster_dir }}/flux-system/network-inputs.yaml"
+    name: network_inputs
+
+- name: Require an explicit administrator allowlist before any firewall change
+  ansible.builtin.assert:
+    that:
+      - network_inputs.data.ADMIN_CIDRS_IPV4 | from_json | length > 0
+      - network_inputs.data.UPSTREAM_DNS_IPV4 | length > 0
+    fail_msg: "Set ADMIN_CIDRS_IPV4 and UPSTREAM_DNS_IPV4 in flux-system/network-inputs.yaml. No firewall changes were made."
+
+- name: Install nftables on Debian
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+    update_cache: true
+    policy_rc_d: 101
+  when: host_os == 'debian'
+
+- name: Require nftables in the NixOS runtime
+  ansible.builtin.command: nft --version
+  changed_when: false
+
+- name: Create persistent firewall directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop: [/etc/homelab, /var/lib/homelab, "{{ k3s_unit_dir }}"]
+
+- name: Write the approved pod resolver configuration
+  ansible.builtin.copy:
+    dest: /etc/homelab/resolv.conf
+    content: "nameserver {{ network_inputs.data.UPSTREAM_DNS_IPV4 }}\n"
+    mode: "0644"
+
+- name: Install the host firewall reconciler
+  ansible.builtin.copy:
+    src: host_firewall.py
+    dest: /var/lib/homelab/host_firewall.py
+    mode: "0755"
+  register: firewall_script
+
+- name: Write explicit host grants
+  ansible.builtin.copy:
+    dest: /etc/homelab/host-firewall.json
+    mode: "0600"
+    content: >-
+      {{ {'administrators': network_inputs.data.ADMIN_CIDRS_IPV4 | from_json,
+          'nodes': groups['k3s_servers'] | map('extract', hostvars, 'ansible_host') | list,
+          'vip': cluster_vip, 'pod_cidr': k3s_config['cluster-cidr'],
+          'dns': [network_inputs.data.UPSTREAM_DNS_IPV4],
+          'dhcp': [network_inputs.data.DHCP_SERVER_IPV4],
+          'ntp_hosts': network_inputs.data.NTP_HOSTNAMES | from_json,
+          'https_hosts': host_https_hosts} | to_nice_json }}
+  register: firewall_config
+
+- name: Install persistent firewall units
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ k3s_unit_dir }}/{{ item }}"
+    mode: "0644"
+  loop: [homelab-host-firewall.service, homelab-firewall-dns.service, homelab-firewall-dns.timer]
+  register: firewall_units
+
+- name: Validate and atomically load rules before starting K3s
+  ansible.builtin.command:
+    argv: ["{{ ansible_python_interpreter | default('/usr/bin/python3') }}", /var/lib/homelab/host_firewall.py, --resolve]
+  when: firewall_script.changed or firewall_config.changed or firewall_units.changed
+
+- name: Keep host enforcement active across boots
+  ansible.builtin.systemd_service:
+    name: homelab-host-firewall.service
+    daemon_reload: "{{ firewall_units.changed }}"
+    enabled: "{{ true if host_os == 'debian' else omit }}"
+    state: started
+
+- name: Start periodic resolution of approved infrastructure hosts
+  ansible.builtin.systemd_service:
+    name: homelab-firewall-dns.timer
+    enabled: "{{ true if host_os == 'debian' else omit }}"
+    state: started

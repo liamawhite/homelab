@@ -25,6 +25,7 @@ k3s_config:
   tls-san: "{{ [cluster_vip] + (groups['k3s_servers'] | map('extract', hostvars, 'ansible_host') | list) }}"
   token-file: "{{ k3s_token_path }}"
   write-kubeconfig-mode: "0600"
+  resolv-conf: /etc/homelab/resolv.conf
 # These expressions are evaluated locally. Never print the inventory with
 # evaluated variables: it includes credentials from the git-crypt checkout.
 bootstrap_secrets: "{{ lookup('ansible.builtin.file', repo_root + '/infra.yaml') | from_yaml }}"
@@ -36,3 +37,30 @@ run_disruptive_checks: false
 reboot_test_host: pi-0
 resume_gitops: true
 verify_gitops: true
+
+# Host-process exceptions for bootstrap, image pulls, and Nix package builds.
+# The OS firewall resolves only these named HTTPS destinations; apps get none.
+host_https_hosts:
+  - github.com
+  - api.github.com
+  - release-assets.githubusercontent.com
+  - objects.githubusercontent.com
+  - raw.githubusercontent.com
+  - ghcr.io
+  - pkg-containers.githubusercontent.com
+  - quay.io
+  - cdn.quay.io
+  - registry-1.docker.io
+  - auth.docker.io
+  - production.cloudflare.docker.com
+  - registry.istio.io
+  - registry.k8s.io
+  - us-central1-docker.pkg.dev
+  - us-east5-docker.pkg.dev
+  - europe-west4-docker.pkg.dev
+  - cache.nixos.org
+  - channels.nixos.org
+  - releases.nixos.org
+  - tarballs.nixos.org
+  - helm.cilium.io
+  - istio-release.storage.googleapis.com

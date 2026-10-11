@@ -57,9 +57,30 @@
     - name: Verify Flux reconciliation
       ansible.builtin.command:
         argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, wait, --for=condition=Ready, "{{ item }}", --timeout=300s]
-      loop: [kustomization/flux-system, kustomization/kube-vip, kustomization/cilium, helmrelease/cilium]
+      loop: [kustomization/flux-system, kustomization/kube-vip, kustomization/cilium, kustomization/network-security, kustomization/istio, kustomization/mesh-security, helmrelease/cilium]
       changed_when: false
       when: verify_gitops | bool
+
+    - name: Require the active pod deny baseline
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ api_kubeconfig }}"
+        api_version: cilium.io/v2
+        kind: CiliumClusterwideNetworkPolicy
+        name: homelab-default-deny
+      register: deny_baseline
+
+    - name: Refuse connectivity tests without enforcement
+      ansible.builtin.assert:
+        that:
+          - deny_baseline.resources | length == 1
+          - deny_baseline.resources[0].spec.enableDefaultDeny.ingress
+          - deny_baseline.resources[0].spec.enableDefaultDeny.egress
+
+    - name: Check that the public denial target is reachable from the operator
+      ansible.builtin.wait_for:
+        host: 1.1.1.1
+        port: 443
+        timeout: 10
 
     - name: Create cross-node network verification workloads
       kubernetes.core.k8s:
@@ -68,7 +89,7 @@
         state: present
       register: verification_created
 
-    - name: Verify pod networking and DNS
+    - name: Verify allowed mesh traffic and denied identities, ports, node access, and internet bypass
       block:
         - name: Wait for the test server on pi-0
           ansible.builtin.command:
@@ -77,7 +98,7 @@
         - name: Wait for test clients on the other two hosts
           ansible.builtin.command:
             argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
-          loop: [network-pi-1, network-nix-server]
+          loop: [network-pi-1, network-nix-server, network-intruder, network-blocked]
           changed_when: false
       always:
         - name: Remove verification workloads

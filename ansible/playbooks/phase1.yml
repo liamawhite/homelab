@@ -5,6 +5,14 @@
   any_errors_fatal: true
   roles: [preflight]
 
+- name: Enforce persistent host security before cluster startup
+  hosts: k3s_servers
+  become: true
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  roles: [host_firewall]
+
 - name: Initialize the seed server
   hosts: pi-0
   become: true

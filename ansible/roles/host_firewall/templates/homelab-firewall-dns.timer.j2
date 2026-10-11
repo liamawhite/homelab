@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh explicit infrastructure DNS destinations
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=5m
+Unit=homelab-firewall-dns.service
+
+[Install]
+WantedBy=timers.target

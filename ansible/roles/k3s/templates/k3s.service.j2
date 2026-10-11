@@ -1,7 +1,9 @@
 [Unit]
 Description=Homelab K3s (managed by Ansible)
 Wants=network-online.target
-After=network-online.target
+After=network-online.target homelab-host-firewall.service homelab-firewall-dns.service
+Requires=homelab-host-firewall.service
+Wants=homelab-firewall-dns.service
 {% if host_os == 'nixos' %}
 After=firewall.service
 {% endif %}

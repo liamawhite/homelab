@@ -1,0 +1,52 @@
+- name: Read shared Istio release definitions
+  ansible.builtin.set_fact:
+    istio_definitions: "{{ lookup('ansible.builtin.file', cluster_dir + '/istio/releases.yaml') | from_yaml_all | list }}"
+
+- name: Install the shared Istio namespace and Gateway API CRDs
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    definition: "{{ (istio_definitions | selectattr('kind', 'equalto', 'Namespace') | list) + (lookup('ansible.builtin.file', cluster_dir + '/istio/gateway-api.yaml') | from_yaml_all | list) }}"
+    apply: true
+    server_side_apply:
+      field_manager: homelab-bootstrap
+      force_conflicts: "{{ allow_addon_recovery | bool }}"
+
+- name: Install ambient using Flux's exact chart identities and values
+  kubernetes.core.helm:
+    kubeconfig: "{{ api_kubeconfig }}"
+    name: "{{ item.spec.releaseName }}"
+    release_namespace: "{{ item.spec.storageNamespace }}"
+    chart_ref: "{{ item.spec.chart.spec.chart }}"
+    chart_repo_url: https://istio-release.storage.googleapis.com/charts
+    chart_version: "{{ item.spec.chart.spec.version }}"
+    release_values: "{{ item.spec['values'] }}"
+    reset_values: true
+    wait: true
+    timeout: "{{ item.spec.timeout }}"
+  loop: "{{ istio_definitions | selectattr('kind', 'equalto', 'HelmRelease') | list }}"
+  loop_control:
+    label: "{{ item.spec.releaseName }}"
+  when: not allow_addon_recovery | bool
+
+- name: Repair ambient resources even when Helm metadata already matches
+  ansible.builtin.include_tasks: repair-mesh-release.yml
+  loop: "{{ istio_definitions | selectattr('kind', 'equalto', 'HelmRelease') | list }}"
+  loop_control:
+    loop_var: mesh_release
+    label: "{{ mesh_release.spec.releaseName }}"
+  when: allow_addon_recovery | bool
+
+- name: Render shared mesh authorization and egress waypoint
+  ansible.builtin.command:
+    argv: [kubectl, kustomize, "{{ cluster_dir }}/mesh-security"]
+  register: mesh_rendered
+  changed_when: false
+
+- name: Apply default-deny identity authorization and dormant egress waypoint
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    definition: "{{ mesh_rendered.stdout | from_yaml_all | list }}"
+    apply: true
+    server_side_apply:
+      field_manager: homelab-bootstrap
+      force_conflicts: "{{ allow_addon_recovery | bool }}"

@@ -1,0 +1,36 @@
+- name: Repair a shared ambient Helm release
+  block:
+    - name: Create a private shared-values file
+      ansible.builtin.tempfile:
+        state: file
+        path: "{{ local_state_dir }}"
+        suffix: -mesh-values.yaml
+      register: mesh_repair_values
+    - name: Write the exact shared ambient values
+      ansible.builtin.copy:
+        dest: "{{ mesh_repair_values.path }}"
+        content: "{{ mesh_release.spec['values'] | to_nice_yaml }}"
+        mode: "0600"
+    - name: Inspect Helm repair support
+      ansible.builtin.command:
+        argv: [helm, upgrade, --help]
+      register: mesh_helm_help
+      changed_when: false
+    - name: Reconcile actual resources during deliberate repair
+      ansible.builtin.command:
+        argv: >-
+          {{ ['helm', '--kubeconfig=' + api_kubeconfig, 'upgrade', '--install',
+              mesh_release.spec.releaseName, mesh_release.spec.chart.spec.chart,
+              '--repo', 'https://istio-release.storage.googleapis.com/charts',
+              '--version', mesh_release.spec.chart.spec.version,
+              '--namespace', mesh_release.spec.storageNamespace,
+              '--reset-values', '--values', mesh_repair_values.path,
+              '--wait', '--timeout', mesh_release.spec.timeout]
+             + (['--server-side=true', '--force-conflicts']
+                if '--force-conflicts' in mesh_helm_help.stdout else []) }}
+  always:
+    - name: Remove temporary ambient values
+      ansible.builtin.file:
+        path: "{{ mesh_repair_values.path }}"
+        state: absent
+      when: mesh_repair_values.path is defined

@@ -1,0 +1,236 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: homelab-security-ownership
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - networking.k8s.io
+      apiVersions:
+      - '*'
+      operations: &id001
+      - CREATE
+      - UPDATE
+      - DELETE
+      resources:
+      - networkpolicies
+    - apiGroups:
+      - cilium.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - ciliumnetworkpolicies
+      - ciliumclusterwidenetworkpolicies
+    - apiGroups:
+      - security.istio.io
+      - networking.istio.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - '*'
+    - apiGroups:
+      - gateway.networking.k8s.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - '*'
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - '*'
+    - apiGroups:
+      - admissionregistration.k8s.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - validatingadmissionpolicies
+      - validatingadmissionpolicybindings
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+    - apiGroups:
+      - ''
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - namespaces
+    - apiGroups:
+      - source.toolkit.fluxcd.io
+      - helm.toolkit.fluxcd.io
+      - kustomize.toolkit.fluxcd.io
+      apiVersions:
+      - '*'
+      operations: *id001
+      resources:
+      - '*'
+  validations:
+  - expression: '''system:masters'' in request.userInfo.groups || request.userInfo.username
+      in [''system:admin'', ''system:serviceaccount:flux-system:kustomize-controller'',
+      ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
+      in [''system:kube-apiserver'', ''system:serviceaccount:kube-system:k3s-server'',
+      ''system:serviceaccount:istio-system:istiod'']'
+    message: Security configuration is owned by trusted administration and deployment
+      identities.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: homelab-security-ownership
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  policyName: homelab-security-ownership
+  validationActions:
+  - Deny
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: homelab-workload-ownership
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+      - pods/ephemeralcontainers
+      - serviceaccounts
+    - apiGroups:
+      - apps
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+      - replicasets
+    - apiGroups:
+      - batch
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - jobs
+      - cronjobs
+  validations:
+  - expression: '''system:masters'' in request.userInfo.groups || request.userInfo.username
+      in [''system:admin'', ''system:serviceaccount:flux-system:kustomize-controller'',
+      ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
+      in [''system:kube-controller-manager'', ''system:kube-scheduler'', ''system:serviceaccount:istio-system:istiod'',
+      ''system:serviceaccount:kube-system:local-path-provisioner-service-account'']
+      || request.userInfo.username.startsWith(''system:node:'') || request.userInfo.username
+      == ''system:serviceaccount:istio-system:istio-cni'''
+    message: Applications cannot create or modify workloads or security-relevant identities.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: homelab-workload-ownership
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  policyName: homelab-workload-ownership
+  validationActions:
+  - Deny
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: homelab-application-namespaces
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - namespaces
+  validations:
+  - expression: object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease',
+      'flux-system', 'istio-system'] || (has(object.metadata.labels) && 'pod-security.kubernetes.io/enforce'
+      in object.metadata.labels && object.metadata.labels['pod-security.kubernetes.io/enforce']
+      == 'restricted' && 'istio.io/dataplane-mode' in object.metadata.labels && object.metadata.labels['istio.io/dataplane-mode']
+      == 'ambient')
+    message: Application namespaces require restricted Pod Security and ambient enrollment.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: homelab-application-namespaces
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  policyName: homelab-application-namespaces
+  validationActions:
+  - Deny
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: homelab-application-pods
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  validations:
+  - expression: request.namespace in ['kube-system','istio-system','flux-system']
+      || ((!has(object.metadata.labels) || !('istio.io/dataplane-mode' in object.metadata.labels)
+      || object.metadata.labels['istio.io/dataplane-mode'] == 'ambient') && (!has(object.metadata.annotations)
+      || !('ambient.istio.io/redirection' in object.metadata.annotations) || object.metadata.annotations['ambient.istio.io/redirection']
+      != 'disabled') && object.spec.containers.all(c, !has(c.ports) || c.ports.all(p,
+      !has(p.hostPort) || p.hostPort == 0)))
+    message: Application pods cannot disable ambient capture or expose host ports.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: homelab-application-pods
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  policyName: homelab-application-pods
+  validationActions:
+  - Deny
