@@ -5,6 +5,7 @@ on:
     paths:
       - "applications/shopping/**"
       - ".github/workflows/shopping-checks.yml"
+      - ".github/workflows/shopping-publish.yml"
   workflow_dispatch:
 
 defaults:
