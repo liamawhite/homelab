@@ -1,0 +1,97 @@
+- name: Require a deliberate disruptive acceptance test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Require explicit opt-in
+      ansible.builtin.assert:
+        that:
+          - run_disruptive_checks | bool
+          - reboot_test_host in groups['k3s_servers']
+        fail_msg: "This test interrupts the VIP owner and reboots the selected test host. Pass -e run_disruptive_checks=true."
+
+- ansible.builtin.import_playbook: access.yml
+
+- name: Identify the current VIP owner
+  hosts: k3s_servers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Check Ansible ownership before a disruptive test
+      ansible.builtin.stat:
+        path: /var/lib/homelab/managed-k3s
+      register: failover_managed
+    - name: Require a migrated cluster
+      ansible.builtin.assert:
+        that: failover_managed.stat.exists
+    - name: Read interface addresses
+      ansible.builtin.command:
+        argv: [ip, -json, address, show]
+      register: failover_addresses
+      changed_when: false
+    - name: Mark the VIP owner
+      ansible.builtin.set_fact:
+        owns_vip: "{{ cluster_vip in (failover_addresses.stdout | from_json | map(attribute='addr_info') | flatten | map(attribute='local') | list) }}"
+
+- name: Verify failover during a host reboot
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles: [access]
+  tasks:
+    - name: Require exactly one VIP owner
+      ansible.builtin.assert:
+        that:
+          - groups['k3s_servers'] | map('extract', hostvars, 'owns_vip') | select('equalto', true) | list | length == 1
+    - name: Select the actual VIP owner
+      ansible.builtin.set_fact:
+        vip_owner: "{{ item }}"
+      loop: "{{ groups['k3s_servers'] }}"
+      when: hostvars[item].owns_vip | bool
+    - name: Refresh VIP kubeconfig
+      ansible.builtin.copy:
+        dest: "{{ local_state_dir }}/vip.yaml"
+        content: "{{ lookup('ansible.builtin.file', api_kubeconfig) | regex_replace('https://[0-9.]+:6443', 'https://' + cluster_vip + ':6443') }}"
+        mode: "0600"
+      no_log: true
+    - name: Stop the VIP owner's K3s service to force a sustained failover
+      ansible.builtin.systemd_service:
+        name: k3s
+        state: stopped
+      delegate_to: "{{ vip_owner }}"
+      become: true
+    - name: Verify the VIP on a surviving server
+      block:
+        - name: Require VIP API recovery within one minute
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ local_state_dir }}/vip.yaml", --request-timeout=5s, get, --raw=/readyz]
+          register: failover_api
+          retries: 12
+          delay: 3
+          until: failover_api.rc == 0
+          changed_when: false
+      always:
+        - name: Ensure K3s is started after the acceptance check
+          ansible.builtin.systemd_service:
+            name: k3s
+            state: started
+          delegate_to: "{{ vip_owner }}"
+          become: true
+
+    - name: Require each direct API to be healthy before the reboot check
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ local_state_dir }}/{{ item }}.yaml", --request-timeout=5s, get, --raw=/readyz]
+      loop: "{{ groups['k3s_servers'] }}"
+      register: restored_api
+      retries: 30
+      delay: 3
+      until: restored_api.rc == 0
+      changed_when: false
+    - name: Reboot the selected host and verify SSH returns
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+        search_paths: [/run/current-system/sw/bin, /sbin, /bin, /usr/sbin, /usr/bin]
+      delegate_to: "{{ reboot_test_host }}"
+      become: true
+
+- ansible.builtin.import_playbook: verify.yml

@@ -1,0 +1,90 @@
+- ansible.builtin.import_playbook: access.yml
+
+- name: Verify the cluster foundation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles: [access]
+  tasks:
+    - name: Check the expected three Ready control-plane nodes
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ api_kubeconfig }}"
+        kind: Node
+      register: cluster_nodes
+
+    - name: Require the exact active inventory
+      ansible.builtin.assert:
+        that:
+          - cluster_nodes.resources | map(attribute='metadata.name') | sort == groups['k3s_servers'] | sort
+
+    - name: Require each node to participate in the control plane and etcd
+      ansible.builtin.assert:
+        that:
+          - "'node-role.kubernetes.io/control-plane' in item.metadata.labels"
+          - "'node-role.kubernetes.io/etcd' in item.metadata.labels"
+      loop: "{{ cluster_nodes.resources }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
+
+    - name: Wait for all nodes to be Ready
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", wait, --for=condition=Ready, nodes, --all, --timeout=300s]
+      changed_when: false
+
+    - name: Verify critical DaemonSets
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, kube-system, rollout, status, "daemonset/{{ item }}", --timeout=300s]
+      loop: [kube-vip, cilium]
+      changed_when: false
+
+    - name: Verify cluster DNS readiness
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, kube-system, rollout, status, deployment/coredns, --timeout=300s]
+      changed_when: false
+
+    - name: Refresh the private VIP kubeconfig
+      ansible.builtin.copy:
+        dest: "{{ local_state_dir }}/vip.yaml"
+        content: "{{ lookup('ansible.builtin.file', api_kubeconfig) | regex_replace('https://[0-9.]+:6443', 'https://' + cluster_vip + ':6443') }}"
+        mode: "0600"
+      no_log: true
+
+    - name: Verify TLS and readiness through the VIP
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ local_state_dir }}/vip.yaml", --request-timeout=10s, get, --raw=/readyz]
+      changed_when: false
+
+    - name: Verify Flux reconciliation
+      ansible.builtin.command:
+        argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, wait, --for=condition=Ready, "{{ item }}", --timeout=300s]
+      loop: [kustomization/flux-system, kustomization/kube-vip, kustomization/cilium, helmrelease/cilium]
+      changed_when: false
+      when: verify_gitops | bool
+
+    - name: Create cross-node network verification workloads
+      kubernetes.core.k8s:
+        kubeconfig: "{{ api_kubeconfig }}"
+        src: "{{ repo_root }}/ansible/verification/network.yaml"
+        state: present
+      register: verification_created
+
+    - name: Verify pod networking and DNS
+      block:
+        - name: Wait for the test server on pi-0
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=Ready, pod/network-server, --timeout=180s]
+          changed_when: false
+        - name: Wait for test clients on the other two hosts
+          ansible.builtin.command:
+            argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
+          loop: [network-pi-1, network-nix-server]
+          changed_when: false
+      always:
+        - name: Remove verification workloads
+          kubernetes.core.k8s:
+            kubeconfig: "{{ api_kubeconfig }}"
+            api_version: v1
+            kind: Namespace
+            name: homelab-verification
+            state: absent
+            wait: true

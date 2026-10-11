@@ -1,0 +1,3 @@
+- ansible.builtin.import_playbook: phase1.yml
+- ansible.builtin.import_playbook: phase2.yml
+- ansible.builtin.import_playbook: verify.yml

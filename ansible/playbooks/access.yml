@@ -1,0 +1,30 @@
+- name: Export private direct-node kubeconfigs without changing the default context
+  hosts: k3s_servers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read the administrator kubeconfig
+      ansible.builtin.slurp:
+        src: /etc/rancher/k3s/k3s.yaml
+      register: remote_kubeconfig
+      no_log: true
+      ignore_unreachable: true
+      failed_when: false
+
+    - name: Create private local state directory
+      ansible.builtin.file:
+        path: "{{ local_state_dir }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+      become: false
+
+    - name: Save a direct-node kubeconfig
+      ansible.builtin.copy:
+        dest: "{{ local_state_dir }}/{{ inventory_hostname }}.yaml"
+        content: "{{ remote_kubeconfig.content | b64decode | replace('https://127.0.0.1:6443', 'https://' + ansible_host + ':6443') }}"
+        mode: "0600"
+      delegate_to: localhost
+      become: false
+      no_log: true
+      when: remote_kubeconfig.content is defined

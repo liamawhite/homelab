@@ -1,0 +1,72 @@
+- name: Validate the recovery request and published definitions
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Require an explicit add-on repair request
+      ansible.builtin.assert:
+        that: [allow_addon_recovery | bool, enable_flux | bool]
+        fail_msg: "Recovery requires Flux to be enabled and allow_addon_recovery=true. Before handoff rerun phase2."
+
+    - name: Require published agreement before resuming Flux
+      ansible.builtin.include_role:
+        name: published
+      when: resume_gitops | bool
+
+- ansible.builtin.import_playbook: access.yml
+
+- name: Repair add-ons using a direct API and shared definitions
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles: [access]
+  tasks:
+    - name: Inspect existing reconciliation objects
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ api_kubeconfig }}"
+        api_version: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        namespace: flux-system
+      register: recovery_kustomizations
+
+    - name: Suspend managed Kustomizations before intervening
+      kubernetes.core.k8s:
+        kubeconfig: "{{ api_kubeconfig }}"
+        definition:
+          apiVersion: kustomize.toolkit.fluxcd.io/v1
+          kind: Kustomization
+          metadata:
+            name: "{{ item.metadata.name }}"
+            namespace: flux-system
+          spec:
+            suspend: true
+      loop: "{{ recovery_kustomizations.resources | default([]) | selectattr('metadata.name', 'in', ['flux-system', 'kube-vip', 'cilium']) | list }}"
+      loop_control:
+        label: "{{ item.metadata.name }}"
+
+    - name: Inspect the Cilium HelmRelease
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ api_kubeconfig }}"
+        api_version: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        name: cilium
+        namespace: flux-system
+      register: recovery_cilium
+
+    - name: Suspend Cilium Helm reconciliation
+      kubernetes.core.k8s:
+        kubeconfig: "{{ api_kubeconfig }}"
+        definition:
+          apiVersion: helm.toolkit.fluxcd.io/v2
+          kind: HelmRelease
+          metadata: {name: cilium, namespace: flux-system}
+          spec: {suspend: true}
+      when: recovery_cilium.resources | default([]) | length > 0
+
+    - name: Reapply known-good definitions
+      ansible.builtin.include_role:
+        name: addons
+
+- ansible.builtin.import_playbook: verify.yml
+  vars:
+    verify_gitops: "{{ enable_flux | bool and resume_gitops | bool }}"

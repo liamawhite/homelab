@@ -99,7 +99,11 @@ in
         description = "Label/annotate this Kubernetes Node with Longhorn's default-disks-config, before Longhorn's own controller can auto-create a single-disk Node CR";
         after = [ "k3s.service" ];
         wants = [ "k3s.service" ];
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "k3s.service" ];
+        unitConfig.ConditionPathExists = [
+          "/var/lib/homelab/k3s/current/bin/k3s"
+          "/etc/rancher/k3s/k3s.yaml"
+        ];
         serviceConfig = {
           Type = "oneshot";
           # Not RemainAfterExit: harmless (idempotent --overwrite) to rerun
@@ -110,12 +114,9 @@ in
         path = [ pkgs.gnugrep pkgs.coreutils ];
         script = ''
           set -eu
-          # k3s's own bundled kubectl subcommand - NixOS's k3s packaging
-          # doesn't populate a /var/lib/rancher/k3s/bin/kubectl symlink the
-          # way the upstream get.k3s.io installer does, so reference the
-          # actual package binary directly (same package modules/k3s.nix
-          # pins) rather than assuming a specific FHS path exists.
-          KUBECTL="${pkgs.k3s_1_36}/bin/k3s kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml"
+          # Follow Ansible's version selection; OS rebuilds must not pin
+          # a second K3s package independently of cluster upgrades.
+          KUBECTL="/var/lib/homelab/k3s/current/bin/k3s kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml"
           # config.networking.hostName is known at build time - no need for
           # a runtime `hostname` call, which also isn't on PATH by default
           # here (NixOS doesn't include it in `coreutils`).

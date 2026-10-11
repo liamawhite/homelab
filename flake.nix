@@ -19,6 +19,10 @@
               jq
               yq
               kubernetes-helm
+              kubectl
+              fluxcd
+              uv
+              sshpass
               k9s
               go
               docker

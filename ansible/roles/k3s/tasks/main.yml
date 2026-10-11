@@ -1,0 +1,134 @@
+- name: Inspect the current managed binary
+  ansible.builtin.stat:
+    path: "{{ k3s_binary }}"
+    follow: true
+  register: current_binary
+
+- name: Read the current version
+  ansible.builtin.command:
+    argv: ["{{ k3s_binary }}", --version]
+  register: current_version
+  changed_when: false
+  when: current_binary.stat.exists
+
+- name: Require the explicit upgrade playbook for version changes
+  ansible.builtin.assert:
+    that:
+      - not current_binary.stat.exists or ('k3s version ' + k3s_version + ' ') in current_version.stdout or allow_k3s_upgrade | bool
+    fail_msg: "Version mismatch: use the upgrade playbook rather than changing a running node during ordinary convergence."
+
+- name: Stage the desired K3s package
+  ansible.builtin.import_tasks: stage.yml
+
+- name: Build the common server configuration
+  ansible.builtin.set_fact:
+    desired_k3s_config: "{{ k3s_config | combine({'cluster-init': true} if inventory_hostname == k3s_seed else {'server': 'https://' + hostvars[k3s_seed].ansible_host + ':6443'}) }}"
+
+- name: Inspect the existing managed configuration
+  ansible.builtin.stat:
+    path: "{{ k3s_config_path }}"
+  register: config_exists
+
+- name: Read the existing managed configuration
+  ansible.builtin.slurp:
+    src: "{{ k3s_config_path }}"
+  register: old_config
+  no_log: true
+  when: config_exists.stat.exists
+
+- name: Prevent implicit cluster configuration migrations
+  ansible.builtin.assert:
+    that:
+      - (old_config.content | b64decode | from_yaml) == desired_k3s_config
+    fail_msg: "K3s configuration differs. Review an explicit migration instead of changing cluster-critical settings during convergence."
+  when: config_exists.stat.exists
+  no_log: true
+
+- name: Obtain the seed's CA-bound join token
+  ansible.builtin.slurp:
+    src: /var/lib/rancher/k3s/server/token
+  delegate_to: "{{ k3s_seed }}"
+  register: seed_join_token
+  no_log: true
+  when: inventory_hostname != k3s_seed
+
+- name: Choose the seed password or CA-bound join credential
+  ansible.builtin.set_fact:
+    desired_token: "{{ k3s_bootstrap_password if inventory_hostname == k3s_seed else (seed_join_token.content | b64decode | trim) }}"
+  no_log: true
+
+- name: Check whether a managed credential already exists
+  ansible.builtin.stat:
+    path: "{{ k3s_token_path }}"
+  register: existing_token
+
+- name: Read the existing managed credential
+  ansible.builtin.slurp:
+    src: "{{ k3s_token_path }}"
+  register: old_token
+  when: existing_token.stat.exists
+  no_log: true
+
+- name: Refuse implicit credential or cluster identity changes
+  ansible.builtin.assert:
+    that: [(old_token.content | b64decode | trim) == desired_token]
+    fail_msg: "The existing cluster credential differs; use an explicit credential migration or reset."
+  when: existing_token.stat.exists
+  no_log: true
+
+- name: Configure the join credential
+  ansible.builtin.copy:
+    dest: "{{ k3s_token_path }}"
+    content: "{{ desired_token }}\n"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  register: token_written
+
+- name: Write the server configuration
+  ansible.builtin.copy:
+    dest: "{{ k3s_config_path }}"
+    content: "{{ desired_k3s_config | to_nice_yaml }}"
+    owner: root
+    group: root
+    mode: "0600"
+  register: config_written
+
+- name: Select the desired version
+  ansible.builtin.file:
+    src: "{{ k3s_install_dir }}/{{ k3s_version }}"
+    dest: "{{ k3s_install_dir }}/current"
+    state: link
+  register: version_selected
+
+- name: Write the Ansible-owned service
+  ansible.builtin.template:
+    src: k3s.service.j2
+    dest: "{{ k3s_unit_dir }}/k3s.service"
+    owner: root
+    group: root
+    mode: "0644"
+  register: unit_written
+
+- name: Record ownership before startup so failed initialization can resume
+  ansible.builtin.copy:
+    dest: /var/lib/homelab/managed-k3s
+    content: "homelab-k3s-v1\n"
+    mode: "0600"
+
+- name: Start or restart only when managed inputs changed
+  ansible.builtin.systemd_service:
+    name: k3s
+    daemon_reload: "{{ unit_written.changed }}"
+    enabled: "{{ true if host_os == 'debian' else omit }}"
+    state: "{{ 'restarted' if version_selected.changed or unit_written.changed or config_written.changed or token_written.changed else 'started' }}"
+
+- name: Wait for the local API to be ready
+  ansible.builtin.command:
+    argv: ["{{ k3s_binary }}", kubectl, --kubeconfig=/etc/rancher/k3s/k3s.yaml, get, --raw=/readyz]
+  register: api_ready
+  retries: 60
+  delay: 5
+  until: api_ready.rc == 0
+  changed_when: false

@@ -1,0 +1,32 @@
+- name: Require committed cluster definitions before handing off to Git
+  ansible.builtin.command:
+    argv: [git, -C, "{{ repo_root }}", status, --porcelain, --, clusters/homelab]
+  register: cluster_git_status
+  changed_when: false
+
+- name: Reject uncommitted cluster definitions
+  ansible.builtin.assert:
+    that: [cluster_git_status.stdout == '']
+    fail_msg: "Commit and publish clusters/homelab before bootstrap. Flux must read exactly the definitions Ansible installs."
+
+- name: Fetch the intended Flux source without changing the checkout
+  ansible.builtin.command:
+    argv: [git, -C, "{{ repo_root }}", fetch, origin, main]
+  changed_when: false
+
+- name: Read the local cluster definition tree
+  ansible.builtin.command:
+    argv: [git, -C, "{{ repo_root }}", rev-parse, HEAD:clusters/homelab]
+  register: local_cluster_tree
+  changed_when: false
+
+- name: Read the published cluster definition tree
+  ansible.builtin.command:
+    argv: [git, -C, "{{ repo_root }}", rev-parse, FETCH_HEAD:clusters/homelab]
+  register: published_cluster_tree
+  changed_when: false
+
+- name: Require identical bootstrap and GitOps definitions
+  ansible.builtin.assert:
+    that: [local_cluster_tree.stdout == published_cluster_tree.stdout]
+    fail_msg: "Remote main differs from this checkout's cluster definitions. Publish them before rebuilding."

@@ -1,0 +1,89 @@
+- name: Create the persistent installation directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - "{{ k3s_install_dir }}"
+    - "{{ k3s_unit_dir }}"
+    - /etc/rancher/k3s
+
+- name: Install Debian runtime dependencies
+  ansible.builtin.apt:
+    name: [ca-certificates, iptables, iproute2, conntrack, socat]
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: host_os == 'debian'
+
+- name: Configure kernel networking modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/homelab-k3s.conf
+    content: "overlay\nbr_netfilter\n"
+    mode: "0644"
+  when: host_os == 'debian'
+
+- name: Load kernel networking modules
+  ansible.builtin.command:
+    argv: [modprobe, "{{ item }}"]
+  loop: [overlay, br_netfilter]
+  changed_when: false
+
+- name: Configure IPv4 forwarding
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/90-homelab-k3s.conf
+    content: "net.ipv4.ip_forward = 1\nnet.bridge.bridge-nf-call-iptables = 1\n"
+    mode: "0644"
+  when: host_os == 'debian'
+  register: sysctl_config
+
+- name: Apply forwarding settings
+  ansible.builtin.command:
+    argv: [sysctl, --system]
+  when: host_os == 'debian' and sysctl_config.changed
+
+- name: Create versioned Debian binary directory
+  ansible.builtin.file:
+    path: "{{ k3s_install_dir }}/{{ k3s_version }}/bin"
+    state: directory
+    mode: "0755"
+  when: host_os == 'debian'
+
+- name: Download the pinned upstream binary with its published checksum
+  ansible.builtin.get_url:
+    url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/k3s-{{ k3s_arch }}"
+    dest: "{{ k3s_install_dir }}/{{ k3s_version }}/bin/k3s"
+    checksum: "sha256:https://github.com/k3s-io/k3s/releases/download/{{ k3s_version | urlencode }}/sha256sum-{{ k3s_arch }}.txt"
+    mode: "0755"
+  when: host_os == 'debian'
+
+- name: Inspect the native Nix package root
+  ansible.builtin.stat:
+    path: "{{ k3s_install_dir }}/{{ k3s_version }}"
+    follow: true
+  register: nix_package
+  when: host_os == 'nixos'
+
+- name: Build and GC-root the exact native Nix package
+  ansible.builtin.command:
+    argv:
+      - nix
+      - build
+      - "github:NixOS/nixpkgs/{{ k3s_nixpkgs_revision }}#legacyPackages.x86_64-linux.{{ k3s_nix_attribute }}"
+      - --out-link
+      - "{{ k3s_install_dir }}/{{ k3s_version }}"
+  when: host_os == 'nixos' and not nix_package.stat.exists
+
+- name: Verify the staged package actually matches the declared version
+  ansible.builtin.command:
+    argv: ["{{ k3s_install_dir }}/{{ k3s_version }}/bin/k3s", --version]
+  register: staged_version
+  changed_when: false
+
+- name: Reject mismatched package pins
+  ansible.builtin.assert:
+    that:
+      - "('k3s version ' + k3s_version + ' ') in staged_version.stdout"
+    fail_msg: "The staged K3s package does not match k3s_version. Update the native Nix package pin alongside the version."

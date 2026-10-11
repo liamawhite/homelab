@@ -1,0 +1,41 @@
+repo_root: "{{ inventory_dir }}/../.."
+cluster_dir: "{{ repo_root }}/clusters/homelab"
+local_state_dir: "{{ repo_root }}/.homelab"
+k3s_seed: pi-0
+cluster_vip: 192.168.1.50
+k3s_version: v1.36.2+k3s1
+# Native Nix packaging is required on NixOS. This revision provides the
+# exact version above; upgrade.yml verifies the built binary before switching.
+k3s_nixpkgs_revision: 1559d3daa3ecc813a650b79375ea61b6741b8746
+k3s_nix_attribute: k3s_1_36
+k3s_install_dir: /var/lib/homelab/k3s
+k3s_binary: "{{ k3s_install_dir }}/current/bin/k3s"
+k3s_unit_dir: "{{ '/var/lib/homelab/systemd' if host_os == 'nixos' else '/etc/systemd/system' }}"
+k3s_config_path: /etc/rancher/k3s/config.yaml
+k3s_token_path: /etc/rancher/k3s/bootstrap-token
+k3s_config:
+  node-name: "{{ inventory_hostname }}"
+  node-ip: "{{ ansible_host }}"
+  cluster-cidr: 10.42.0.0/16
+  service-cidr: 10.43.0.0/16
+  flannel-backend: none
+  disable-kube-proxy: true
+  disable-network-policy: true
+  disable: [traefik, servicelb]
+  tls-san: "{{ [cluster_vip] + (groups['k3s_servers'] | map('extract', hostvars, 'ansible_host') | list) }}"
+  token-file: "{{ k3s_token_path }}"
+  write-kubeconfig-mode: "0600"
+# These expressions are evaluated locally. Never print the inventory with
+# evaluated variables: it includes credentials from the git-crypt checkout.
+bootstrap_secrets: "{{ lookup('ansible.builtin.file', repo_root + '/infra.yaml') | from_yaml }}"
+# Reuse the password portion, not the old cluster's CA fingerprint.
+k3s_bootstrap_password: "{{ bootstrap_secrets.cluster.token.split('::')[-1].split(':')[-1] }}"
+allow_k3s_upgrade: false
+allow_addon_recovery: false
+run_disruptive_checks: false
+reboot_test_host: pi-0
+resume_gitops: true
+# Enable after the foundation is verified and these definitions are merged.
+# enable_flux: true
+enable_flux: false
+verify_gitops: "{{ enable_flux }}"

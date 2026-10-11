@@ -1,0 +1,21 @@
+- name: Preflight every server before changing any host
+  hosts: k3s_servers
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  roles: [preflight]
+
+- name: Initialize the seed server
+  hosts: pi-0
+  become: true
+  gather_facts: false
+  any_errors_fatal: true
+  roles: [k3s]
+
+- name: Join the remaining servers one at a time
+  hosts: k3s_servers:!pi-0
+  become: true
+  gather_facts: false
+  serial: 1
+  any_errors_fatal: true
+  roles: [k3s]

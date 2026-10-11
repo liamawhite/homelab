@@ -1,0 +1,17 @@
+- name: Find a ready direct API endpoint
+  ansible.builtin.command:
+    argv: [kubectl, "--kubeconfig={{ local_state_dir }}/{{ item }}.yaml", --request-timeout=5s, get, --raw=/readyz]
+  loop: "{{ groups['k3s_servers'] }}"
+  register: direct_apis
+  failed_when: false
+  changed_when: false
+
+- name: Require at least one healthy API
+  ansible.builtin.assert:
+    that:
+      - direct_apis.results | selectattr('rc', 'equalto', 0) | list | length > 0
+    fail_msg: "No direct API is ready. Repair K3s/etcd over SSH before attempting add-on recovery."
+
+- name: Select the direct API kubeconfig
+  ansible.builtin.set_fact:
+    api_kubeconfig: "{{ local_state_dir }}/{{ (direct_apis.results | selectattr('rc', 'equalto', 0) | first).item }}.yaml"

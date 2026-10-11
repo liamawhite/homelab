@@ -1,0 +1,24 @@
+[Unit]
+Description=Homelab K3s (managed by Ansible)
+Wants=network-online.target
+After=network-online.target
+{% if host_os == 'nixos' %}
+After=firewall.service
+{% endif %}
+
+[Service]
+Type=notify
+Environment="PATH={{ '/run/current-system/sw/bin:/run/current-system/sw/sbin' if host_os == 'nixos' else '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }}"
+ExecStart={{ k3s_binary }} server --config {{ k3s_config_path }}
+KillMode=process
+Delegate=yes
+Restart=always
+RestartSec=5s
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
