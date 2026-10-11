@@ -42,8 +42,6 @@ metadata:
   labels:
     istio.io/dataplane-mode: ambient
     istio.io/use-waypoint: egress
-    pod-security.kubernetes.io/enforce: restricted
-    pod-security.kubernetes.io/enforce-version: v1.36
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway

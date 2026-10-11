@@ -3,7 +3,6 @@ kind: Namespace
 metadata:
   name: istio-system
   labels:
-    pod-security.kubernetes.io/enforce: privileged
     homelab.local/infrastructure: 'true'
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
