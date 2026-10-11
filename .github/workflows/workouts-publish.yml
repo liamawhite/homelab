@@ -1,4 +1,4 @@
-name: Publish workouts image
+name: applications / workouts
 
 on:
   push:
@@ -12,7 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  build:
+    name: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
