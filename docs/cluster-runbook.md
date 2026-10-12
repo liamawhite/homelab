@@ -1,7 +1,7 @@
 # Cluster bootstrap and recovery runbook
 
 Run commands from the repository root. Ansible owns K3s installation, configuration,
-services, and upgrades. Flux owns kube-vip, Cilium, network/admission policy, Istio ambient, and its own controllers after
+services, and upgrades. Flux owns kube-vip, Cilium, network policy, Istio ambient, and its own controllers after
 handoff. Both bootstrap and repair consume `clusters/homelab/`.
 
 | Host | Address | OS | Role |
@@ -326,7 +326,7 @@ Expect all three inventory nodes Ready with control-plane/etcd labels; kube-vip
 and Cilium ready on every server; CoreDNS ready; VIP TLS/API access working;
 foundation Flux reconciliation Ready and resumed; and cross-node HTTP/DNS tests
 passing, with unauthorized identities, ports, direct internet, and node API access
-denied and admission self-grants rejected. Normal phase 2 should report zero changes after handoff.
+denied. Normal phase 2 should report zero changes after handoff.
 
 `verify` requires all three intended nodes, so it can fail while a degraded
 cluster still serves traffic. During an intentional Git outage, use
@@ -387,17 +387,16 @@ to node services still requires an explicit Cilium grant.
    Publish the reviewed definitions to `main` and use a matching checkout. The
    existing published-definition guard still applies.
 3. Run `scripts/homelab security`. It deliberately reconciles shared Cilium,
-   network/admission policy, Istio ambient, and Flux definitions through a direct
+   network policy, Istio ambient, and Flux definitions through a direct
    API, then resumes Flux and runs verification. It does not configure host
    firewall rules or restart K3s for a host resolver migration.
-4. Complete the allowed/denied traffic and admission checks, then exercise mesh
+4. Complete the allowed/denied traffic checks, then exercise mesh
    failure and administrative recovery. Keep the milestone incomplete until all
-   checks pass. Automated `verify` covers cross-node traffic and admission;
+   checks pass. Automated `verify` covers cross-node traffic;
    disruptive mesh outage/recovery remains a separate deployment check.
 
 Flux's stock allow-all network policies are removed. Revocable network and mesh
-grants are pruned when removed from Git; default-deny baselines and admission
-controls are protected from accidental pruning. Existing non-foundation workloads
+grants are pruned when removed from Git; default-deny baselines are protected from accidental pruning. Existing non-foundation workloads
 must be inventoried before applying this to a cluster with additional applications.
 The inspected foundation contains no application workloads.
 
@@ -407,3 +406,24 @@ It uses the same definitions and resumes reconciliation only after repair. A
 failure leaves reconciliation suspended for diagnosis. During a Git outage,
 recovery preserves deny policies and leaves Flux suspended; chart and image
 availability still depend on external node connectivity and explicit pod grants.
+
+## Defer admission enforcement
+
+Admission security is a later learning milestone tracked in
+[issue #26](https://github.com/liamawhite/homelab/issues/26). The removal definitions
+omit the four homelab ValidatingAdmissionPolicies and bindings and all
+repository-managed Pod Security labels. Container security contexts remain.
+
+The deployed admission objects have `prune: disabled`; deleting their manifests
+will not delete those objects. After merging the admission-removal PR, run
+`scripts/homelab security` from a checkout matching published main. The playbook
+suspends managed reconciliation, preserves the L4 policies, explicitly deletes
+only the four named homelab bindings and policies, removes repository-managed
+Pod Security labels from `default`, `istio-egress`, `istio-system`, and
+`flux-system`, then resumes Flux and runs traffic verification. Bootstrap on a
+fresh cluster skips nonexistent objects. User-managed namespaces and unrelated
+admission policies are outside this cleanup.
+
+Confirm no named homelab admission policies/bindings or managed Pod Security
+labels remain, and Flux and traffic checks still pass. Until that migration runs,
+the existing live admission controls can remain active despite the Git removal.

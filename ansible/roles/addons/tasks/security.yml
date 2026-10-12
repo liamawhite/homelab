@@ -3,13 +3,13 @@
     file: "{{ cluster_dir }}/flux-system/network-inputs.yaml"
     name: network_inputs
 
-- name: Render shared pod network and admission definitions
+- name: Render shared pod network definitions
   ansible.builtin.command:
     argv: [kubectl, kustomize, "{{ cluster_dir }}/security"]
   register: security_rendered
   changed_when: false
 
-- name: Apply shared L4 and admission enforcement before Flux workloads
+- name: Apply shared L4 enforcement before Flux workloads
   kubernetes.core.k8s:
     kubeconfig: "{{ api_kubeconfig }}"
     definition: "{{ security_rendered.stdout | replace('${UPSTREAM_DNS_IPV4}', network_inputs.data.UPSTREAM_DNS_IPV4) | from_yaml_all | list }}"
@@ -27,3 +27,48 @@
     name: "{{ item }}"
     state: absent
   loop: [allow-egress, allow-scraping, allow-webhooks]
+
+# These objects were protected from Flux pruning. Explicit retirement is needed
+# when migrating an already deployed cluster to the L4 learning milestone.
+- name: Retire protected homelab admission bindings
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    api_version: admissionregistration.k8s.io/v1
+    kind: ValidatingAdmissionPolicyBinding
+    name: "{{ item }}"
+    state: absent
+  loop: &retired_admission_names
+    - homelab-security-ownership
+    - homelab-workload-ownership
+    - homelab-application-namespaces
+    - homelab-application-pods
+
+- name: Retire protected homelab admission policies
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    api_version: admissionregistration.k8s.io/v1
+    kind: ValidatingAdmissionPolicy
+    name: "{{ item }}"
+    state: absent
+  loop: *retired_admission_names
+
+- name: Remove repository-managed Pod Security admission labels
+  kubernetes.core.k8s:
+    kubeconfig: "{{ api_kubeconfig }}"
+    state: patched
+    merge_type: [merge]
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ item }}"
+        labels:
+          pod-security.kubernetes.io/enforce: null
+          pod-security.kubernetes.io/enforce-version: null
+          pod-security.kubernetes.io/warn: null
+          pod-security.kubernetes.io/warn-version: null
+  register: retired_pod_security_labels
+  until: retired_pod_security_labels is succeeded
+  retries: 6
+  delay: 2
+  loop: [default, istio-egress, istio-system, flux-system]

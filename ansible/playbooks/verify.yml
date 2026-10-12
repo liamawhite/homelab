@@ -111,10 +111,6 @@
             argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, homelab-verification, wait, --for=condition=complete, "job/{{ item }}", --timeout=180s]
           loop: [network-intruder, network-blocked]
           changed_when: false
-        - name: Verify policy and identity admission restrictions
-          ansible.builtin.command:
-            argv: ["{{ ansible_playbook_python }}", "{{ repo_root }}/ansible/tools/verify_admission.py", "--kubeconfig={{ api_kubeconfig }}"]
-          changed_when: false
       always:
         - name: Remove verification workloads
           kubernetes.core.k8s:

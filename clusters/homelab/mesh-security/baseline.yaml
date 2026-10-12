@@ -42,8 +42,6 @@ metadata:
   labels:
     istio.io/dataplane-mode: ambient
     istio.io/use-waypoint: egress
-    pod-security.kubernetes.io/enforce: restricted
-    pod-security.kubernetes.io/enforce-version: v1.36
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -54,7 +52,26 @@ metadata:
     istio.io/waypoint-for: service
 spec:
   gatewayClassName: istio-waypoint
+  infrastructure:
+    parametersRef:
+      group: ""
+      kind: ConfigMap
+      name: egress-pod-security
   listeners:
   - name: mesh
     port: 15008
     protocol: HBONE
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: egress-pod-security
+  namespace: istio-egress
+data:
+  deployment: |
+    spec:
+      template:
+        spec:
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault

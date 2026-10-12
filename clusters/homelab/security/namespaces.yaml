@@ -6,5 +6,3 @@ metadata:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     istio.io/dataplane-mode: ambient
-    pod-security.kubernetes.io/enforce: restricted
-    pod-security.kubernetes.io/enforce-version: v1.36
