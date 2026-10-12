@@ -407,6 +407,26 @@ failure leaves reconciliation suspended for diagnosis. During a Git outage,
 recovery preserves deny policies and leaves Flux suspended; chart and image
 availability still depend on external node connectivity and explicit pod grants.
 
+## Verify the registered TLS egress path
+
+Run `scripts/verify-egress` to verify registered downloads, explicit caller/path
+authorization, denied unregistered destinations and direct 80/443 bypass, and
+the actual waypoint TLS/certificate-validation configuration. Add `--disruptive`
+to briefly stop and restore the waypoint and prove fail-closed behavior; this
+temporarily interrupts Flux downloads. Successful verification removes its
+temporary resources; failures retain them for diagnosis.
+
+After changing Istio chart versions, run
+`uv run --project ansible --locked python ansible/tools/update_helm_index.py` and
+update the registered chart paths before publishing. The pinned index retains
+upstream digests while supplying HTTP URLs that the gateway upgrades to TLS.
+Envoy access logs are JSON on stdout: `kubectl -n istio-egress logs deployment/egress`.
+
+The local rollout holds root, Cilium, network-security, Istio, and mesh-security
+Kustomizations pending merge. Resume them only after the reviewed definitions
+are on main, then verify their updated revision is Ready. Tailscale's separate
+Kustomizations and release remain suspended pending TLS-origination compatibility.
+
 ## Defer admission enforcement
 
 Admission security is a later learning milestone tracked in

@@ -118,9 +118,9 @@ The later gateway decision supersedes the direct chart-download proposal, which
 has been removed. Kubernetes API access remains a pending internal-path decision.
 
 Local shared-definition checks, pinned chart rendering, Ansible syntax checks,
-and server dry runs passed. These checks do not establish that the existing
-cluster-wide security model is enforced; its invalid baseline and absent live
-homelab admission policies remain prerequisite findings for final verification.
+and server dry runs passed. Initial inspection found the invalid Cilium baseline;
+the gateway-first rollout below repaired and verified it. Global admission
+enforcement remains deliberately deferred to issue #26 on main.
 
 ## Gateway-first rollout and verification
 
@@ -145,12 +145,13 @@ Review the gateway's chart path permissions at the same time. Cold bootstrap
 installs ambient, the shared gateway resources, and the internal index before
 Flux starts; operator-side chart downloads still use HTTPS independently of the mesh.
 
-The corrected cluster-wide deny baseline and admission rules are now active.
-Live rollout exposed missing K3s controller identities and ambient local delivery
-from `169.254.7.127`; exact identities and receiver ports are explicitly permitted.
-Namespace-controller cleanup can delete security resources only in an already
-deleting namespace. A malformed privileged-pod negative test was corrected to
-exercise Pod Security rather than Kubernetes field validation.
+The corrected cluster-wide deny baseline is now active. Live rollout exposed
+ambient local delivery from `169.254.7.127`; that exact source and required
+receiver ports are explicitly permitted. Merge review revealed that main had
+deliberately deferred global admission enforcement to issue #26. The older
+branch's temporarily staged admission policies were retired, and the final
+change preserves that deferral. Tailscale's explicitly requested restricted
+namespace and proxy security contexts remain scoped to its migration.
 
 Verified live:
 
@@ -158,14 +159,13 @@ Verified live:
 - Envoy's actual configuration contains expected SNI, exact certificate SAN checks, and system trust roots for all three origins.
 - Unauthorized identity and unapproved Git path return 403; unregistered hosts, direct public-IP ports 80/443, and client HTTPS bypass fail.
 - Waypoint outage fails closed, and recovery restores the allowed path.
-- Cross-node allowed mesh traffic, denied identities/ports/node access/internet bypass, and enforced admission restrictions.
+- Cross-node allowed mesh traffic and denied identities/ports/node access/internet bypass.
 - Istio access logging emits JSON to stdout, confirmed on the live egress waypoint.
 
 `scripts/verify-egress` repeats the gateway checks and cleans successful temporary
 resources. Use `--disruptive` to additionally stop and restore the waypoint;
 failed verification retains resources for diagnosis. The cross-node matrix
-passed; its admission fixture correction was then verified separately, including
-denial of namespace-controller policy deletion while a namespace is active.
+passed. Global admission verification remains a separate deferred milestone.
 
 All active Flux controllers and foundation Helm releases are healthy. The old
 Flux containers were confirmed exited before their stuck terminating Pod objects
