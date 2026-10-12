@@ -1,0 +1,62 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: flux-artifacts
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app: source-controller
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/helm-controller
+        - cluster.local/ns/flux-system/sa/kustomize-controller
+    to:
+    - operation:
+        ports:
+        - '9090'
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: flux-events
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app: notification-controller
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+        - cluster.local/ns/flux-system/sa/helm-controller
+        - cluster.local/ns/flux-system/sa/kustomize-controller
+    to:
+    - operation:
+        ports:
+        - '9090'
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: flux-chart-index
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app: helm-index
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        ports:
+        - '8080'

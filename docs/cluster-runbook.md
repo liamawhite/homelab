@@ -361,10 +361,9 @@ record and the unresolved Nix server reboot issue.
 ## Network security migration
 
 The target and ownership boundaries are illustrated in
-[the network security architecture](architecture/network-security.md). The migration completed on 2026-10-11, with Flux converged at
-`be2a9606ae2616c6ffc6d7638a3a283cd6ad3092`. Live traffic and admission checks passed;
-disruptive mesh outage/recovery remains untested. The following steps document
-the initial migration procedure.
+[the network security architecture](architecture/network-security.md). This change
+is now enforced in the running cluster. See `docs/tailscale-migration.md` for the
+current gateway rollout, verification evidence, and held reconciliation.
 
 Node and host-network isolation is managed through the homelab owner's external
 local-network controls. This change adds no node firewall, administrator CIDR
@@ -407,6 +406,26 @@ It uses the same definitions and resumes reconciliation only after repair. A
 failure leaves reconciliation suspended for diagnosis. During a Git outage,
 recovery preserves deny policies and leaves Flux suspended; chart and image
 availability still depend on external node connectivity and explicit pod grants.
+
+## Verify the registered TLS egress path
+
+Run `scripts/verify-egress` to verify registered downloads, explicit caller/path
+authorization, denied unregistered destinations and direct 80/443 bypass, and
+the actual waypoint TLS/certificate-validation configuration. Add `--disruptive`
+to briefly stop and restore the waypoint and prove fail-closed behavior; this
+temporarily interrupts Flux downloads. Successful verification removes its
+temporary resources; failures retain them for diagnosis.
+
+After changing Istio chart versions, run
+`uv run --project ansible --locked python ansible/tools/update_helm_index.py` and
+update the registered chart paths before publishing. The pinned index retains
+upstream digests while supplying HTTP URLs that the gateway upgrades to TLS.
+Envoy access logs are JSON on stdout: `kubectl -n istio-egress logs deployment/egress`.
+
+The local rollout holds root, Cilium, network-security, Istio, and mesh-security
+Kustomizations pending merge. Resume them only after the reviewed definitions
+are on main, then verify their updated revision is Ready. Tailscale's separate
+Kustomizations and release remain suspended pending TLS-origination compatibility.
 
 ## Defer admission enforcement
 

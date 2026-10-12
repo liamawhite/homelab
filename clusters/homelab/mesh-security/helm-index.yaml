@@ -1,0 +1,108 @@
+# Curated pinned metadata; HTTP download URLs are encrypted by the egress waypoint.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helm-index
+  namespace: flux-system
+data:
+  index.yaml: "apiVersion: v1\nentries:\n  base:\n  - apiVersion: v2\n    appVersion:\
+    \ 1.30.2\n    created: '2026-06-24T16:49:36.475712327Z'\n    description: Helm\
+    \ chart for deploying Istio cluster resources and CRDs\n    digest: ca90466ac96e6286a03e3c6481dca324dd3d4682dee3dabd9c85af9776363ac1\n\
+    \    icon: https://istio.io/latest/favicons/android-192x192.png\n    keywords:\n\
+    \    - istio\n    name: base\n    sources:\n    - https://github.com/istio/istio\n\
+    \    urls:\n    - http://istio-release.storage.googleapis.com/charts/base-1.30.2.tgz\n\
+    \    version: 1.30.2\n  istiod:\n  - apiVersion: v2\n    appVersion: 1.30.2\n\
+    \    created: '2026-06-24T16:49:36.47880559Z'\n    description: Helm chart for\
+    \ istio control plane\n    digest: be0127e3e060caa5792106ecbb7a77d230d7678b9b43e726abc3a694d3438f9b\n\
+    \    icon: https://istio.io/latest/favicons/android-192x192.png\n    keywords:\n\
+    \    - istio\n    - istiod\n    - istio-discovery\n    name: istiod\n    sources:\n\
+    \    - https://github.com/istio/istio\n    urls:\n    - http://istio-release.storage.googleapis.com/charts/istiod-1.30.2.tgz\n\
+    \    version: 1.30.2\n  cni:\n  - apiVersion: v2\n    appVersion: 1.30.2\n   \
+    \ created: '2026-06-24T16:49:36.476428955Z'\n    description: Helm chart for istio-cni\
+    \ components\n    digest: b19aabbf0c5e774e783e25d7ff6ce5cf7ac1b8e53b4edf21fc9c9420627624e7\n\
+    \    icon: https://istio.io/latest/favicons/android-192x192.png\n    keywords:\n\
+    \    - istio-cni\n    - istio\n    name: cni\n    sources:\n    - https://github.com/istio/istio\n\
+    \    urls:\n    - http://istio-release.storage.googleapis.com/charts/cni-1.30.2.tgz\n\
+    \    version: 1.30.2\n  ztunnel:\n  - apiVersion: v2\n    appVersion: 1.30.2\n\
+    \    created: '2026-06-24T16:49:36.479337737Z'\n    description: Helm chart for\
+    \ istio ztunnel components\n    digest: 0c29e85e6df6240412f1b541804f8c750299ffacd2b1f0893ca870811f77865f\n\
+    \    icon: https://istio.io/latest/favicons/android-192x192.png\n    keywords:\n\
+    \    - istio-ztunnel\n    - istio\n    name: ztunnel\n    sources:\n    - https://github.com/istio/istio\n\
+    \    urls:\n    - http://istio-release.storage.googleapis.com/charts/ztunnel-1.30.2.tgz\n\
+    \    version: 1.30.2\n"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: helm-index
+  namespace: flux-system
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helm-index
+  namespace: flux-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helm-index
+  template:
+    metadata:
+      labels:
+        app: helm-index
+        istio.io/dataplane-mode: ambient
+    spec:
+      serviceAccountName: helm-index
+      automountServiceAccountToken: false
+      containers:
+      - name: index
+        image: busybox:1.37.0
+        command:
+        - httpd
+        - -f
+        - -p
+        - '8080'
+        - -h
+        - /charts
+        ports:
+        - containerPort: 8080
+          name: http
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+          readOnlyRootFilesystem: true
+        resources:
+          requests:
+            cpu: 5m
+            memory: 8Mi
+          limits:
+            memory: 32Mi
+        volumeMounts:
+        - name: index
+          mountPath: /charts
+          readOnly: true
+      volumes:
+      - name: index
+        configMap:
+          name: helm-index
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helm-index
+  namespace: flux-system
+spec:
+  selector:
+    app: helm-index
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080

@@ -271,6 +271,13 @@ spec:
     - ports:
       - port: '15008'
         protocol: TCP
+  # Ztunnel performs local delivery after authenticating and authorizing callers.
+  - fromCIDR:
+    - 169.254.7.127/32
+    toPorts:
+    - ports:
+      - port: '8080'
+        protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

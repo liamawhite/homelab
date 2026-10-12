@@ -2,7 +2,7 @@
 
 This first architecture lesson covers how Cilium controls pod traffic using source,
 destination, protocol, and port. The agreed security model is recorded in
-[ADR 0006](../adr/0006-explicit-l4-network-access.md). Istio is also deployed; its architecture is reserved for a later learning milestone.
+[ADR 0006](../adr/0006-explicit-l4-network-access.md). Istio is also deployed; its registered TLS egress boundary is described below.
 Admission controls are deferred to [issue #26](https://github.com/liamawhite/homelab/issues/26).
 
 ## Default deny
@@ -15,7 +15,7 @@ would weaken this baseline.
 The baseline is `homelab-default-deny` in
 [`network.yaml`](../../clusters/homelab/security/network.yaml). Its empty endpoint
 selector selects all managed pod endpoints; both `enableDefaultDeny.ingress` and
-`enableDefaultDeny.egress` are true. Its empty ingress/egress lists grant nothing.
+`enableDefaultDeny.egress` are true. Its nonempty ingress/egress rules select Cilium’s `none` entity, which matches no real peer. Empty lists were rejected by the deployed Cilium version; the corrected form was validated live.
 The baseline is protected from accidental Flux pruning.
 
 ```mermaid
@@ -134,3 +134,25 @@ RBAC still applies, but L4 rules alone do not prevent a sufficiently authorized
 API identity from changing policy or deploying a host-network/privileged workload.
 The removal PR requires the documented migration before previously deployed
 admission controls are retired.
+
+## Registered TLS egress gateway
+
+[ADR 0008](../adr/0008-require-gateway-for-pod-internet-egress.md) requires all ordinary-pod internet connections, including Flux and Tailscale, to traverse the shared egress waypoint. Only explicitly registered destinations are allowed, and the gateway originates external TLS with certificate validation. External TCP 80 and client TLS passthrough are denied. Service registration and `REGISTRY_ONLY` are not an ambient security boundary by themselves; Cilium and gateway authorization enforce the paths.
+
+```mermaid
+flowchart LR
+    Flux["Ambient Flux source-controller"] --> Path["Cilium: approved HBONE 15008"]
+    Path --> Gateway["Shared egress waypoint"]
+    Gateway --> Auth["Source identity, registered origin, approved HTTP path"]
+    Auth --> TLS["TLS 443: SNI and server certificate validation"]
+    TLS --> Origin["Git and pinned chart origin"]
+    Flux -. "No direct internet grant" .-> Denied["Cilium denies bypass"]
+```
+
+Flux Git and chart URLs use HTTP carried through mesh mTLS. A pinned internal Istio index preserves upstream digests while replacing absolute HTTPS chart URLs with HTTP origins for gateway TLS origination. Bootstrap establishes this path before source-controller starts. The source-controller’s old direct-download exception is removed; only the gateway has FQDN-scoped external TCP 443 grants.
+
+Ambient local delivery and probes use `169.254.7.127`; Cilium grants that exact source only on required receiver ports. Ztunnel authorization still controls authenticated application requests. Istio Envoy access logs emit JSON on `/dev/stdout`, while ztunnel retains its own connection logs.
+
+Live verification covered a fresh Flux Git clone (including upload-pack POST), all pinned Cilium/Istio charts, exact upstream SNI/certificate validation, denied identities/paths/unregistered destinations/direct 80/443 bypass, and gateway outage/recovery. All active foundation controllers and Helm releases are healthy. Root and four foundation Kustomizations are held pending review/merge of the staged definitions; Tailscale remains blocked pending mandatory TLS-origination compatibility. See the [migration notes](../tailscale-migration.md).
+
+Global admission enforcement remains deferred to issue #26. The explicitly requested restricted Tailscale namespace and proxy security contexts remain scoped to that migration; this change does not reinstate the older global admission policies. Node and host-network isolation remain externally managed.

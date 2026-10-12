@@ -75,6 +75,7 @@
           - deny_baseline.resources | length == 1
           - deny_baseline.resources[0].spec.enableDefaultDeny.ingress
           - deny_baseline.resources[0].spec.enableDefaultDeny.egress
+          - deny_baseline.resources[0].status.conditions | selectattr('type', 'equalto', 'Valid') | selectattr('status', 'equalto', 'True') | list | length == 1
 
     - name: Check that the public denial target is reachable from the operator
       ansible.builtin.wait_for:

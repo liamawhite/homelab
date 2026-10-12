@@ -42,7 +42,16 @@
   register: mesh_rendered
   changed_when: false
 
-- name: Apply default-deny identity authorization and dormant egress waypoint
+- name: Create the shared Flux namespace for the pinned chart index before controllers start
+  kubernetes.core.k8s:
+    kubeconfig: '{{ api_kubeconfig }}'
+    definition: "{{ lookup('ansible.builtin.file', cluster_dir + '/flux-system/gotk-components.yaml') | from_yaml_all | selectattr('kind', 'equalto', 'Namespace') | list }}"
+    apply: true
+    server_side_apply:
+      field_manager: homelab-bootstrap
+      force_conflicts: '{{ allow_addon_recovery | bool }}'
+
+- name: Apply default-deny identity authorization and the registered TLS egress path
   kubernetes.core.k8s:
     kubeconfig: "{{ api_kubeconfig }}"
     definition: "{{ mesh_rendered.stdout | from_yaml_all | list }}"
@@ -50,3 +59,13 @@
     server_side_apply:
       field_manager: homelab-bootstrap
       force_conflicts: "{{ allow_addon_recovery | bool }}"
+
+- name: Wait for the shared egress waypoint before starting Flux downloads
+  ansible.builtin.command:
+    argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, istio-egress, rollout, status, deployment/egress, --timeout=180s]
+  changed_when: false
+
+- name: Wait for the pinned internal Helm index before starting Flux downloads
+  ansible.builtin.command:
+    argv: [kubectl, "--kubeconfig={{ api_kubeconfig }}", -n, flux-system, rollout, status, deployment/helm-index, --timeout=180s]
+  changed_when: false

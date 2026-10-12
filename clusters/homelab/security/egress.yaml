@@ -1,0 +1,198 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-flux-egress-gateway
+spec:
+  description: Flux source-controller reaches only the shared egress waypoint for
+    internet downloads.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-egress
+        k8s:io.cilium.k8s.policy.serviceaccount: egress
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-egress-gateway-flux
+spec:
+  description: The shared egress waypoint accepts Flux source-controller HBONE.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:io.cilium.k8s.policy.serviceaccount: egress
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-egress-gateway-downloads
+spec:
+  description: Only the egress waypoint reaches approved download origins with TLS
+    on TCP 443.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:io.cilium.k8s.policy.serviceaccount: egress
+  egress:
+  - toFQDNs:
+    - matchName: github.com
+    - matchName: helm.cilium.io
+    - matchName: istio-release.storage.googleapis.com
+    toPorts:
+    - ports:
+      - port: '443'
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+        k8s:k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: '53'
+        protocol: UDP
+      - port: '53'
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: '*'
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-source-chart-index
+spec:
+  description: Flux source-controller reads the pinned internal Helm index through
+    ambient mTLS.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: helm-index
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-chart-index-source
+spec:
+  description: Flux source-controller reads the pinned internal Helm index through
+    ambient mTLS.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: helm-index
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-system
+        k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-ambient-local-source-controller
+spec:
+  description: Authenticated artifact traffic after ambient local delivery. Link-local
+    source is the node ambient delivery path, not internet ingress.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: source-controller
+  ingress:
+  - fromCIDR:
+    - 169.254.7.127/32
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-ambient-local-notification-controller
+spec:
+  description: Authenticated events after ambient local delivery. Link-local source
+    is the node ambient delivery path, not internet ingress.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: notification-controller
+  ingress:
+  - fromCIDR:
+    - 169.254.7.127/32
+    toPorts:
+    - ports:
+      - port: '9090'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-ambient-local-helm-index
+spec:
+  description: Authenticated pinned-index reads after ambient local delivery. Link-local
+    source is the node ambient delivery path, not internet ingress.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+      k8s:io.cilium.k8s.policy.serviceaccount: helm-index
+  ingress:
+  - fromCIDR:
+    - 169.254.7.127/32
+    toPorts:
+    - ports:
+      - port: '8080'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-ambient-flux-probes
+spec:
+  description: Kubelet health probes arrive with the ambient probe SNAT address.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: flux-system
+    matchExpressions:
+    - key: k8s:io.cilium.k8s.policy.serviceaccount
+      operator: In
+      values:
+      - source-controller
+      - helm-controller
+      - kustomize-controller
+      - notification-controller
+  ingress:
+  - fromCIDR:
+    - 169.254.7.127/32
+    toPorts:
+    - ports:
+      - port: '9440'
+        protocol: TCP

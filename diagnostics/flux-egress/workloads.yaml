@@ -1,0 +1,299 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-egress-verification
+  labels:
+    istio.io/dataplane-mode: ambient
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.36
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: flux-egress-verification
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress: []
+  egress: []
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: client
+  namespace: flux-egress-verification
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client
+  namespace: flux-egress-verification
+  labels:
+    app: client
+    homelab.local/dns: allowed
+spec:
+  serviceAccountName: client
+  automountServiceAccountToken: false
+  nodeName: pi-1
+  containers:
+  - name: curl
+    image: curlimages/curl:8.16.0
+    command:
+    - sleep
+    - '3600'
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      seccompProfile:
+        type: RuntimeDefault
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: client-waypoint
+  namespace: flux-egress-verification
+spec:
+  description: Temporary HBONE path; the intruder deliberately has transport but no
+    gateway authorization.
+  endpointSelector:
+    matchLabels:
+      k8s:io.cilium.k8s.policy.serviceaccount: client
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-egress
+        k8s:io.cilium.k8s.policy.serviceaccount: egress
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: intruder
+  namespace: flux-egress-verification
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: intruder
+  namespace: flux-egress-verification
+  labels:
+    app: intruder
+    homelab.local/dns: allowed
+spec:
+  serviceAccountName: intruder
+  automountServiceAccountToken: false
+  nodeName: pi-1
+  containers:
+  - name: curl
+    image: curlimages/curl:8.16.0
+    command:
+    - sleep
+    - '3600'
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      seccompProfile:
+        type: RuntimeDefault
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: intruder-waypoint
+  namespace: flux-egress-verification
+spec:
+  description: Temporary HBONE path; the intruder deliberately has transport but no
+    gateway authorization.
+  endpointSelector:
+    matchLabels:
+      k8s:io.cilium.k8s.policy.serviceaccount: intruder
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-egress
+        k8s:io.cilium.k8s.policy.serviceaccount: egress
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: homelab-egress-verification-ingress
+spec:
+  description: Temporary verification clients reach gateway HBONE.
+  endpointSelector:
+    matchLabels:
+      k8s:io.kubernetes.pod.namespace: istio-egress
+      k8s:io.cilium.k8s.policy.serviceaccount: egress
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-egress-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: client
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: flux-egress-verification
+        k8s:io.cilium.k8s.policy.serviceaccount: intruder
+    toPorts:
+    - ports:
+      - port: '15008'
+        protocol: TCP
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: verify-allow-flux-github
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: github
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - github.com
+        - github.com:80
+        methods:
+        - GET
+        paths:
+        - /liamawhite/homelab.git/info/refs
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - github.com
+        - github.com:80
+        methods:
+        - POST
+        paths:
+        - /liamawhite/homelab.git/git-upload-pack
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: verify-allow-flux-cilium-charts
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: cilium-charts
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - helm.cilium.io
+        - helm.cilium.io:80
+        methods:
+        - GET
+        paths:
+        - /index.yaml
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - helm.cilium.io
+        - helm.cilium.io:80
+        methods:
+        - GET
+        paths:
+        - /cilium-1.19.5.tgz
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: verify-allow-flux-istio-charts
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: istio-charts
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/base-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/istiod-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/cni-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-egress-verification/sa/client
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/ztunnel-1.30.2.tgz
