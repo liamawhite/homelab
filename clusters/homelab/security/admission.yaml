@@ -79,7 +79,10 @@ spec:
       in [''system:admin'', ''system:serviceaccount:flux-system:kustomize-controller'',
       ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
       in [''system:kube-apiserver'', ''system:serviceaccount:kube-system:k3s-server'',
-      ''system:serviceaccount:istio-system:istiod'']'
+      ''system:serviceaccount:istio-system:istiod''] || (request.operation == ''DELETE''
+      && request.userInfo.username == ''system:serviceaccount:kube-system:namespace-controller''
+      && request.namespace != '''' && namespaceObject != null
+      && has(namespaceObject.metadata.deletionTimestamp))'
     message: Security configuration is owned by trusted administration and deployment
       identities.
 ---
@@ -143,8 +146,21 @@ spec:
       ''system:serviceaccount:flux-system:helm-controller''] || request.userInfo.username
       in [''system:kube-controller-manager'', ''system:kube-scheduler'', ''system:serviceaccount:istio-system:istiod'',
       ''system:serviceaccount:kube-system:local-path-provisioner-service-account'']
+      || request.userInfo.username in [''system:serviceaccount:kube-system:deployment-controller'',
+      ''system:serviceaccount:kube-system:replicaset-controller'',
+      ''system:serviceaccount:kube-system:statefulset-controller'',
+      ''system:serviceaccount:kube-system:daemon-set-controller'',
+      ''system:serviceaccount:kube-system:job-controller'',
+      ''system:serviceaccount:kube-system:cronjob-controller'',
+      ''system:serviceaccount:kube-system:replication-controller'',
+      ''system:serviceaccount:kube-system:service-account-controller'']
       || request.userInfo.username.startsWith(''system:node:'') || request.userInfo.username
-      == ''system:serviceaccount:istio-system:istio-cni'''
+      == ''system:serviceaccount:istio-system:istio-cni'' || (request.userInfo.username
+      == ''system:serviceaccount:tailscale:operator'' && request.namespace == ''tailscale''
+      && object.metadata.name.startsWith(''ts-'') && ((request.resource.group == ''apps''
+      && request.resource.resource == ''statefulsets'' && object.spec.template.spec.serviceAccountName
+      == ''proxies'') || (request.resource.group == '''' && request.resource.resource
+      == ''pods'' && object.spec.serviceAccountName == ''proxies'')))'
     message: Applications cannot create or modify workloads or security-relevant identities.
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -217,6 +233,10 @@ spec:
       - pods
   validations:
   - expression: request.namespace in ['kube-system','istio-system','flux-system']
+      || (request.namespace == 'istio-egress' && object.spec.serviceAccountName == 'egress'
+      && has(object.metadata.labels) && 'gateway.networking.k8s.io/gateway-name'
+      in object.metadata.labels && object.metadata.labels['gateway.networking.k8s.io/gateway-name']
+      == 'egress')
       || ((!has(object.metadata.labels) || !('istio.io/dataplane-mode' in object.metadata.labels)
       || object.metadata.labels['istio.io/dataplane-mode'] == 'ambient') && (!has(object.metadata.annotations)
       || !('ambient.istio.io/redirection' in object.metadata.annotations) || object.metadata.annotations['ambient.istio.io/redirection']

@@ -16,13 +16,13 @@ run() { uv run --project "$repo_root/ansible" --locked "$@"; }
 
 case "$task" in
   help)
-    echo 'Usage: scripts/homelab {bootstrap|phase1|phase2|upgrade|recover|verify|failover|security|check|prepare-nixos|kubeconfig} [arguments]'
+    echo 'Usage: scripts/homelab {bootstrap|phase1|phase2|upgrade|recover|verify|failover|security|check|prepare-nixos|kubeconfig|tailscale-secrets} [arguments]'
     exit 0
     ;;
   check)
     run python "$repo_root/ansible/tools/check_definitions.py"
     ;;
-  bootstrap|phase1|phase2|upgrade|recover|verify|failover|security|prepare-nixos|kubeconfig) ;;
+  bootstrap|phase1|phase2|upgrade|recover|verify|failover|security|prepare-nixos|kubeconfig|tailscale-secrets) ;;
   *) echo "Unknown command: $task" >&2; exit 2 ;;
 esac
 
@@ -38,7 +38,7 @@ then
   run ansible-galaxy collection install -r "$repo_root/ansible/requirements.yml" -p "$ANSIBLE_COLLECTIONS_PATH" --force
 fi
 if [[ "$task" == check ]]; then
-  for playbook in site upgrade recover verify failover security prepare-nixos kubeconfig; do
+  for playbook in site upgrade recover verify failover security prepare-nixos kubeconfig tailscale-secrets; do
     run ansible-playbook "$repo_root/ansible/playbooks/$playbook.yml" --syntax-check
   done
   exit 0

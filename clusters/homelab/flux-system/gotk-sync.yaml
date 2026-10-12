@@ -5,7 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  url: https://github.com/liamawhite/homelab.git
+  # HTTP is carried by mesh mTLS; the egress waypoint originates external TLS.
+  url: http://github.com/liamawhite/homelab.git
   ref:
     branch: main
 ---

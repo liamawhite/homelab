@@ -2,7 +2,7 @@
 
 ## Deployment status
 
-These diagrams describe the model agreed in [ADR 0006](../adr/0006-explicit-l4-network-access.md) and the configuration in this PR. **The live cluster has not been migrated.** Inspection found Cilium and Flux running, Flux's stock broad network grants, and no Istio installation. Dry runs and manifest checks validate configuration; they do not prove live enforcement.
+These diagrams describe [ADR 0006](../adr/0006-explicit-l4-network-access.md) and the stricter internet boundary in [ADR 0008](../adr/0008-require-gateway-for-pod-internet-egress.md). The live cluster now has valid Cilium default deny, Istio ambient, and admission enforcement. Flux Git and pinned chart downloads have been verified through the TLS-originating egress waypoint, including denied direct bypass and waypoint outage/recovery. Tailscale remains blocked pending compatibility with mandatory TLS origination. Root and foundation reconciliation are temporarily suspended until these locally staged definitions are reviewed and merged.
 
 Node and host-network isolation is managed by the homelab owner through external local-network controls. This repository does not configure node firewalls or administrator CIDR allowlists. Cilium still restricts pod access to node services.
 
@@ -14,8 +14,10 @@ flowchart LR
     Nodes --> Cilium["Cilium pod networking"]
     Flux["Flux"] --> Cilium
     Flux --> VIP["kube-vip"]
-    Flux --> Controllers["Flux controllers with stock broad network grants"]
-    Pending["Pending migration: pod deny baseline, Istio ambient, admission guards"]
+    Flux --> Controllers["Ambient Flux controllers"]
+    Controllers --> Egress["Shared egress waypoint: registered destinations and TLS origination"]
+    Egress --> Origins["Git and pinned chart origins: TLS 443"]
+    Pending["Tailscale staged with traffic blocked"]
 ```
 
 ## Ownership after migration
@@ -78,7 +80,7 @@ A service without a waypoint still needs ztunnel authorization. A service whose 
 
 ## Internet, LAN, and DNS
 
-Application internet egress defaults deny at L4. The shared egress waypoint starts with no permitted external destinations. Adding an internet dependency requires a workload-to-waypoint path, an external service definition, per-workload destination authorization, and a waypoint-to-destination network grant.
+All ordinary-pod internet egress defaults deny at L4 and must traverse the shared egress waypoint. Adding an internet dependency requires a workload-to-waypoint path, an external service definition, per-workload destination authorization, a waypoint-to-destination network grant, and external TLS origination with certificate validation. Client HTTP is carried through mesh mTLS to the waypoint; external TCP 80 and client TLS passthrough are not allowed. Registration alone and Istio's `REGISTRY_ONLY` setting are not an ambient security boundary; Cilium and gateway authorization enforce it.
 
 ```mermaid
 flowchart LR
@@ -99,7 +101,11 @@ flowchart LR
 
 Resolver-path restrictions do not prevent DNS exfiltration through arbitrary names queried via the approved resolver. Name filtering is separate. Internet protocols unsupported by the mesh remain denied unless a controlled proxy or specific infrastructure exception is approved.
 
-Flux's source-controller has a named non-mesh bootstrap exception for Git and the pinned chart repositories. It does not grant application internet access. Node image/package downloads and host-network egress are outside these pod policies and depend on the externally managed node isolation.
+Flux controllers are ambient-enrolled. The source-controller can request only the homelab Git discovery/upload-pack paths and approved pinned chart paths through ServiceEntry authorization. Its former direct-download exception is removed. A small internal index retains upstream Istio chart digests but supplies HTTP download URLs so absolute upstream HTTPS URLs cannot bypass mesh TLS origination. Istio Envoy access logs are JSON on `/dev/stdout`; ztunnel retains its own connection logs.
+
+Ambient local delivery and probes use `169.254.7.127`; Cilium grants that exact source only on the required receiver ports. Ztunnel authorization still controls authenticated application requests. Admission trusts exact built-in K3s workload-controller identities, and permits namespace-controller security-resource deletion only while the owning namespace is already deleting.
+
+Node image/package downloads, host-network egress, and operator-side bootstrap chart downloads remain outside these pod policies and depend on externally managed isolation. Bootstrap establishes the gateway, registered origins, and internal index before Flux starts downloading.
 
 ## Bootstrap and recovery
 

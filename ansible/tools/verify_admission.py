@@ -7,9 +7,10 @@ import subprocess
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--kubeconfig',required=True)
+    parser.add_argument('--namespace',default='homelab-verification')
     args=parser.parse_args()
     command=['kubectl','--kubeconfig='+args.kubeconfig]
-    namespace='homelab-verification'
+    namespace=args.namespace
     identity='homelab-admission-test'
     created=[]
     def apply(document):
@@ -31,8 +32,14 @@ def main():
         reject(pod,'Application pods cannot disable ambient capture')
         del pod['metadata']['annotations']
         pod['spec']['containers'][0]['securityContext']['privileged']=True
+        # Keep the request API-valid so rejection actually exercises Pod Security.
+        del pod['spec']['containers'][0]['securityContext']['allowPrivilegeEscalation']
         reject(pod,'violates PodSecurity')
         reject({'apiVersion':'v1','kind':'Namespace','metadata':{'name':'homelab-admission-negative'}},'Application namespaces require restricted Pod Security and ambient enrollment')
+        cleanup_policy={'apiVersion':'cilium.io/v2','kind':'CiliumNetworkPolicy','metadata':{'name':'admission-cleanup-test','namespace':namespace},'spec':{'endpointSelector':{'matchLabels':{'app':'never-selected-admission-test'}},'egress':[{'toEntities':['none']}]}}
+        apply(cleanup_policy)
+        result=subprocess.run(command+['--as=system:serviceaccount:kube-system:namespace-controller','delete','--dry-run=server','-f','-'],input=json.dumps(cleanup_policy),text=True,capture_output=True)
+        assert result.returncode != 0 and 'Security configuration is owned' in result.stderr, result.stderr
         print('Admission denied workload/identity self-grants, policy self-grants, ambient opt-out, privileged containers, and insecure namespace creation')
     finally:
         for document in reversed(created):

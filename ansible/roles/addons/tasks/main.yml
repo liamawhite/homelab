@@ -66,7 +66,9 @@
         name: "{{ cilium_release.spec.releaseName }}"
         release_namespace: "{{ cilium_release.spec.storageNamespace }}"
         chart_ref: "{{ cilium_release.spec.chart.spec.chart }}"
-        chart_repo_url: "{{ cilium_repository.spec.url }}"
+        # The controller uses HTTP through mesh TLS origination; local bootstrap
+        # downloads directly over HTTPS before that gateway exists.
+        chart_repo_url: "{{ cilium_repository.spec.url | regex_replace('^http:', 'https:') }}"
         chart_version: "{{ cilium_release.spec.chart.spec.version }}"
         release_values: "{{ cilium_release.spec['values'] }}"
         reset_values: true
@@ -101,7 +103,7 @@
             argv: >-
               {{ ['helm', '--kubeconfig=' + api_kubeconfig, 'upgrade', '--install',
                   cilium_release.spec.releaseName, cilium_release.spec.chart.spec.chart,
-                  '--repo', cilium_repository.spec.url,
+                  '--repo', cilium_repository.spec.url | regex_replace('^http:', 'https:'),
                   '--version', cilium_release.spec.chart.spec.version,
                   '--namespace', cilium_release.spec.storageNamespace,
                   '--reset-values', '--values', repair_values.path,

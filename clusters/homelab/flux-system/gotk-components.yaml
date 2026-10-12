@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/version: v2.9.6
     pod-security.kubernetes.io/warn: restricted
     pod-security.kubernetes.io/warn-version: latest
+    istio.io/dataplane-mode: ambient
   name: flux-system
 ---
 apiVersion: v1

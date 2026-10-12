@@ -362,8 +362,8 @@ record and the unresolved Nix server reboot issue.
 
 The target and ownership boundaries are illustrated in
 [the network security architecture](architecture/network-security.md). This change
-has not yet been applied to the running cluster; the earlier verification history
-predates network enforcement.
+is now enforced in the running cluster. See `docs/tailscale-migration.md` for the
+current gateway rollout, verification evidence, and held reconciliation.
 
 Node and host-network isolation is managed through the homelab owner's external
 local-network controls. This change adds no node firewall, administrator CIDR

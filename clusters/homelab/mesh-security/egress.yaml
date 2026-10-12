@@ -1,0 +1,253 @@
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: github
+  namespace: istio-egress
+  labels:
+    istio.io/use-waypoint: egress
+spec:
+  hosts:
+  - github.com
+  location: MESH_EXTERNAL
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+    targetPort: 443
+  resolution: DNS
+  exportTo:
+  - '*'
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: github-tls
+  namespace: istio-egress
+spec:
+  host: github.com
+  exportTo:
+  - '*'
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+      sni: github.com
+      subjectAltNames:
+      - github.com
+      insecureSkipVerify: false
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-flux-github
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: github
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - github.com
+        - github.com:80
+        methods:
+        - GET
+        paths:
+        - /liamawhite/homelab.git/info/refs
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - github.com
+        - github.com:80
+        methods:
+        - POST
+        paths:
+        - /liamawhite/homelab.git/git-upload-pack
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: cilium-charts
+  namespace: istio-egress
+  labels:
+    istio.io/use-waypoint: egress
+spec:
+  hosts:
+  - helm.cilium.io
+  location: MESH_EXTERNAL
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+    targetPort: 443
+  resolution: DNS
+  exportTo:
+  - '*'
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: cilium-charts-tls
+  namespace: istio-egress
+spec:
+  host: helm.cilium.io
+  exportTo:
+  - '*'
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+      sni: helm.cilium.io
+      subjectAltNames:
+      - helm.cilium.io
+      insecureSkipVerify: false
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-flux-cilium-charts
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: cilium-charts
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - helm.cilium.io
+        - helm.cilium.io:80
+        methods:
+        - GET
+        paths:
+        - /index.yaml
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - helm.cilium.io
+        - helm.cilium.io:80
+        methods:
+        - GET
+        paths:
+        - /cilium-1.19.5.tgz
+---
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: istio-charts
+  namespace: istio-egress
+  labels:
+    istio.io/use-waypoint: egress
+spec:
+  hosts:
+  - istio-release.storage.googleapis.com
+  location: MESH_EXTERNAL
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+    targetPort: 443
+  resolution: DNS
+  exportTo:
+  - '*'
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: istio-charts-tls
+  namespace: istio-egress
+spec:
+  host: istio-release.storage.googleapis.com
+  exportTo:
+  - '*'
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+      sni: istio-release.storage.googleapis.com
+      subjectAltNames:
+      - istio-release.storage.googleapis.com
+      insecureSkipVerify: false
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-flux-istio-charts
+  namespace: istio-egress
+spec:
+  targetRefs:
+  - group: networking.istio.io
+    kind: ServiceEntry
+    name: istio-charts
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/base-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/istiod-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/cni-1.30.2.tgz
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/flux-system/sa/source-controller
+    to:
+    - operation:
+        hosts:
+        - istio-release.storage.googleapis.com
+        - istio-release.storage.googleapis.com:80
+        methods:
+        - GET
+        paths:
+        - /charts/ztunnel-1.30.2.tgz

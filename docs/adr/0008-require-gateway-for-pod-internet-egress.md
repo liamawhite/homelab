@@ -1,0 +1,5 @@
+# Require gateway traversal and TLS origination for pod internet egress
+
+All internet-bound connections from ordinary pods, including Flux and Tailscale, must pass through the shared egress gateway, which originates external TLS and permits only explicitly registered destinations. Remove direct pod internet grants once the gateway path is verified; block external TCP 80 and direct gateway bypass, and fail closed when the gateway is unavailable. Existing client TLS passthrough is insufficient: clients that cannot use gateway TLS origination require adaptation before their internet access can be enabled.
+
+Explicit internal-cluster and LAN permissions remain separate, and node processes and host-network workloads retain the externally managed boundary from ADR 0006. This supersedes the direct Flux Git/chart download exception; bootstrap and recovery must establish a working gateway path independently of Flux's ability to fetch its own definitions. Service registration alone does not establish the security boundary: Cilium and gateway authorization must enforce the allowed paths and destinations.

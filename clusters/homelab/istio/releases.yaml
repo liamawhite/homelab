@@ -13,7 +13,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  url: https://istio-release.storage.googleapis.com/charts
+  # Pinned index rewrites absolute HTTPS chart URLs for mesh TLS origination.
+  url: http://helm-index.flux-system.svc.cluster.local:8080
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -76,6 +77,9 @@ spec:
     mode: enabled
   values:
     profile: ambient
+    meshConfig:
+      accessLogFile: /dev/stdout
+      accessLogEncoding: JSON
     pilot:
       env:
         PILOT_ENABLE_AMBIENT_WAYPOINTS: 'true'

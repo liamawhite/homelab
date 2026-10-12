@@ -1,0 +1,11 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: tailscale
+  namespace: flux-system
+spec:
+  # Held until Tailscale can satisfy mandatory gateway TLS origination.
+  suspend: true
+  interval: 1h
+  timeout: 30s
+  url: https://pkgs.tailscale.com/helmcharts
